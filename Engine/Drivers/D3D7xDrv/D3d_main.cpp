@@ -3,6 +3,32 @@
 /*                                                                                      */
 /*  Author: John Pollard                                                                */
 /*  Description: DD/D3D wrapper                                                         */
+/*   TODO: Gamma table OK but is done is software not using dx7,                        */
+/*         implement gamma/color correction in dx7                                      */
+/*   TODO: Understand lightmap generation a little better                               */
+/*   TODO: a lot of createthandle calls were made for a level with 1 texture... why?    */
+/*         check and make sure textures are only sent once...                           */
+/*   01/13/2003 Wendell Buckner
+/*     Use the geneis d3d api functions else there be problems
+/*   01/11/2003 Wendell Buckner                                                         */
+/*    Force to bpp to desktop bpp...                                                    */
+/*   01/11/2003 Wendell Buckner                                                         */
+/*    The driver did not take into account the ZBufferD and allways created a 16-bit    */
+/*    z-buffer                                                                          */
+/*   01/05/2003 Wendell Buckner
+/*    Set the memory to nulls so we can check against it later to see if it's available... */	
+/*   01/04/2003 Wendell Buckner                                                         */
+/*    This variable was never initialized?, I know I've done complete recompiles why    */
+/*    hasn't this shown up before?                                                      */
+/*   01/02/2003 Wendell Buckner                                                         */
+/*    Allow z buffer depths of 32 bits                                                  */
+/*   12/28/2002 Wendell Buckner                                                         */
+/*    16-bit for 16bit and ect... right now always assumes 8-bit                        */
+/*          32-bit alpha.                                                               */
+/*    Allow/make 32-bit (ARGB) mode the default mode...                                 */ 
+/*    This surface will be FORCED to 32-bit (ARGB) at the end of this routine if it is  */
+/*    available...                                                                      */
+/*    Give out the true 24-bit surface as well...                                       */
 /*   03/01/2002 Wendell Buckner	                                                        */
 /*    This wasn't commented in the original code but it was in my genesis 1.0 converted */
 /*    code...not sure I should do this.		                                            */ 
@@ -251,8 +277,14 @@ BOOL D3DMain_InitD3D(HWND hWnd, const char *DriverName, int32 Width, int32 Heigh
 		// Force Width/Height to client window area size
 		Width = AppInfo.OldWindowWidth;
 		Height = AppInfo.OldWindowHeight;
-		
+
+//IT APPEARS YOU MUST KEEP THE DESKTOP BPP INSTEAD OF TRYING TO SET IT TO SOMETHING ELSE...		
 		ATTEMPT(D3DMain_SetDisplayMode(hWnd, Width, Height, AppInfo.OldBpp, FALSE));
+
+/* 01/11/2003 Wendell Buckner
+    Force to bpp to desktop bpp... */
+        BPP32 =	AppInfo.OldBpp;
+
 	}
 	else
 	{
@@ -333,8 +365,12 @@ BOOL D3DMain_InitD3D(HWND hWnd, const char *DriverName, int32 Width, int32 Heigh
 	Also turning D3DRENDERSTATE_LOCALVIEWER to false saves transform cycles when exact specular highlights are not necessary.*/
     AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_LOCALVIEWER,FALSE); 
 
+/*  01/13/2003 Wendell Buckner
+     Use the geneis d3d api functions else there be problems 
 	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL);
-	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_GREATEREQUAL);
+	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_GREATEREQUAL);*/
+    D3DZFunc (D3DCMP_LESSEQUAL);
+    D3DZFunc (D3DCMP_GREATEREQUAL);
 
 	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, TRUE);
     AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_SPECULARENABLE, FALSE);
@@ -342,10 +378,10 @@ BOOL D3DMain_InitD3D(HWND hWnd, const char *DriverName, int32 Width, int32 Heigh
 	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_DITHERENABLE, TRUE);
 
 /* 12/06/2001 Wendell Buckner
-    ENHANCEMENT - Allow full-scene anti-aliasing 
+    ENHANCEMENT - Allow full-scene anti-aliasing  
     if ( AppInfo.Drivers[AppInfo.CurrentDriver].Desc.dpcLineCaps.dwRasterCaps & D3DPRASTERCAPS_ANTIALIASSORTINDEPENDENT )
 	{
- 	 D3DMain_Log("sort independent anti-aliasing available");
+ 	 D3DMain_Log("Sort independent anti-aliasing available\n");
      AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_ANTIALIAS,D3DANTIALIAS_SORTINDEPENDENT );
 	}*/
 
@@ -523,7 +559,7 @@ static HRESULT CALLBACK EnumDisplayModesCallback(LPDDSURFACEDESC2 pddsd, LPVOID 
 	if (!pddsd)
 		return DDENUMRET_OK;
 		
-	if (pddsd->dwWidth > 1280 || pddsd->dwHeight > 960)
+	if (pddsd->dwWidth > 1280 || pddsd->dwHeight > 1024)
 		return DDENUMRET_OK;
 
 	if (AppInfo.NumModes >= MAX_APP_MODES)
@@ -988,12 +1024,21 @@ static BOOL D3DMain_CreateViewPort(int w, int h)
 static HRESULT CALLBACK EnumTextureFormatsCallback(LPDDPIXELFORMAT lpddpfPixelFormat, LPVOID lpContext)
 {
 	DDMain_SurfFormat	*pTexFormat;
-	
+
+
 	if(!lpddpfPixelFormat)
 		return DDENUMRET_OK;
 
+	D3DMain_Log("EnumTextureFormatsCallback: %i, A:%x, R:%x, G:%x, B:%x Texture Support Found\n",	lpddpfPixelFormat->dwRGBBitCount, 
+																									lpddpfPixelFormat->dwRGBAlphaBitMask, 
+																									lpddpfPixelFormat->dwRBitMask, 
+																									lpddpfPixelFormat->dwGBitMask, 
+																									lpddpfPixelFormat->dwBBitMask);
+
+
 	if (AppInfo.NumTextureFormats+1 >= DDMAIN_MAX_TEXTURE_FORMATS )
 	{
+		D3DMain_Log("EnumTextureFormatsCallback:  Can't enumerate any more texture formats\n");	
 		return DDENUMRET_CANCEL;
 	}
 
@@ -1004,7 +1049,23 @@ static HRESULT CALLBACK EnumTextureFormatsCallback(LPDDPIXELFORMAT lpddpfPixelFo
 
 	if(lpddpfPixelFormat->dwFlags & DDPF_ALPHAPIXELS) 
 	{
-		if(lpddpfPixelFormat->dwRGBAlphaBitMask == 0x8000) 
+
+/* 12/28/2002 Wendell Buckner
+    Allow/make 32-bit (ARGB) mode the default mode... 
+		if(lpddpfPixelFormat->dwRGBAlphaBitMask == 0x8000)     */
+		if(lpddpfPixelFormat->dwRGBAlphaBitMask == 0xff000000) 
+		{
+			if(lpddpfPixelFormat->dwRBitMask != 0xff0000 || 
+				lpddpfPixelFormat->dwGBitMask != 0xff00 ||
+				lpddpfPixelFormat->dwBBitMask != 0xff)
+					return DDENUMRET_OK;
+				
+			pTexFormat->HasOneBitAlpha = FALSE;
+			pTexFormat->HasFourBitAlpha = FALSE;
+			pTexFormat->HasEightBitAlpha = TRUE;
+		}		
+
+		else if(lpddpfPixelFormat->dwRGBAlphaBitMask == 0x8000) 
 		{
 			if(lpddpfPixelFormat->dwRBitMask != 0x7c00 || 
 				lpddpfPixelFormat->dwGBitMask != 0x3e0 ||
@@ -1013,7 +1074,13 @@ static HRESULT CALLBACK EnumTextureFormatsCallback(LPDDPIXELFORMAT lpddpfPixelFo
 				
 			pTexFormat->HasOneBitAlpha = TRUE;
 			pTexFormat->HasFourBitAlpha = FALSE;
+
+/* 12/28/2002 Wendell Buckner
+    Allow/make 32-bit (ARGB) mode the default mode...  */
+			pTexFormat->HasEightBitAlpha = FALSE;
+
 		}
+
 		else if(lpddpfPixelFormat->dwRGBAlphaBitMask == 0xf000) 
 		{
 			if(lpddpfPixelFormat->dwRBitMask != 0xf00 || 
@@ -1023,11 +1090,22 @@ static HRESULT CALLBACK EnumTextureFormatsCallback(LPDDPIXELFORMAT lpddpfPixelFo
 
 			pTexFormat->HasOneBitAlpha = FALSE;
 			pTexFormat->HasFourBitAlpha = TRUE;
+
+/* 12/28/2002 Wendell Buckner
+    Allow/make 32-bit (ARGB) mode the default mode...  */
+			pTexFormat->HasEightBitAlpha = FALSE;
+
 		}
+
 		else
 		{
 			pTexFormat->HasOneBitAlpha = FALSE;
 			pTexFormat->HasFourBitAlpha = FALSE;
+
+/* 12/28/2002 Wendell Buckner
+    Allow/make 32-bit (ARGB) mode the default mode...  */
+			pTexFormat->HasEightBitAlpha = FALSE;
+
 		}
 	}
 	else 
@@ -1047,6 +1125,11 @@ static HRESULT CALLBACK EnumTextureFormatsCallback(LPDDPIXELFORMAT lpddpfPixelFo
 
 		pTexFormat->HasOneBitAlpha = FALSE;
 		pTexFormat->HasFourBitAlpha = FALSE;
+
+/* 12/28/2002 Wendell Buckner
+    Allow/make 32-bit (ARGB) mode the default mode...  */
+		pTexFormat->HasEightBitAlpha = FALSE;
+
 	}
 
 	// Record the PixelFormat of this texture
@@ -1103,8 +1186,20 @@ HRESULT WINAPI EnumSurfaceFormatsCallback(LPDIRECTDRAWSURFACE7 lpDDSurface, LPDD
 	if(!lpddpfPixelFormat)
 		return DDENUMRET_OK;
 
+	D3DMain_Log("EnumSurfaceFormatsCallback: %i, A:%x, R:%x, G:%x, B:%x Texture Support Found\n",	lpddpfPixelFormat->dwRGBBitCount, 
+																									lpddpfPixelFormat->dwRGBAlphaBitMask, 
+																									lpddpfPixelFormat->dwRBitMask, 
+																									lpddpfPixelFormat->dwGBitMask, 
+																									lpddpfPixelFormat->dwBBitMask);
+
+
+
+
 	if (AppInfo.NumSurfFormats+1 >= DDMAIN_MAX_SURFACE_FORMATS )
-		return DDENUMRET_CANCEL;
+	{
+	 D3DMain_Log("EnumSurfaceFormatsCallback:  Can't enumerate any more surface formats\n");	
+	 return DDENUMRET_CANCEL;
+    }
 
 	pSurfFormat = &AppInfo.SurfFormats[AppInfo.NumSurfFormats];
 
@@ -1113,7 +1208,24 @@ HRESULT WINAPI EnumSurfaceFormatsCallback(LPDIRECTDRAWSURFACE7 lpDDSurface, LPDD
 
 	if(lpddpfPixelFormat->dwFlags & DDPF_ALPHAPIXELS) 
 	{
-		if(lpddpfPixelFormat->dwRGBAlphaBitMask == 0x8000) 
+
+/* 12/28/2002 Wendell Buckner
+    Allow/make 32-bit (ARGB) mode the default mode... 
+		if(lpddpfPixelFormat->dwRGBAlphaBitMask == 0x8000)      */
+		if(lpddpfPixelFormat->dwRGBAlphaBitMask == 0xff000000) 
+		{
+			//8888
+			if(lpddpfPixelFormat->dwRBitMask != 0xff0000 || 
+				lpddpfPixelFormat->dwGBitMask != 0xff00 ||
+				lpddpfPixelFormat->dwBBitMask != 0xff)
+					return DDENUMRET_OK;
+				
+			pSurfFormat->HasOneBitAlpha = FALSE;
+			pSurfFormat->HasFourBitAlpha = FALSE;
+			pSurfFormat->HasEightBitAlpha = TRUE;
+		}	
+		
+		else if(lpddpfPixelFormat->dwRGBAlphaBitMask == 0x8000) 
 		{
 			// 1555
 			if(lpddpfPixelFormat->dwRBitMask != 0x7c00 || 
@@ -1123,7 +1235,12 @@ HRESULT WINAPI EnumSurfaceFormatsCallback(LPDIRECTDRAWSURFACE7 lpDDSurface, LPDD
 				
 			pSurfFormat->HasOneBitAlpha = TRUE;
 			pSurfFormat->HasFourBitAlpha = FALSE;
+
+/* 12/28/2002 Wendell Buckner
+    Allow/make 32-bit (ARGB) mode the default mode...  */
+			pSurfFormat->HasEightBitAlpha = FALSE;
 		}
+
 		else if(lpddpfPixelFormat->dwRGBAlphaBitMask == 0xf000) 
 		{
 			// 4444
@@ -1134,11 +1251,20 @@ HRESULT WINAPI EnumSurfaceFormatsCallback(LPDIRECTDRAWSURFACE7 lpDDSurface, LPDD
 
 			pSurfFormat->HasOneBitAlpha = FALSE;
 			pSurfFormat->HasFourBitAlpha = TRUE;
+
+/* 12/28/2002 Wendell Buckner
+    Allow/make 32-bit (ARGB) mode the default mode...  */
+			pSurfFormat->HasEightBitAlpha = FALSE;
 		}
+
 		else
 		{
 			pSurfFormat->HasOneBitAlpha = FALSE;
 			pSurfFormat->HasFourBitAlpha = FALSE;
+
+/* 12/28/2002 Wendell Buckner
+    Allow/make 32-bit (ARGB) mode the default mode...  */
+			pSurfFormat->HasEightBitAlpha = FALSE;
 		}
 	}
 	else 
@@ -1148,6 +1274,10 @@ HRESULT WINAPI EnumSurfaceFormatsCallback(LPDIRECTDRAWSURFACE7 lpDDSurface, LPDD
 
 		pSurfFormat->HasOneBitAlpha = FALSE;
 		pSurfFormat->HasFourBitAlpha = FALSE;
+
+/* 12/28/2002 Wendell Buckner
+    Allow/make 32-bit (ARGB) mode the default mode...  */
+		pSurfFormat->HasEightBitAlpha = FALSE;
 	}
 
 	// Record the PixelFormat of this texture
@@ -1190,6 +1320,8 @@ BOOL Main_EnumSurfaceFormats(void)
 static HRESULT WINAPI EnumZBufferFormatsCallback( DDPIXELFORMAT* pddpf,
                                                   VOID* pddpfDesired )
 {
+	unsigned long UserZBufferD = ZbufferD;
+
     if( NULL==pddpf || NULL==pddpfDesired )
         return D3DENUMRET_CANCEL;
 
@@ -1200,8 +1332,14 @@ static HRESULT WINAPI EnumZBufferFormatsCallback( DDPIXELFORMAT* pddpf,
     {
         memcpy( pddpfDesired, pddpf, sizeof(DDPIXELFORMAT) );
 
-		// We're happy with a 16-bit z-buffer. Otherwise, keep looking.
+// We're happy with a 16-bit z-buffer. Otherwise, keep looking.
+
+/* 01/11/2003 Wendell Buckner
+    The driver did not take into account the ZBufferD and allways created a 16-bit z- buffer 
 		if( pddpf->dwZBufferBitDepth == 16 )
+			return D3DENUMRET_CANCEL;        */
+
+		if( pddpf->dwZBufferBitDepth == UserZBufferD )
 			return D3DENUMRET_CANCEL;
     }
 
@@ -1328,13 +1466,13 @@ BOOL Main_ShowBackBuffer(void)
 /*	01/24/2002 Wendell Buckner
     Change flags for speed...		
 			LastError = AppInfo.lpFrontBuffer->Flip(AppInfo.lpBackBuffer, DDFLIP_WAIT);*/
-			LastError = AppInfo.lpFrontBuffer->Flip(AppInfo.lpBackBuffer, DDFLIP_DONOTWAIT | DDFLIP_NOVSYNC);
+			LastError = AppInfo.lpFrontBuffer->Flip(AppInfo.lpBackBuffer, DDFLIP_DONOTWAIT | DDFLIP_NOVSYNC );
 
 		#else
 /*	01/24/2002 Wendell Buckner
     Change flags for speed...		
 			LastError = AppInfo.lpFrontBuffer->Flip(AppInfo.lpBackBuffer, DDFLIP_NOVSYNC);*/
-			LastError = AppInfo.lpFrontBuffer->Flip(AppInfo.lpBackBuffer, DDFLIP_DONOTWAIT | DDFLIP_NOVSYNC);
+			LastError = AppInfo.lpFrontBuffer->Flip(AppInfo.lpBackBuffer, DDFLIP_DONOTWAIT | DDFLIP_NOVSYNC );
 		#endif
 		
 		if (LastError == DDERR_SURFACELOST) 
@@ -1436,7 +1574,6 @@ BOOL Main_ClearBackBuffer(BOOL Clear, BOOL ClearZ)
     sample code won't work with this value set to 0	*/
 	LastError = AppInfo.lpD3DDevice->Clear( 1, &Dummy, ClearFlags,  0,  1.0f, 0L );	
 	
-    
 	if (LastError != D3D_OK) 
 	{
 		D3DMain_Log("Viewport clear failed.\n  %s\n",
@@ -1574,6 +1711,10 @@ BOOL D3DMain_GetSurfaceFormats(void)
 {
 	int32		i;
 
+/* 12/28/2002 Wendell Buckner
+    Allow/make 32-bit (ARGB) mode the default mode...  */
+	BOOL HasEightBitAlpha = FALSE;
+
     D3DMain_Log("--- D3DMain_GetSurfaceFormats ---\n");
 	
 	if (!Main_EnumTextureFormats())
@@ -1587,6 +1728,11 @@ BOOL D3DMain_GetSurfaceFormats(void)
         D3DMain_Log("D3DMain_GetSurfaceFormats:  Main_EnumSurfaceFormats failed.\n");
 		return FALSE;
 	}
+
+/* 01/05/2003 Wendell Buckner
+    Set the memory to nulls so we can check against it later to see if it's available... */	
+    memset(&AppInfo.ddTexFormat24, 0, sizeof(DDSURFACEDESC2));
+	memset(&AppInfo.ddTexFormat32, 0, sizeof(DDSURFACEDESC2));
 
 #if 1
 	for(i = 0; i < AppInfo.NumSurfFormats; i++)
@@ -1616,7 +1762,9 @@ BOOL D3DMain_GetSurfaceFormats(void)
 		return FALSE;
 	#endif
 
-		
+/* 12/28/2002 Wendell Buckner
+    A 2-d surface is different than a 3d-surface, some cards don't support the same surfaces in 3-d as in 2-d, so don't force the 2-d
+    surface to be like the 3-d one*/
 		AppInfo.ddSurfFormat = AppInfo.SurfFormats[i].ddsd;
 
 		break;
@@ -1671,6 +1819,32 @@ BOOL D3DMain_GetSurfaceFormats(void)
 
 	// Now get the 3d surface formats
 
+/* 12/28/2002 Wendell Buckner
+    Allow/make 32-bit (ARGB) mode the default mode...  */
+    // Get 8888
+	for(i = 0; i < AppInfo.NumTextureFormats; i++)
+	{
+        if(AppInfo.TextureFormats[i].HasEightBitAlpha == TRUE) 
+		{
+            AppInfo.ddEightBitAlphaSurfFormat = AppInfo.TextureFormats[i].ddsd;
+
+/* 12/28/2002 Wendell Buckner
+    Allow/make 32-bit (ARGB) mode the default mode...   */
+			AppInfo.ddTexFormat32  = AppInfo.TextureFormats[i].ddsd;
+			HasEightBitAlpha = TRUE;
+            break;
+        }
+	}
+
+    if(i == AppInfo.NumTextureFormats) 
+	{
+		D3DMain_Log("D3DMain_GetSurfaceFormats:  Unable to find 8888 (32-bit) texture support.\n");
+
+/* 01/05/2003 Wendell Buckner 
+    Only abort if the base 16-bit texture/surface support doesn't exist...
+        return FALSE;*/
+    }
+
 	// Get 1555
 	for(i = 0; i < AppInfo.NumTextureFormats; i++)
 	{
@@ -1683,7 +1857,7 @@ BOOL D3DMain_GetSurfaceFormats(void)
 
     if(i == AppInfo.NumTextureFormats) 
 	{
-		D3DMain_Log("D3DMain_GetSurfaceFormats:  Unable to find 1555 texture support.\n");
+		D3DMain_Log("D3DMain_GetSurfaceFormats:  Unable to find 1555 (16-bit) texture support.\n");
         return FALSE;
     }
     
@@ -1699,14 +1873,20 @@ BOOL D3DMain_GetSurfaceFormats(void)
 
     if(i == AppInfo.NumTextureFormats) 
 	{
-		D3DMain_Log("D3DMain_GetSurfaceFormats:  Unable to find 4444 texture support.\n");
+		D3DMain_Log("D3DMain_GetSurfaceFormats:  Unable to find 4444 (16-bit) texture support.\n");
         return FALSE;
     }
 
-	// Get either 555, or 565.
+/* 12/28/2002 Wendell Buckner
+    Give out the true 24-bit surface as well...  */
+	// Get a 888
 	for(i = 0; i < AppInfo.NumTextureFormats; i++)
 	{
 		LPDDPIXELFORMAT lpddpfPixelFormat;
+
+/* 01/04/2003 Wendell Buckner
+    This variable was never initialized?, I know I've done complete recompiles why hasn't this shown up before? */
+        lpddpfPixelFormat = &AppInfo.TextureFormats[i].ddsd.ddpfPixelFormat;
 
         if(AppInfo.TextureFormats[i].HasOneBitAlpha == TRUE)
 			continue;
@@ -1714,7 +1894,102 @@ BOOL D3DMain_GetSurfaceFormats(void)
 		if (AppInfo.TextureFormats[i].HasFourBitAlpha == TRUE) 
 			continue;
 
-		lpddpfPixelFormat = &AppInfo.TextureFormats[i].ddsd.ddpfPixelFormat;
+		if (AppInfo.TextureFormats[i].HasEightBitAlpha == TRUE) 
+			continue;
+
+		// For now, force 3d textures with RGB only info to be either 565 or 555
+		// We could enum all formats and let the caller pick between several different RGB formats...
+		if (lpddpfPixelFormat->dwFlags & DDPF_ALPHAPIXELS)
+			continue;		// We don't want any surface that has alpha, just pure RGB...
+
+		if(lpddpfPixelFormat->dwRGBBitCount != 24) 
+			continue;
+
+		if(	(lpddpfPixelFormat->dwRBitMask != 0xff0000) ||
+			(lpddpfPixelFormat->dwGBitMask != 0xff00) ||
+			(lpddpfPixelFormat->dwBBitMask != 0xff))
+				continue;
+
+		AppInfo.ddTexFormat24 = AppInfo.TextureFormats[i].ddsd;
+
+		break;
+	}
+
+    if(i == AppInfo.NumTextureFormats) 
+	{
+		D3DMain_Log("D3DMain_GetSurfaceFormats:  Unable to find a 888 (24-bit) texture support.\n");
+
+/* 01/05/2003 Wendell Buckner 
+    Only abort if the base 16-bit texture/surface support doesn't exist...
+		return FALSE;*/
+    }
+
+/* 12/28/2002 Wendell Buckner
+    Give out the 24-bit surface as well...  (this is really 32-bit mode) */
+	// Get a X888
+	for(i = 0; i < AppInfo.NumTextureFormats; i++)
+	{
+		LPDDPIXELFORMAT lpddpfPixelFormat;
+
+/* 01/04/2003 Wendell Buckner
+    This variable was never initialized?, I know I've done complete recompiles why hasn't this shown up before? */
+        lpddpfPixelFormat = &AppInfo.TextureFormats[i].ddsd.ddpfPixelFormat;
+
+        if(AppInfo.TextureFormats[i].HasOneBitAlpha == TRUE)
+			continue;
+
+		if (AppInfo.TextureFormats[i].HasFourBitAlpha == TRUE) 
+			continue;
+
+		if (AppInfo.TextureFormats[i].HasEightBitAlpha == TRUE) 
+			continue;
+
+		// For now, force 3d textures with RGB only info to be either 565 or 555
+		// We could enum all formats and let the caller pick between several different RGB formats...
+		if (lpddpfPixelFormat->dwFlags & DDPF_ALPHAPIXELS)
+			continue;		// We don't want any surface that has alpha, just pure RGB...
+
+		if(lpddpfPixelFormat->dwRGBBitCount != 32) 
+			continue;
+
+		if(	(lpddpfPixelFormat->dwRBitMask != 0xff0000) ||
+			(lpddpfPixelFormat->dwGBitMask != 0xff00) ||
+			(lpddpfPixelFormat->dwBBitMask != 0xff) )
+				continue;
+
+		AppInfo.ddTexFormat24 = AppInfo.TextureFormats[i].ddsd;
+
+		break;
+	}
+
+    if(i == AppInfo.NumTextureFormats) 
+	{
+		D3DMain_Log("D3DMain_GetSurfaceFormats:  Unable to find a X888 (32-bit) texture support.\n");
+
+/* 01/05/2003 Wendell Buckner 
+    Only abort if the base 16-bit texture/surface support doesn't exist...
+		return FALSE;*/
+    }
+
+	// Get either 555, or 565.
+	for(i = 0; i < AppInfo.NumTextureFormats; i++)
+	{
+		LPDDPIXELFORMAT lpddpfPixelFormat;
+
+/* 01/04/2003 Wendell Buckner
+    This variable was never initialized?, I know I've done complete recompiles why hasn't this shown up before? */
+        lpddpfPixelFormat = &AppInfo.TextureFormats[i].ddsd.ddpfPixelFormat;
+
+        if(AppInfo.TextureFormats[i].HasOneBitAlpha == TRUE)
+			continue;
+
+		if (AppInfo.TextureFormats[i].HasFourBitAlpha == TRUE) 
+			continue;
+
+/* 12/28/2002 Wendell Buckner
+    Allow/make 32-bit (ARGB) mode the default mode...  */
+		if (AppInfo.TextureFormats[i].HasEightBitAlpha == TRUE) 
+			continue;
 
 		// For now, force 3d textures with RGB only info to be either 565 or 555
 		// We could enum all formats and let the caller pick between several different RGB formats...
@@ -1729,18 +2004,33 @@ BOOL D3DMain_GetSurfaceFormats(void)
 			(lpddpfPixelFormat->dwBBitMask != 0x1f))
 				continue;
 
-
+/* 12/28/2002 Wendell Buckner
+    This surface will be FORCED to 32-bit (ARGB) at the end of this routine if it is available...  */
 		// This is it
 		AppInfo.ddTexFormat = AppInfo.TextureFormats[i].ddsd;
+
+/* 12/28/2002 Wendell Buckner
+    Allow/make 32-bit (ARGB) mode the default mode...  */
+		AppInfo.ddTexFormat16 = AppInfo.TextureFormats[i].ddsd;
+
 		break;
 	}
 
     if(i == AppInfo.NumTextureFormats) 
 	{
-		D3DMain_Log("D3DMain_GetSurfaceFormats:  Unable to find 555 or 565 texture support.\n");
+		D3DMain_Log("D3DMain_GetSurfaceFormats:  Unable to find 555 or 565 (16-bit) texture support.\n");
 		return FALSE;
     }
 
+/* 12/28/2002 Wendell Buckner
+    A 2-d surface is different than a 3d-surface, some cards don't support the same surfaces in 3-d as in 2-d, so don't force the 2-d
+    surface to be like the 3-d one*/
+
+/* 12/28/2002 Wendell Buckner
+    Allow/make 32-bit (ARGB) mode the default mode...  */
+	if ( HasEightBitAlpha && (BPP32 == 32) ) AppInfo.ddTexFormat =  AppInfo.ddEightBitAlphaSurfFormat;
+
+	
 	Main_BuildRGBGammaTables(1.0f);
 	
 	return TRUE;
@@ -1951,6 +2241,30 @@ void Main_BuildRGBGammaTables(float Gamma)
 		AppInfo.Lut3.G[i] = (((uint32)Val >> G_Right) << G_Left) & PixelMask.G_Mask;
 		AppInfo.Lut3.B[i] = (((uint32)Val >> B_Right) << B_Left) & PixelMask.B_Mask;
 		AppInfo.Lut3.A[i] = (((uint32)  i >> A_Right) << A_Left) & PixelMask.A_Mask;
+	}
+
+/* 01/10/2002 Wendell Buckner
+     Add gamma table for true 32-bit alpha/color.... */
+	GetSurfacePixelMask(&AppInfo.ddEightBitAlphaSurfFormat, &PixelMask);
+	for (i=0; i< 256; i++)
+	{
+		// Get shift constants for current video mode/pixel format
+		R_Left = PixelMask.R_Shift;
+		G_Left = PixelMask.G_Shift;
+		B_Left = PixelMask.B_Shift;
+		A_Left = PixelMask.A_Shift;
+
+		R_Right = 8 - PixelMask.R_Width;
+		G_Right = 8 - PixelMask.G_Width;
+		B_Right = 8 - PixelMask.B_Width;
+		A_Right = 8 - PixelMask.A_Width;
+
+		Val = GammaTable[i];
+
+		AppInfo.Lut4.R[i] = (((uint32)Val >> R_Right) << R_Left) & PixelMask.R_Mask;
+		AppInfo.Lut4.G[i] = (((uint32)Val >> G_Right) << G_Left) & PixelMask.G_Mask;
+		AppInfo.Lut4.B[i] = (((uint32)Val >> B_Right) << B_Left) & PixelMask.B_Mask;
+		AppInfo.Lut4.A[i] = (((uint32)  i >> A_Right) << A_Left) & PixelMask.A_Mask;
 	}
 }
 
@@ -2228,8 +2542,18 @@ static BOOL D3DMain_PickDevice(void)
 
 		// Only choose drivers that can create the zbuffer we need
 // start 32 bit changes
+
 		// Get the Z buffer depth
-		if ( ZbufferD == 24)
+/* 01/02/2003 Wendell Buckner
+    Allow z buffer depths of 32 bits 
+		if ( ZbufferD == 24)*/
+		if ( ZbufferD == 32) 
+		{
+		// Only choose drivers that can create the zbuffer we need
+			if (!(AppInfo.Drivers[i].Desc.dwDeviceZBufferBitDepth & DDBD_32))
+				continue;
+		}
+		else if ( ZbufferD == 24)
 		{
 		// Only choose drivers that can create the zbuffer we need
 			if (!(AppInfo.Drivers[i].Desc.dwDeviceZBufferBitDepth & DDBD_24))
@@ -2260,6 +2584,7 @@ static BOOL D3DMain_PickDevice(void)
 		return TRUE;
 	}
 
+	D3DMain_Log("    Could not find a %i-bit Z buffer \n",ZbufferD);
 	return FALSE;
 }
 
@@ -2350,9 +2675,15 @@ static BOOL D3DMain_CreateBuffers(void)
 		ddsd.dwBackBufferCount = 1;      */
 		ddsd.dwBackBufferCount = 2; 
 
-
-
 		ddsd.ddsCaps.dwCaps |= DDSCAPS_VIDEOMEMORY;
+
+/* 12/06/2001 Wendell Buckner
+    ENHANCEMENT - Allow full-scene anti-aliasing  
+        if ( AppInfo.Drivers[AppInfo.CurrentDriver].Desc.dpcLineCaps.dwRasterCaps & D3DPRASTERCAPS_ANTIALIASSORTINDEPENDENT )
+		{
+			D3DMain_Log("Sort independent anti-aliasing enabled\n");
+			ddsd.ddsCaps.dwCaps2 = DDSCAPS2_HINTANTIALIASING; 
+		}*/
 
 		LastError = CreateSurface(&ddsd, &AppInfo.lpFrontBuffer);
 

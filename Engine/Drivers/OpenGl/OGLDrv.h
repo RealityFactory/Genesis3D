@@ -26,8 +26,8 @@
 // Here are some useful values you can change to meet your needs.
 // These should, in the future, really be handled at run-time as opposed to compile-time.
 // The defaults work well with TNT2 based cards.
-#define COLOR_DEPTH			16		// Bits per pixel to use for OpenGL Window/Context
-#define ZBUFFER_DEPTH		16		// Depth of the ZBuffer to use in OpenGL.   
+unsigned int COLOR_DEPTH;	// Bits per pixel to use for OpenGL Window/Context
+unsigned int ZBUFFER_DEPTH;		// Depth of the ZBuffer to use in OpenGL.   
 
 #define USE_LIGHTMAPS					// Render lightmaps
 #define USE_LINEAR_INTERPOLATION		// Comment out to use nearest neighbor interpolation
@@ -42,6 +42,8 @@ extern      PFNGLMULTITEXCOORD4FARBPROC glMultiTexCoord4fARB;
 extern		GLboolean multitexture;
 
 extern		maxTextureSize;
+extern		FogEnabled;
+extern		RenderingIsOK;
 
 geBoolean DRIVERCC SetFogEnable(geBoolean Enable, float r, float g, float b, float Start, float End);
 geBoolean DRIVERCC DrvInit(DRV_DriverHook *Hook);

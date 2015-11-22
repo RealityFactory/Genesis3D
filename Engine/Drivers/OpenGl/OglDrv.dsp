@@ -43,7 +43,8 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "OglDrv_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /Ob2 /X /I "..\..\..\Support" /I "..\\" /I "..\..\..\Math" /I "..\..\..\Bitmap" /I "..\..\..\..\MsDev60\Include" /I "..\..\..\\" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "OglDrv_EXPORTS" /D "__MSC__" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /Ob2 /I "..\..\..\Support" /I "..\\" /I "..\..\..\Math" /I "..\..\..\Bitmap" /I "..\..\..\\" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "OglDrv_EXPORTS" /D "__MSC__" /YX /FD /c
+# SUBTRACT CPP /X
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -53,7 +54,8 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 glu32.lib opengl32.lib /nologo /dll /machine:I386 /nodefaultlib
+# ADD LINK32 glu32.lib opengl32.lib libcmt.lib winspool.lib uuid.lib comdlg32.lib gdi32.lib kernel32.lib oldnames.lib shell32.lib user32.lib advapi32.lib /nologo /dll /machine:I386
+# SUBTRACT LINK32 /nodefaultlib
 
 !ELSEIF  "$(CFG)" == "OglDrv - Win32 Debug"
 
@@ -137,72 +139,6 @@ SOURCE=.\Win32.c
 # Begin Source File
 
 SOURCE=.\Win32.h
-# End Source File
-# End Group
-# Begin Group "Libraries"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\..\..\..\MSDev60\lib\Libcmt.lib
-
-!IF  "$(CFG)" == "OglDrv - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "OglDrv - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\MSDev60\lib\Libcmtd.lib
-
-!IF  "$(CFG)" == "OglDrv - Win32 Release"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "OglDrv - Win32 Debug"
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\MSDev60\lib\Winspool.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\MSDev60\lib\Uuid.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\MSDev60\lib\Comdlg32.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\MSDev60\lib\Gdi32.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\MSDev60\lib\Kernel32.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\MSDev60\lib\Oldnames.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\MSDev60\lib\Shell32.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\MSDev60\lib\User32.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\MSDev60\lib\Advapi32.lib
 # End Source File
 # End Group
 # End Target

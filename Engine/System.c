@@ -52,6 +52,7 @@
 //=====================================================================================
 static char DriverFileNames[][200] = 
 {
+	{"D3D7xDrv.dll"},
 	{"D3DDrv.dll"},
 	{"GlideDrv.dll"},
 	{"SoftDrv.dll"},

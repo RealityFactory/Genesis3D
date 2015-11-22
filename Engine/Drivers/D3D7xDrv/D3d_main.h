@@ -3,6 +3,11 @@
 /*                                                                                      */
 /*  Author: John Pollard                                                                */
 /*  Description: DD/D3D wrapper                                                         */
+/*  Edit History                                                                        */
+/*  01/10/2003 Wendell Buckner                                                          */
+/*   Add gamma table for true 32-bit alpha/color....                                    */
+/*  12/28/2002 Wendell Buckner                                                          */
+/*   Allow/make 32-bit (ARGB) mode the default mode...                                  */
 /*  07/16/2000 Wendell Buckner                                                          */
 /*   Convert to Directx7...                                                             */
 /*                                                                                      */
@@ -85,6 +90,11 @@ typedef struct
     DDSURFACEDESC2		ddsd;							// DDSURFACEDESC for complete information 
     BOOL				HasOneBitAlpha;	
     BOOL				HasFourBitAlpha;
+
+/* 12/28/2002 Wendell Buckner
+    Allow/make 32-bit (ARGB) mode the default mode... */
+    BOOL				HasEightBitAlpha;
+
 } DDMain_SurfFormat;
 
 typedef struct
@@ -154,16 +164,31 @@ typedef struct
     LPDIRECT3DDEVICE7	BackgroundMaterial;
 
 	// 2d surface format (for blt'ing to the display)
-	DDSURFACEDESC2		ddSurfFormat;						// 555 or 565 surface desc
+	DDSURFACEDESC2		ddSurfFormat;						// Current surface, 8888, 555 or 565 surface desc
 
 	// Texture formats (for the D3D device)
-	DDSURFACEDESC2		ddTexFormat;						// 555 or 565 surface desc
+	DDSURFACEDESC2		ddTexFormat;						// Current texture, 8888, 555 or 565 surface desc
+
+/* 12/28/2002 Wendell Buckner
+    Allow/make 32-bit (ARGB) mode the default mode...  */
+    DDSURFACEDESC2		ddTexFormat16;						// 555 or 565 surface desc
+	DDSURFACEDESC2		ddTexFormat24;						// 888  surface desc
+    DDSURFACEDESC2		ddTexFormat32;						// 8888 surface desc
+
 	DDSURFACEDESC2		ddFourBitAlphaSurfFormat;			// 4444 surface desc
 	DDSURFACEDESC2		ddOneBitAlphaSurfFormat;			// 1555 surface desc
+
+/* 12/28/2002 Wendell Buckner
+    Allow/make 32-bit (ARGB) mode the default mode...  */
+    DDSURFACEDESC2		ddEightBitAlphaSurfFormat;			// 8888 surface desc
 
 	RGB_LUT				Lut1;
 	RGB_LUT				Lut2;
 	RGB_LUT				Lut3;
+
+/* 01/10/2003 Wendell Buckner
+     Add gamma table for true 32-bit alpha/color.... */
+    RGB_LUT				Lut4;
 
 	BOOL				IsPrimary;							// 
 	BOOL				FullScreen;

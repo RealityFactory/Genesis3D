@@ -4,11 +4,16 @@
 /*  Author: John Pollard                                                                */
 /*  Description: THandle manager for D3DDrv                                             */
 /*                                                                                      */
-/*   02/25/2001 Wendell Buckner
-/*    This texture pointer is no longer valid under directx 7.  Set it to TRUE so there is
-/*    something there when  the code does assert checks.	
-/*   05/28/2000 Wendell Buckner
-/*    Running out of texture handles...
+/*  Edit History:                                                                       */
+/*  12/28/2002 Wendell Buckner                                                          */
+/*    Allow/make 32-bit (ARGB) mode the default mode...                                 */
+/*  12/28/2002 Wendell Buckner                                                          */
+/*    Give out the true 24-bit surface as well...                                       */
+/*   02/25/2001 Wendell Buckner                                                         */
+/*    This texture pointer is no longer valid under directx 7.  Set it to TRUE so there */
+/*    is something there when  the code does assert checks.	                            */    
+/*   05/28/2000 Wendell Buckner                                                         */
+/*    Running out of texture handles...                                                 */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -409,27 +414,66 @@ geRDriver_THandle *Create2DTHandle(geRDriver_THandle *THandle, int32 Width, int3
 //============================================================================================
 geBoolean SetupCurrent3dDesc(gePixelFormat PixelFormat)
 {
+    DDSURFACEDESC2 NoSurfDesc;
+    memset(&NoSurfDesc, 0, sizeof(DDSURFACEDESC2));
+	
 	switch (PixelFormat)
 	{
 		case GE_PIXELFORMAT_16BIT_555_RGB:
 		case GE_PIXELFORMAT_16BIT_565_RGB:
 		{
-			memcpy(&CurrentSurfDesc, &AppInfo.ddTexFormat, sizeof(DDSURFACEDESC2));
+/* 12/28/2002 Wendell Buckner
+    Allow/make 32-bit (ARGB) mode the default mode...  
+			memcpy(&CurrentSurfDesc, &AppInfo.ddTexFormat, sizeof(DDSURFACEDESC2)); */
+			memcpy(&CurrentSurfDesc, &AppInfo.ddTexFormat16, sizeof(DDSURFACEDESC2));
 			break;
 		}
+
 		case GE_PIXELFORMAT_16BIT_4444_ARGB:
 		{
 			memcpy(&CurrentSurfDesc, &AppInfo.ddFourBitAlphaSurfFormat, sizeof(DDSURFACEDESC2));
 			break;
 		}
+
 		case GE_PIXELFORMAT_16BIT_1555_ARGB:
 		{
 			memcpy(&CurrentSurfDesc, &AppInfo.ddOneBitAlphaSurfFormat, sizeof(DDSURFACEDESC2));
 			break;
 		}
 
+/* 12/28/2002 Wendell Buckner
+    Give out the true 24-bit surface as well...  */		
+		case GE_PIXELFORMAT_32BIT_XRGB:
+		{
+			memcpy(&CurrentSurfDesc, &AppInfo.ddTexFormat24, sizeof(DDSURFACEDESC2));
+
+            if ( CurrentSurfDesc.ddpfPixelFormat.dwRGBBitCount != 32)
+			{
+			 D3DMain_Log("SetupCurrent3dDesc:  Invalid pixel format (%i).\n",PixelFormat);
+			 return FALSE;
+			}
+
+			break;
+		}
+
+/* 12/28/2002 Wendell Buckner
+    Allow/make 32-bit (ARGB) mode the default mode...  */
+        case GE_PIXELFORMAT_32BIT_ARGB:
+		{
+			memcpy(&CurrentSurfDesc, &AppInfo.ddEightBitAlphaSurfFormat, sizeof(DDSURFACEDESC2));
+
+			if ( CurrentSurfDesc.ddpfPixelFormat.dwRGBBitCount != 32 )
+			{
+             D3DMain_Log("SetupCurrent3dDesc:  Invalid pixel format (%i).\n",PixelFormat);
+			 return FALSE;
+			}
+
+			break;
+		}
+
 		default:
 		{
+			D3DMain_Log("SetupCurrent3dDesc:  Invalid pixel format (%i).\n",PixelFormat);
 			SetLastDrvError(DRV_ERROR_GENERIC, "SetupCurrent3dDesc:  Invalid pixel format.\n");
 			return GE_FALSE;
 		}
@@ -765,7 +809,11 @@ geBoolean THandle_CheckCache(void)
 {
 	geRDriver_THandle	*pTHandle;
 	int32				i, Stage0, Stage1;
-	int32				MaxTable1[9], MaxTable2[9];
+
+/* 11/25/2002 Wendell Buckner
+    Raise texture limits to 16384 x 16384. 
+	int32				MaxTable1[9],  MaxTable2[9]; */
+    int32				MaxTable1[14], MaxTable2[14];
 
 	if (!CacheNeedsUpdate)
 		return GE_TRUE;
@@ -785,6 +833,13 @@ geBoolean THandle_CheckCache(void)
 		MaxTable1[6] = 512;			// 64x64
 		MaxTable1[7] = 256;			//128x128
 		MaxTable1[8] = 256;			//256x256
+
+        MaxTable1[9]  = 64;			//  512x512
+		MaxTable1[10] = 64;			// 1024x1024
+		MaxTable1[11] = 64;			// 2048x2048
+		MaxTable1[12] = 64;			// 4096x4096
+        MaxTable1[13] = 64;			// 8192x8192
+        MaxTable1[14] = 64;			//16384x1638
 #else
 	if (AppInfo.DeviceIdentifier.dwVendorId == 4634)		// 3dfx series have a limit on the number of texture handles
 	{
@@ -827,6 +882,13 @@ geBoolean THandle_CheckCache(void)
 		MaxTable1[7] = 128;			//128x128
 		MaxTable1[8] = 128;			//256x256
 
+        MaxTable1[9]  = 64;			//  512x512
+		MaxTable1[10] = 64;			// 1024x1024
+		MaxTable1[11] = 64;			// 2048x2048
+		MaxTable1[12] = 64;			// 4096x4096
+        MaxTable1[13] = 64;			// 8192x8192
+        MaxTable1[14] = 64;			//16384x16384
+
 		MaxTable2[0] = 128;			//  1x1
 		MaxTable2[1] = 128;			//  2x2
 		MaxTable2[2] = 256;			//  4x4
@@ -836,6 +898,13 @@ geBoolean THandle_CheckCache(void)
 		MaxTable2[6] = 256;			// 64x64
 		MaxTable2[7] = 256;			//128x128
 		MaxTable2[8] = 256;			//256x256
+
+        MaxTable1[9]  = 64;			//  512x512
+		MaxTable1[10] = 64;			// 1024x1024
+		MaxTable1[11] = 64;			// 2048x2048
+		MaxTable1[12] = 64;			// 4096x4096
+        MaxTable1[13] = 64;			// 8192x8192
+        MaxTable1[14] = 64;			//16384x16384
 	}
 #endif
 

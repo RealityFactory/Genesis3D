@@ -37,6 +37,8 @@ DRV_Window	ClientWindow;
 static DRV_CacheInfo	CacheInfo;
 
 GLint maxTextureSize = 0;
+geBoolean FogEnabled = GE_TRUE;
+geBoolean RenderingIsOK = GE_TRUE;
 
 // Toggle and function pointers for OpenGL multitexture extention
 GLboolean multitexture = GE_FALSE;
@@ -115,7 +117,28 @@ DRV_Driver OGLDRV =
 // Not implemented, but you noticed that already huh?
 geBoolean DRIVERCC SetFogEnable(geBoolean Enable, float r, float g, float b, float Start, float End)
 {
+	GLfloat fogColor[4];
 
+	if(Enable==GE_TRUE)
+	{
+		glEnable(GL_FOG);
+		glFogi(GL_FOG_MODE, GL_LINEAR);
+		fogColor[0] = (GLfloat)r/255.0f;
+		fogColor[1] = (GLfloat)g/255.0f;
+		fogColor[2] = (GLfloat)b/255.0f;
+		fogColor[3] = 1.0f;
+		glFogfv(GL_FOG_COLOR, fogColor);
+		glFogf(GL_FOG_DENSITY, 1.0f);
+		glHint(GL_FOG_HINT, GL_FASTEST);
+		glFogf(GL_FOG_START, Start);
+		glFogf(GL_FOG_END, End);
+		FogEnabled = GE_TRUE;
+	}
+	else
+	{
+		glDisable(GL_FOG);
+		FogEnabled = GE_FALSE;
+	}
 	return GE_TRUE;
 }
 
@@ -123,7 +146,18 @@ geBoolean DRIVERCC SetFogEnable(geBoolean Enable, float r, float g, float b, flo
 geBoolean DRIVERCC DrvInit(DRV_DriverHook *Hook)
 {
 	RECT		WRect;
-	
+	FILE *stream;
+
+	COLOR_DEPTH = 16;
+	ZBUFFER_DEPTH = 16;
+
+	stream = fopen("D3D24.ini","r");
+	if(stream)
+	{
+		fscanf(stream,"%d",&COLOR_DEPTH);
+		fscanf(stream,"%d",&ZBUFFER_DEPTH);
+		fclose(stream);
+	}
 
 	WindowSetup(Hook);
 	
@@ -199,6 +233,8 @@ geBoolean DRIVERCC DrvInit(DRV_DriverHook *Hook)
 		return GE_FALSE;
 	}
 
+	RenderingIsOK = GE_TRUE;
+
 	return GE_TRUE;
 }
 
@@ -209,6 +245,8 @@ geBoolean DRIVERCC DrvShutdown(void)
 	glFinish();
 
 	WindowCleanup();
+
+	RenderingIsOK = GE_FALSE;
 
 	return GE_TRUE;
 }
@@ -224,7 +262,7 @@ geBoolean DRIVERCC DrvUpdateWindow(void)
 
 geBoolean	DRIVERCC DrvSetActive(geBoolean Active)
 {
-
+	RenderingIsOK = Active;
 	return	GE_TRUE;
 }
 

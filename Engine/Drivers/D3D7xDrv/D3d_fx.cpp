@@ -4,6 +4,10 @@
 /*  Author: John Pollard                                                                */
 /*  Description: D3D renderstate wrapper                                                */
 /*                                                                                      */
+/*  01/13/2003 Wendell Buckner                                                          */
+/*   Optimization from GeForce_Optimization2.doc                                        */
+/*   9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not */
+/*      set a renderstate unless it is needed.                                          */
 /*  02/28/2001 Wendell Buckner                                                          */
 /*   The flags at the end of DrawPrimitive are no longer supported in  d3d 7.0, use the */
 /*   combination of flags in the renderstate call                                       */
@@ -284,25 +288,97 @@ void D3DTexWrap(DWORD Stage, BOOL Wrap)
 	}
 }
 
+/* 01/13/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc  
+9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. */
+static BOOL OldZWriteEnable = TRUE;
+
 void D3DZWriteEnable (BOOL Enable)
 {
+/* 01/13/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc  
+9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. */
+  	if (OldZWriteEnable == Enable)
+  		return;
+  
+  	OldZWriteEnable = Enable;
+
 	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, Enable);
 }
 
+/* 01/13/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc  
+9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed.*/
+static D3DCMPFUNC OldZFunc = D3DCMP_LESSEQUAL;
+
 void D3DZFunc (D3DCMPFUNC Func)
 {
+/* 01/13/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc  
+9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. */
+  	if (OldZFunc == Func)
+  		return;
+  
+  	OldZFunc = Func;
+
 	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, Func);
 }
 
+/* 01/13/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc  
+9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. 
+    The default is true if there is a depth buffer attached, we assume there is one with genesis */
+static BOOL OldZEnable = TRUE;
+
 void D3DZEnable(BOOL Enable)
 {
-	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, Enable);
+  	if (OldZEnable == Enable)
+  		return;
+  
+  	OldZEnable = Enable;
+  
+  	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, Enable);
 }
+
+/* 01/13/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc  
+9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. */
+static D3DFILLMODE OldPolygonMode = D3DFILL_SOLID;
 
 void D3DPolygonMode (D3DFILLMODE Mode)
 {
+/* 01/13/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc  
+9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. */
+  	if (OldPolygonMode == Mode)
+  		return;
+  
+  	OldPolygonMode = Mode;
+
 	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FILLMODE, D3DFILL_SOLID);
 }
 
 
+/* 01/13/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc  
+9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. */
+static BOOL  OldFogEnable = FALSE;
+static DWORD OldFogColor  = 0;
 
+void D3DFogEnable (BOOL Enable, DWORD Color)
+{
+  	if ( (OldFogEnable == Enable) && (OldFogColor == Color) )
+  		return;
+
+	if ( OldFogEnable != Enable )
+	{
+		OldFogEnable = Enable;
+		AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , Enable);
+	}
+
+	if ( Enable && (OldFogColor != Color) ) 
+	{
+		OldFogColor = Color;
+		AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGCOLOR , Color);	
+	}
+}

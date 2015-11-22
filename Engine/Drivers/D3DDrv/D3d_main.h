@@ -28,6 +28,8 @@
 
 #define INITGUID
 
+//#define WIREFRAME
+
 #include "DCommon.h"
 
 #define MAX_APP_MODES					50

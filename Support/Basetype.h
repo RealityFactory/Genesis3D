@@ -47,9 +47,11 @@ typedef signed int geBoolean;
 #define GE_TRUE		(1)
 
 typedef float geFloat;
+typedef double geDouble;
 
 #ifndef NULL
-#define NULL	((void *)0)
+/* #define NULL	((void *)0) */
+#define NULL 0
 #endif
 
 typedef signed long     int32;

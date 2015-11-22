@@ -97,6 +97,9 @@ BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, RECT *WorldRect)
 		D3DBlendFunc (D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA);
 		D3DBlendEnable(TRUE);
 
+/*	01/13/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc
+    9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. 
 		if (AppInfo.FogEnable)
 		{
 			AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , TRUE);
@@ -105,7 +108,17 @@ BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, RECT *WorldRect)
 		else
 		{
 			AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , FALSE);
+		} */
+		if (AppInfo.FogEnable)
+		{
+            D3DFogEnable ( AppInfo.FogEnable, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<<8)|(DWORD)AppInfo.FogB );		
 		}
+		else
+		{
+			D3DFogEnable ( AppInfo.FogEnable, 0 );		
+		} 
+
+        
 	}
 
 	return TRUE;

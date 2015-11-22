@@ -119,7 +119,6 @@ geBoolean FreeAllTextureHandles(void)
 geRDriver_THandle *DRIVERCC THandle_Create(int32 Width, int32 Height, int32 NumMipLevels, 
 										   const geRDriver_PixelFormat *PixelFormat)
 {
-	int32				SWidth, SHeight;		
 	geRDriver_THandle	*THandle;	
 	GLubyte				Log;
 
@@ -147,21 +146,6 @@ geRDriver_THandle *DRIVERCC THandle_Create(int32 Width, int32 Height, int32 NumM
 		{
 			sprintf(errMsg, "OGL_THandleCreate: Height > GL_MAX_TEXTURE_SIZE (%d)", maxTextureSize);
 			SetLastDrvError(DRV_ERROR_GENERIC, errMsg);
-			goto ExitWithError;
-		}
-	
-		SWidth = SnapToPower2(Width);
-		SHeight = SnapToPower2(Height);
-
-		if (Width != SWidth)
-		{
-			SetLastDrvError(DRV_ERROR_GENERIC, "OGL_THandleCreate: Not a power of 2.");
-			goto ExitWithError;
-		}
-
-		if (Height != SHeight)
-		{
-			SetLastDrvError(DRV_ERROR_GENERIC, "OGL_THandleCreate: Not a power of 2.");
 			goto ExitWithError;
 		}
 	}
@@ -466,6 +450,18 @@ S32 SnapToPower2(S32 Width)
 	else if(Width > 1024 && Width <= 2048) 
 	{
 		Width = 2048;
+	}
+	else if (Width > 2048 && Width <= 4096 )
+	{
+		Width = 4096;
+	}
+	else if (Width > 4096 && Width <= 8192 )
+	{
+		Width = 8192;
+	}
+    else if (Width > 8192 && Width <= 16384)
+	{
+		Width = 16384;
 	}
 
 	return Width;

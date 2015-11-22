@@ -56,4 +56,8 @@ void D3DPolygonMode (D3DFILLMODE Mode);
 void D3DViewport (int32 x, int32 y, int32 width, int32 height);
 void D3DDepthRange (float zNear, float zFar);
 
+/* 01/13/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc  
+9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. */
+void D3DFogEnable (BOOL Enable, DWORD Color);
 #endif

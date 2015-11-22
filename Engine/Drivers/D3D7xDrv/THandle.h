@@ -38,7 +38,8 @@
 #define THANDLE_MAX_MIP_LEVELS		255
 //#define	MAX_LMAP_LOG_SIZE			8			// Max lightmap size in pixels will be 128x128
 //#define	MAX_LMAP_LOG_SIZE			7			// Max lightmap size in pixels will be 64x64
-#define	MAX_LMAP_LOG_SIZE			6			// Max lightmap size in pixels will be 32x32
+//#define	MAX_LMAP_LOG_SIZE			6			// Max lightmap size in pixels will be 32x32
+#define	MAX_LMAP_LOG_SIZE			12			// Max lightmap size in pixels will be 32x32
 
 typedef struct
 {

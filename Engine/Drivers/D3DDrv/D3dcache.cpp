@@ -746,7 +746,6 @@ uint32 Log2(uint32 P2)
 //=====================================================================================
 int32 SnapToPower2(int32 Width)
 {
-#if 1
 	if (Width > 0 && Width <= 1) Width = 1;
 	else if (Width > 1 && Width <= 2) Width = 2;
 	else if (Width > 2 && Width <= 4) Width = 4;
@@ -756,19 +755,16 @@ int32 SnapToPower2(int32 Width)
 	else if (Width > 32 && Width <= 64) Width = 64;
 	else if (Width > 64 && Width <= 128) Width = 128;
 	else if (Width > 128 && Width <= 256) Width = 256;
+/* 11/25/2002 Wendell Buckner
+    Raise texture limits to 16384 x 16384. */
+    else if (Width > 256  && Width <=  512 ) Width = 512;
+    else if (Width > 512  && Width <= 1024 ) Width = 1024;
+    else if (Width > 1024 && Width <= 2048 ) Width = 2048;
+    else if (Width > 2048 && Width <= 4096 ) Width = 4096;
+    else if (Width > 4096 && Width <= 8192 ) Width = 8192;
+    else if (Width > 8192 && Width <= 16384) Width = 16384;
 	else 
 		return -1;
-#else
-	
-	if (Width > 1 && Width <= 8) Width = 8;
-	else if (Width > 8 && Width <= 16) Width =16;
-	else if (Width > 16 && Width <= 32) Width = 32;
-	else if (Width > 32 && Width <= 64) Width = 64;
-	else if (Width > 64 && Width <= 128) Width = 128;
-	else if (Width > 128 && Width <= 256) Width = 256;
-	else 
-		return -1;
-#endif
 
 	return Width;
 }

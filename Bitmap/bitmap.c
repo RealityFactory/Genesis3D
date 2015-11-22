@@ -49,7 +49,6 @@ see {} for notes/long-term-todos
 *
 ***
  ********/
-
 #include	<math.h>
 #include	<time.h>
 #include	<stdio.h>
@@ -3680,11 +3679,11 @@ return Bmp->PreferredFormat;
 
 /*}{ ************** FILE I/O ************************/
 
-
 GENESISAPI geBitmap * GENESISCC geBitmap_CreateFromFileName(const geVFile *BaseFS,const char *Name)
 {
-geVFile * File;
-geBitmap * Bitmap;
+	geVFile * File;
+	geBitmap * Bitmap;
+
 
 	if ( BaseFS )
 	{
@@ -3695,11 +3694,12 @@ geBitmap * Bitmap;
 		File = geVFile_OpenNewSystem(NULL,GE_VFILE_TYPE_DOS,Name,NULL,GE_VFILE_OPEN_READONLY);
 	}
 	if ( ! File )
-		return NULL;
+			return NULL;
+	
 	Bitmap = geBitmap_CreateFromFile(File);
 	geVFile_Close(File);
-
-return Bitmap;
+		
+	return Bitmap;
 }
 
 GENESISAPI geBoolean GENESISCC geBitmap_WriteToFileName(const geBitmap * Bmp,const geVFile *BaseFS,const char *Name)
@@ -3740,11 +3740,14 @@ typedef uint32			geBmTag_t;
 #define MIP_FLAG_PAETH_FILTERED	(1<<5)
 
 static geBoolean geBitmap_ReadFromBMP(geBitmap * Bmp,geVFile * F);
-
+// change QuestOfDreams
+static geBoolean geBitmap_IsTGA(geVFile * F);
+static geBoolean  geBitmap_ReadFromTGA(geBitmap * Bmp, geVFile * File);
+// end change QuestOfDreams
 GENESISAPI geBitmap * GENESISCC geBitmap_CreateFromFile(geVFile *F)
 {
-geBitmap *	Bmp;
-geBmTag_t Tag;
+	geBitmap *	Bmp;
+	geBmTag_t Tag;
 
 	assert(F);
 
@@ -3757,9 +3760,9 @@ geBmTag_t Tag;
 
 	if ( Tag == GEBM_TAG )
 	{
-	uint8 flags;
-	uint8 Version;
-	int mip;
+	  	uint8 flags;
+		uint8 Version;
+		int mip;
 
 		// see WriteToFile for comments on the file format
 
@@ -3865,8 +3868,17 @@ geBmTag_t Tag;
 		}
 		else
 		{
-			// geErrorLog_AddString(-1,"CreateFromFile : unknown format", NULL);
-			goto fail;
+			
+// change QuestOfDreams
+			if (geBitmap_IsTGA(F))
+			{
+				if( ! geBitmap_ReadFromTGA(Bmp, F))
+					goto fail;
+			}
+			else 
+				// geErrorLog_AddString(-1,"CreateFromFile : unknown format", NULL);
+				goto fail;
+// end change QuestOfDreams
 		}
 	}
 
@@ -4038,6 +4050,23 @@ return GE_TRUE;
 /*}{********** Windows BMP Types *******/
 
 #pragma pack(1)
+
+typedef struct TGAHEADER
+{
+	char	IDLength;
+	char	ColorMapType;
+	char	ImageType;
+	uint16	CMFirstEntry;
+	uint16	CMLength;
+	char	CMEntrySize;
+	uint16	Xorigin;
+	uint16	Yorigin;
+	uint16	Width;
+	uint16	Height;
+	char	PixelDepth;
+	char	ImageDescriptor;
+} TGAHEADER;
+
 typedef struct 
 {
 	uint32      biSize;
@@ -4070,6 +4099,8 @@ typedef struct
     uint8    rgbReserved;
 } RGBQUAD;
 #pragma pack()
+
+
 
 static geBoolean geBitmap_ReadFromBMP(geBitmap * Bmp,geVFile * F)
 {
@@ -4190,6 +4221,310 @@ int bPad,myRowWidth,bmpRowWidth,pelBytes;
 
 return GE_TRUE;
 }	// end BMP reader
+
+
+/*******************************************************************************/
+static geBoolean  geBitmap_IsTGA(geVFile * F)
+{
+	char targa[18];
+	TGAHEADER tgah;
+	
+	if (!geVFile_Seek(F, - 18, GE_VFILE_SEEKEND))
+		return GE_FALSE;
+	
+	if(!geVFile_Read(F, &targa, 18))
+		return GE_FALSE;
+	geVFile_Seek(F, 0, GE_VFILE_SEEKSET);
+
+	//if we find the TRUEVISION-XFILE. signature this should be a tga file
+	if(!strcmp(targa, "TRUEVISION-XFILE."))
+		return GE_TRUE;
+	
+	// older versions don't have a signature so do further checks
+	if(!geVFile_Read(F, &tgah, 18))
+		return GE_FALSE;
+	geVFile_Seek(F, 0, GE_VFILE_SEEKSET);
+
+	if(tgah.ColorMapType != 0 && tgah.ColorMapType != 1)
+		return GE_FALSE;
+	else if(tgah.ImageType != 1 && tgah.ImageType != 2 && tgah.ImageType != 9 && tgah.ImageType != 10)
+		return GE_FALSE;
+	else if(tgah.PixelDepth != 8 && tgah.PixelDepth != 16 && tgah.PixelDepth != 24 && tgah.PixelDepth != 32)
+		return GE_FALSE;
+	else 
+		return GE_TRUE;
+
+				
+	return GE_FALSE;
+}
+ 
+/*****************************************************************************/
+
+static geBoolean  geBitmap_ReadFromTGA(geBitmap * Bmp, geVFile * File)
+{
+	TGAHEADER tgah;
+	int alphabits;
+	int fliphoriz;
+	int flipvert;
+    int myRowWidth,bmpRowWidth,pelBytes;
+	long ImageOffset = 0;
+	geBitmap *AlphaBmp = NULL;
+
+
+	//read the header fields 
+	if(!geVFile_Read(File, &tgah, 18))
+		return GE_FALSE;
+	
+	Bmp->Info.Width = tgah.Width;
+	Bmp->Info.Height = tgah.Height;
+	Bmp->Info.Stride = ((tgah.Width+3)&(~3));
+	Bmp->Info.HasColorKey = GE_FALSE;
+
+	alphabits = tgah.ImageDescriptor & 0x0f;
+	fliphoriz = (tgah.ImageDescriptor & 0x10) ? 0 : 1;
+	flipvert = (tgah.ImageDescriptor & 0x20) ? 1 : 0;  
+	//flipvert is ignored at the moment, because it appears rather rarely
+	//+ you can flip textures in editors
+
+	switch (tgah.PixelDepth) 
+	{
+		case 8 :
+			pelBytes=1;
+			Bmp->Info.Format = GE_PIXELFORMAT_8BIT_PAL;
+			ImageOffset = 0;
+
+			//	if ( tgah.CMLength == 0 ) tgah.CMLength = 256;
+			if(tgah.CMEntrySize == 16)
+			{
+				if ( ! (Bmp->Info.Palette = geBitmap_Palette_Create(GE_PIXELFORMAT_16BIT_555_RGB, tgah.CMLength)) )
+					return GE_FALSE;
+			}
+			else if(tgah.CMEntrySize == 24)
+			{
+				if ( ! (Bmp->Info.Palette = geBitmap_Palette_Create(GE_PIXELFORMAT_24BIT_BGR, tgah.CMLength)) )
+					return GE_FALSE;
+			}
+			else if(tgah.CMEntrySize == 32)
+			{
+				if ( ! (Bmp->Info.Palette = geBitmap_Palette_Create(GE_PIXELFORMAT_32BIT_XRGB, tgah.CMLength)) )
+					return GE_FALSE;
+			}
+			else
+				return GE_FALSE;
+
+			// move to the palette data
+			geVFile_Seek(File, tgah.IDLength, GE_VFILE_SEEKCUR);
+
+			if ( ! geVFile_Read(File, Bmp->Info.Palette->Data, tgah.CMLength*(tgah.CMEntrySize/8)) )
+				return GE_FALSE;
+			
+			break;
+
+		case 16 :
+			pelBytes = 2;
+			Bmp->Info.Format = GE_PIXELFORMAT_16BIT_555_RGB;
+			ImageOffset = tgah.IDLength+((tgah.CMEntrySize/8) * tgah.CMLength);
+			break;
+
+		case 24 :
+			pelBytes = 3;
+			Bmp->Info.Format = GE_PIXELFORMAT_24BIT_BGR;
+			ImageOffset = tgah.IDLength+((tgah.CMEntrySize/8) * tgah.CMLength);			
+			break;
+
+		case 32 :
+			// Alpha map base creation ***************************
+			AlphaBmp = geBitmap_Create_Base();
+	
+			if (!AlphaBmp)
+				return GE_FALSE;
+				
+			AlphaBmp->Info.Width = tgah.Width;
+			AlphaBmp->Info.Height = tgah.Height;
+			AlphaBmp->Info.Stride = ((tgah.Width+3)&(~3));
+			AlphaBmp->Info.HasColorKey = GE_FALSE;
+			AlphaBmp->Info.Format = GE_PIXELFORMAT_8BIT_GRAY;
+	
+			if ( ! geBitmap_AllocSystemMip(AlphaBmp,0) )
+				goto fail;		
+			// Alpha map base creation done **********************
+			
+			pelBytes = 3;
+			Bmp->Info.Format = GE_PIXELFORMAT_24BIT_BGR;
+			//	Bmp->Info.Format = GE_PIXELFORMAT_32BIT_ARGB;
+			ImageOffset = tgah.IDLength+((tgah.CMEntrySize/8) * tgah.CMLength);
+
+			break;
+		
+		default :
+			return GE_FALSE;
+	}
+	
+
+
+	if ( ! geBitmap_AllocSystemMip(Bmp,0) )
+		goto fail;
+	
+	// move to the image data
+	geVFile_Seek(File, ImageOffset, GE_VFILE_SEEKCUR);
+				
+	myRowWidth	= Bmp->Info.Stride * pelBytes;
+	bmpRowWidth = (((tgah.Width * pelBytes) + 3)&(~3));
+	assert( bmpRowWidth <= myRowWidth );
+	
+	// NOTE: to avoid the  if(tgah.PixelDepth == 32) statements in the following code
+	// you can write a separate reading code for 32bit in the switch statement above
+	// this may be longer but faster ...
+
+	//Uncompressed images
+	if(tgah.ImageType == 1 || tgah.ImageType == 2)
+	{
+		int count, y;
+		char *row;
+		char * alpharow;
+		row = Bmp->Data[0];
+		alpharow = NULL;
+		
+		if(tgah.PixelDepth == 32)
+			alpharow = AlphaBmp->Data[0];
+
+		if(fliphoriz)
+		{
+			row += (Bmp->Info.Height - 1) * myRowWidth;
+			if(tgah.PixelDepth == 32)
+				alpharow += (AlphaBmp->Info.Height - 1) * (AlphaBmp->Info.Stride);				
+		}
+
+		for(y= Bmp->Info.Height;y--;)
+		{
+			// uff... since this could be 32bit we have to read each pixel separately
+			for(count=0; count<Bmp->Info.Stride; count++ )
+			{				
+				geVFile_Read(File, row, pelBytes);					
+				row += pelBytes;
+				if(tgah.PixelDepth == 32)
+				{
+					geVFile_Read(File, alpharow, 1);
+					alpharow++;
+				}
+			}
+			if(fliphoriz)
+			{
+				// go back this row and to the row above
+				row -= 2*myRowWidth; 
+				if(tgah.PixelDepth == 32)
+					alpharow -= 2*(AlphaBmp->Info.Stride);
+			}				
+		}	
+	}
+	//Run-Length Encoded images
+	else if(tgah.ImageType == 9 || tgah.ImageType == 10)
+	{
+		int i, j, k, y;
+		char buff[4];
+		char * row;
+		char * alpharow;
+		row = Bmp->Data[0];
+		alpharow = NULL;
+		y = 0;
+		k = 1;
+
+		if(tgah.PixelDepth == 32)
+			alpharow = AlphaBmp->Data[0];
+	
+		if(fliphoriz)
+		{
+			row += (Bmp->Info.Height - 1) * myRowWidth;
+			if(tgah.PixelDepth == 32)
+				alpharow += (AlphaBmp->Info.Height - 1) * (AlphaBmp->Info.Stride);
+		}					
+		while(y < Bmp->Info.Height)
+		{	
+			// read in the Repetition Count byte:
+			// 1bit = packet type (RLE/Raw packet), 7bits = pixel count
+			// The pixel count can range from 0 to 127. Since a packet never 
+			// encodes zero pixels, the value in pixel count is always 1 less
+			// than the actual number of pixels encoded in the packet
+			geVFile_Read(File, buff, 1);
+				
+			j = buff[0] & 0x7f; // number of encoded pixels-1
+			
+			if(buff[0] & 0x80) // RLE packet
+			{	
+				geVFile_Read(File, buff, pelBytes);
+				if(tgah.PixelDepth == 32)
+					geVFile_Read(File, &(buff[3]), 1);
+				
+				for(i = 0; i <= j; i++)
+				{								
+					*row++ = buff[0];
+					if(pelBytes>1) *row++ = buff[1];
+					if(pelBytes>2) *row++ = buff[2];
+					if(tgah.PixelDepth == 32) *alpharow++ = buff[3];
+					k++;
+					if(k > Bmp->Info.Stride)
+					{
+						k=1;
+						y++;
+						if(fliphoriz)
+						{
+							// go back this row and to the row above
+							row -= 2*myRowWidth;
+							if(tgah.PixelDepth == 32)
+								alpharow -= 2*(AlphaBmp->Info.Stride);
+						}
+					}
+				}	
+			}	
+			else //Raw packet
+			{						
+				for(i = 0; i <= j; i++)
+				{
+					geVFile_Read(File, row, pelBytes);
+					row += pelBytes;
+					if(tgah.PixelDepth == 32)
+					{
+						geVFile_Read(File, alpharow, 1);
+						alpharow++;
+					}
+					k++;
+					if(k > Bmp->Info.Stride)
+					{
+						k=1;
+						y++;
+						if(fliphoriz)
+						{
+							// go back this row and to the row above
+							row -= 2*myRowWidth;
+							if(tgah.PixelDepth == 32)
+								alpharow -= 2*(AlphaBmp->Info.Stride);
+						}
+					}
+				}
+			}
+		}				
+	}
+	else
+		goto fail;
+
+	//set alphamap
+	if(tgah.PixelDepth == 32)
+	{
+		assert(AlphaBmp);
+		if(!geBitmap_SetAlpha( Bmp, AlphaBmp))
+			goto fail;
+		geBitmap_Destroy(&AlphaBmp);
+		geBitmap_SetPreferredFormat(Bmp,GE_PIXELFORMAT_32BIT_ARGB);
+	}
+
+	return GE_TRUE;
+
+fail:
+	if(AlphaBmp)
+		geBitmap_Destroy(&AlphaBmp);
+	return GE_FALSE;
+}
+
 
 /*}{ *** Packed Info IO ***/
 

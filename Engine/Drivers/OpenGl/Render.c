@@ -212,6 +212,8 @@ geBoolean DRIVERCC Render_WorldPoly(DRV_TLVertex *Pnts, int32 NumPoints, geRDriv
 	GLubyte alpha;
 	BOOL	Dynamic = 0;
 
+	if(!RenderingIsOK)
+		return GE_TRUE;
 
 	if(Flags & DRV_RENDER_ALPHA)
 	{
@@ -258,7 +260,6 @@ geBoolean DRIVERCC Render_WorldPoly(DRV_TLVertex *Pnts, int32 NumPoints, geRDriv
 		}
 	}
 
-
 	if(multitexture) 
 	{
 		// Hooray!!
@@ -285,6 +286,9 @@ geBoolean DRIVERCC Render_GouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint3
 	GLfloat zRecip;
 	DRV_TLVertex *pPnt = Pnts;
 	GLubyte alpha;
+
+	if(!RenderingIsOK)
+		return GE_TRUE;
 
 	if(Flags & DRV_RENDER_ALPHA)
 	{
@@ -329,6 +333,8 @@ geBoolean DRIVERCC Render_MiscTexturePoly(DRV_TLVertex *Pnts, int32 NumPoints,
 	DRV_TLVertex *pPnt = Pnts;
 	GLubyte alpha;
 
+	if(!RenderingIsOK)
+		return GE_TRUE;
 
 	if(Flags & DRV_RENDER_ALPHA)
 	{
@@ -404,6 +410,9 @@ geBoolean DRIVERCC DrawDecal(geRDriver_THandle *THandle, RECT *SRect, int32 x, i
 	GLfloat uClamp, vClamp;
 	GLfloat uDiff = 1.0f, vDiff = 1.0f;
 	
+	if(!RenderingIsOK)
+		return GE_TRUE;
+
 	if(!SRect)
 	{
 		tmpRect.left = 0;
@@ -583,7 +592,8 @@ geBoolean DRIVERCC BeginScene(geBoolean Clear, geBoolean ClearZ, RECT *WorldRect
 
 geBoolean DRIVERCC EndScene(void)
 {	
-	FlipGLBuffers();
+	if(RenderingIsOK)
+		FlipGLBuffers();
 	
 	return GE_TRUE;
 }

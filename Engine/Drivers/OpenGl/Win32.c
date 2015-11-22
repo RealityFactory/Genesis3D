@@ -31,86 +31,16 @@ HGLRC hRC				= NULL;
 GLboolean fullscreen	= GE_FALSE;
 
 
-static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
-{
-	switch(iMessage)
-	{
-		case WM_DESTROY:
-			break;
-
-		default:
-			if(originalWndProc != NULL)
-			{
-				return originalWndProc(hWnd, iMessage, wParam, lParam);
-			}
-	}
-
-	return 0;
-}
-
-
 void WindowSetup(DRV_DriverHook *Hook)
 {
-	HINSTANCE	hInstance;
-	WNDCLASS	wc;
-	RECT		wndRect;	
-	DWORD		style = 0;
-	char		className[256];
-
-
-	hInstance = (HINSTANCE)GetWindowLong(Hook->hWnd, GWL_HINSTANCE);
-	memset(className, 0, sizeof(className));
-	GetClassName(Hook->hWnd, className, 256);
-	GetClassInfo(hInstance, className, &wc);
-	GetWindowRect(Hook->hWnd, &wndRect);
-
-	originalWnd = Hook->hWnd;
-
-	strcat(className, "_r");
-
-	wc.lpszClassName = className;
-	wc.style |= CS_OWNDC;
-
-	originalWndProc = wc.lpfnWndProc;
-	wc.lpfnWndProc   = WndProc;
-
 	if(Hook->Width != -1 && Hook->Height != -1)
-	{
-		style = WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
-	}
-
-	RegisterClass(&wc);
-
-	Hook->hWnd = CreateWindowEx(
-		0,
-		wc.lpszClassName,
-		wc.lpszClassName,
-		style,
-		wndRect.left,
-		wndRect.top, 
-		wndRect.right - wndRect.left,
-		wndRect.bottom - wndRect.top,
-		NULL,
-		NULL,
-		hInstance,
-		NULL); 
-
-	if(Hook->Width != -1 && Hook->Height != -1)
-	{
-		SetWindowPos(originalWnd, HWND_BOTTOM, 0, 0, Hook->Width, Hook->Height, 0);
-		SetWindowPos(Hook->hWnd, HWND_TOP, 0, 0, Hook->Width, Hook->Height, 0);
-	}
-
-	ShowWindow(originalWnd, SW_HIDE);
-	ShowWindow(Hook->hWnd, SW_SHOW);
+		SetWindowPos(Hook->hWnd, HWND_TOP, 0, 0, Hook->Width, Hook->Height,
+		SWP_NOCOPYBITS | SWP_NOZORDER | SWP_NOSIZE | SWP_SHOWWINDOW);
 }
 
 
 void WindowCleanup()
 {
-	HINSTANCE	hInstance;
-	char		className[256];
-
 	if(ClientWindow.hWnd != NULL)
 	{
 		if(hDC != NULL && hRC != NULL)
@@ -126,21 +56,6 @@ void WindowCleanup()
 	{
 		ChangeDisplaySettings(NULL, 0);
 		fullscreen = GE_FALSE;
-	}
-
-	if(ClientWindow.hWnd != NULL)
-	{
-		hInstance = (HINSTANCE)GetWindowLong(ClientWindow.hWnd, GWL_HINSTANCE);
-		memset(className, 0, sizeof(className));
-		GetClassName(ClientWindow.hWnd, className, 256);
-
-		UnregisterClass(className, hInstance); 
-		DestroyWindow(ClientWindow.hWnd);
-
-		if(originalWnd != NULL)
-		{
-			ShowWindow(originalWnd, SW_SHOW);
-		}
 	}
 }
 
@@ -162,7 +77,7 @@ geBoolean SetFullscreen(DRV_DriverHook *Hook)
 	devMode.dmPelsHeight = Hook->Height;
 	
 	modeCount = 0;
-	
+
 	while(EnumDisplaySettings(NULL, modeCount++, &devMode))
 	{
 		if(devMode.dmBitsPerPel != COLOR_DEPTH)
@@ -200,7 +115,7 @@ void SetGLPixelFormat(DRV_DriverHook *Hook)
 {
 	GLint nPixelFormat;
 	static PIXELFORMATDESCRIPTOR pfd;
-	
+
 	memset(&pfd, 0x00, sizeof(pfd));
 	
 	pfd.nSize         = sizeof(PIXELFORMATDESCRIPTOR);
@@ -236,6 +151,18 @@ GLint EnumNativeModes(DRV_ENUM_MODES_CB *Cb, void *Context)
 	char resolution[16];
 	GLint idx = 0;
 	MODELIST *modeList = NULL;
+	FILE *stream;
+		
+	COLOR_DEPTH = 16;
+	ZBUFFER_DEPTH = 16;
+
+	stream = fopen("D3D24.ini","r");
+	if(stream)
+	{
+		fscanf(stream,"%d",&COLOR_DEPTH);
+		fscanf(stream,"%d",&ZBUFFER_DEPTH);
+		fclose(stream);
+	}
 
 	modeCount = 0;
 

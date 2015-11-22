@@ -725,7 +725,7 @@ geBoolean THandle_CheckCache(void)
 {
 	geRDriver_THandle	*pTHandle;
 	int32				i, Stage0, Stage1;
-	int32				MaxTable1[9], MaxTable2[9];
+	int32				MaxTable1[14], MaxTable2[14];
 
 	if (!CacheNeedsUpdate)
 		return GE_TRUE;
@@ -745,6 +745,12 @@ geBoolean THandle_CheckCache(void)
 		MaxTable1[6] = 512;			// 64x64
 		MaxTable1[7] = 256;			//128x128
 		MaxTable1[8] = 256;			//256x256
+		MaxTable1[9]  = 64;			//  512x512
+		MaxTable1[10] = 64;			// 1024x1024
+		MaxTable1[11] = 64;			// 2048x2048
+		MaxTable1[12] = 64;			// 4096x4096
+        MaxTable1[13] = 64;			// 8192x8192
+        MaxTable1[14] = 64;			//16384x1638
 #else
 	if (AppInfo.DeviceIdentifier.dwVendorId == 4634)		// 3dfx series have a limit on the number of texture handles
 	{
@@ -786,6 +792,12 @@ geBoolean THandle_CheckCache(void)
 		MaxTable1[6] = 128;			// 64x64
 		MaxTable1[7] = 128;			//128x128
 		MaxTable1[8] = 128;			//256x256
+		MaxTable1[9]  = 64;			//  512x512
+		MaxTable1[10] = 64;			// 1024x1024
+		MaxTable1[11] = 64;			// 2048x2048
+		MaxTable1[12] = 64;			// 4096x4096
+        MaxTable1[13] = 64;			// 8192x8192
+        MaxTable1[14] = 64;			//16384x16384
 
 		MaxTable2[0] = 128;			//  1x1
 		MaxTable2[1] = 128;			//  2x2
@@ -796,6 +808,12 @@ geBoolean THandle_CheckCache(void)
 		MaxTable2[6] = 256;			// 64x64
 		MaxTable2[7] = 256;			//128x128
 		MaxTable2[8] = 256;			//256x256
+		 MaxTable1[9]  = 64;			//  512x512
+		MaxTable1[10] = 64;			// 1024x1024
+		MaxTable1[11] = 64;			// 2048x2048
+		MaxTable1[12] = 64;			// 4096x4096
+        MaxTable1[13] = 64;			// 8192x8192
+        MaxTable1[14] = 64;			//16384x16384
 	}
 #endif
 

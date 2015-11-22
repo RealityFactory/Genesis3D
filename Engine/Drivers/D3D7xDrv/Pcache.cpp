@@ -4,6 +4,8 @@
 /*  Author: John Pollard                                                                */
 /*  Description: D3D poly cache                                                         */
 /*                                                                                      */
+/*   01/10/2003 Wendell Buckner
+/*    Allow 32-bit color depth lightmaps...                                              */
 /*   03/10/2002 Wendell Buckner                                                         */
 /*    Procedural Textures                                                               */
 /*    if you must lock a texture specify the flags WRITEONLY and DISCARDCONTENTS when   */
@@ -383,6 +385,10 @@ static void FillLMapSurface(DRV_LInfo *LInfo, int32 LNum)
 	geRDriver_THandle	*THandle;
 	int32				Extra;
 
+/* 01/10/2003 Wendell Buckner
+     Allow 32-bit color depth lightmaps...  */
+	U32					*pTempBits2;
+
 	THandle = LInfo->THandle;
 
 	pBitPtr = (U8*)LInfo->RGBLight[LNum];
@@ -391,10 +397,21 @@ static void FillLMapSurface(DRV_LInfo *LInfo, int32 LNum)
 	Height = LInfo->Height;
 	Size = 1<<THandle->Log;
 
+/* 01/10/2003 Wendell Buckner
+     Allow 32-bit color depth lightmaps... 
 	Lut = &AppInfo.Lut1;
-
-	THandle_Lock(THandle, 0, (void**)&pTempBits);
-
+	THandle_Lock(THandle, 0, (void**)&pTempBits);                 */
+	if ( AppInfo.ddTexFormat.ddpfPixelFormat.dwRGBBitCount == 32 )
+	{
+	 Lut = &AppInfo.Lut4;
+     THandle_Lock(THandle, 0, (void**)&pTempBits2);
+	}
+    else
+	{
+	 Lut = &AppInfo.Lut1;
+	 THandle_Lock(THandle, 0, (void**)&pTempBits);
+	}
+	
 	Extra = Size - Width;
 
 	for (h=0; h< Height; h++)
@@ -403,15 +420,41 @@ static void FillLMapSurface(DRV_LInfo *LInfo, int32 LNum)
 		{
 			U8	R, G, B;
 			U16	Color;
+
+/* 01/10/2003 Wendell Buckner
+     Allow 32-bit color depth lightmaps... */
+			U8  A = 0;
+			U32 Color2;
+
 			R = *pBitPtr++;
 			G = *pBitPtr++;
-			B =  *pBitPtr++;
-			
-			Color = (U16)(Lut->R[R] | Lut->G[G] | Lut->B[B]);
+			B = *pBitPtr++;
 
-			*pTempBits++ = Color;
+/* 01/10/2003 Wendell Buckner
+     Allow 32-bit color depth lightmaps... 
+			Color = (U16)(Lut->R[R] | Lut->G[G] | Lut->B[B]);
+		    *pTempBits++  = Color;                                       */
+	        if ( AppInfo.ddTexFormat.ddpfPixelFormat.dwRGBBitCount == 32 )
+			{ 			
+             Color2 = (U32)(Lut->A[A] | Lut->R[R] | Lut->G[G] | Lut->B[B]);
+			 *pTempBits2++ = Color2;
+			}
+			else
+			{
+			 Color = (U16)(Lut->R[R] | Lut->G[G] | Lut->B[B]);
+			 *pTempBits++  = Color;
+			}
+			
 		}
-		pTempBits += Extra;
+
+/* 01/10/2003 Wendell Buckner
+     Allow 32-bit color depth lightmaps... 
+		pTempBits += Extra;                */
+		if ( AppInfo.ddTexFormat.ddpfPixelFormat.dwRGBBitCount == 32 )
+		 pTempBits2 += Extra;
+		else
+		 pTempBits  += Extra;
+
 	}
 
 	THandle_UnLock(THandle, 0);
@@ -432,6 +475,10 @@ static void FillLMapSurface2(DRV_LInfo *LInfo, int32 LNum)
 	const RECT			*pRect;
     DDSURFACEDESC2		SurfDesc;
 
+/* 01/10/2003 Wendell Buckner
+     Allow 32-bit color depth lightmaps...  */
+	U32					*pTempBits2;
+
 /* 07/16/2000 Wendell Buckner
     Convert to Directx7...    
 	LPDIRECTDRAWSURFACE4	Surface; */
@@ -446,7 +493,13 @@ static void FillLMapSurface2(DRV_LInfo *LInfo, int32 LNum)
 	Width = LInfo->Width;
 	Height = LInfo->Height;
 
-	Lut = &AppInfo.Lut1;
+/* 01/10/2003 Wendell Buckner
+     Allow 32-bit color depth lightmaps... 
+	Lut = &AppInfo.Lut1;                   */
+	if ( AppInfo.ddTexFormat.ddpfPixelFormat.dwRGBBitCount == 32 )
+     Lut = &AppInfo.Lut4;
+	else
+	 Lut = &AppInfo.Lut1;
 
     pRect = TPage_BlockGetRect(THandle->Block);
 	Surface = TPage_BlockGetSurface(THandle->Block);
@@ -464,7 +517,13 @@ static void FillLMapSurface2(DRV_LInfo *LInfo, int32 LNum)
 
 	Stride = SurfDesc.dwWidth;
 
-	pTempBits = (U16*)SurfDesc.lpSurface;
+/* 01/10/2003 Wendell Buckner
+     Allow 32-bit color depth lightmaps... 
+	pTempBits = (U16*)SurfDesc.lpSurface; */
+    if ( AppInfo.ddTexFormat.ddpfPixelFormat.dwRGBBitCount == 32 )
+     pTempBits2 = (U32*) SurfDesc.lpSurface;
+    else
+	 pTempBits  = (U16*) SurfDesc.lpSurface;
 
 	Extra = Stride - Width; 
 
@@ -474,15 +533,40 @@ static void FillLMapSurface2(DRV_LInfo *LInfo, int32 LNum)
 		{
 			U8	R, G, B;
 			U16	Color;
+
+/* 01/10/2003 Wendell Buckner
+     Allow 32-bit color depth lightmaps... */
+			U8 A = 0;
+			U32 Color2;
+
 			R = *pBitPtr++;
 			G = *pBitPtr++;
 			B = *pBitPtr++;
-			
-			Color = (U16)(Lut->R[R] | Lut->G[G] | Lut->B[B]);
 
-			*pTempBits++ = Color;
+/* 01/10/2003 Wendell Buckner
+     Allow 32-bit color depth lightmaps... 
+			Color = (U16)(Lut->R[R] | Lut->G[G] | Lut->B[B]);
+			*pTempBits++  = Color;                                       */
+	        if ( AppInfo.ddTexFormat.ddpfPixelFormat.dwRGBBitCount == 32 )
+			{ 						
+             Color2 = (U32)(Lut->A[A] | Lut->R[R] | Lut->G[G] | Lut->B[B]);
+			 *pTempBits2++ = Color2;
+			}
+			else
+			{
+			 Color = (U16)(Lut->R[R] | Lut->G[G] | Lut->B[B]);
+			 *pTempBits++ = Color;
+			}
+
 		}
-		pTempBits += Extra;
+
+/* 01/10/2003 Wendell Buckner
+     Allow 32-bit color depth lightmaps... 
+		pTempBits += Extra;                */
+		if ( AppInfo.ddTexFormat.ddpfPixelFormat.dwRGBBitCount == 32 )
+		 pTempBits2 += Extra;
+		else
+		 pTempBits  += Extra;
 	}
 
     Result = Surface->Unlock((RECT*)pRect);
@@ -499,6 +583,10 @@ static void LoadLMapFromSystem(DRV_LInfo *LInfo, int32 Log, int32 LNum)
 	U16					*pTempBits;
 	int32				w, h, Width, Height, Size, Extra;
 	U8					*pBitPtr;
+
+/* 01/10/2003 Wendell Buckner
+     Allow 32-bit color depth lightmaps...  */
+	U32					*pTempBits2;
 
 /*   07/16/2000 Wendell Buckner                                                          
 /*    Convert to Directx7...                                                             
@@ -517,7 +605,13 @@ static void LoadLMapFromSystem(DRV_LInfo *LInfo, int32 Log, int32 LNum)
 
 	Extra = Size - Width;
 
-	Lut = &AppInfo.Lut1;
+/* 01/10/2003 Wendell Buckner
+     Allow 32-bit color depth lightmaps... 
+	Lut = &AppInfo.Lut1;                   */
+	if ( AppInfo.ddTexFormat.ddpfPixelFormat.dwRGBBitCount == 32 )
+     Lut = &AppInfo.Lut4;
+	else
+	 Lut = &AppInfo.Lut1;
 
 	Surface = SystemToVideo[Log].Surface;
 
@@ -532,7 +626,13 @@ static void LoadLMapFromSystem(DRV_LInfo *LInfo, int32 Log, int32 LNum)
 
 	assert(ddrval == DD_OK);
 
-	pTempBits = (USHORT*)ddsd.lpSurface;
+/* 01/10/2003 Wendell Buckner
+     Allow 32-bit color depth lightmaps... 
+	pTempBits = (USHORT*)ddsd.lpSurface;   */
+    if ( AppInfo.ddTexFormat.ddpfPixelFormat.dwRGBBitCount == 32 )
+     pTempBits2 = (ULONG*)  ddsd.lpSurface;	 
+	else
+	 pTempBits  = (USHORT*) ddsd.lpSurface;	 
 
 	for (h=0; h< Height; h++)
 	{
@@ -540,15 +640,40 @@ static void LoadLMapFromSystem(DRV_LInfo *LInfo, int32 Log, int32 LNum)
 		{
 			U8	R, G, B;
 			U16	Color;
+
+/* 01/10/2003 Wendell Buckner
+     Allow 32-bit color depth lightmaps... */
+			U8 A = 0;
+			U32 Color2;
+
 			R = *pBitPtr++;
 			G = *pBitPtr++;
-			B =  *pBitPtr++;
+			B = *pBitPtr++;
 			
+/* 01/10/2003 Wendell Buckner
+     Allow 32-bit color depth lightmaps... 
 			Color = (U16)(Lut->R[R] | Lut->G[G] | Lut->B[B]);
-			
-			*pTempBits++ = Color;
+			*pTempBits++  = Color;                                       */
+	        if ( AppInfo.ddTexFormat.ddpfPixelFormat.dwRGBBitCount == 32 )
+			{ 						
+             Color2 = (U32)(Lut->A[A] | Lut->R[R] | Lut->G[G] | Lut->B[B]);
+			 *pTempBits2++ = Color2;
+			}
+			else
+			{				
+			 Color = (U16)(Lut->R[R] | Lut->G[G] | Lut->B[B]);
+			 *pTempBits++ = Color;
+			}
+
 		}
-		pTempBits += Extra;
+
+/* 01/10/2003 Wendell Buckner
+     Allow 32-bit color depth lightmaps... 
+		pTempBits += Extra;                */
+		if ( AppInfo.ddTexFormat.ddpfPixelFormat.dwRGBBitCount == 32 )
+		 pTempBits2 += Extra;
+		else
+		 pTempBits  += Extra;
 	}
 
     ddrval = Surface->Unlock(NULL);
@@ -868,12 +993,20 @@ BOOL PCache_FlushMiscPolys(void)
 			return GE_FALSE;
 
 		if ( (pPoly->Flags & DRV_RENDER_POLY_NO_FOG) && AppInfo.FogEnable) // poly fog
-			AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , FALSE);
+/*	01/13/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc
+    9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. 
+			AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , FALSE); */
+		    D3DFogEnable ( FALSE, 0  );
 
 		D3DTexturedPoly(&MiscCache.Verts[pPoly->FirstVert], pPoly->NumVerts);
 
 		if ( (pPoly->Flags & DRV_RENDER_POLY_NO_FOG) && AppInfo.FogEnable) // poly fog
-			AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , TRUE);
+/*	01/13/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc
+    9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. 
+			AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , TRUE); */
+		    D3DFogEnable ( TRUE, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<<8)|(DWORD)AppInfo.FogB );
 	}
 
 	// Turn z stuff back on...
@@ -1251,7 +1384,11 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 				
 				if (pPoly->LInfo->RGBLight[1])
 				{
-					AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, FALSE);
+/*	01/13/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc
+    9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. 
+					AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, FALSE); */
+					D3DFogEnable ( FALSE, 0 );
 
 					D3DBlendFunc (D3DBLEND_ONE, D3DBLEND_ONE);				// Change to a fog state
 
@@ -1267,7 +1404,11 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 					D3DBlendFunc (D3DBLEND_DESTCOLOR, D3DBLEND_ZERO);		// Restore state
 
 					if (AppInfo.FogEnable)
-						AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , TRUE);
+/*	01/13/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc
+    9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. 
+						AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , TRUE); */
+						D3DFogEnable ( TRUE, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<<8)|(DWORD)AppInfo.FogB );
 				}
 			}
 			break;
@@ -1338,13 +1479,22 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 				World_PolyPrepVerts(pPoly, PREP_WORLD_VERTS_SINGLE_PASS, TSTAGE_0, TSTAGE_1);
 
 				if ( (pPoly->Flags & DRV_RENDER_POLY_NO_FOG) && AppInfo.FogEnable) // poly fog
-						AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , FALSE);
+/*	01/13/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc
+    9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. 
+						AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , FALSE); */
+						D3DFogEnable ( FALSE, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<<8)|(DWORD)AppInfo.FogB );
 
 				// Draw the texture
 				D3DTexturedPoly(&WorldCache.Verts[pPoly->FirstVert], pPoly->NumVerts);
 
 				if ( (pPoly->Flags & DRV_RENDER_POLY_NO_FOG) && AppInfo.FogEnable) // poly fog
-						AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , TRUE);
+/*	01/13/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc
+    9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. 
+						AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , TRUE); */
+                        D3DFogEnable ( TRUE, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<<8)|(DWORD)AppInfo.FogB );
+
 
 				// Render any fog maps
 				if (pPoly->LInfo->RGBLight[1])
@@ -1415,13 +1565,21 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 				World_PolyPrepVerts(pPoly, PREP_WORLD_VERTS_NORMAL, TSTAGE_0, TSTAGE_1);
 
 				if ( (pPoly->Flags & DRV_RENDER_POLY_NO_FOG) && AppInfo.FogEnable) // poly fog
-						AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , FALSE);
+/*	01/13/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc
+    9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. 
+						AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , FALSE); */
+                        D3DFogEnable ( FALSE, 0 );
 
 				// Draw the texture
 				D3DTexturedPoly(&WorldCache.Verts[pPoly->FirstVert], pPoly->NumVerts);
 
 				if ( (pPoly->Flags & DRV_RENDER_POLY_NO_FOG) && AppInfo.FogEnable) // poly fog
-					AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , TRUE);
+/*	01/13/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc
+    9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. 
+					AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , TRUE); */
+				    D3DFogEnable ( TRUE, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<<8)|(DWORD)AppInfo.FogB );
 			}
 
 			break;						 

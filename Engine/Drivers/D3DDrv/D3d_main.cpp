@@ -188,7 +188,7 @@ BOOL D3DMain_InitD3D(HWND hWnd, const char *DriverName, int32 Width, int32 Heigh
 	unlink(D3DMAIN_LOG_FILENAME);
 
 	D3DMain_Log("=================================================================\n");
-	D3DMain_Log(" D3DDrv v%i.%i\n", DRV_VERSION_MAJOR, DRV_VERSION_MINOR);
+	D3DMain_Log(" D3DDrv 16 Bit v%i.%i\n", DRV_VERSION_MAJOR, DRV_VERSION_MINOR);
 	D3DMain_Log(" Build Date: "__DATE__", Time: "__TIME__"\n");
 	D3DMain_Log("=================================================================\n\n");
 
@@ -215,14 +215,14 @@ BOOL D3DMain_InitD3D(HWND hWnd, const char *DriverName, int32 Width, int32 Heigh
 
 // start 32 bit changes
 	// Open the config file and read the bpp variable
-	stream = fopen("D3D24.ini","r");
+/*	stream = fopen("D3D24.ini","r");
 	if(stream)
 	{
 		fscanf(stream,"%d",&BPP32);
 		fscanf(stream,"%d",&ZbufferD);
 		fclose(stream);
 	}
-	else
+	else */
 	{
 		BPP32 = 16;
 		ZbufferD = 16;
@@ -463,7 +463,7 @@ static HRESULT CALLBACK EnumDisplayModesCallback(LPDDSURFACEDESC2 pddsd, LPVOID 
 	if (!pddsd)
 		return DDENUMRET_OK;
 		
-	if (pddsd->dwWidth > 1024 || pddsd->dwHeight > 768)
+	if (pddsd->dwWidth > 1280 || pddsd->dwHeight > 1024)
 		return DDENUMRET_OK;
 
 	if (AppInfo.NumModes >= MAX_APP_MODES)
@@ -2496,7 +2496,11 @@ BOOL FAR PASCAL EnumDriversCB2(GUID FAR *lpGUID, LPSTR lpDriverDesc, LPSTR lpDri
 	}
 
 	// Save name
-	sprintf(pDriver->Name, "(D3D)%s", lpDriverDesc);
+#ifdef WIREFRAME
+	sprintf(pDriver->Name, "WireFrame ( D3D )");
+#else
+	sprintf(pDriver->Name, "D3D 16 Bit");
+#endif
 
 	return DDENUMRET_OK;
 }
@@ -2725,7 +2729,11 @@ static BOOL D3DMain_CreateDDFromName(const char *DriverName)
 	{
 		char		TempName[1024];
 
-		sprintf(TempName, "(D3D)%s", DriverName);
+#ifdef WIREFRAME
+		sprintf(TempName, "WireFrame ( D3D )");
+#else
+		sprintf(TempName, "D3D 16 Bit");
+#endif
 
 		if (!CreateDDFromName(TempName, &Info))
 			return GE_FALSE;

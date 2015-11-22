@@ -79,7 +79,12 @@ BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, RECT *WorldRect)
 		}
 
 		D3DBilinearFilter(D3DFILTER_LINEAR, D3DFILTER_LINEAR);
+
+#ifdef WIREFRAME
+		D3DPolygonMode (D3DFILL_WIREFRAME);
+#else
 		D3DPolygonMode (D3DFILL_SOLID);
+#endif
 		
 		D3DZWriteEnable (TRUE);
 		D3DZEnable(TRUE);

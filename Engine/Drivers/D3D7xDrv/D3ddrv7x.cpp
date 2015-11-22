@@ -4,8 +4,14 @@
 /*  Author: John Pollard                                                                */
 /*  Description: D3D driver                                                             */
 /*                                                                                      */
+/*  Edit History:                                                                       */
+/*  12/28/2002 Wendell Buckner                                                          */
+/*    Allow/make 32-bit (ARGB) mode the default mode...                                 */
+/*    Give out the true 24-bit surface as well...                                       */
+/*    Make sure the standard 16-bit is available...                                     */
 /*  07/16/2000 Wendell Buckner                                                          */
 /*   Convert to Directx7...                                                             */
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -37,7 +43,6 @@
 #include "D3D_Main.h"
 #include "PCache.h"
 #include "THandle.h"
-
 
 DRV_Window			ClientWindow;
 BOOL				ExitHandlerActive = FALSE;
@@ -100,6 +105,10 @@ geBoolean DRIVERCC EnumPixelFormats(DRV_ENUM_PFORMAT_CB *Cb, void *Context)
 	int32			i;
 	gePixelFormat	Format3d, Format2d;
 	uint32			CurrentBpp;
+	int32			j;
+    DDSURFACEDESC2 NoSurfDesc;
+
+    memset(&NoSurfDesc, 0, sizeof(DDSURFACEDESC2));
 
 	CurrentBpp = AppInfo.ddsd.ddpfPixelFormat.dwRGBBitCount;
 
@@ -115,8 +124,22 @@ geBoolean DRIVERCC EnumPixelFormats(DRV_ENUM_PFORMAT_CB *Cb, void *Context)
 	else
 		Format2d = GE_PIXELFORMAT_16BIT_565_RGB;
 
+/* 12/28/2002 Wendell Buckner
+    Allow/make 32-bit (ARGB) mode the default mode...  
+	if (AppInfo.ddTexFormat.ddpfPixelFormat.dwGBitMask == (31<<5)) */
+    if (CurrentBpp == 32 && AppInfo.ddTexFormat.ddpfPixelFormat.dwRGBAlphaBitMask == 0xff000000)		
+		Format3d = GE_PIXELFORMAT_32BIT_ARGB;
+
+	else if (CurrentBpp == 32 && AppInfo.ddTexFormat.ddpfPixelFormat.dwBBitMask == 0xff)
+		Format2d = GE_PIXELFORMAT_32BIT_XRGB;
+
+/* 12/28/2002 Wendell Buckner
+    Give out the true 24-bit surface as well...  */
+	else if (CurrentBpp == 24 && AppInfo.ddTexFormat.ddpfPixelFormat.dwBBitMask == 0xff)
+		Format3d = GE_PIXELFORMAT_24BIT_RGB;
+
 	// Setup the 3d (Texture) format
-	if (AppInfo.ddTexFormat.ddpfPixelFormat.dwGBitMask == (31<<5))
+	else if (AppInfo.ddTexFormat.ddpfPixelFormat.dwGBitMask == (31<<5))
 		Format3d = GE_PIXELFORMAT_16BIT_555_RGB;
 	else
 		Format3d = GE_PIXELFORMAT_16BIT_565_RGB;
@@ -138,8 +161,43 @@ geBoolean DRIVERCC EnumPixelFormats(DRV_ENUM_PFORMAT_CB *Cb, void *Context)
 	PixelFormat[4].PixelFormat = GE_PIXELFORMAT_16BIT_1555_ARGB;	
 	PixelFormat[4].Flags = RDRIVER_PF_3D | RDRIVER_PF_COMBINE_LIGHTMAP;
 
+/* 12/28/2002 Wendell Buckner
+    Make sure the standard 16-bit is available...  	 */
+//  THIS KILLED ME BUT IT'S FIXED NOW, I NEED TO CHECK AND MAKE SURE IT'S 555 OR 565 THE CALLING
+//  PROGRAM KNOWS THE DIFFERENCE...	
+	// Setup the 3d (Texture) format
+	if (AppInfo.ddTexFormat16.ddpfPixelFormat.dwGBitMask == (31<<5))
+	 PixelFormat[5].PixelFormat = GE_PIXELFORMAT_16BIT_555_RGB;
+	else
+ 	 PixelFormat[5].PixelFormat = GE_PIXELFORMAT_16BIT_565_RGB;
+	
+	PixelFormat[5].Flags = RDRIVER_PF_3D | RDRIVER_PF_COMBINE_LIGHTMAP;
+
+    j = 6;
+
+/* 12/28/2002 Wendell Buckner
+    Give out the true 24-bit or 32-bit XRGB surface as well...  */
+    if ( (AppInfo.ddTexFormat24.ddpfPixelFormat.dwRGBBitCount == 32) && (CurrentBpp == 32) )
+	{	 
+	 PixelFormat[j].PixelFormat = GE_PIXELFORMAT_32BIT_XRGB;;	// 3d X888 surface
+	 PixelFormat[j].Flags = RDRIVER_PF_3D | RDRIVER_PF_COMBINE_LIGHTMAP;	 
+	 j++;
+    }
+
+/* 12/28/2002 Wendell Buckner
+    Allow/make 32-bit (ARGB) mode the default mode...  */
+    if ( (AppInfo.ddTexFormat32.ddpfPixelFormat.dwRGBBitCount == 32) && (CurrentBpp == 32) )
+	{	 
+	 PixelFormat[j].PixelFormat = GE_PIXELFORMAT_32BIT_ARGB;	// 3d 8888 surface
+	 PixelFormat[j].Flags = RDRIVER_PF_3D | RDRIVER_PF_COMBINE_LIGHTMAP;
+	 j++;
+	}
+
 	// Then hand them off to the caller
-	for (i=0; i<5; i++)
+/* 12/28/2002 Wendell Buckner
+    Give out the true 24-bit or 32-bit XRGB surface as well...  
+	for (i=0; i<5; i++)   */
+	for (i=0; i<j; i++)
 	{
 		if (!Cb(&PixelFormat[i], Context))
 			return GE_TRUE;
