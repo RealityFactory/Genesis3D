@@ -61,6 +61,11 @@ GENESISAPI geBoolean GENESISCC geXForm3d_IsValid(const geXForm3d *M);
 	// returns GE_TRUE if M is 'valid'  
 	// 'valid' means that M is non NULL, and there are no NAN's in the matrix.
 
+//MRB BEGIN
+GENESISAPI geBoolean GENESISCC geXForm3d_IsIdentity(const geXForm3d *M);
+	// returns GE_TRUE if M is an identity matrix 
+//MRB END
+
 GENESISAPI geBoolean GENESISCC geXForm3d_IsOrthonormal(const geXForm3d *M);
 	// returns GE_TRUE if M is orthonormal 
 	// (if the rows and columns are all normalized (transform has no scaling or shearing)

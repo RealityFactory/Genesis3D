@@ -154,6 +154,11 @@ typedef enum
 	ERR_ACTOR_FILE_WRITE,				// failure to write to data file.
 	GE_ERR_INVALID_MODEL_MOTION_FILE,	// Bad model motion file (for bsp files)
 	GE_ERR_BAD_BSP_FILE_CHUNK_SIZE,		// Chunk size does not match structure size of kind
+//MRB BEGIN
+//geSprite
+	ERR_SPRITE_ENOMEM,					// failure to create. (memory allocation failure)
+	ERR_SPRITE_INVALIDBITMAP,		// failure to use bitmap because bitmap was invalid
+//MRB END
 } geErrorLog_ErrorIDEnumType;
 
 

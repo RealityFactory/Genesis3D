@@ -380,6 +380,13 @@ GENESISAPI void *geSound_GetDSound(void);
 //================================================================================
 #include "Actor.h"
 
+//MRB BEGIN
+//geSprite
+//================================================================================
+//  Sprite Support
+//================================================================================
+#include "Sprite.h"
+//MRB END
 
 
 //================================================================================
@@ -392,6 +399,13 @@ GENESISAPI void			geWorld_Free(geWorld *World);
 GENESISAPI geBoolean	geWorld_RemoveActor    (geWorld *World, geActor *Actor);
 GENESISAPI geBoolean    geWorld_AddActor       (geWorld *World, geActor *Actor, uint32 Flags, uint32 UserFlags);
 GENESISAPI geBoolean	geWorld_SetActorFlags  (geWorld *World, geActor *Actor, uint32 Flags);
+
+//MRB BEGIN
+//geSprite
+GENESISAPI geBoolean	geWorld_RemoveSprite    (geWorld *World, geSprite *Sprite);
+GENESISAPI geBoolean	geWorld_AddSprite       (geWorld *World, geSprite *Sprite, uint32 Flags, uint32 UserFlags);
+GENESISAPI geBoolean	geWorld_SetSpriteFlags  (geWorld *World, geSprite *Sprite, uint32 Flags);
+//MRB END
 
 // World Bitmaps
 GENESISAPI geBoolean	geWorld_AddBitmap(		geWorld *World, geBitmap *Bitmap);
@@ -502,6 +516,9 @@ GENESISAPI geBoolean	geWorld_LeafMightSeeLeaf(const geWorld *World, int32 Leaf1,
 
 GENESISAPI geBoolean GENESISCC geWorld_IsActorPotentiallyVisible(const geWorld *World, const geActor *Actor, const geCamera *Camera);
 
+//MRB BEGIN
+//geSprite
+GENESISAPI geBoolean GENESISCC geWorld_IsSpritePotentiallyVisible(const geWorld *World, const geSprite *Sprite, const geCamera *Camera);
 
 //================================================================================
 //	Camera Management functions

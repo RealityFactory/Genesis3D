@@ -73,6 +73,27 @@ GENESISAPI geBoolean GENESISCC geXForm3d_IsValid(const geXForm3d *M)
 }
 
 
+//MRB BEGIN
+GENESISAPI geBoolean GENESISCC geXForm3d_IsIdentity(const geXForm3d *M)
+	// returns GE_TRUE if M is an identity matrix 
+{
+	assert( M != NULL );
+
+	return ( M->Translation.X == 0.0f
+				&& M->Translation.Y == 0.0f
+				&& M->Translation.Z == 0.0f
+				&& M->AX == 1.0f
+				&& M->AY == 0.0f
+				&& M->AZ == 0.0f
+				&& M->BX == 0.0f
+				&& M->BY == 1.0f
+				&& M->BZ == 0.0f
+				&& M->CX == 0.0f
+				&& M->CY == 0.0f
+				&& M->CZ == 1.0f );
+}
+//MRB END
+
 
 
 GENESISAPI void GENESISCC geXForm3d_SetIdentity(geXForm3d *M)

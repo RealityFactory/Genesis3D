@@ -45,6 +45,17 @@ extern "C" {
 #define GE_ACTOR_RENDER_ALWAYS			(1<<2)		// Render always, skipping all visibility tests
 #define GE_ACTOR_COLLIDE				(1<<3)		// Collide when calling geWorld_Collision
 
+//MRB BEGIN
+//geSprite
+//
+// Sprite flags (geSprite_AddSprite)
+//
+#define GE_SPRITE_RENDER_NORMAL			(1<<0)		// Render in normal views
+#define GE_SPRITE_RENDER_MIRRORS		(1<<1)		// Render in mirror views
+#define GE_SPRITE_RENDER_ALWAYS			(1<<2)		// Render always, skipping all visibility tests
+#define GE_SPRITE_COLLIDE						(1<<3)		// Collide when calling geWorld_Collision
+//MRB END
+
 typedef struct
 {
 	geBoolean		UseEnvironmentMapping;	//toggle for actor-level environ-map
@@ -61,6 +72,18 @@ typedef struct
 #define GE_MODEL_RENDER_MIRRORS			(1<<1)		// Render in mirror views
 #define GE_MODEL_RENDER_ALWAYS			(1<<2)		// Render always, skipping all visibility tests
 #define GE_MODEL_COLLIDE				(1<<3)		// Collide when calling geWorld_Collision
+
+//MRB BEGIN
+typedef struct
+{
+	geFloat				r, g, b;
+} geColor;
+
+typedef struct
+{
+	geFloat				u, v;
+} geUV;
+//MRB END
 
 typedef struct
 {
@@ -80,6 +103,14 @@ typedef struct
 	geFloat MinX,MaxX;
 	geFloat MinY,MaxY;
 } geFloatRect;
+
+//MRB BEGIN
+typedef struct
+{
+	geFloat X;
+	geFloat Y;
+} geCoordinate;
+//MRB END
 
 // Lit vertex
 typedef struct

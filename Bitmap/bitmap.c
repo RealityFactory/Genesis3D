@@ -3401,10 +3401,12 @@ uint32 pel,ColorKey;
 		case 0:
 			geErrorLog_AddString(-1,"UsesColorKey : invalid format", NULL);
 			return GE_TRUE;
-		case 3:
-			#pragma message("Bitmap : UsesColorKey : no 24bit Smart ColorKey")
-			geErrorLog_AddString(-1,"UsesColorKey : no 24bit Smart ColorKey", NULL);
-			return GE_TRUE;	
+//Start Dec2001DCS - Added new case 3 below
+//		case 3:
+//			#pragma message("Bitmap : UsesColorKey : no 24bit Smart ColorKey")
+//			geErrorLog_AddString(-1,"UsesColorKey : no 24bit Smart ColorKey", NULL);
+//			return GE_TRUE;	
+//End Dec2001DCS
 		case 1:
 		{
 		uint8 * ptr;
@@ -3441,6 +3443,31 @@ uint32 pel,ColorKey;
 			}
 			break;
 		}
+//Start Dec2001DCS - Added new case 3 
+		case 3:
+		{
+   		uint8 * ptr;
+         uint8   ckR, ckG, ckB;
+
+         ckB = (uint8) (ColorKey & 0x000000ff);
+         ckG = (uint8) ((ColorKey >> 8) & 0x000000ff);
+         ckR = (uint8) ((ColorKey >> 16) & 0x000000ff);
+			ptr = Bits;
+			for(y=h;y--;)
+			{
+				for(x=w;x--;)
+				{
+					if ((*ptr == ckR) && (*(ptr+1) == ckG) && (*(ptr+2) == ckB))
+					{
+						return GE_TRUE;	
+					}
+               ptr += 3;
+				}
+				ptr += ((s-w)*3);
+			}
+			break;
+		}
+//End Dec2001DCS
 		case 4:
 		{
 		uint32 * ptr;

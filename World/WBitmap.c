@@ -265,7 +265,15 @@ geBoolean geWBitmap_Pool_CreateAllWBitmaps(geWBitmap_Pool *Pool, GBSP_BSPData *B
 		if (BitmapIsTransparent[i])
 		{
 			UseColorKey = GE_TRUE;
-			ColorKey = 255;
+         //Start Dec2001DCS - ColorKey = 24 bit version of bright magenta.  NOTE: Blue value is 254 (0xfe)
+         //                                                                       because I couldn't make a 24 bit bitmap
+         //                                                                       with MSPaint using the color 
+         //                                                                       255 0 255.  Even though Paint said it
+         //                                                                       was the right value, by the time the 
+         //                                                                       bitmap got to Genesis it was read as
+         //                                                                       255 0 254 ???
+			ColorKey = 0x00ff00fe;
+         //End Dec2001DCS
 		}
 		else
 		{
@@ -289,7 +297,10 @@ geBoolean geWBitmap_Pool_CreateAllWBitmaps(geWBitmap_Pool *Pool, GBSP_BSPData *B
 		assert(NumMips <= MAX_MIPS_ALLOWED);
 
 		// Create the bitmap
-		pWBitmap->Bitmap = geBitmap_Create(Width, Height, NumMips, GE_PIXELFORMAT_8BIT);
+      //Start Dec2001DCS - Changed format to 24 bit
+	   pWBitmap->Bitmap = geBitmap_Create(Width, Height, NumMips, GE_PIXELFORMAT_24BIT_RGB);
+//	   pWBitmap->Bitmap = geBitmap_Create(Width, Height, NumMips, GE_PIXELFORMAT_8BIT);
+      //End Dec2001DCS
 
 		if (!pWBitmap->Bitmap)
 		{
@@ -342,14 +353,18 @@ geBoolean geWBitmap_Pool_CreateAllWBitmaps(geWBitmap_Pool *Pool, GBSP_BSPData *B
 
 			if ( Stride == Width )
 			{
-				memcpy(pDest,pSrc,Width*Height);
+            //Start Dec2001DCS - Added * 3 since textures are now 24 bit
+			   memcpy(pDest,pSrc,Width*Height*3);
+            //End Dec2001DCS
 			}
 			else
 			{
 			int h;
 				for (h=Height;h--;)
 				{
-					memcpy(pDest,pSrc,Width);
+               //Start Dec2001DCS - Added * 3 since textures are now 24 bit
+               memcpy(pDest,pSrc,Width*3);
+               //End Dec2001DCS
 					pSrc += Width;
 					pDest += Stride;
 				}

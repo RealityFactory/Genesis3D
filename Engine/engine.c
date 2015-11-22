@@ -545,7 +545,8 @@ GENESISAPI geBoolean geEngine_SetDriverAndMode(	geEngine *Engine,
 	geEngine_UpdateGamma(Engine);
 	geEngine_UpdateFogEnable(Engine);
 
-#ifdef DONT_DO_SPLASH
+//#ifdef DONT_DO_SPLASH
+#ifdef _DEBUG
 	#pragma message("Engine :splash screen disabled")
 	Engine = Engine;
 #else
@@ -1839,7 +1840,7 @@ GENESISAPI geBoolean geEngine_EndFrame(geEngine *Engine)
 		#define				MAX_FPS_ARRAY		20
 
 		geFloat				AverageFps;
-		DRV_CacheInfo		*pCacheInfo;
+		//DRV_CacheInfo		*pCacheInfo;
 		static geFloat		FpsArray[MAX_FPS_ARRAY];
 		static int32		NumFps = 0, i;
 
@@ -1858,7 +1859,7 @@ GENESISAPI geBoolean geEngine_EndFrame(geEngine *Engine)
 		geEngine_Printf(Engine, 2,2+15*1, "Polys  : %4i/%4i/%4i", Engine->DebugInfo.TraversedPolys, Engine->DebugInfo.SentPolys, Engine->DebugInfo.RenderedPolys);
 
 		geEngine_Printf(Engine, 2,2+15*2, "Mirrors: %3i", Engine->DebugInfo.NumMirrors);
-
+/*
 		pCacheInfo = Engine->DriverInfo.RDriver->CacheInfo;
 
 		if (pCacheInfo)
@@ -1871,12 +1872,12 @@ GENESISAPI geBoolean geEngine_EndFrame(geEngine *Engine)
 											pCacheInfo->LMapMisses);
 																			
 		}
-
-		geEngine_Printf(Engine, 2,2+15*4, "Actors : %3i, Models: %3i", Engine->DebugInfo.NumActors, Engine->DebugInfo.NumModels);
-		geEngine_Printf(Engine, 2,2+15*5, "DLights: %3i", Engine->DebugInfo.NumDLights);
-		geEngine_Printf(Engine, 2,2+15*6, "Fog    : %3i", Engine->DebugInfo.NumFog);
-		geEngine_Printf(Engine, 2,2+15*7, "LMap1  : %3i, LMap2  : %3i", Engine->DebugInfo.LMap1, Engine->DebugInfo.LMap2);
-
+*/
+		geEngine_Printf(Engine, 2,2+15*3, "Actors : %3i, Models: %3i", Engine->DebugInfo.NumActors, Engine->DebugInfo.NumModels);
+		geEngine_Printf(Engine, 2,2+15*4, "DLights: %3i", Engine->DebugInfo.NumDLights);
+		geEngine_Printf(Engine, 2,2+15*5, "Fog    : %3i", Engine->DebugInfo.NumFog);
+//		geEngine_Printf(Engine, 2,2+15*7, "LMap1  : %3i, LMap2  : %3i", Engine->DebugInfo.LMap1, Engine->DebugInfo.LMap2);
+/*
 		// For now, just display debug info for the first world...
 		if (Engine->NumWorlds)
 		{
@@ -1893,6 +1894,7 @@ GENESISAPI geBoolean geEngine_EndFrame(geEngine *Engine)
 			NumGetContents = 0;
 
 		}
+*/
 	}
 
 	// Do an engine frame

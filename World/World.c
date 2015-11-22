@@ -469,6 +469,12 @@ GENESISAPI geWorld *geWorld_Create(geVFile *File)
 	NewWorld->ActorCount = 0;
 	NewWorld->ActorArray = NULL;
 
+//MRB BEGIN
+//geSprite
+	NewWorld->SpriteCount = 0;
+	NewWorld->SpriteArray = NULL;
+//MRB END
+
 	if (!CreateStaticFogList(NewWorld))
 	{
 		geErrorLog_AddString(-1,"Failed to create static FogList", NULL);
@@ -527,7 +533,26 @@ if (World->CurrentBSP)
 			geRam_Free( World->ActorArray );
 			World->ActorArray = NULL;
 		}
-	
+
+//MRB BEGIN
+//geSprite
+	// Shutdown sprites
+	if (World->SpriteCount>0)
+	{
+			assert( World->SpriteArray != NULL );
+			for (i=0; i< World->SpriteCount; i++)
+				{
+					geSprite_Destroy( &( World->SpriteArray[i].Sprite ) );
+				}
+			World->SpriteCount = 0;
+	}
+	if (World->SpriteArray != NULL)
+	{
+			geRam_Free( World->SpriteArray );
+			World->SpriteArray = NULL;
+	}
+//MRB END
+		
 	assert( World->ActorArray == NULL );
 	
 	// Call other modules to release info from the world that they created...
@@ -849,6 +874,37 @@ GENESISAPI geBoolean GENESISCC geWorld_IsActorPotentiallyVisible(const geWorld *
 
 }
 
+//MRB BEGIN
+//geSprite
+GENESISAPI geBoolean GENESISCC geWorld_IsSpritePotentiallyVisible(const geWorld *World, const geSprite *Sprite, const geCamera *Camera)
+{
+	#pragma message ("This is a fairly poor test: ")
+		// mirrors aren't checked.
+		// this doesn't check the extents of the sprite, just the center point.
+	geVec3d			Center;
+	const geXForm3d	*CameraTransform;
+	int32			Leaf,CameraLeaf;
+		
+	assert( World != NULL );
+	assert( geSprite_IsValid(Sprite)!= GE_FALSE );
+	assert( Camera != NULL );
+
+	geSprite_GetPosition ( Sprite, &Center );
+
+	// NOTE - We are not taking into acount that a sprite may live in more than one leaf...
+	geWorld_GetLeaf(World, &Center, &Leaf);
+
+	CameraTransform = geCamera_GetWorldSpaceVisXForm( Camera );
+	geWorld_GetLeaf(World, &(CameraTransform->Translation), &CameraLeaf);
+
+	#pragma message ("geWorld_MightSeeLeaf would be WAY FASTER here, but would be a frame behind...")
+	if (geWorld_LeafMightSeeLeaf(World, Leaf, CameraLeaf, 0 )==GE_FALSE)
+		return GE_FALSE;
+
+	return GE_TRUE;
+}
+//MRB END
+
 
 //=====================================================================================
 //	RenderScene
@@ -897,6 +953,12 @@ static geBoolean RenderScene(geEngine *Engine, geWorld *World, geCamera *Camera,
 	{	
 		int i;
 		World_Actor		*WActor;
+
+//MRB BEGIN
+//geSprite
+		World_Sprite *WSprite;
+//MRB END
+
 		//geXForm3d		XForm;
 		geVec3d			Center;
 		int32			Leaf;
@@ -955,6 +1017,39 @@ static geBoolean RenderScene(geEngine *Engine, geWorld *World, geCamera *Camera,
 				}
 
 			}
+
+//MRB BEGIN
+//geSprite
+		WSprite = World->SpriteArray;
+
+		for (i = 0; i < World->SpriteCount; i++, WSprite++)
+		{
+			// Not visible in normal views, skip it
+			if ( (MirrorRecursion == 0) && !(WSprite->Flags & (GE_SPRITE_RENDER_NORMAL | GE_SPRITE_RENDER_ALWAYS)) )
+				continue;
+
+			// Not visible in mirros, skip it
+			if ( (MirrorRecursion > 0) && !(WSprite->Flags & (GE_SPRITE_RENDER_MIRRORS | GE_SPRITE_RENDER_ALWAYS)) )
+				continue;
+
+			// if it is not always rendered, then make sure it is in a visible leaf
+			if (!(WSprite->Flags & GE_SPRITE_RENDER_ALWAYS))
+			{
+				// get the position of the sprite
+				geSprite_GetPosition( WSprite->Sprite, &Center );
+
+				// NOTE - We are not taking into acount that a sprite may live in more than one leaf...
+				geWorld_GetLeaf(World, &Center, &Leaf);
+
+				// Not in PVS, skip it
+				if (World->CurrentBSP->LeafData[Leaf].VisFrame != World->CurFrameStatic)
+					continue;		
+			}
+
+			// render the sprite through the frustum
+			geSprite_RenderThroughFrustum(WSprite->Sprite, Engine, World, Camera, &ActorFrustum);
+		}
+//MRB END
 
 		if (!Engine->DriverInfo.RDriver->EndMeshes())
 		{
@@ -2283,6 +2378,122 @@ GENESISAPI geBoolean geWorld_SetActorFlags(geWorld *World, geActor *Actor, uint3
 	geErrorLog_AddString(-1,"Failed to find actor in actor list", NULL);
 	return GE_FALSE;
 }
+
+//MRB BEGIN
+//geSprite
+//========================================================================================
+//========================================================================================
+GENESISAPI geBoolean geWorld_AddSprite(geWorld *World, geSprite *Sprite, uint32 Flags, uint32 UserFlags)
+{
+	World_Sprite *NewArray;
+
+	assert( World );
+	assert( geSprite_IsValid(Sprite) );
+	assert( World->SpriteCount >= 0 );
+
+	NewArray = GE_RAM_REALLOC_ARRAY( World->SpriteArray, World_Sprite, (World->SpriteCount + 1) );
+
+	if (NewArray == NULL)	
+	{
+		geErrorLog_AddString(-1, "Failed to grow world sprite array", NULL);
+		return GE_FALSE;
+	}
+
+	World->SpriteArray = NewArray;
+	World->SpriteArray[World->SpriteCount].Sprite			= Sprite;
+	World->SpriteArray[World->SpriteCount].Flags			= Flags;
+	World->SpriteArray[World->SpriteCount].UserFlags	= UserFlags;
+
+	if ( geSprite_RenderPrep(Sprite, World) == GE_FALSE )
+	{
+		geErrorLog_AddString(-1, "Failed to prepare the sprite for rendering", NULL);
+		return GE_FALSE;
+	}
+
+	World->SpriteCount++;
+	geSprite_CreateRef(Sprite);
+
+#ifdef DO_ADDREMOVE_MESSAGES	
+	{
+		char str[100];
+
+		sprintf(str, "World_AddSprite : %08X\n", Sprite);
+		OutputDebugString(str);
+	}
+#endif
+	
+	return GE_TRUE;
+}
+
+
+//========================================================================================
+//========================================================================================
+GENESISAPI geBoolean geWorld_RemoveSprite(geWorld *World, geSprite *Sprite)
+{
+	int i, Count;
+
+	assert( World );
+	assert( geSprite_IsValid(Sprite) );
+	assert( World->SpriteCount >= 0 );
+
+	Count = World->SpriteCount;
+
+#ifdef DO_ADDREMOVE_MESSAGES	
+	{
+		char str[100];
+
+		sprintf(str,"World_RemoveSprite : %08X\n",Sprite);
+		OutputDebugString(str);
+	}
+#endif
+
+	for (i=0; i < Count; i++)
+	{
+		if (World->SpriteArray[i].Sprite == Sprite)
+		{
+			geSprite_Destroy( &Sprite );
+
+			World->SpriteArray[i] = World->SpriteArray[Count-1];
+
+			World->SpriteArray[Count-1].Sprite = NULL;
+			World->SpriteArray[Count-1].Flags = 0;
+			
+			World->SpriteCount--;
+
+			return GE_TRUE;
+		}
+	}
+
+	geErrorLog_AddString(-1,"Failed to find actor in actor list", NULL);
+	
+	return GE_FALSE;
+}
+
+//========================================================================================
+//========================================================================================
+GENESISAPI geBoolean geWorld_SetSpriteFlags(geWorld *World, geSprite *Sprite, uint32 Flags)
+{
+	int i, Count;
+
+	assert( World );
+	assert( geSprite_IsValid(Sprite) );
+
+	Count = World->SpriteCount;
+
+	for (i = 0; i < Count; i++)
+	{
+		if (World->SpriteArray[i].Sprite == Sprite)
+		{
+			World->SpriteArray[i].Flags = Flags;
+			return GE_TRUE;
+		}
+	}
+
+	geErrorLog_AddString(-1,"Failed to find actor in actor list", NULL);
+
+	return GE_FALSE;
+}
+//MRB END
 
 //========================================================================================
 //	geWorld_GetLeaf

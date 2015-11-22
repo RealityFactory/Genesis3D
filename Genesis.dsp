@@ -743,6 +743,14 @@ SOURCE=.\Sound3d.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\sprite.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\sprite.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\Tclip.c
 # End Source File
 # Begin Source File

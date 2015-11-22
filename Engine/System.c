@@ -57,6 +57,7 @@ static char DriverFileNames[][200] =
 	{"SoftDrv.dll"},
 	{"SoftDrv2.dll"},
 	{"OglDrv.dll"},
+	{"WireDrv.dll"},
 	{""}
 };
 

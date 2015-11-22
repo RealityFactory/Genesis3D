@@ -297,11 +297,20 @@ static	void *	GENESISCC FSVFS_OpenNewSystem(
 	else
 	{
 		TStr = (char *)Context;
-		strncpy(EString, TStr, 4);
-		Mask = (EString[0]<<2) & 0xc0;
-		Mask |= EString[1] & 0x30;
-		Mask |= EString[2] & 0x0c;
-		Mask |= EString[3] & 0x03;
+		strncpy(EString, TStr, 8);
+		Mask = EString[0] & 0x01;
+		Mask |= EString[7] & 0x02;
+		Mask |= EString[1] & 0x04;
+		Mask |= EString[6] & 0x08;
+		Mask |= EString[2] & 0x10;
+		Mask |= EString[5] & 0x20;
+		Mask |= EString[3] & 0x40;
+		Mask |= EString[4] & 0x80;
+
+		//Mask = (EString[0]<<2) & 0xc0;
+		//Mask |= EString[1] & 0x30;
+		//Mask |= EString[2] & 0x0c;
+		//Mask |= EString[3] & 0x03;
 	}
 
 	// All VFS are directories

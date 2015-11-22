@@ -892,10 +892,10 @@ static void GENESISCC gePuppet_DrawShadow(const gePuppet *P,
 				NULL,
 				&Collision);
 
-   		if(GoodImpact) 
+   		//if(GoodImpact) 
 	   		Impact = Collision.Impact;
-   		else
-	   		return;
+   		//else
+	   		//return;
 	}
 
 	Impact.Y += 1.0f;
@@ -903,7 +903,7 @@ static void GENESISCC gePuppet_DrawShadow(const gePuppet *P,
 	v[0].r = v[0].b = v[0].g = 0.0f;
 	v[1].r = v[1].b = v[1].g = 0.0f;
 	v[2].r = v[2].b = v[2].g = 0.0f;
-	
+
 #ifdef SHADOW_MAP
 	{
 		int i;
@@ -990,7 +990,7 @@ static void GENESISCC gePuppet_DrawShadow(const gePuppet *P,
 		geVec3d V;
 		geFloat Angle = 0.0f;
 		geFloat DAngleDStep = -(2.0f * 3.14159f / (geFloat)steps);
-		geFloat Radius = P->ShadowScale;
+		geFloat Radius = P->ShadowScale/2.0f;
 
 		V = Impact;
 		geCamera_Transform(Camera,&V,&V);
@@ -999,7 +999,8 @@ static void GENESISCC gePuppet_DrawShadow(const gePuppet *P,
 		v[0].Y = V.Y;
 		v[0].Z = V.Z;
 
-		geTClip_SetTexture(NULL);
+		//geTClip_SetTexture(NULL);
+		geTClip_SetTexture(P->ShadowMap);
 
 		V = Impact;
 		V.Z += Radius;
@@ -1022,7 +1023,8 @@ static void GENESISCC gePuppet_DrawShadow(const gePuppet *P,
 				v[1].Z = V.Z;
 
 				Angle = Angle + DAngleDStep;
-				geTClip_Triangle(v);
+				geEngine_RenderPoly(Engine, (GE_TLVertex *)v, 3, P->ShadowMap, 0 );
+				//geTClip_Triangle(v);
 			}
 	}
 #endif
@@ -1519,6 +1521,11 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 	#endif
 	geRect ClippingRect;
 	geBoolean Clipping = GE_TRUE;
+
+	char name[128];
+	int i, j;
+	geBoolean flag;
+
 	#define BACK_EDGE (1.0f)
 
 	const geBodyInst_Geometry *G;
@@ -1532,6 +1539,18 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
     rdtsc_zero(&RDTSCEnd);
 	#endif
 
+	flag = GE_FALSE;
+	j = Engine->DriverInfo.NumSubDrivers;
+	for(i=0;i<j;i++)
+	{
+		strcpy(name, Engine->DriverInfo.SubDrivers[i].Name);
+		if(name[0]=='G')
+		{
+			flag = GE_TRUE;
+			break;
+		}
+	}
+	
 
 	geCamera_GetClippingRect(Camera,&ClippingRect);
 	
@@ -1603,7 +1622,7 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 			}
 		}
  
-	}
+	} 
 
 	Engine->DebugInfo.NumActors++;
 
@@ -1811,11 +1830,14 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 				gePuppet_SetVertexColor(&(v[j]),SV->ReferenceBoneIndex);
 			}
 		
+			if(flag==GE_FALSE)
+				Clipping = GE_FALSE;
+
 			if (Clipping)
 			{
 				geTClip_Triangle(v);
 			}
-			else
+			else 
 			{
 				geEngine_RenderPoly(Engine, (GE_TLVertex *)v, 3, PM->Bitmap, 0 );
 			}

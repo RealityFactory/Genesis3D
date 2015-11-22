@@ -19,6 +19,16 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
 /*                                                                                      */
 /****************************************************************************************/
+
+
+/****************************************************************************************/
+/*  32 BPP Supported																	*/
+/*																						*/
+/*  32 BPP Code Created by: Matthew Ellis												*/
+/*																						*/
+/*  This driver also support resolutions up 1280x960									*/
+/****************************************************************************************/
+
 #include <Windows.h>
 #include <Assert.h>
 #include <stdio.h>
@@ -53,6 +63,13 @@ FARPROC					pOldWndProc;
 //	Globals
 //================================================================================
 App_Info	AppInfo;				// Our global structure that knows all... (once initialized)
+
+// start 32 bit changes
+int BPP32 = 16; // Our bpp variable
+int ZbufferD = 16; // our Z buffer depths
+FILE *stream; // The variable we open our config file to
+int gWidth, gHeight; // Global variables for our width and height
+// end 32 bit changes
 
 #define MAX_DRIVERS		64
 
@@ -196,6 +213,25 @@ BOOL D3DMain_InitD3D(HWND hWnd, const char *DriverName, int32 Width, int32 Heigh
 	ATTEMPT(D3DMain_CreateD3D());
 	ATTEMPT(D3DMain_EnumDevices());
 
+// start 32 bit changes
+	// Open the config file and read the bpp variable
+	stream = fopen("D3D24.ini","r");
+	if(stream)
+	{
+		fscanf(stream,"%d",&BPP32);
+		fscanf(stream,"%d",&ZbufferD);
+		fclose(stream);
+	}
+	else
+	{
+		BPP32 = 16;
+		ZbufferD = 16;
+	}
+
+	// Set our global width and height to the real width and height
+	gWidth = Width;
+	gHeight = Height;
+
 	if (Width == -1 && Height == -1)		// Window Mode
 	{
 		// Force Width/Height to client window area size
@@ -206,8 +242,9 @@ BOOL D3DMain_InitD3D(HWND hWnd, const char *DriverName, int32 Width, int32 Heigh
 	}
 	else
 	{
-		ATTEMPT(D3DMain_SetDisplayMode(hWnd, Width, Height, 16, TRUE));
+		ATTEMPT(D3DMain_SetDisplayMode(hWnd, Width, Height, BPP32, TRUE));
 	}
+// end 32 bit changes
 
 	// Pick a device we will be happy with
 	ATTEMPT(D3DMain_PickDevice());
@@ -1970,7 +2007,21 @@ static BOOL D3DMain_PickDevice(void)
 	D3DMain_Log("--- D3DMain_PickDevice ---\n");
 
 	// Find a device with the same bpp as the mode set
-	Depths = BPPToDDBD(AppInfo.CurrentBpp);
+
+// start 32 bit change
+	if (gWidth == -1 && gHeight == -1)
+	{
+		// Find a device with the same bpp as the mode set
+		Depths = BPPToDDBD(AppInfo.CurrentBpp);
+	}
+	else
+	{
+		// Find a device with the same bpp as the mode set
+		Depths = BPPToDDBD(BPP32);
+	}
+
+	//Depths = BPPToDDBD(AppInfo.CurrentBpp);
+// end 32 bit change
 
 	for (i = 0; i < AppInfo.NumDrivers; i++)
 	{
@@ -1982,8 +2033,24 @@ static BOOL D3DMain_PickDevice(void)
 			continue;
 
 		// Only choose drivers that can create the zbuffer we need
-		if (!(AppInfo.Drivers[i].Desc.dwDeviceZBufferBitDepth & DDBD_16))
-			continue;
+
+// start 32 bit changes
+		// Get the Z buffer depth
+		if ( ZbufferD == 24)
+		{
+		// Only choose drivers that can create the zbuffer we need
+			if (!(AppInfo.Drivers[i].Desc.dwDeviceZBufferBitDepth & DDBD_24))
+				continue;
+		}
+		else
+		{
+		// Only choose drivers that can create the zbuffer we need
+			if (!(AppInfo.Drivers[i].Desc.dwDeviceZBufferBitDepth & DDBD_16))
+				continue;
+		}
+		//if (!(AppInfo.Drivers[i].Desc.dwDeviceZBufferBitDepth & DDBD_16))
+			//continue;
+// end 32 bit changes
 
 		if (!(AppInfo.Drivers[i].Desc.dcmColorModel & D3DCOLOR_RGB))
 			continue;

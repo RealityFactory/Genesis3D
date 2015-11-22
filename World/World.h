@@ -37,6 +37,11 @@
 
 #include "Actor.h"			
 
+//MRB BEGIN
+//geSprite
+#include "Sprite.h"
+//MRB END			
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -160,6 +165,18 @@ typedef struct World_Actor
 	//int32			Leaf;				// Current leaf the actor is in (currently used for PVS occlusion)
 } World_Actor;
 
+//MRB BEGIN
+//geSprite
+typedef struct World_Sprite
+{
+	geSprite			*Sprite;
+	uint32			Flags;				// GE_SPRITE_RENDER_NORMAL, GE_SPRITE_RENDER_MIRRORS, GE_SPRITE_COLLIDE
+	uint32			UserFlags;
+
+	//int32			Leaf;				// Current leaf the sprite is in (currently used for PVS occlusion)
+} World_Sprite;
+//MRB END
+
 /******
 
 Critial : A negative-numbered Node is a Leaf.
@@ -210,6 +227,12 @@ typedef struct geWorld
 	
 	int32				ActorCount;							// Number of actors in world
 	World_Actor			*ActorArray;						// Array of actors
+
+//MRB BEGIN
+//geSprite
+	int32				SpriteCount;							// Number of sprites in world
+	World_Sprite			*SpriteArray;						// Array of sprites
+//MRB END
 	
 	geWorld_EntClassSet	EntClassSets[MAX_WORLD_ENT_CLASS_SETS];
 	int32				NumEntClassSets;
