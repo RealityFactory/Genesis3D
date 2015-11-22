@@ -345,7 +345,9 @@ static	geBoolean	GENESISCC FSMemory_Seek(void *Handle, int Where, geVFile_Whence
 	case	GE_VFILE_SEEKEND:
 		if	(File->Size < Where)
 			return GE_FALSE;
-		File->Position = File->Size - Where;
+// changed QD
+//		File->Position = File->Size - Where;
+		File->Position = File->Size + Where;
 		break;
 
 	case	GE_VFILE_SEEKSET:

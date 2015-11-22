@@ -676,7 +676,9 @@ static	geBoolean	GENESISCC FSVFS_Seek(void *Handle, int Where, geVFile_Whence Wh
 		break;
 
 	case	GE_VFILE_SEEKEND:
-		AbsolutePos = File->RWOpsStartPos + File->Length - Where;
+// changed QD
+//		AbsolutePos = File->RWOpsStartPos + File->Length - Where;
+		AbsolutePos = File->RWOpsStartPos + File->Length + Where;
 		break;
 
 	case	GE_VFILE_SEEKCUR:

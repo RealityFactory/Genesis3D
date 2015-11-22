@@ -599,7 +599,7 @@ static	geBoolean	GENESISCC FSDos_Seek(void *Handle, int Where, geVFile_Whence Wh
 	if	(File->IsDirectory == GE_TRUE)
 		return GE_FALSE;
 
-	switch	(Whence)
+	switch(Whence)
 	{
 	case	GE_VFILE_SEEKCUR:
 		RTLWhence = FILE_CURRENT;

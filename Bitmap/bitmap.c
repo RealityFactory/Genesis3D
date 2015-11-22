@@ -5267,13 +5267,15 @@ static geBoolean geBitmap_ReadFromBMP(geBitmap * Bmp,geVFile * F)
 /*******************************************************************************/
 static geBoolean  geBitmap_IsTGA(geVFile * F)
 {
+	long Size;
 	char targa[18];
 	TGAHEADER tgah;
 	
-	if (!geVFile_Seek(F, - 18, GE_VFILE_SEEKEND))
+	geVFile_Size(F, &Size);
+	if(!geVFile_Seek(F, Size-18, GE_VFILE_SEEKSET))
 		return GE_FALSE;
 	
-	if(!geVFile_Read(F, &targa, 18))
+	if(!geVFile_Read(F, targa, 18))
 		return GE_FALSE;
 	geVFile_Seek(F, 0, GE_VFILE_SEEKSET);
 
