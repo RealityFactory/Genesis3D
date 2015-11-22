@@ -30,7 +30,7 @@
 #include "Errorlog.h"
 #include "Bitmap._h"
 
-#define USEPERPIXEL
+//#define USEPERPIXEL
 
 //	NOTES -
 //	WBitmap is the original owner of all the bitmaps in the .BSP file.  They are kind of a hack right now.
@@ -263,6 +263,7 @@ geBoolean geWBitmap_Pool_CreateAllWBitmaps(geWBitmap_Pool *Pool, GBSP_BSPData *B
 		geBitmap	*Mips[MAX_MIPS_ALLOWED];
 		int32		NumMips, m, Width, Height, Stride;
 		uint8		*pSrc;
+		uint8		depth;
 
 		if (BitmapIsTransparent[i])
 		{
@@ -274,11 +275,8 @@ geBoolean geWBitmap_Pool_CreateAllWBitmaps(geWBitmap_Pool *Pool, GBSP_BSPData *B
          //                                                                       was the right value, by the time the 
          //                                                                       bitmap got to Genesis it was read as
          //                                                                       255 0 254 ???
-#ifdef USEPERPIXEL
-			ColorKey = 0xffff00fe;
-#else
-			ColorKey = 0x00ff00fe;
-#endif
+		ColorKey = 0x00ff00fe;
+
          //End Dec2001DCS
 		}
 		else
@@ -302,14 +300,20 @@ geBoolean geWBitmap_Pool_CreateAllWBitmaps(geWBitmap_Pool *Pool, GBSP_BSPData *B
 
 		assert(NumMips <= MAX_MIPS_ALLOWED);
 
+		// Get the src from the .bsp texture data
+		pSrc = &BSPData->GFXTexData[pGFXTexture->Offset];
+
+		memcpy(&depth,pSrc,1);
+		pSrc += 1;
+
 		// Create the bitmap
 //Start Dec2001DCS - Changed format to 32 bit
 // added transparent textures
-#ifdef USEPERPIXEL
+	if(depth == GE_PIXELFORMAT_32BIT_ARGB)
 	   pWBitmap->Bitmap = geBitmap_Create(Width, Height, NumMips, GE_PIXELFORMAT_32BIT_ARGB);
-#else
+	else
 	   pWBitmap->Bitmap = geBitmap_Create(Width, Height, NumMips, GE_PIXELFORMAT_24BIT_RGB);
-#endif
+
 //End Dec2001DCS
 
 		if (!pWBitmap->Bitmap)
@@ -337,9 +341,6 @@ geBoolean geWBitmap_Pool_CreateAllWBitmaps(geWBitmap_Pool *Pool, GBSP_BSPData *B
 			goto ExitWithError;
 		}
 
-		// Get the src from the .bsp texture data
-		pSrc = &BSPData->GFXTexData[pGFXTexture->Offset];
-
 		// Fill all the mip levels
 		for (m=0; m< NumMips; m++)
 		{
@@ -365,31 +366,35 @@ geBoolean geWBitmap_Pool_CreateAllWBitmaps(geWBitmap_Pool *Pool, GBSP_BSPData *B
 			{
             //Start Dec2001DCS - Added * 4 since textures are now 32 bit
 			// added transparent textures
-#ifdef USEPERPIXEL
+			if(depth == GE_PIXELFORMAT_32BIT_ARGB)
 				memcpy(pDest,pSrc,Width*Height*4);
-#else
+			else
 			   memcpy(pDest,pSrc,Width*Height*3);
-#endif
+
             //End Dec2001DCS
 			}
 			else
 			{
-			int h;
+				int h;
 				for (h=Height;h--;)
 				{
-               //Start Dec2001DCS - Added * 4 since textures are now 32 bit
-				// added transparent textures
-#ifdef USEPERPIXEL
-				memcpy(pDest,pSrc,Width*4);
-               //End Dec2001DCS
-					pSrc += Width*4;
-					pDest += Stride*4;
-#else
-               memcpy(pDest,pSrc,Width*3);
-               //End Dec2001DCS
-					pSrc += Width*3;
-					pDest += Stride*3;
-#endif
+					//Start Dec2001DCS - Added * 4 since textures are now 32 bit
+					// added transparent textures
+					if(depth == GE_PIXELFORMAT_32BIT_ARGB)
+					{
+						memcpy(pDest,pSrc,Width*4);
+						//End Dec2001DCS
+						pSrc += Width*4;
+						pDest += Stride*4;
+					}
+					else
+					{
+						memcpy(pDest,pSrc,Width*3);
+						//End Dec2001DCS
+						pSrc += Width*3;
+						pDest += Stride*3;
+					}
+					
 				}
 			}
 
@@ -400,66 +405,6 @@ geBoolean geWBitmap_Pool_CreateAllWBitmaps(geWBitmap_Pool *Pool, GBSP_BSPData *B
 				goto ExitWithError;
 			}
 		}
-// start transparent textures
-/*		if(memcmp(pSrc, "A", 1)==0)
-		{
-			uint8			*pDest;
-			geBitmap_Info	Info;
-			geBitmap *Bitmap;
-			geBitmap *Lock;
-
-			pSrc += 1;
-			Bitmap = geBitmap_Create(Width, Height, 1, GE_PIXELFORMAT_8BIT_GRAY);
-			if (!geBitmap_LockForWrite(Bitmap, &Lock, 0, NumMips-1))
-			{
-				geErrorLog_AddString(-1, "geWBitmap_Pool_CreateAllWBitmaps:  geBitmap_LockForWrite on Alpha failed.", NULL);
-				goto ExitWithError;
-			}
-
-			if (!geBitmap_GetInfo(Lock, &Info, NULL))
-			{
-				geErrorLog_AddString(-1, "geWBitmap_Pool_CreateAllWBitmaps:  geBitmap_GetInfo alpha failed.", NULL);
-				goto ExitWithError;
-			}
-			pDest = geBitmap_GetBits(Lock);
-			assert( pDest );
-
-			Stride = Info.Stride;
-			Width  = Info.Width;
-			Height = Info.Height;
-
-			assert(Stride >= Width);
-
-			if ( Stride == Width )
-			{
-			   memcpy(pDest,pSrc,Width*Height);
-			}
-			else
-			{
-			int h;
-				for (h=Height;h--;)
-				{
-					memcpy(pDest,pSrc,Width);
-					pSrc += Width;
-					pDest += Stride;
-				}
-			}
-
-			if (!geBitmap_UnLock(Lock))
-			{
-				geErrorLog_AddString(-1, "geWBitmap_Pool_CreateAllWBitmaps:  geBitmap_Unlock Alpha failed.", NULL);
-				goto ExitWithError;
-			}
-
-			if(!geBitmap_SetAlpha(pWBitmap->Bitmap, Bitmap))
-			{
-				geErrorLog_AddString(-1, "geWBitmap_Pool_CreateAllWBitmaps:  geBitmap_SetAlpha failed.", NULL);
-				goto ExitWithError;
-			}
-
-			geBitmap_Destroy(&Bitmap); 
-		} */
-// end transparent textures
 
 		// Create the palette...
 		{
@@ -514,11 +459,14 @@ geBoolean geWBitmap_Pool_CreateAllWBitmaps(geWBitmap_Pool *Pool, GBSP_BSPData *B
 			geBitmap_Palette_Destroy(&Pal);
 		} //done making the palette
 
-		if (!geBitmap_SetColorKey(pWBitmap->Bitmap, UseColorKey, ColorKey, GE_TRUE))
+		if(depth == GE_PIXELFORMAT_24BIT_RGB)
+		{
+			if (!geBitmap_SetColorKey(pWBitmap->Bitmap, UseColorKey, ColorKey, GE_TRUE))
 			{
 				geErrorLog_AddString(-1, "geWBitmap_Pool_CreateAllWBitmaps:  geBitmap_SetColorKey failed.", NULL);
 				goto ExitWithError;
 			}
+		}
 
 	}
 
