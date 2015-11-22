@@ -58,12 +58,12 @@ static geSprite_DynamicLight geSpriteDynamicLights[MAX_DYNAMIC_LIGHTS];
 
 static Surf_TexVert		UnclippedUVRGBA[MAX_TEMP_VERTS];
 
-static geVec3d				FrustumClippedVertexes1[MAX_TEMP_VERTS];
+static geVec3d			FrustumClippedVertexes1[MAX_TEMP_VERTS];
 static Surf_TexVert		FrustumClippedUVRGBA1[MAX_TEMP_VERTS];
-static geVec3d				FrustumClippedVertexes2[MAX_TEMP_VERTS];
+static geVec3d			FrustumClippedVertexes2[MAX_TEMP_VERTS];
 static Surf_TexVert		FrustumClippedUVRGBA2[MAX_TEMP_VERTS];
 
-static int32					FrustumNumClippedTexturedLitVertices;
+static int32			FrustumNumClippedTexturedLitVertices;
 
 static Surf_TLVertex	FrustumClippedTexturedLitVertexes[MAX_TEMP_VERTS];
 
@@ -104,7 +104,7 @@ typedef struct geSprite
 	// corners are used to build the vertexes
 	// vertexes are used to build final screen polys
 	geCoordinate	Corners[SPRITE_NUM_CORNERS];
-	geVec3d				Vertexes[SPRITE_NUM_CORNERS];
+	geVec3d			Vertexes[SPRITE_NUM_CORNERS];
 
 	// texture parameters
 	geFloat			TextureOffsetX;
@@ -113,8 +113,8 @@ typedef struct geSprite
 	geFloat			TextureScaleY;
 
 	// cached texture mapping information
-	geUV				UVs[SPRITE_NUM_CORNERS];
-	geUV				BackfaceUVs[SPRITE_NUM_CORNERS];
+	geUV			UVs[SPRITE_NUM_CORNERS];
+	geUV			BackfaceUVs[SPRITE_NUM_CORNERS];
 
 	// lighting parameters
 	// used to build cached lighting information
@@ -123,7 +123,7 @@ typedef struct geSprite
 	geColor			FillLight;
 	geVec3d			FillLightNormal;
 	geBoolean		UseLightFromFloor;
-	int32				MaximumDynamicLightsToUse;
+	int32			MaximumDynamicLightsToUse;
 
 	// cached lighting information
 	GE_RGBA			RGBA;
@@ -242,8 +242,8 @@ __inline static void geSprite_UpdateVertexesToFaceCamera(geSprite *S, geCamera *
 	//		geVec3d_CrossProduct(&Up, &In, &Left);
 	//
 	Left.X = (Up.Z * In.Y) - (Up.Y * In.Z);
-  Left.Y = (Up.X * In.Z) - (Up.Z * In.X);
-  Left.Z = (Up.Y * In.X) - (Up.X * In.Y);
+	Left.Y = (Up.X * In.Z) - (Up.Z * In.X);
+	Left.Z = (Up.Y * In.X) - (Up.X * In.Y);
 
 	// build the transform based on the left, up, in, and position of the sprite
 	//

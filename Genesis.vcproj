@@ -68,7 +68,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="Debug\GenesisD.lib"
+				OutputFile="Lib\GenesisD.lib"
 				SuppressStartupBanner="true"
 			/>
 			<Tool

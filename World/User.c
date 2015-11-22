@@ -693,6 +693,7 @@ static void RenderGouraudTLPoly ( DRV_Driver *RDriver, gePoly *Poly )
 	DRV_TLVertex	Clipped1[90];
 	int32			Length1;
 	int32			i;
+	uint32			RenderFlags;
 
 	assert(geWorld_PolyIsValid(Poly));
 
@@ -713,11 +714,24 @@ static void RenderGouraudTLPoly ( DRV_Driver *RDriver, gePoly *Poly )
 
 	Clipped1[0].a = Poly->Verts[0].a;
 
-	// Render it...
-	if (Clipped1[0].a != 255.0f)
-		RDriver->RenderGouraudPoly(Clipped1, Length1, DRV_RENDER_ALPHA);
+	if (Poly->RenderFlags & GE_RENDER_DO_NOT_OCCLUDE_OTHERS)
+	{
+		RenderFlags = DRV_RENDER_NO_ZWRITE;
+	}
 	else
-		RDriver->RenderGouraudPoly(Clipped1, Length1, 0);
+	{
+		RenderFlags = 0;
+	}
+
+	if (Poly->RenderFlags & GE_RENDER_DO_NOT_OCCLUDE_SELF)
+	{
+		RenderFlags |= DRV_RENDER_NO_ZMASK;
+	}
+
+	if (Clipped1[0].a != 255.0f)
+		RenderFlags |= DRV_RENDER_ALPHA;
+
+	RDriver->RenderGouraudPoly(Clipped1, Length1, RenderFlags);
 
 }
 
@@ -1133,6 +1147,7 @@ static void RenderGouraudPoly(DRV_Driver *RDriver, gePoly *Poly, Frustum_Info *F
 	int32			Length1, Length2;
 	GFX_Plane		*pFPlanes;
 	int32			i, p;
+	uint32			RenderFlags;
 
 	assert(geWorld_PolyIsValid(Poly));
 
@@ -1192,7 +1207,7 @@ static void RenderGouraudPoly(DRV_Driver *RDriver, gePoly *Poly, Frustum_Info *F
 	for (i=0; i< Length1; i++)
 	{
 		//geXForm3d_Transform(&Camera->XForm, pDest1, pDest2);
-		geCamera_Transform(Camera,pDest1,pDest2);
+		geCamera_Transform(Camera, pDest1, pDest2);
 		pDest1++;
 		pDest2++;
 	}
@@ -1201,11 +1216,25 @@ static void RenderGouraudPoly(DRV_Driver *RDriver, gePoly *Poly, Frustum_Info *F
 		
 	Clipped1[0].a = Poly->Verts[0].a;
 
-	// Render it...
-	if (Clipped1[0].a != 255.0f)
-		RDriver->RenderGouraudPoly(Clipped1, Length1, DRV_RENDER_ALPHA);
+	if(Poly->RenderFlags & GE_RENDER_DO_NOT_OCCLUDE_OTHERS)
+	{
+		RenderFlags = DRV_RENDER_NO_ZWRITE;
+	}
 	else
-		RDriver->RenderGouraudPoly(Clipped1, Length1, 0);
+	{
+		RenderFlags = 0;
+	}
+
+	if(Poly->RenderFlags & GE_RENDER_DO_NOT_OCCLUDE_SELF)
+	{
+		RenderFlags |= DRV_RENDER_NO_ZMASK;
+	}
+
+	if (Clipped1[0].a != 255.0f)
+		RenderFlags |= DRV_RENDER_ALPHA;
+
+	// Render it...
+	RDriver->RenderGouraudPoly(Clipped1, Length1, RenderFlags);
 
 }
 
@@ -1549,7 +1578,7 @@ GENESISAPI void geWorld_RemovePoly(geWorld *World, gePoly *Poly)
 //===================================================================================
 GENESISAPI geBoolean gePoly_GetLVertex(gePoly *Poly, int32 Index, GE_LVertex *LVert)
 {
-	assert (Poly != NULL);
+	assert(Poly  != NULL);
 	assert(LVert != NULL);
 	assert(geWorld_PolyIsValid(Poly));
 
@@ -1566,7 +1595,7 @@ GENESISAPI geBoolean gePoly_GetLVertex(gePoly *Poly, int32 Index, GE_LVertex *LV
 //=====================================================================================
 GENESISAPI geBoolean gePoly_SetLVertex(gePoly *Poly, int32 Index, const GE_LVertex *LVert)
 {
-	assert (Poly != NULL);
+	assert(Poly  != NULL);
 	assert(LVert != NULL);
 	assert(geWorld_PolyIsValid(Poly));
 

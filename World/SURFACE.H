@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_SURFACE_H
@@ -77,16 +77,16 @@ typedef struct Surf_TexVert
 // Lit vertex
 typedef struct
 {
-	geFloat X, Y, Z;									// 3d vertex
-	geFloat u, v;										// Uv's
+	geFloat X, Y, Z;								// 3d vertex
+	geFloat u, v;									// Uv's
 	geFloat r, g, b, a;								// color
 } Surf_LVertex;
 
 // Transformed Lit vertex
 typedef struct
 {
-	geFloat x, y, z;									// screen points
-	geFloat u, v;										// Uv's
+	geFloat x, y, z;								// screen points
+	geFloat u, v;									// Uv's
 	geFloat r, g, b, a;								// color
 } Surf_TLVertex;
 

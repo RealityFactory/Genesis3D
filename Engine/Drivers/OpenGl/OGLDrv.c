@@ -39,6 +39,7 @@ static DRV_CacheInfo	CacheInfo;
 GLint maxTextureSize = 0;
 geBoolean FogEnabled = GE_TRUE;
 geBoolean RenderingIsOK = GE_TRUE;
+GLfloat ClearColor[3];
 
 // Toggle and function pointers for OpenGL multitexture extention
 GLboolean multitexture = GE_FALSE;
@@ -116,7 +117,8 @@ DRV_Driver OGLDRV =
 	SetGamma, 
 	GetGamma,
 
-	SetFogEnable, 
+	SetFogEnable,
+	SetClearColor,
 
 	NULL,
 	NULL,								// Init to NULL, engine SHOULD set this (SetupLightmap)
@@ -126,7 +128,7 @@ DRV_Driver OGLDRV =
 // Not implemented, but you noticed that already huh?
 geBoolean DRIVERCC SetFogEnable(geBoolean Enable, float r, float g, float b, float Start, float End)
 {
-	GLfloat fogColor[4];
+	GLfloat fogColor[3];
 
 	if(Enable==GE_TRUE)
 	{
@@ -135,7 +137,7 @@ geBoolean DRIVERCC SetFogEnable(geBoolean Enable, float r, float g, float b, flo
 		fogColor[0] = (GLfloat)r/255.0f;
 		fogColor[1] = (GLfloat)g/255.0f;
 		fogColor[2] = (GLfloat)b/255.0f;
-		fogColor[3] = 1.0f;
+		//fogColor[3] = 1.0f;
 		glFogfv(GL_FOG_COLOR, fogColor);
 		//glFogf(GL_FOG_DENSITY, 1.0f); // changed QD Fog: only used for exponential fogmode
 		glHint(GL_FOG_HINT, GL_FASTEST);
@@ -156,11 +158,21 @@ geBoolean DRIVERCC SetFogEnable(geBoolean Enable, float r, float g, float b, flo
 		glDisable(GL_FOG);
 		FogEnabled = GE_FALSE;
 		// changed QD Fog
-		glClearColor(0.0, 0.0, 0.0, 1.0);
+		glClearColor(ClearColor[0], ClearColor[1], ClearColor[2], 1.0);
 	}
 	return GE_TRUE;
 }
 
+geBoolean DRIVERCC SetClearColor(float r, float g, float b)
+{
+	ClearColor[0] = (GLfloat)r/255.0f;
+	ClearColor[1] = (GLfloat)g/255.0f;
+	ClearColor[2] = (GLfloat)b/255.0f;
+
+	glClearColor(ClearColor[0], ClearColor[1], ClearColor[2], 1.0);
+
+	return GE_TRUE;
+}
 
 geBoolean DRIVERCC DrvInit(DRV_DriverHook *Hook)
 {
@@ -170,12 +182,23 @@ geBoolean DRIVERCC DrvInit(DRV_DriverHook *Hook)
 	COLOR_DEPTH = 16;
 	ZBUFFER_DEPTH = 16;
 
+	ClearColor[0] = ClearColor[1] = ClearColor[2] = 0.f;
+
 	stream = fopen("D3D24.ini","r");
 	if(stream)
 	{
 		fscanf(stream,"%d",&COLOR_DEPTH);
 		fscanf(stream,"%d",&ZBUFFER_DEPTH);
 		fclose(stream);
+
+		{
+			char lpRetStr[25];
+			DWORD dwRetCount;
+			dwRetCount = GetPrivateProfileString("D3D24", "BPP","16", (LPTSTR) &lpRetStr,sizeof(lpRetStr), ".\\D3D24.INI");
+			if ( dwRetCount ) COLOR_DEPTH = atoi(lpRetStr);
+			dwRetCount = GetPrivateProfileString("D3D24", "ZBufferD","16", (LPTSTR) &lpRetStr,sizeof(lpRetStr), ".\\D3D24.INI");
+			if ( dwRetCount ) ZBUFFER_DEPTH = atoi(lpRetStr);
+		}
 	}
 
 	WindowSetup(Hook);

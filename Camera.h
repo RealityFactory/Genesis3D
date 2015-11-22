@@ -50,7 +50,9 @@ GENESISAPI void GENESISCC geCamera_GetClippingRect(const geCamera *Camera, geRec
 void GENESISCC geCamera_GetWidthHeight(const geCamera *Camera,geFloat *Width,geFloat *Height);
 geFloat GENESISCC geCamera_GetScale(const geCamera *Camera);
 GENESISAPI void GENESISCC geCamera_SetAttributes(geCamera *Camera, geFloat Fov, const geRect *Rect);
+#ifdef GLOBALINFO
 void geCamera_FillDriverInfo(geCamera *Camera);
+#endif
 GENESISAPI void GENESISCC geCamera_ScreenPointToWorld (	const geCamera	*Camera,
 														int32			 ScreenX,
 														int32			 ScreenY,

@@ -227,11 +227,11 @@ geBoolean geEntity_GetModelNumForKey(geEntity *Entity, const char *Key, int32 *M
 	geEntity_Epair	*Epair;
 	int32			Value;
 
-	for (Epair = Entity->Epairs; Epair; Epair = Epair->Next)
+	for(Epair = Entity->Epairs; Epair; Epair = Epair->Next)
 	{
-		if (!stricmp(Epair->Key, Key))
+		if(!stricmp(Epair->Key, Key))
 		{
-			if (Epair->Value[0] == '*')
+			if(Epair->Value[0] == '*')
 				sscanf(Epair->Value+1, "%d", &Value);
 			else
 				sscanf(Epair->Value, "%d", &Value);

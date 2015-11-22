@@ -345,6 +345,7 @@ typedef struct
 	HWND				hWnd;
 } DRV_DriverHook;
 
+#ifdef GLOBALINFO
 typedef struct
 {
 	// Texture info
@@ -376,6 +377,7 @@ typedef struct
 	geVec3d		RPlaneNormal;		// Rotated Face normal
 	geVec3d		Pov;
 } GInfo;
+#endif
 
 // What the driver can support as far as texture mapping is concerned
 #define DRV_SUPPORT_ALPHA					(1<<0)		// Driver can do alpha blending
@@ -472,6 +474,7 @@ typedef geBoolean DRIVERCC SCREEN_SHOT(const char *Name);
 typedef geBoolean DRIVERCC SET_GAMMA(geFloat Gamma);
 typedef geBoolean DRIVERCC GET_GAMMA(geFloat *Gamma);
 typedef geBoolean DRIVERCC DRV_SET_FOG_ENABLE(geBoolean Enable, geFloat r, geFloat g, geFloat b, geFloat Start, geFloat End);
+typedef geBoolean DRIVERCC DRV_SET_CLEARCOLOR(geFloat r, geFloat g, geFloat b);
 
 typedef void SETUP_LIGHTMAP_CB(DRV_LInfo *LInfo, geBoolean *Dynamic);
 
@@ -554,6 +557,7 @@ typedef struct
 	GET_GAMMA			*GetGamma;
 
 	DRV_SET_FOG_ENABLE	*SetFogEnable;
+	DRV_SET_CLEARCOLOR	*SetClearColor;
 	
 	// Driver preferences
 	DRV_EngineSettings	*EngineSettings;
@@ -561,8 +565,10 @@ typedef struct
 	// The engine supplies these for the drivers misc use
 	SETUP_LIGHTMAP_CB	*SetupLightmap;
 
+#ifdef GLOBALINFO
 	// Temp hack global
 	GInfo				*GlobalInfo;
+#endif
 
 /* 05/19/2003 Wendell Buckner 
     BUMPMAPPING */

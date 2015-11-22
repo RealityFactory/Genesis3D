@@ -54,6 +54,19 @@
     CONFIG DRIVER - Make the driver configurable by "ini" file settings */
 extern DWORD BltRtFlags;
 
+__inline DWORD F2DW(float f)
+{
+   DWORD            retval = 0;
+
+   _asm {
+      fld            f
+      lea            eax, [retval]
+      fistp         dword ptr[eax]
+   }
+
+   return retval;
+}
+
 geBoolean DRIVERCC RenderGouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint32 Flags)
 {
 	int32			i;
@@ -78,6 +91,16 @@ geBoolean DRIVERCC RenderGouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint32
 	D3DBlendFunc (D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA);
 
 	D3DSetTexture(0, NULL);
+
+	if(Flags & DRV_RENDER_NO_ZMASK)		// We are assuming that this is not going to change all that much
+		D3DZEnable(FALSE);
+	else
+		D3DZEnable(TRUE);
+
+	if(Flags & DRV_RENDER_NO_ZWRITE)	// We are assuming that this is not going to change all that much
+		D3DZWriteEnable(FALSE);	
+	else
+		D3DZWriteEnable(TRUE);
 	
 	int32 SAlpha = (int32)Alpha<<24;
 	pPnts = Pnts;
@@ -102,7 +125,7 @@ geBoolean DRIVERCC RenderGouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint32
 			if (Val > AppInfo.FogEnd)
 				Val = AppInfo.FogEnd;
 
-			FogVal = (DWORD)((AppInfo.FogEnd-Val)/(AppInfo.FogEnd-AppInfo.FogStart)*255.0f);
+			FogVal = F2DW((AppInfo.FogEnd-Val)/(AppInfo.FogEnd-AppInfo.FogStart)*255.0f);
 		
 			if (FogVal < 0)
 				FogVal = 0;
@@ -120,6 +143,10 @@ geBoolean DRIVERCC RenderGouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint32
 
 	D3DTexturedPolyOld(D3DPnts, NumPoints);
 
+	// Turn z stuff back on...
+	D3DZWriteEnable (TRUE);
+	D3DZEnable(TRUE);
+	
 	if (Flags & DRV_RENDER_FLUSH)
 	{
 /* 02/28/2001 Wendell Buckner
@@ -128,6 +155,8 @@ geBoolean DRIVERCC RenderGouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint32
 		AppInfo.lpD3DDevice->EndScene();
 		AppInfo.lpD3DDevice->BeginScene();
 	}
+
+	
 
 	return TRUE;
 }

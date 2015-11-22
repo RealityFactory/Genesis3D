@@ -225,6 +225,7 @@ DRV_Driver D3DDRV =
 	GetGamma,
 
 	D3DMain_SetFogEnable,
+	D3DMain_SetClearColor,
 
 	NULL,
 	NULL,								// Init to NULL, engine SHOULD set this (SetupLightmap)

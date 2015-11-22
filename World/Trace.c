@@ -1733,6 +1733,7 @@ geBoolean Trace_GetContents(geWorld *World, const geVec3d *Pos, const geVec3d *M
 	assert(World);
 	assert(Contents);
 	
+	ActorHit = NULL;
 	MeshHit = NULL;
 	ModelHit = NULL;
 	FinalContents = 0;

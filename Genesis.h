@@ -311,6 +311,7 @@ GENESISAPI geBoolean	geEngine_SetFogEnable(geEngine *Engine, geBoolean Enable, g
 						//  r,g,b is the color of the fog
 						//  Start is how far out from the camera is not fogged - this is where the fog begins
 						//  End is how far out from the camera where the fog fully obscures things
+GENESISAPI geBoolean	geEngine_SetClearColor(geEngine *Engine, geFloat r, geFloat g, geFloat b);
 				
 
 GENESISAPI geBoolean	geEngine_ScreenShot(geEngine *Engine, const char *FileName);
@@ -484,12 +485,11 @@ GENESISAPI geBoolean geFog_SetAttributes(	geFog			*Fog,
 											geFloat			VolumeRadius);
 
 // World Classes/Entities
+GENESISAPI geEntity *geWorld_AddEntity(geWorld *World, const char *ClassName, const char *EntityName, void *UserData);
 GENESISAPI geEntity_EntitySet *geWorld_GetEntitySet(geWorld *World, const char *ClassName);
 GENESISAPI geEntity		*geEntity_EntitySetGetNextEntity(geEntity_EntitySet *EntitySet, geEntity *Entity);
 GENESISAPI void			*geEntity_GetUserData(geEntity *Entity);
 GENESISAPI void			geEntity_GetName(const geEntity *Entity, char *Buff, int MaxLen);
-// QoD Oct 2007
-GENESISAPI geEntity* geWorld_AddEntity(geWorld *World, const char *ClassName, const char *EntityName, void *UserData);
 
 // World collision
 GENESISAPI geBoolean	geWorld_ModelCollision(	geWorld			*World, 

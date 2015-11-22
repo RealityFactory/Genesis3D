@@ -1802,11 +1802,38 @@ geBoolean DRIVERCC D3DMain_SetFogEnable(geBoolean Enable, geFloat r, geFloat g, 
 	}
 	else
 	{
-		Material.dcvDiffuse.r = Material.dcvAmbient.r = 0.0f;
-		Material.dcvDiffuse.g = Material.dcvAmbient.g = 0.0f;
-		Material.dcvDiffuse.b = Material.dcvAmbient.b = 0.0f;
+		Material.dcvDiffuse.r = Material.dcvAmbient.r = AppInfo.ClearR/255.0f;
+		Material.dcvDiffuse.g = Material.dcvAmbient.g = AppInfo.ClearG/255.0f;
+		Material.dcvDiffuse.b = Material.dcvAmbient.b = AppInfo.ClearB/255.0f;
 	}
 	
+	Material.dwRampSize = 16L; // A default ramp size
+
+	AppInfo.BackgroundMaterial->SetMaterial(&Material);
+
+	return GE_TRUE;
+}
+
+//========================================================================================================
+//	D3DMain_SetClearColor
+//========================================================================================================
+geBoolean DRIVERCC D3DMain_SetClearColor(geFloat r, geFloat g, geFloat b)
+{
+	D3DMATERIAL			Material;
+
+	AppInfo.ClearR = r;
+	AppInfo.ClearG = g;
+	AppInfo.ClearB = b;
+	
+	// Fill in the material with the data
+	memset(&Material, 0, sizeof(D3DMATERIAL));
+
+	Material.dwSize       = sizeof(D3DMATERIAL);
+
+	Material.dcvDiffuse.r = Material.dcvAmbient.r = AppInfo.ClearR/255.0f;
+	Material.dcvDiffuse.g = Material.dcvAmbient.g = AppInfo.ClearG/255.0f;
+	Material.dcvDiffuse.b = Material.dcvAmbient.b = AppInfo.ClearB/255.0f;
+
 	Material.dwRampSize = 16L; // A default ramp size
 
 	AppInfo.BackgroundMaterial->SetMaterial(&Material);

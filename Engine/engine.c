@@ -149,6 +149,33 @@ GENESISAPI geBoolean geEngine_SetFogEnable(geEngine *Engine, geBoolean Enable, g
 	return geEngine_UpdateFogEnable(Engine);
 }
 
+//=====================================================================================
+//	geEngine_UpdateClearColor
+//=====================================================================================
+static geBoolean geEngine_UpdateClearColor(geEngine *Engine)
+{
+	if(Engine->DriverInfo.RDriver)
+	{
+		return Engine->DriverInfo.RDriver->SetClearColor(Engine->ClearR,
+														Engine->ClearG, 
+														Engine->ClearB);
+	}
+
+	return GE_TRUE;
+}
+
+//=====================================================================================
+//	geEngine_SetClearColor
+//=====================================================================================
+GENESISAPI geBoolean geEngine_SetClearColor(geEngine *Engine, geFloat r, geFloat g, geFloat b)
+{
+	Engine->ClearR = r;
+	Engine->ClearG = g;
+	Engine->ClearB = b;
+
+	return geEngine_UpdateClearColor(Engine);
+}
+
 void geEngine_UpdateGamma(geEngine *Engine)
 {
 DRV_Driver * RDriver;
@@ -1619,8 +1646,9 @@ HINSTANCE geEngine_LoadLibrary( const char * lpLibFileName, const char *DriverDi
 return NULL;
 }
  
- 
+#ifdef GLOBALINFO
 extern GInfo GlobalInfo;		// AHH!!!  Get rid of this!!!
+#endif
 
 //=====================================================================================
 //	EngineInitDriver
@@ -1700,7 +1728,9 @@ static geBoolean Engine_InitDriver(	geEngine *Engine,
 
 	// We MUST set this! So driver can setup lightmap data when needed...
 	RDriver->SetupLightmap = Light_SetupLightmap;
+#ifdef GLOBALINFO
 	RDriver->GlobalInfo = &GlobalInfo;
+#endif
 
 	strcpy(DLLDriverHook.AppName, Engine->AppName);
 

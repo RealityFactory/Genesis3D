@@ -217,6 +217,10 @@ typedef struct geEngine
 	geFloat				FogStart;
 	geFloat				FogEnd;
 
+	geFloat				ClearR;
+	geFloat				ClearG;
+	geFloat				ClearB;
+
 // changed QD Shadows
 	geBoolean			StencilShadowsEnable;
 	int					NumStencilShadowLights;

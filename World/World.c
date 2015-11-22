@@ -78,12 +78,17 @@
 //============================================================================
 // Dirty HACKS that need to be removed
 //============================================================================
+#ifdef GLOBALINFO
 #pragma message ("HACK!!! remove geCamera_FillDriverInfo (uses GlobalInfo)")
+#endif
 
 int32				MirrorRecursion;					// GLOBAL!!!
 
+#ifdef GLOBALINFO
 GInfo				GlobalInfo;
+
 void				geCamera_FillDriverInfo(geCamera *Camera);
+#endif
 
 extern geVec3d		GlobalEyePos;
 
@@ -992,26 +997,26 @@ GENESISAPI void geWorld_Free(geWorld *World)
 	if (World->RefCount > 0)
 		return;			// No need to destroy till ref count goes to zero...
 
-if (World->CurrentBSP)
-{
-	// Shutdown actors
-	if (World->ActorCount>0)
+	if (World->CurrentBSP)
+	{
+		// Shutdown actors
+		if (World->ActorCount>0)
 		{
 			assert( World->ActorArray != NULL );
 			for (i=0; i< World->ActorCount; i++)
-				{
+			{
 				if(!geActor_Destroy( &( World->ActorArray[i].Actor ) ))
 					geErrorLog_AddString(-1, "geWorld_Free:  geActor_Destroy failed.", NULL);
-				}
+			}
 
 			/*geActor_Count       = 0;geActor_DestroyDirect
 			geActor_RefCount    = 0;
 			geActor_DefCount    = 0;
 			geActor_DefRefCount = 0;*/
 			World->ActorCount	= 0;
+		}
 
-	}
-	if (World->ActorArray != NULL)
+		if (World->ActorArray != NULL)
 		{
 			geRam_Free( World->ActorArray );
 			World->ActorArray = NULL;
@@ -1019,86 +1024,86 @@ if (World->CurrentBSP)
 
 //MRB BEGIN
 //geSprite
-	// Shutdown sprites
-	if (World->SpriteCount>0)
-	{
-			assert( World->SpriteArray != NULL );
-			for (i=0; i< World->SpriteCount; i++)
+		// Shutdown sprites
+		if (World->SpriteCount>0)
+		{
+				assert( World->SpriteArray != NULL );
+				for (i=0; i< World->SpriteCount; i++)
 				{
 					geSprite_Destroy( &( World->SpriteArray[i].Sprite ) );
 				}
-			World->SpriteCount = 0;
-	}
-	if (World->SpriteArray != NULL)
-	{
+				World->SpriteCount = 0;
+		}
+		if (World->SpriteArray != NULL)
+		{
 			geRam_Free( World->SpriteArray );
 			World->SpriteArray = NULL;
-	}
+		}
 //MRB END
 		
-	assert( World->ActorArray == NULL );
+		assert( World->ActorArray == NULL );
 	
-	// Call other modules to release info from the world that they created...
+		// Call other modules to release info from the world that they created...
 #ifdef	MESHES
-	Mesh_WorldShutdown(World);
+		Mesh_WorldShutdown(World);
 #endif
-	Light_WorldShutdown(World);
-	Ent_WorldShutdown(World);
-	Vis_WorldShutdown(World);
-	Surf_WorldShutdown(World);
+		Light_WorldShutdown(World);
+		Ent_WorldShutdown(World);
+		Vis_WorldShutdown(World);
+		Surf_WorldShutdown(World);
 
-	User_WorldShutdown(World);
+		User_WorldShutdown(World);
 
-	if (World->CurrentBSP->WBitmapPool)
-	{
-		geWBitmap_Pool_Destroy(World->CurrentBSP->WBitmapPool);
-		World->CurrentBSP->WBitmapPool = NULL;
-	}
-
-	// Make sure we free all the fog
-	for (Fog = World->FogList; Fog; Fog = Next)
-	{
-		geWorld_FogData		*FogData;
-
-		Next = Fog->Next;
-
-		FogData = (geWorld_FogData*)geFog_GetUserData(Fog);
-
-		if (FogData)
-			geRam_Free(FogData);
-
-		geFog_SetUserData(Fog, NULL);		// Just in case...
-
-		geFog_Destroy(Fog);
-	}
-
-	// Free the leaf data array in the world
-	if (World->CurrentBSP->LeafData)
-	{
-		int32			l;
-		geWorld_Leaf	*pLeafData;
-		
-		pLeafData = World->CurrentBSP->LeafData;
-
-		for (l=0; l< World->CurrentBSP->BSPData.NumGFXLeafs; l++, pLeafData++)
+		if (World->CurrentBSP->WBitmapPool)
 		{
-			if (pLeafData->PolyList)
-			{
-				User_DestroyPolyList(World, pLeafData->PolyList);
-				pLeafData->PolyList = NULL;
-			}
+			geWBitmap_Pool_Destroy(World->CurrentBSP->WBitmapPool);
+			World->CurrentBSP->WBitmapPool = NULL;
 		}
+
+		// Make sure we free all the fog
+		for (Fog = World->FogList; Fog; Fog = Next)
+		{
+			geWorld_FogData		*FogData;
+
+			Next = Fog->Next;
+
+			FogData = (geWorld_FogData*)geFog_GetUserData(Fog);
+
+			if (FogData)
+				geRam_Free(FogData);
+
+			geFog_SetUserData(Fog, NULL);		// Just in case...
+
+			geFog_Destroy(Fog);
+		}
+
+		// Free the leaf data array in the world
+		if (World->CurrentBSP->LeafData)
+		{
+			int32			l;
+			geWorld_Leaf	*pLeafData;
+		
+			pLeafData = World->CurrentBSP->LeafData;
+
+			for (l=0; l< World->CurrentBSP->BSPData.NumGFXLeafs; l++, pLeafData++)
+			{
+				if (pLeafData->PolyList)
+				{
+					User_DestroyPolyList(World, pLeafData->PolyList);
+					pLeafData->PolyList = NULL;
+				}
+			}
 	
-		geRam_Free(World->CurrentBSP->LeafData);
-		World->CurrentBSP->LeafData = NULL;
+			geRam_Free(World->CurrentBSP->LeafData);
+			World->CurrentBSP->LeafData = NULL;
+		}
+
+		GBSP_FreeGBSPFile(&World->CurrentBSP->BSPData);
+		geRam_Free(World->CurrentBSP);
+
+		// Shutdown the bitmaplist	(this should be done last, to give others a chance to remove their bitmaps)
+		geWorld_BitmapListShutdown(World);
 	}
-
-	GBSP_FreeGBSPFile(&World->CurrentBSP->BSPData);
-	geRam_Free(World->CurrentBSP);
-
-	// Shutdown the bitmaplist	(this should be done last, to give others a chance to remove their bitmaps)
-	geWorld_BitmapListShutdown(World);
-}
 
 	geRam_Free(World);
 
@@ -1559,9 +1564,11 @@ static geBoolean RenderScene(geEngine *Engine, geWorld *World, geCamera *Camera,
 		}
 	}
 
+#ifdef GLOBALINFO
 	// Hack...  Must restore the camera hack for trans world polys
 	geCamera_FillDriverInfo(Camera);
-	
+#endif
+
 	// Setup the user stuff with the world for this scene
 	if (!User_SetCameraInfo(Engine, World, Camera, FrustumInfo))
 		return GE_FALSE;
@@ -2152,12 +2159,14 @@ static void RenderBSPFrontBack_r(int32 Node, const geWorld_RenderInfo *RenderInf
 
 	// Render the side of the node we are on first
 	RenderBSPFrontBack_r(pNode->Children[Side], RenderInfo, ClipFlags);
-		
+
+#ifdef GLOBALINFO
 	// Setup the global driver info about this plane (all the faces share it for this run)
 	// FIXME:  Software driver needs to calculate gradients from uv's, so we can QUIT doing this here...
 	GlobalInfo.PlaneNormal = BSPData->GFXPlanes[pNode->PlaneNum].Normal;
 	GlobalInfo.PlaneDist = BSPData->GFXPlanes[pNode->PlaneNum].Dist;
 	geXForm3d_Rotate(geCamera_GetCameraSpaceXForm(RenderInfo->Camera), &GlobalInfo.PlaneNormal, &GlobalInfo.RPlaneNormal);
+#endif
 
 	// Render faces on this node
 	for (i = 0; i < pNode->NumFaces; i++, pSurfInfo2++, pFace++)
@@ -2542,10 +2551,12 @@ static void RenderFace(int32 Face, const geWorld_RenderInfo *RenderInfo, int32 C
 	DrvTexInfo.DrawScaleU = pTexInfo->DrawScale[0];
 	DrvTexInfo.DrawScaleV = pTexInfo->DrawScale[1];
 
+#ifdef GLOBALINFO
 	GlobalInfo.VecU = pTexInfo->Vecs[0];
 	GlobalInfo.VecV = pTexInfo->Vecs[1];
 	GlobalInfo.TexShiftX = pTexInfo->Shift[0];
 	GlobalInfo.TexShiftY = pTexInfo->Shift[1];
+#endif
 
 	// Get the THandle from the bitmap
 	THandle = geBitmap_GetTHandle(pBitmap);
@@ -2561,6 +2572,7 @@ static void RenderFace(int32 Face, const geWorld_RenderInfo *RenderInfo, int32 C
 	}
 	else
 	{
+#ifdef GLOBALINFO
 		DRV_LInfo			*pLInfo = &pSurfInfo[Face].LInfo;
 
 		// The camera is set up at the beginning of the world...
@@ -2568,7 +2580,7 @@ static void RenderFace(int32 Face, const geWorld_RenderInfo *RenderInfo, int32 C
 		GlobalInfo.TexMinsY = pLInfo->MinV;
 		GlobalInfo.TexWidth = pLInfo->Width<<4;
 		GlobalInfo.TexHeight = pLInfo->Height<<4;
-
+#endif
 /* 10/17/2003 Wendell Buckner
     Bumpmapping for the World */
         geBitmap_SetRenderFlags(pBitmap, &RenderFlags);
@@ -2625,8 +2637,10 @@ static geBoolean RenderWorldModel(geCamera *Camera, Frustum_Info *FrustumInfo, g
 	// Make the frustum go to world space
 	Frustum_TransformToWorldSpace(FrustumInfo, Camera, &WorldSpaceFrustum);
 
+#ifdef GLOBALINFO
 	geCamera_FillDriverInfo(Camera);
-	
+#endif
+
 	// Make a ClipFlags bits for for each side of the frustum...
 	assert(WorldSpaceFrustum.NumPlanes < 32);
 
@@ -2719,8 +2733,9 @@ static geBoolean RenderSubModels(geCamera *Camera, Frustum_Info *FrustumInfo, ge
 		// Make the frustum go to World/Model space
 		Frustum_TransformToWorldSpace(FrustumInfo, Camera, &ModelSpaceFrustum);
 
+#ifdef GLOBALINFO
 		geCamera_FillDriverInfo(Camera);
-	
+#endif	
 		// Make a ClipFlags bits for for each side of the frustum...
 		StartClipFlags = (1<<ModelSpaceFrustum.NumPlanes)-1;
 
@@ -2816,6 +2831,7 @@ static void RenderTransPoly(geCamera *Camera, World_TransPoly *pPoly)
 	DrvTexInfo.DrawScaleU = pTexInfo->DrawScale[0];
 	DrvTexInfo.DrawScaleV = pTexInfo->DrawScale[1];
 
+#ifdef GLOBALINFO
 	// Setup the global info (pass this in the driver the right way!!!)
 	GlobalInfo.VecU = pTexInfo->Vecs[0];
 	GlobalInfo.VecV = pTexInfo->Vecs[1];
@@ -2825,6 +2841,7 @@ static void RenderTransPoly(geCamera *Camera, World_TransPoly *pPoly)
 	GlobalInfo.PlaneNormal = BSPData->GFXPlanes[pFace->PlaneNum].Normal;
 	GlobalInfo.PlaneDist = BSPData->GFXPlanes[pFace->PlaneNum].Dist;
 	geXForm3d_Rotate(geCamera_GetCameraSpaceXForm(Camera), &GlobalInfo.PlaneNormal, &GlobalInfo.RPlaneNormal);
+#endif
 
 	if (pTexInfo->Flags & TEXINFO_NO_LIGHTMAP)
 	{
@@ -2853,12 +2870,13 @@ static void RenderTransPoly(geCamera *Camera, World_TransPoly *pPoly)
      Bumpmapping for the World */
 		uint32               RenderFlags = DRV_RENDER_ALPHA | DRV_RENDER_FLUSH;
 
+#ifdef GLOBALINFO
 		// This global info only needs to be set up for faces that have lightmaps...
 		GlobalInfo.TexMinsX = pLInfo->MinU;
 		GlobalInfo.TexMinsY = pLInfo->MinV;
 		GlobalInfo.TexWidth = pLInfo->Width<<4;
 		GlobalInfo.TexHeight = pLInfo->Height<<4;
-
+#endif
 		THandle = geBitmap_GetTHandle(pBitmap);
 
 		assert(THandle);
@@ -3518,6 +3536,136 @@ GENESISAPI geBoolean geWorld_LeafMightSeeLeaf(const geWorld *World, int32 Leaf1,
 }
 
 //========================================================================================
+//	geWorld_AddEntity
+//========================================================================================
+GENESISAPI geEntity* geWorld_AddEntity(
+		geWorld		*World,
+		const char	*ClassName,
+		const char	*EntityName,
+		void		*UserData)
+{
+	geWorld_EntClassSet	*WSets;
+	int32				i;
+	geEntity			*Entity;
+	geEntity_Class		*Class;
+
+	assert(World);
+
+	// No classname, just return
+	if(!ClassName || !EntityName ||!UserData)
+	{
+		return NULL;
+	}
+
+	WSets = World->EntClassSets;
+
+	Entity = geEntity_Create();
+	if(!Entity)
+	{
+		return NULL;
+	}
+
+	// Add it to the main set
+	if(!geEntity_EntitySetAddEntity(WSets[0].Set, Entity))
+	{
+		geEntity_Destroy(Entity);
+		return NULL;
+	}
+
+	// create Epair for name (every entity needs one - should be unique but we don't check for it here)
+	{
+		geEntity_Epair *EntityNameEpair = geEntity_EpairCreate();
+
+		EntityNameEpair->Key = geRam_Allocate(strlen("%Name%")+1);
+		strcpy(EntityNameEpair->Key, "%Name%");
+
+		EntityNameEpair->Value = geRam_Allocate(strlen(EntityName)+1);
+		strcpy(EntityNameEpair->Value, EntityName);
+
+		geEntity_AddEpair(Entity, EntityNameEpair);
+	}
+
+	// remember type class
+	Class = geEntity_EntitySetFindClassByName(WSets[0].Set, ClassName);
+	if(!Class)
+	{
+		geEntity_Destroy(Entity);
+		return NULL;
+	}
+
+	Entity->Class = Class;
+
+	// allocate space for user data
+	Entity->UserData = GE_RAM_ALLOCATE_ARRAY(char, Entity->Class->FieldSize);
+	if(!Entity->UserData)
+	{
+		geEntity_Destroy(Entity);
+		return NULL;
+	}
+	memcpy(Entity->UserData, UserData, Entity->Class->FieldSize);
+
+	// check all fields to see if there are any of type "string"
+	// if so, add a new Epair, copy the string to Epair->Value and
+	// set the char pointer in the UserData to point to Epair->Value
+	{
+		geEntity_Field	*Field;
+		char			*UData = Entity->UserData;
+
+		for(Field=Class->Fields; Field; Field=Field->Next)
+		{
+			if(Field->TypeClass->Type == TYPE_STRING)
+			{
+				if(*(char**)(UData + Field->Offset) != NULL)
+				{
+					geEntity_Epair *Epair = geEntity_EpairCreate();
+
+					// get fieldname
+					Epair->Key = geRam_Allocate(strlen(Field->Name)+1);
+					strcpy(Epair->Key, Field->Name);
+
+					// copy string
+					Epair->Value = geRam_Allocate(strlen(*(char**)(UData + Field->Offset))+1);
+					strcpy(Epair->Value, *(char**)(UData + Field->Offset));
+					*(char**)(UData + Field->Offset) = Epair->Value;
+
+					// add epair to entity
+					geEntity_AddEpair(Entity, Epair);
+				}
+			}
+		}
+	}
+
+	// insert entity in class list
+	for(i=1; i<World->NumEntClassSets; i++)
+	{
+		assert(WSets[i].Set);
+
+		if(!stricmp(WSets[i].ClassName, ClassName))
+		{
+			geEntity_EntitySetAddEntity(WSets[i].Set, Entity);
+			return Entity;
+		}
+	}
+
+	if(i >= MAX_WORLD_ENT_CLASS_SETS)
+	{
+		geEntity_Destroy(Entity);
+		return NULL;					// oh well...
+	}
+
+	// Create a new entity set
+	WSets[i].Set = geEntity_EntitySetCreate();
+
+	// Insert the entity into a new class set
+	WSets[i].ClassName = Entity->Class->Name;
+	geEntity_EntitySetAddEntity(WSets[i].Set, Entity);
+
+	World->NumEntClassSets++;
+
+	return Entity;
+}
+
+//========================================================================================
 //	geWorld_GetSetByClass
 //========================================================================================
 GENESISAPI geEntity_EntitySet *geWorld_GetEntitySet(geWorld *World, const char *ClassName)
@@ -3528,7 +3676,7 @@ GENESISAPI geEntity_EntitySet *geWorld_GetEntitySet(geWorld *World, const char *
 	assert(World);
 
 	// No classname, just return the main set of all entities
-	if (!ClassName)
+	if(!ClassName)
 	{
 		assert(World->EntClassSets[0].Set);
 
@@ -3537,11 +3685,11 @@ GENESISAPI geEntity_EntitySet *geWorld_GetEntitySet(geWorld *World, const char *
 
 	WSets = World->EntClassSets;
 	
-	for (i=1; i< World->NumEntClassSets; i++)
+	for (i=1; i<World->NumEntClassSets; i++)
 	{
 		assert(WSets[i].Set);
 
-		if (!stricmp(WSets[i].ClassName, ClassName))
+		if(!stricmp(WSets[i].ClassName, ClassName))
 			return WSets[i].Set;
 	}
 
@@ -4513,223 +4661,54 @@ GENESISAPI geBoolean geWorld_BitmapIsVisible(geWorld *World, const geBitmap *Bit
 }
 
 
-
-// sirkorgan 01/05/2004
-
+//================================================================================
+//	geWorld_GetWorldGeometry
+//	sirkorgan 01/05/2004
 //	Returns the world geometry as a triangle list. You must free()
-
 //	the indices array yourself once you're done with it.
-
-GENESISAPI geBoolean geWorld_GetWorldGeometry(geWorld* world,
-
-							geVec3d** verts, int* numVerts,
-
-							long** indices, long* numIndices)
-
+//================================================================================
+GENESISAPI geBoolean geWorld_GetWorldGeometry(geWorld *World,
+							geVec3d **Verts, int *NumVerts,
+							long **Indices, long *NumIndices)
 {
-
-	int i,j,k;
-
-	GBSP_BSPData* bspData; // convenience pointer
-
+	int i, j, k;
+	GBSP_BSPData *bspData; // convenience pointer
 	int numTris;
 
-
-
-	if ( !world )
-
+	if(!World)
 		return GE_FALSE;
 
+	assert(Verts && NumVerts && Indices && NumIndices);
 
+	bspData = &World->CurrentBSP->BSPData;
 
-	assert(verts && numVerts && indices && numIndices);
-
-
-
-	bspData = &world->CurrentBSP->BSPData;
-
-
-
-	*verts = bspData->GFXVerts;
-
-	*numVerts = bspData->NumGFXVerts;
-
-
+	*Verts = bspData->GFXVerts;
+	*NumVerts = bspData->NumGFXVerts;
 
 	// determine how many tris exist
-
-	for(i = 0, numTris = 0; i < bspData->NumGFXFaces; i++)
-
+	for(i=0, numTris=0; i<bspData->NumGFXFaces; ++i)
 		numTris += bspData->GFXFaces[i].NumVerts-2; // assuming stored as fans or strips
 
-
-
-	*numIndices = numTris*3; // returning a triangle list
-
-	*indices = malloc( sizeof(long)*(*numIndices) );
-
-	
+	*NumIndices = numTris*3; // returning a triangle list
+	*Indices = malloc( sizeof(long)*(*NumIndices) );
 
 	// FANS
-
 	j = 0; // j is the index into the vert index array
 
-	for(i = 0; i < bspData->NumGFXFaces; i++)
+	// loop through each brush face in the world
+	for(i=0; i<bspData->NumGFXFaces; ++i)
+	{
+		GFX_Face *face = &bspData->GFXFaces[i];
 
-	{ // loop through each brush face in the world
-
-		GFX_Face* face = &bspData->GFXFaces[i];
-
-		for(k = 0; k < face->NumVerts-2; k++)
-
-		{ // loop through each tri in the face
-
+		// loop through each tri in the face
+		for(k=0; k<face->NumVerts-2; ++k)
+		{
 			// build list from fan
-
-			(*indices)[j++] = bspData->GFXVertIndexList[face->FirstVert];
-
-			(*indices)[j++] = bspData->GFXVertIndexList[face->FirstVert + (k+1)];
-
-			(*indices)[j++] = bspData->GFXVertIndexList[face->FirstVert + (k+2)];
-
+			(*Indices)[j++] = bspData->GFXVertIndexList[face->FirstVert];
+			(*Indices)[j++] = bspData->GFXVertIndexList[face->FirstVert + (k+1)];
+			(*Indices)[j++] = bspData->GFXVertIndexList[face->FirstVert + (k+2)];
 		}
-
 	}
 
-
-
 	return GE_TRUE;
-
-}
-
-// end sirkorgan 01/05/2004
-
-//========================================================================================
-//   geWorld_AddEntity
-//========================================================================================
-GENESISAPI geEntity* geWorld_AddEntity(
-      geWorld      *World,
-      const char   *ClassName,
-      const char   *EntityName,
-      void      *UserData)
-{
-   geWorld_EntClassSet   *WSets;
-   int32            i;
-   geEntity         *Entity;
-   geEntity_Class      *Class;
-   
-   assert(World);
-
-   // No classname, just return
-   if(!ClassName || !EntityName ||!UserData)
-   {
-      return NULL;
-   }
-
-   WSets = World->EntClassSets;
-   
-   Entity = geEntity_Create();
-   if(!Entity)
-   {
-      return NULL;
-   }
-
-   // Add it to the main set
-   if(!geEntity_EntitySetAddEntity(WSets[0].Set, Entity))
-   {
-      geEntity_Destroy(Entity);
-      return NULL;
-   }
-
-   // create Epair for name (every entity needs one - should be unique but we don't check for it here)
-   {
-      geEntity_Epair *EntityNameEpair = geEntity_EpairCreate();
-      
-      EntityNameEpair->Key = geRam_Allocate(strlen("%Name%")+1);
-      strcpy(EntityNameEpair->Key, "%Name%");
-      
-      EntityNameEpair->Value = geRam_Allocate(strlen(EntityName)+1);
-      strcpy(EntityNameEpair->Value, EntityName);
-      
-      geEntity_AddEpair(Entity, EntityNameEpair);
-   }
-
-   // remember type class
-   Class = geEntity_EntitySetFindClassByName(WSets[0].Set, ClassName);
-   if(!Class)
-   {
-      geEntity_Destroy(Entity);
-      return NULL;
-   }
-
-   Entity->Class = Class;
-
-   // allocate space for user data
-   Entity->UserData = GE_RAM_ALLOCATE_ARRAY(char, Entity->Class->FieldSize);
-   if(!Entity->UserData)
-   {
-      geEntity_Destroy(Entity);
-      return NULL;
-   }
-   memcpy(Entity->UserData, UserData, Entity->Class->FieldSize);
-   
-   // check all fields and look if there are any strings in this entity class
-   // if so, add a new Epair, copy the string to the Epair->Value and
-   // set the char pointer in the UserData to point to Epair->Value
-   {
-      geEntity_Field   *Field;
-      char         *UData = Entity->UserData;
-      
-      for(Field=Class->Fields; Field; Field=Field->Next)
-      {
-         if(Field->TypeClass->Type == TYPE_STRING)
-         {
-            if(*(char**)(UData + Field->Offset) != NULL)
-            {
-               geEntity_Epair *Epair = geEntity_EpairCreate();
-
-               // get fieldname
-               Epair->Key = geRam_Allocate(strlen(Field->Name)+1);
-               strcpy(Epair->Key, Field->Name);
-            
-               // copy string
-               Epair->Value = geRam_Allocate(strlen(*(char**)(UData + Field->Offset))+1);
-               strcpy(Epair->Value, *(char**)(UData + Field->Offset));
-               *(char**)(UData + Field->Offset) = Epair->Value;
-
-               // add epair to entity
-               geEntity_AddEpair(Entity, Epair);
-            }
-         }
-      }
-   }
-   
-   // insert entity in class list
-   for(i=1; i<World->NumEntClassSets; i++)
-   {
-      assert(WSets[i].Set);
-
-      if(!stricmp(WSets[i].ClassName, ClassName))
-      {         
-         geEntity_EntitySetAddEntity(WSets[i].Set, Entity);
-         return Entity;
-      }
-   }
-
-   if(i >= MAX_WORLD_ENT_CLASS_SETS)
-   {
-      geEntity_Destroy(Entity);
-      return NULL;               // oh well...
-   }
-
-   // Create a new entity set
-   WSets[i].Set = geEntity_EntitySetCreate();
-
-   // Insert the entity into a new class set
-   WSets[i].ClassName = Entity->Class->Name;
-   geEntity_EntitySetAddEntity(WSets[i].Set, Entity);
-
-   World->NumEntClassSets++;
-
-   return Entity;
 }

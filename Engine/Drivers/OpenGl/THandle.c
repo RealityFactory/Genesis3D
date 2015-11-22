@@ -24,6 +24,8 @@
 #include "OglDrv.h"
 #include "Render.h"
 
+extern boundTexture;
+extern boundTexture2;
 
 geRDriver_THandle	TextureHandles[MAX_TEXTURE_HANDLES];
 
@@ -31,7 +33,6 @@ geRDriver_THandle	TextureHandles[MAX_TEXTURE_HANDLES];
 // Init THandle system (do nothing, for now)
 geBoolean THandle_Startup(void)
 {
-
 	return GE_TRUE;
 }
 
@@ -72,7 +73,12 @@ geBoolean DRIVERCC THandle_Destroy(geRDriver_THandle *THandle)
 		return	GE_FALSE;
 	}
 
-	glDeleteTextures(1, &THandle->TextureID);
+	if(boundTexture == THandle->TextureID)
+		boundTexture = -1;
+	else if(boundTexture2 == THandle->TextureID)
+		boundTexture2 = -1;
+
+	glDeleteTextures(1, &(THandle->TextureID));
 
 	for(i = 0; i < THANDLE_MAX_MIP_LEVELS; i++)
 	{
@@ -110,6 +116,8 @@ geBoolean FreeAllTextureHandles(void)
 
 	glDeleteTextures(1, &decalTexObj);
 	decalTexObj = -1;
+	boundTexture = -1;
+	boundTexture2 = -1;
 
 	return GE_TRUE;
 }
@@ -175,7 +183,7 @@ geRDriver_THandle *DRIVERCC THandle_Create(int32 Width, int32 Height, int32 NumM
 	}
 
 	// Init an OpenGL texture object to hold this texture
-	glGenTextures(1, &THandle->TextureID);
+	glGenTextures(1, &(THandle->TextureID));
 
 	return THandle;
 		
@@ -297,7 +305,6 @@ geBoolean DRIVERCC THandle_UnLock(geRDriver_THandle *THandle, int32 MipLevel)
 // use of a texture that is marked for updating (THANDLE_UPDATE)
 void THandle_Update(geRDriver_THandle *THandle)
 {		
-
 	if(THandle->PixelFormat.Flags & RDRIVER_PF_2D)
 	{
 		if(THandle->PixelFormat.PixelFormat == GE_PIXELFORMAT_24BIT_RGB)
@@ -400,7 +407,6 @@ void THandle_DownloadLightmap(DRV_LInfo *LInfo)
 // Reset the THandle system
 geBoolean DRIVERCC DrvResetAll(void)
 {
-
 	return	FreeAllTextureHandles();
 }
 

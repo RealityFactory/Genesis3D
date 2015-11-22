@@ -893,7 +893,19 @@ static DWORD         OldBumpEnvMat11TSS1   = 0;
 static DWORD         OldBumpEnvLScaleTSS1  = 0;
 static DWORD         OldBumpEnvLOffsetTSS1 = 0;
 
-inline DWORD F2DW( FLOAT f ) { return *((DWORD*)&f); }
+//inline DWORD F2DW( FLOAT f ) { return *((DWORD*)&f); }
+__inline DWORD F2DW(float f)
+{
+   DWORD            retval = 0;
+
+   _asm {
+      fld            f
+      lea            eax, [retval]
+      fistp         dword ptr[eax]
+   }
+
+   return retval;
+}
 
 void D3DSetTextureStageState1BM (float BumpEnvMat00TSS1, float BumpEnvMat01TSS1, float BumpEnvMat10TSS1, float BumpEnvMat11TSS1, float BumpEnvLScaleTSS1, float BumpEnvLOffsetTSS1)
 {

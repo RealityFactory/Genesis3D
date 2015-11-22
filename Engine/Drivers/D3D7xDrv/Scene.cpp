@@ -57,6 +57,19 @@ uint32 CurrentLRU;
 /*   Cache decals so that they can be drawn after all the 3d stuff...                   */
 BOOL InScene = FALSE;
 
+__inline DWORD F2DW(float f)
+{
+   DWORD            retval = 0;
+
+   _asm {
+      fld            f
+      lea            eax, [retval]
+      fistp         dword ptr[eax]
+   }
+
+   return retval;
+}
+
 // changed QD Shadows
 //BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, RECT *WorldRect)
 BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, BOOL ClearStencil, RECT *WorldRect)
@@ -131,11 +144,11 @@ BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, BOOL ClearStencil, RECT *World
 		} */
 		if (AppInfo.FogEnable)
 		{
-            D3DFogEnable ( AppInfo.FogEnable, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<<8)|(DWORD)AppInfo.FogB );		
+            D3DFogEnable ( AppInfo.FogEnable, (F2DW(AppInfo.FogR)<<16)|(F2DW(AppInfo.FogG)<<8)|F2DW(AppInfo.FogB) );		
 		}
 		else
 		{
-			D3DFogEnable ( AppInfo.FogEnable, 0 );		
+			D3DFogEnable ( AppInfo.FogEnable, (F2DW(AppInfo.ClearR)<<16)|(F2DW(AppInfo.ClearG)<<8)|F2DW(AppInfo.ClearB) );		
 		} 
 
         

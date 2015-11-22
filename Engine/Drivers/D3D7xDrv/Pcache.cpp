@@ -296,6 +296,21 @@ static int32 GetMipLevel(DRV_TLVertex *Verts, int32 NumVerts, float ScaleU, floa
 
 #include <Math.h>
 
+//inline DWORD F2DW( FLOAT f ) { return *((DWORD*)&f); }
+__inline DWORD F2DW(float f)
+{
+   DWORD            retval = 0;
+
+   _asm {
+      fld            f
+      lea            eax, [retval]
+      fistp         dword ptr[eax]
+   }
+
+   return retval;
+}
+
+
 /* 01/03/2004 Wendell Buckner
     CONFIG DRIVER - Make the driver configurable by "ini" file settings */
 extern DWORD BltSurfFlags;
@@ -466,7 +481,7 @@ BOOL PCache_InsertWorldPoly(DRV_TLVertex *Verts, int32 NumVerts, geRDriver_THand
 			if (Val > AppInfo.FogEnd)
 				Val = AppInfo.FogEnd;
 
-			FogVal = (DWORD)((AppInfo.FogEnd-Val)/(AppInfo.FogEnd-AppInfo.FogStart)*255.0f);
+			FogVal = F2DW((AppInfo.FogEnd-Val)/(AppInfo.FogEnd-AppInfo.FogStart)*255.0f);
 		
 			if (FogVal < 0)
 				FogVal = 0;
@@ -1138,8 +1153,6 @@ geBoolean SetupTexture(int32 Stage, geRDriver_THandle *THandle, int32 MipLevel)
 	Send World Poly's as triangle lists instead of fans... */
 static PCache_Vert		Verts2[MAX_MISC_POLY_VERTS];
 
-inline DWORD F2DW( FLOAT f ) { return *((DWORD*)&f); }
-
 
 BOOL PCache_FlushMiscPolys(void)
 {
@@ -1262,12 +1275,12 @@ BOOL PCache_FlushMiscPolys(void)
 /*	01/13/2003 Wendell Buckner
     Optimization from GeForce_Optimization2.doc
     9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. */
-        if ( AppInfo.FogEnable ) // poly fog
+        if( AppInfo.FogEnable ) // poly fog
 		{
-			if ( pPoly->Flags & DRV_RENDER_POLY_NO_FOG ) 
-			 D3DFogEnable ( FALSE, 0  );
+			if(pPoly->Flags & DRV_RENDER_POLY_NO_FOG)
+				D3DFogEnable ( FALSE, 0  );
 			else
-			 D3DFogEnable ( TRUE, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<<8)|(DWORD)AppInfo.FogB ); 
+				D3DFogEnable ( TRUE, (F2DW(AppInfo.FogR)<<16)|(F2DW(AppInfo.FogG)<<8)|F2DW(AppInfo.FogB) ); 
 		}
 
 /* 08/23/2003 Wendell Buckner
@@ -1440,7 +1453,7 @@ BOOL PCache_FlushMiscPolys(void)
 
 /*  01/18/2003 Wendell Buckner                                                         
      Basically when you leave the above loop, make sure fog is on  */
-	if ( AppInfo.FogEnable ) D3DFogEnable ( TRUE, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<<8)|(DWORD)AppInfo.FogB ); 
+	if ( AppInfo.FogEnable ) D3DFogEnable ( TRUE, (F2DW(AppInfo.FogR)<<16)|(F2DW(AppInfo.FogG)<<8)|F2DW(AppInfo.FogB) ); 
 
 	// Turn z stuff back on...
 	D3DZWriteEnable (TRUE);
@@ -1551,7 +1564,7 @@ BOOL PCache_InsertMiscPoly(DRV_TLVertex *Verts, int32 NumVerts, geRDriver_THandl
 			if (Val > AppInfo.FogEnd)
 				Val = AppInfo.FogEnd;
 
-			FogVal = (DWORD)((AppInfo.FogEnd-Val)/(AppInfo.FogEnd-AppInfo.FogStart)*255.0f);
+			FogVal = F2DW((AppInfo.FogEnd-Val)/(AppInfo.FogEnd-AppInfo.FogStart)*255.0f);
 		
 			if (FogVal < 0)
 				FogVal = 0;
@@ -2080,7 +2093,7 @@ static BOOL RenderWorldPolys(int32 RenderMode)
     Optimization from GeForce_Optimization2.doc
     9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. 
 						AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , TRUE); */
-						D3DFogEnable ( TRUE, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<<8)|(DWORD)AppInfo.FogB );
+						D3DFogEnable ( TRUE, (F2DW(AppInfo.FogR)<<16)|(F2DW(AppInfo.FogG)<<8)|F2DW(AppInfo.FogB) );
 				}
 			}
 			break;
@@ -2202,10 +2215,10 @@ static BOOL RenderWorldPolys(int32 RenderMode)
     9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. */
   				if ( AppInfo.FogEnable ) // poly fog
 				{
-				 if ( pPoly->Flags & DRV_RENDER_POLY_NO_FOG )
-				  D3DFogEnable ( FALSE, 0 );
-				 else
-				  D3DFogEnable ( TRUE, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<<8)|(DWORD)AppInfo.FogB );
+					if(pPoly->Flags & DRV_RENDER_POLY_NO_FOG)
+						D3DFogEnable(FALSE, 0);
+					else
+						D3DFogEnable(TRUE, (F2DW(AppInfo.FogR)<<16)|(F2DW(AppInfo.FogG)<<8)|F2DW(AppInfo.FogB));
 				}    
 
 /* 10/15/2003 Wendell Buckner
@@ -2321,7 +2334,7 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 
 /*  01/18/2003 Wendell Buckner                                                         
      Basically when you leave the above loop, make sure fog is on  */
-				    if ( AppInfo.FogEnable ) D3DFogEnable ( TRUE, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<<8)|(DWORD)AppInfo.FogB );
+				    if ( AppInfo.FogEnable ) D3DFogEnable ( TRUE, (F2DW(AppInfo.FogR)<<16)|(F2DW(AppInfo.FogG)<<8)|F2DW(AppInfo.FogB) );
 
 					D3DBlendFunc (D3DBLEND_ONE, D3DBLEND_ONE);				// Change to a fog state
 
@@ -2503,7 +2516,7 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 				  if ( pPoly->Flags & DRV_RENDER_POLY_NO_FOG )
 				   D3DFogEnable ( FALSE, 0 );
 				  else
-                   D3DFogEnable ( TRUE, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<<8)|(DWORD)AppInfo.FogB );
+                   D3DFogEnable ( TRUE, (F2DW(AppInfo.FogR)<<16)|(F2DW(AppInfo.FogG)<<8)|F2DW(AppInfo.FogB) );
 				} 
 
 /* 11/11/2003 Wendell Buckner
@@ -2612,7 +2625,7 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 
 /*  01/18/2003 Wendell Buckner                                                         
      Basically when you leave the above loop, make sure fog is on  */
-            if ( AppInfo.FogEnable ) D3DFogEnable ( TRUE, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<<8)|(DWORD)AppInfo.FogB );
+            if ( AppInfo.FogEnable ) D3DFogEnable ( TRUE, (F2DW(AppInfo.FogR)<<16)|(F2DW(AppInfo.FogG)<<8)|F2DW(AppInfo.FogB) );
 			break;						 
 		}
 

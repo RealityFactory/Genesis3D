@@ -61,6 +61,16 @@ geBoolean DRIVERCC RenderGouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint32
 
 	D3DSetTexture(0, NULL);
 	
+	if(Flags & DRV_RENDER_NO_ZMASK)		// We are assuming that this is not going to change all that much
+		D3DZEnable(FALSE);
+	else
+		D3DZEnable(TRUE);
+
+	if(Flags & DRV_RENDER_NO_ZWRITE)	// We are assuming that this is not going to change all that much
+		D3DZWriteEnable(FALSE);	
+	else
+		D3DZWriteEnable(TRUE);
+	
 	int32 SAlpha = (int32)Alpha<<24;
 	pPnts = Pnts;
 	pD3DPnts = D3DPnts;
@@ -101,6 +111,10 @@ geBoolean DRIVERCC RenderGouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint32
 	}
 
 	D3DTexturedPolyOld(D3DPnts, NumPoints);
+
+	// Turn z stuff back on...
+	D3DZWriteEnable (TRUE);
+	D3DZEnable(TRUE);
 
 	if (Flags & DRV_RENDER_FLUSH)
 	{

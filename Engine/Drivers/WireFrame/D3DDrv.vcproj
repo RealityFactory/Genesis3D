@@ -175,6 +175,7 @@
 				OutputFile="Release/WireDrv.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				GenerateManifest="false"
 				ProgramDatabaseFile=".\Release/WireDrv.pdb"
 				ImportLibrary=".\Release/WireDrv.lib"
 				TargetMachine="1"

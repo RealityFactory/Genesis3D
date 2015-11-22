@@ -1363,7 +1363,6 @@ GENESISAPI geBoolean GENESISCC geActor_SetBoneAttachment(geActor *A,
 	return GE_TRUE;
 }
 
-
 GENESISAPI geBoolean GENESISCC geActor_SetBoneGlobalAttachment(geActor *A,
 								const char *BoneName,
 								geXForm3d *Attachment,
@@ -1385,7 +1384,6 @@ GENESISAPI geBoolean GENESISCC geActor_SetBoneGlobalAttachment(geActor *A,
 
 	return GE_TRUE;
 }
-
 
 //-------------------------------------------------------------------------------------------------
 // Actor Cuing system

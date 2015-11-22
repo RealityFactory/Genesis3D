@@ -58,9 +58,9 @@ GENESISAPI void GENESISCC		geVec3d_Inverse(geVec3d *V);
 GENESISAPI void GENESISCC		geVec3d_MA(geVec3d *V1, geFloat Scale, const geVec3d *V2, geVec3d *V1PlusV2Scaled);
 GENESISAPI void GENESISCC		geVec3d_AddScaled(const geVec3d *V1, const geVec3d *V2, geFloat Scale, geVec3d *V1PlusV2Scaled);
 
-GENESISAPI geFloat GENESISCC		geVec3d_DistanceBetween(const geVec3d *V1, const geVec3d *V2);	// returns length of V1-V2	
+GENESISAPI geFloat GENESISCC	geVec3d_DistanceBetween(const geVec3d *V1, const geVec3d *V2);	// returns length of V1-V2	
 
-GENESISAPI geBoolean GENESISCC geVec3d_IsValid(const geVec3d *V);
+GENESISAPI geBoolean GENESISCC	geVec3d_IsValid(const geVec3d *V);
 
 #ifdef __cplusplus
 }

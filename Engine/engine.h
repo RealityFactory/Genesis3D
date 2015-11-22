@@ -61,6 +61,7 @@ void geEngine_SetAllWorldChangedFlag(geEngine *Engine, geBoolean Flag);
 GENESISAPI geBoolean geEngine_SetGamma(geEngine *Engine, geFloat Gamma);
 GENESISAPI geBoolean geEngine_GetGamma(geEngine *Engine, geFloat *Gamma);
 GENESISAPI geBoolean geEngine_SetFogEnable(geEngine *Engine, geBoolean Enable, geFloat r, geFloat g, geFloat b, geFloat Start, geFloat End);
+GENESISAPI geBoolean geEngine_SetClearColor(geEngine *Engine, geFloat r, geFloat g, geFloat b);
 void geEngine_UpdateGamma(geEngine *Engine);
 
 geBoolean geEngine_BitmapListInit(geEngine *Engine);

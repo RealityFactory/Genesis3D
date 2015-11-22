@@ -277,6 +277,10 @@ typedef struct
 	float				FogG;
 	float				FogB;
 
+	float				ClearR;
+	float				ClearG;
+	float				ClearB;
+
 	// DD / D3D Flags
 	uint32				Flags;
 } App_Info;
@@ -325,5 +329,6 @@ BOOL				D3DMain_GetClientWindowOffset(HWND hWnd);
 geBoolean DRIVERCC	D3DMain_UpdateWindow(void);
 geBoolean DRIVERCC	D3DMain_SetActive(geBoolean wParam);
 geBoolean DRIVERCC	D3DMain_SetFogEnable(geBoolean Enable, float r, float g, float b, float Start, float End);
+geBoolean DRIVERCC	D3DMain_SetClearColor(float r, float g, float b);
 
 #endif

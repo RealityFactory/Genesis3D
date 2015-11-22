@@ -43,7 +43,7 @@ typedef struct geRDriver_THandle
 	GLint					PaddedWidth, PaddedHeight;
 	geRDriver_PixelFormat	PixelFormat;
 	GLuint					Flags;
-	GLint					TextureID;
+	GLuint					TextureID;
 	GLubyte					*Data[THANDLE_MAX_MIP_LEVELS];
 	GLfloat					InvScale;
 } geRDriver_THandle;

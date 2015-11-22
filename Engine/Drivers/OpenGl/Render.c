@@ -301,6 +301,11 @@ geBoolean DRIVERCC Render_GouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint3
 
 	glDisable(GL_TEXTURE_2D);
 
+	if(Flags & DRV_RENDER_NO_ZMASK)
+	{
+		glDisable(GL_DEPTH_TEST);
+	}
+
  	glBegin(GL_TRIANGLE_FAN);
 
 	for(i = 0; i < NumPoints; i++)
@@ -317,6 +322,11 @@ geBoolean DRIVERCC Render_GouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint3
 	glEnd(); 
 
 	glEnable(GL_TEXTURE_2D); 
+
+	if(Flags & DRV_RENDER_NO_ZMASK)
+	{
+		glEnable(GL_DEPTH_TEST);
+	}
 
 	OGLDRV.NumRenderedPolys++; 
 

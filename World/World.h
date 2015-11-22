@@ -327,9 +327,7 @@ GENESISAPI geBoolean geWorld_CreateBumpmapByNameDot3(geWorld *World, const char 
 /* 10/15/2003 Wendell Buckner
     Bumpmapping for the World */
 GENESISAPI geBitmap * geWorld_CreateBumpmapByName(geWorld *World, const char *BumpmapName, gePixelFormat BumpFormat);
-
-GENESISAPI geBoolean geWorld_GetWorldGeometry(geWorld* world, geVec3d** verts, int* numVerts, long** indices, long* numIndices);
-
+GENESISAPI geBoolean geWorld_GetWorldGeometry(geWorld *World, geVec3d **Verts, int *NumVerts, long **Indices, long *NumIndices);
 
 #ifdef __cplusplus
 }

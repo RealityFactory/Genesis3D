@@ -46,6 +46,7 @@ extern		FogEnabled;
 extern		RenderingIsOK;
 
 geBoolean DRIVERCC SetFogEnable(geBoolean Enable, float r, float g, float b, float Start, float End);
+geBoolean DRIVERCC SetClearColor(float r, float g, float b);
 geBoolean DRIVERCC DrvInit(DRV_DriverHook *Hook);
 geBoolean DRIVERCC DrvShutdown(void);
 geBoolean DRIVERCC DrvUpdateWindow(void);

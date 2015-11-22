@@ -1815,6 +1815,20 @@ BOOL Main_ShowBackBuffer(void)
 	return TRUE;
 }
 
+__inline DWORD F2DW(float f)
+{
+   DWORD            retval = 0;
+
+   _asm {
+      fld            f
+      lea            eax, [retval]
+      fistp         dword ptr[eax]
+   }
+
+   return retval;
+}
+
+
 //================================================================================
 //	Main_ClearBackBuffer
 //================================================================================
@@ -1860,9 +1874,9 @@ BOOL Main_ClearBackBuffer(BOOL Clear, BOOL ClearZ, BOOL ClearStencil)
 	sample code won't work with this value set to 0 *
 	LastError = AppInfo.lpD3DDevice->Clear( 1, &Dummy, ClearFlags, 0, 1.0f, 0L ); */
 	if (AppInfo.FogEnable) 
-		LastError = AppInfo.lpD3DDevice->Clear( 1, &Dummy, ClearFlags, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<< 8)|(DWORD)AppInfo.FogB, 1.0f, 0L );
+		LastError = AppInfo.lpD3DDevice->Clear( 1, &Dummy, ClearFlags, (F2DW(AppInfo.FogR)<<16)|(F2DW(AppInfo.FogG)<<8)|F2DW(AppInfo.FogB), 1.0f, 0L );
 	else
-		LastError = AppInfo.lpD3DDevice->Clear( 1, &Dummy, ClearFlags, 0, 1.0f, 0L ); 
+		LastError = AppInfo.lpD3DDevice->Clear( 1, &Dummy, ClearFlags, (F2DW(AppInfo.ClearR)<<16)|(F2DW(AppInfo.ClearG)<<8)|F2DW(AppInfo.ClearB), 1.0f, 0L ); 
 
 
 	if (LastError != D3D_OK) 
@@ -2845,15 +2859,39 @@ geBoolean DRIVERCC D3DMain_SetFogEnable(geBoolean Enable, float r, float g, floa
 	}
 	else
 	{
-		Material.dcvDiffuse.r = Material.dcvAmbient.r = 0.0f;
-		Material.dcvDiffuse.g = Material.dcvAmbient.g = 0.0f;
-		Material.dcvDiffuse.b = Material.dcvAmbient.b = 0.0f;
+		Material.dcvDiffuse.r = Material.dcvAmbient.r = AppInfo.ClearR/255.0f;
+		Material.dcvDiffuse.g = Material.dcvAmbient.g = AppInfo.ClearG/255.0f;
+		Material.dcvDiffuse.b = Material.dcvAmbient.b = AppInfo.ClearB/255.0f;
 	}
 
 /* 07/16/2000 Wendell Buckner
     Convert to Directx7...    		
 	Material.dwRampSize = 16L; // A default ramp size */
 
+	AppInfo.BackgroundMaterial->SetMaterial(&Material); 
+
+	return GE_TRUE;
+}
+
+
+//========================================================================================================
+//	D3DMain_SetClearColor
+//========================================================================================================
+geBoolean DRIVERCC D3DMain_SetClearColor(float r, float g, float b)
+{
+	D3DMATERIAL7		Material;
+
+	AppInfo.ClearR = r;
+	AppInfo.ClearG = g;
+	AppInfo.ClearB = b;
+
+	// Fill in the material with the data
+	memset(&Material, 0, sizeof(D3DMATERIAL7));
+
+	Material.dcvDiffuse.r = Material.dcvAmbient.r = r/255.0f;
+	Material.dcvDiffuse.g = Material.dcvAmbient.g = g/255.0f;
+	Material.dcvDiffuse.b = Material.dcvAmbient.b = b/255.0f;
+	
 	AppInfo.BackgroundMaterial->SetMaterial(&Material); 
 
 	return GE_TRUE;

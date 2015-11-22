@@ -252,6 +252,7 @@ GENESISAPI void GENESISCC geCamera_SetAttributes(geCamera *Camera, geFloat Fov, 
 	}
 }
 
+#ifdef GLOBALINFO
 //========================================================================================
 //	geCamera_FillDriverInfo
 //	HACK!!!!
@@ -278,6 +279,7 @@ extern GInfo GlobalInfo;
 
 	geXForm3d_Rotate(&Camera->XForm, &GlobalInfo.Pov, &GlobalInfo.CPov);
 }
+#endif
 
 //========================================================================================
 //	geCamera_ScreenPointToWorld
