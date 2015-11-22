@@ -296,7 +296,6 @@ static int32 GetMipLevel(DRV_TLVertex *Verts, int32 NumVerts, float ScaleU, floa
 
 #include <Math.h>
 
-//inline DWORD F2DW( FLOAT f ) { return *((DWORD*)&f); }
 __inline DWORD F2DW(float f)
 {
    DWORD            retval = 0;
@@ -1355,14 +1354,20 @@ BOOL PCache_FlushMiscPolys(void)
 // Use luminance for this example.
 			D3DSetTextureStageState2(D3DTA_TEXTURE, D3DTA_CURRENT, D3DTOP_ADD, D3DTA_TEXTURE, D3DTA_CURRENT, D3DTOP_DISABLE , 0);
 
-    // Once the blending operations and arguments are set, the following code sets the 2×2 bump mapping matrix to the identity matrix, by setting the D3DTSS_BUMPENVMAT00 and D3DTSS_BUMPENVMAT11 texture stage states to 1.0. Setting the matrix to the identity causes the system to use the delta-values in the bump map unmodified, but this is not a requirement. 
-    // Set the bump mapping matrix. 
-    // If you set the bump mapping operation to include luminance (D3DTOP_BUMPENVMAPLUMINANCE), you must set the luminance controls. The luminance controls configure how the system computes luminance before modulating the color from the texture in the next stage. (For details, see Bump Mapping Formulas.)
-    // Set luminance controls. This is only needed when using a bump map 
-    // that contains luminance, and when the D3DTOP_BUMPENVMAPLUMINANCE 
-    // texture blending operation is being used.
+	// Once the blending operations and arguments are set, the following code sets the
+	// 2×2 bump mapping matrix to the identity matrix, by setting the D3DTSS_BUMPENVMAT00
+	// and D3DTSS_BUMPENVMAT11 texture stage states to 1.0. Setting the matrix to the identity
+	// causes the system to use the delta-values in the bump map unmodified, but this is not a requirement.
+	// Set the bump mapping matrix.
+	// If you set the bump mapping operation to include luminance (D3DTOP_BUMPENVMAPLUMINANCE),
+	// you must set the luminance controls. The luminance controls configure how the system computes
+	// luminance before modulating the color from the texture in the next stage.
+	// (For details, see Bump Mapping Formulas.)
+	// Set luminance controls. This is only needed when using a bump map
+	// that contains luminance, and when the D3DTOP_BUMPENVMAPLUMINANCE
+	// texture blending operation is being used.
 
-			D3DSetTextureStageState1BM (0.5f, 0.0f, 0.0f, 0.5f, 1.0f, 0.0f );		
+			D3DSetTextureStageState1BM (0.5f, 0.0f, 0.0f, 0.5f, 1.0f, 0.0f );
         } 
 /* 08/24/2004 Wendell Buckner 
     Make sure you render regular polys properly... */

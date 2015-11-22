@@ -132,20 +132,23 @@ geBoolean GENESISCC geBody_CreateTangentSpace( const geBody *B )
 		{
 			FILE *fp = fopen("c:\\cube.txt","at");
 
-			fprintf(fp,"Vertex List\n");  
+			if(fp)
+			{
+				fprintf(fp,"Vertex List\n");
 
-			for ( i= 0; i < VertexCount; i++ )  
-				fprintf(fp,"%i,  X = %f Y = %f Z= %f U = %f V = %f \n", i, SV[i].XPoint.X,SV[i].XPoint.Y,SV[i].XPoint.Z,SV[i].XU,SV[i].XV);  
+				for ( i= 0; i < VertexCount; i++ )
+					fprintf(fp,"%i,  X = %f Y = %f Z= %f U = %f V = %f \n", i, SV[i].XPoint.X,SV[i].XPoint.Y,SV[i].XPoint.Z,SV[i].XU,SV[i].XV);
 
-			fprintf(fp,"Normal List\n");  
+				fprintf(fp,"Normal List\n");
 
-			for ( i= 0; i < B->SkinNormalCount; i++ )  
-				fprintf(fp,"%i,  X = %f Y = %f Z = %f\n", i, SN[i].Normal.X,SN[i].Normal.Y,SN[i].Normal.Z);  
+				for ( i= 0; i < B->SkinNormalCount; i++ )
+					fprintf(fp,"%i,  X = %f Y = %f Z = %f\n", i, SN[i].Normal.X,SN[i].Normal.Y,SN[i].Normal.Z);
 
-			for ( j = 0; j < FaceCount; j++ )
-				fprintf(fp,"%i,  V1 = %i V2 = %i V3 = %i N1 = %i N2 = %i N3 = %i\n",j, SF[j].VtxIndex[0],SF[j].VtxIndex[1],SF[j].VtxIndex[2],SF[j].NormalIndex[0],SF[j].NormalIndex[1],SF[j].NormalIndex[2]);
+				for ( j = 0; j < FaceCount; j++ )
+					fprintf(fp,"%i,  V1 = %i V2 = %i V3 = %i N1 = %i N2 = %i N3 = %i\n",j, SF[j].VtxIndex[0],SF[j].VtxIndex[1],SF[j].VtxIndex[2],SF[j].NormalIndex[0],SF[j].NormalIndex[1],SF[j].NormalIndex[2]);
 
-			fclose(fp);
+				fclose(fp);
+			}
 		}
 #endif // end change 
 

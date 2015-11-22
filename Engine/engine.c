@@ -283,7 +283,7 @@ GENESISAPI geBoolean geEngine_AddBitmap(geEngine *Engine, geBitmap *Bitmap)
 		return GE_FALSE;
 	}
 
-	geBitmap_SetDriverFlags(Bitmap,RDRIVER_PF_2D);
+	geBitmap_SetDriverFlags(Bitmap, RDRIVER_PF_2D);
 
 	// Add bitmap to the lit of bitmaps attached to the engine
 	if ( BitmapList_Add(Engine->AttachedBitmaps, (geBitmap *)Bitmap) )
@@ -727,7 +727,7 @@ Sys_DriverInfo *DrvInfo;
 
 //================================================================================
 //	geEngine_RenderPoly
-//		World MUST ne passed in if using a texture, as it is a container object for ALL 3d textures
+//		World MUST be passed in if using a texture, as it is a container object for ALL 3d textures
 //		* stop passing World ?
 //		* cut the Flags parameter and pass in zero ?
 //================================================================================
@@ -736,11 +736,11 @@ GENESISAPI void GENESISCC geEngine_RenderPoly(const geEngine *Engine,
 {
 	geBoolean	Ret;
 
-	assert(Engine && Points );
+	assert(Engine && Points);
 
-	if ( Texture )
+	if(Texture)
 	{
-	geRDriver_THandle * TH;
+		geRDriver_THandle * TH;
 	
 //		assert(World);
 //		assert(geEngine_HasWorld(Engine, World) == GE_TRUE);
@@ -754,8 +754,24 @@ GENESISAPI void GENESISCC geEngine_RenderPoly(const geEngine *Engine,
      BUMPMAPPING                                                                       	*/
         geBitmap_SetRenderFlags(Texture, &Flags);
 
-		Ret = Engine->DriverInfo.RDriver->RenderMiscTexturePoly((DRV_TLVertex *)Points,
-			NumPoints,TH,Flags);
+		assert(Engine);
+
+		assert(Engine->DriverInfo.RDriver);
+
+		assert(Points);
+
+		assert(NumPoints);
+
+		assert(TH);
+
+		assert(Flags>=0);
+
+		Ret =
+			Engine->DriverInfo.RDriver->RenderMiscTexturePoly(
+			(DRV_TLVertex*)Points,
+			NumPoints,
+			TH,
+			Flags);
 	}
 	else
 	{

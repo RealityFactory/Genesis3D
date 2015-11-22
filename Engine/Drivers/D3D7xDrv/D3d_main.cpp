@@ -268,12 +268,12 @@ BOOL D3DMain_InitD3D(HWND hWnd, const char *DriverName, int32 Width, int32 Heigh
 	unlink(D3DMAIN_LOG_FILENAME);
 
 	D3DMain_Log("=================================================================\n");
-	D3DMain_Log(" D3DDrv v%i.%i\n", DRV_VERSION_MAJOR, DRV_VERSION_MINOR);
+	D3DMain_Log(" D3DDrv v%d.%d\n", DRV_VERSION_MAJOR, DRV_VERSION_MINOR);
 	D3DMain_Log(" Build Date: "__DATE__", Time: "__TIME__"\n");
 	D3DMain_Log("=================================================================\n\n");
 
-	D3DMain_Log("Current Time: %2i:%2i:%2i\n", Time.wHour, Time.wMinute, Time.wSecond);
-	D3DMain_Log("Current Date: %2i-%2i-%4i\n", Time.wMonth, Time.wDay, Time.wYear);
+	D3DMain_Log("Current Date: %02d-%02d-%4d\n", Time.wMonth, Time.wDay, Time.wYear);
+	D3DMain_Log("Current Time: %02d:%02d:%02d\n", Time.wHour, Time.wMinute, Time.wSecond);
 	D3DMain_Log("\n ** D3D Driver Initializing **\n\n");
 
 	AppInfo.hWnd = hWnd;

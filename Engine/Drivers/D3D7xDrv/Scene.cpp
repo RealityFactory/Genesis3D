@@ -144,11 +144,11 @@ BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, BOOL ClearStencil, RECT *World
 		} */
 		if (AppInfo.FogEnable)
 		{
-            D3DFogEnable ( AppInfo.FogEnable, (F2DW(AppInfo.FogR)<<16)|(F2DW(AppInfo.FogG)<<8)|F2DW(AppInfo.FogB) );		
+			D3DFogEnable ( AppInfo.FogEnable, (F2DW(AppInfo.FogR)<<16)|(F2DW(AppInfo.FogG)<<8)|F2DW(AppInfo.FogB) );
 		}
 		else
 		{
-			D3DFogEnable ( AppInfo.FogEnable, (F2DW(AppInfo.ClearR)<<16)|(F2DW(AppInfo.ClearG)<<8)|F2DW(AppInfo.ClearB) );		
+			D3DFogEnable ( AppInfo.FogEnable, (F2DW(AppInfo.ClearR)<<16)|(F2DW(AppInfo.ClearG)<<8)|F2DW(AppInfo.ClearB) );
 		} 
 
         

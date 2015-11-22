@@ -164,10 +164,10 @@ void Render_WorldPolyMultitexture(DRV_TLVertex *Pnts, int32 NumPoints, geRDriver
 
 	pPnt = Pnts;
 
-	glBegin(GL_TRIANGLE_FAN);	
+	glBegin(GL_TRIANGLE_FAN);
 
 	for(i = 0; i < NumPoints; i++)
-	{	
+	{
 		zRecip = 1.0f / pPnt->z;   
 
 		tu = (pPnt->u * scaleU + shiftU);

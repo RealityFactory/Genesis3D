@@ -1965,7 +1965,7 @@ GENESISAPI void GENESISCC geBitmap_AttachBumpmapToDriver( geBitmap *Bmp )
 		if ( !geBitmap_IsValid(BumpBmpAlt) ) break; 
 
 		if(!Bmp->DriverHandle) break;
-		if(!BumpBmpAlt->DriverHandle) break;;
+		if(!BumpBmpAlt->DriverHandle) break;
 
 		DriverHandle[0] = Bmp->DriverHandle;
 		DriverHandle[1] = BumpBmpAlt->DriverHandle;

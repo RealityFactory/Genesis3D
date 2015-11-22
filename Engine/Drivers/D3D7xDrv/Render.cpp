@@ -101,7 +101,7 @@ geBoolean DRIVERCC RenderGouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint32
 		D3DZWriteEnable(FALSE);	
 	else
 		D3DZWriteEnable(TRUE);
-	
+
 	int32 SAlpha = (int32)Alpha<<24;
 	pPnts = Pnts;
 	pD3DPnts = D3DPnts;
@@ -155,8 +155,6 @@ geBoolean DRIVERCC RenderGouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint32
 		AppInfo.lpD3DDevice->EndScene();
 		AppInfo.lpD3DDevice->BeginScene();
 	}
-
-	
 
 	return TRUE;
 }

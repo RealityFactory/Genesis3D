@@ -893,23 +893,23 @@ static DWORD         OldBumpEnvMat11TSS1   = 0;
 static DWORD         OldBumpEnvLScaleTSS1  = 0;
 static DWORD         OldBumpEnvLOffsetTSS1 = 0;
 
-//inline DWORD F2DW( FLOAT f ) { return *((DWORD*)&f); }
+__inline DWORD F2DW( FLOAT f ) { return *((DWORD*)&f); }
+/* following code doesn't work here ...
 __inline DWORD F2DW(float f)
 {
    DWORD            retval = 0;
 
    _asm {
-      fld            f
-      lea            eax, [retval]
-      fistp         dword ptr[eax]
+	fld			f				; load float into stack
+	lea			eax, [retval]	; Load effective address to register
+	fistp		dword ptr[eax]
    }
 
    return retval;
-}
+}/**/
 
 void D3DSetTextureStageState1BM (float BumpEnvMat00TSS1, float BumpEnvMat01TSS1, float BumpEnvMat10TSS1, float BumpEnvMat11TSS1, float BumpEnvLScaleTSS1, float BumpEnvLOffsetTSS1)
 {
-
 	DWORD dwBumpEnvMat00TSS1   = F2DW(BumpEnvMat00TSS1);
 	DWORD dwBumpEnvMat01TSS1   = F2DW(BumpEnvMat01TSS1);
 	DWORD dwBumpEnvMat10TSS1   = F2DW(BumpEnvMat10TSS1);
@@ -917,46 +917,53 @@ void D3DSetTextureStageState1BM (float BumpEnvMat00TSS1, float BumpEnvMat01TSS1,
 	DWORD dwBumpEnvLScaleTSS1  = F2DW(BumpEnvLScaleTSS1);
 	DWORD dwBumpEnvLOffsetTSS1 = F2DW(BumpEnvLOffsetTSS1);
 
-	if ( (OldBumpEnvMat00TSS1 == dwBumpEnvMat00TSS1) && (OldBumpEnvMat01TSS1  == dwBumpEnvMat01TSS1)  && (OldBumpEnvMat10TSS1   == dwBumpEnvMat10TSS1) &&
-		 (OldBumpEnvMat11TSS1 == dwBumpEnvMat11TSS1) && (OldBumpEnvLScaleTSS1 == dwBumpEnvLScaleTSS1) && (OldBumpEnvLOffsetTSS1 == dwBumpEnvLOffsetTSS1) )
+	if (   (OldBumpEnvMat00TSS1 == dwBumpEnvMat00TSS1)
+		&& (OldBumpEnvMat01TSS1 == dwBumpEnvMat01TSS1)
+		&& (OldBumpEnvMat10TSS1 == dwBumpEnvMat10TSS1)
+		&& (OldBumpEnvMat11TSS1 == dwBumpEnvMat11TSS1)
+		&& (OldBumpEnvLScaleTSS1 == dwBumpEnvLScaleTSS1)
+		&& (OldBumpEnvLOffsetTSS1 == dwBumpEnvLOffsetTSS1) )
 		 return;
 
 	if ( (OldBumpEnvMat00TSS1 != dwBumpEnvMat00TSS1) )
-    {
-     OldBumpEnvMat00TSS1 = dwBumpEnvMat00TSS1;
-	 AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_BUMPENVMAT00, dwBumpEnvMat00TSS1 );
+	{
+		OldBumpEnvMat00TSS1 = dwBumpEnvMat00TSS1;
+		AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_BUMPENVMAT00, dwBumpEnvMat00TSS1 );
 	}
 
 	if ( (OldBumpEnvMat01TSS1 != dwBumpEnvMat01TSS1) )
-    {
-     OldBumpEnvMat01TSS1 = dwBumpEnvMat01TSS1;
-	 AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_BUMPENVMAT01, dwBumpEnvMat01TSS1 );
+	{
+		OldBumpEnvMat01TSS1 = dwBumpEnvMat01TSS1;
+		AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_BUMPENVMAT01, dwBumpEnvMat01TSS1 );
 	}
 
 	if ( (OldBumpEnvMat10TSS1 != dwBumpEnvMat10TSS1) )
-    {
-     OldBumpEnvMat10TSS1 = dwBumpEnvMat10TSS1;
-	 AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_BUMPENVMAT10, dwBumpEnvMat10TSS1 );
+	{
+		OldBumpEnvMat10TSS1 = dwBumpEnvMat10TSS1;
+		AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_BUMPENVMAT10, dwBumpEnvMat10TSS1 );
 	}
 
 	if ( (OldBumpEnvMat11TSS1 != dwBumpEnvMat11TSS1) )
-    {
-     OldBumpEnvMat11TSS1 = dwBumpEnvMat11TSS1;
-	 AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_BUMPENVMAT11, dwBumpEnvMat11TSS1 );
+	{
+		OldBumpEnvMat11TSS1 = dwBumpEnvMat11TSS1;
+		AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_BUMPENVMAT11, dwBumpEnvMat11TSS1 );
 	}
 
-//  If you set the bump mapping operation to include luminance (D3DTOP_BUMPENVMAPLUMINANCE), you must set the luminance controls. The luminance controls configure how the system computes luminance before modulating the color from the texture in the next stage. (For details, see Bump Mapping Formulas.)
+	// If you set the bump mapping operation to include luminance (D3DTOP_BUMPENVMAPLUMINANCE),
+	// you must set the luminance controls. The luminance controls configure how the system computes
+	// luminance before modulating the color from the texture in the next stage.
+	// (For details, see Bump Mapping Formulas.)
 
 	if ( (OldBumpEnvLScaleTSS1 != dwBumpEnvLScaleTSS1) )
-    {
-     OldBumpEnvLScaleTSS1 = dwBumpEnvLScaleTSS1;
-	 AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_BUMPENVLSCALE, dwBumpEnvLScaleTSS1 );
+	{
+		OldBumpEnvLScaleTSS1 = dwBumpEnvLScaleTSS1;
+		AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_BUMPENVLSCALE, dwBumpEnvLScaleTSS1 );
 	}
 
 	if ( (OldBumpEnvLOffsetTSS1 != dwBumpEnvLOffsetTSS1) )
-    {
-     OldBumpEnvLOffsetTSS1 = dwBumpEnvLOffsetTSS1;
-	 AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_BUMPENVLOFFSET, dwBumpEnvLOffsetTSS1 );
+	{
+		OldBumpEnvLOffsetTSS1 = dwBumpEnvLOffsetTSS1;
+		AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_BUMPENVLOFFSET, dwBumpEnvLOffsetTSS1 );
 	}
 }    
 
