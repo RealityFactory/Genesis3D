@@ -15,8 +15,7 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Copyright (C) 1996-1999 Eclipse Entertainment, L.L.C. All Rights Reserved           */
 /*                                                                                      */
 /****************************************************************************************/
 
@@ -117,6 +116,9 @@ typedef struct geTClip_StaticsType
 	geRDriver_THandle * THandle;
 
 	geTClip_Rasterize_FuncPtr RasterizeFunc;
+
+	uint32 RenderFlags;		// LA
+
 } geTClip_StaticsType;
 
 /*}{************ Protos ***********/
@@ -131,12 +133,23 @@ static void GENESISCC geTClip_TrianglePlane_Old(const GE_LVertex * zTriVertex,ge
 
 static Link * geTClip_Link = NULL;
 static geTClip_StaticsType geTClip_Statics;
+static uint32 ActiveRenderFlags = 0;	// LA
 
 /*}{************ Functions ***********/
+
+// LA
+void GENESISCC geTClip_SetRenderFlags(uint32 newflags)
+{
+	geTClip_Statics.RenderFlags = newflags;
+	ActiveRenderFlags = newflags;
+	return;
+}
 
 geBoolean GENESISCC geTClip_Push(void)
 {
 geTClip_StaticsType * TCI;
+
+	geTClip_Statics.RenderFlags = ActiveRenderFlags; // LA
 
 	if ( ! geTClip_Link )
 	{
@@ -153,6 +166,8 @@ geTClip_StaticsType * TCI;
 
 	Link_Push( geTClip_Link , TCI );
 
+	geTClip_Statics.RenderFlags = 0;	// LA, this is needed to set RF = 0 for default after any _Push
+	
 	return GE_TRUE;
 }
 
@@ -173,6 +188,9 @@ geTClip_StaticsType * TCI;
 		geTClip_Link = NULL;
 		List_Stop();
 	}
+
+	ActiveRenderFlags = geTClip_Statics.RenderFlags; // LA, set ARF from newly pop'd statics
+	
 	return GE_TRUE;
 }
 
@@ -224,6 +242,7 @@ void GENESISCC geTClip_Triangle(const GE_LVertex TriVertex[3])
 
 #if 1
 	geTClip_TrianglePlane(TriVertex,BACK_CLIPPING_PLANE);
+	//geTClip_TrianglePlane(TriVertex,LEFT_CLIPPING_PLANE);
 #else
 	geTClip_TrianglePlane_Old(TriVertex,BACK_CLIPPING_PLANE);
 #endif
@@ -236,12 +255,12 @@ void GENESISCC geTClip_Triangle(const GE_LVertex TriVertex[3])
 static void RASTERIZECC geTClip_Rasterize_Tex(const GE_LVertex * TriVtx)
 {
 	geTClip_Statics.Driver->RenderMiscTexturePoly((DRV_TLVertex *)TriVtx,
-		3,geTClip_Statics.THandle,0);
+		3,geTClip_Statics.THandle, ActiveRenderFlags); // LA
 }
 
 static void RASTERIZECC geTClip_Rasterize_Gou(const GE_LVertex * TriVtx)
 {
-	geTClip_Statics.Driver->RenderGouraudPoly((DRV_TLVertex *)TriVtx,3,0);
+	geTClip_Statics.Driver->RenderGouraudPoly((DRV_TLVertex *)TriVtx,3,ActiveRenderFlags); // LA
 }
 
 static void GENESISCC geTClip_Rasterize(const GE_LVertex * TriVtx)
@@ -253,12 +272,12 @@ static void GENESISCC geTClip_Rasterize(const GE_LVertex * TriVtx)
 	if ( geTClip_Statics.THandle )
 	{
 		geTClip_Statics.Driver->RenderMiscTexturePoly((DRV_TLVertex *)TriVtx,
-			3,geTClip_Statics.THandle,0);
+			3,geTClip_Statics.THandle,ActiveRenderFlags);	// LA
 	}
 	else
 	{
 		geTClip_Statics.Driver->RenderGouraudPoly((DRV_TLVertex *)TriVtx,
-			3,0);
+			3,ActiveRenderFlags); // LA
 	}
 }
 
@@ -421,6 +440,9 @@ uint32 OutBits = 0;
 	if ( OutBits )
 	{
 	GE_LVertex NewTriVertex[3];
+
+	memset(NewTriVertex, '\0',sizeof(GE_LVertex)*(3));
+
 		ClippingPlane = 0;
 		for(;;)
 		{
@@ -520,15 +542,30 @@ uint32 OutBits = 0;
 	if ( geTClip_Statics.THandle )
 	{
 		geTClip_Statics.Driver->RenderMiscTexturePoly((DRV_TLVertex *)TriVertex,
-			3,geTClip_Statics.THandle,0);
+			3,geTClip_Statics.THandle,ActiveRenderFlags); // LA
 	}
 	else
 	{
-		geTClip_Statics.Driver->RenderGouraudPoly((DRV_TLVertex *)TriVertex,3,0);
+		geTClip_Statics.Driver->RenderGouraudPoly((DRV_TLVertex *)TriVertex,3,ActiveRenderFlags); // LA
 	}
 
 #endif //}
 
+}
+
+// LA - this is for completely onscreen-only triangles
+void GENESISCC geTClip_UnclippedTriangle(const GE_LVertex TriVertex[3])
+{
+	if ( geTClip_Statics.THandle )
+	{
+		geTClip_Statics.Driver->RenderMiscTexturePoly((DRV_TLVertex *)TriVertex,
+			3,geTClip_Statics.THandle,ActiveRenderFlags);
+	}
+	else
+	{
+		geTClip_Statics.Driver->RenderGouraudPoly((DRV_TLVertex *)TriVertex,3,ActiveRenderFlags);
+	}
+	return;
 }
 
 /*}{*********** EOF ************/

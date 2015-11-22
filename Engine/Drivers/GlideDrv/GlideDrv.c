@@ -260,6 +260,9 @@ DRV_Driver GLIDEDRV =
 
 DllExport geBoolean DriverHook(DRV_Driver **Driver)
 {
+	GrHwConfiguration g;
+	FxBool b;
+	
 	EngineSettings.CanSupportFlags = (DRV_SUPPORT_ALPHA | DRV_SUPPORT_COLORKEY);
 	EngineSettings.PreferenceFlags = 0;
 
@@ -272,7 +275,10 @@ DllExport geBoolean DriverHook(DRV_Driver **Driver)
 
 	SetLastDrvError(DRV_ERROR_NONE, "GLIDE_DRV:  No error.");
 
-	return GE_TRUE;
+	// query glide2x.dll for how many boards are installed
+	b=grSstQueryBoards(&g);
+
+	return (b && g.num_sst)?TRUE:FALSE;
 }
 
 //================================================================================================

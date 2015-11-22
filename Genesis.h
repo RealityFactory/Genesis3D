@@ -98,6 +98,8 @@ typedef enum
 #define	GE_RENDER_BACKFACED				(1<<2)			// Poly should be backfaced from the Camera's Pov
 #define GE_RENDER_DEPTH_SORT_BF			(1<<3)			// Sorts relative to camera position, from back to front
 #define GE_RENDER_CLAMP_UV				(1<<4)			// Clamp UV's in both directions
+#define GE_RENDER_NO_FOG				(1<<5)
+#define GE_RENDER_NO_CLIP				(1<<6)
 
 // World Add flags
 #define GE_WORLD_RENDER				(1<<0)
@@ -484,6 +486,9 @@ GENESISAPI geBoolean geWorld_Collision(	geWorld *World,				// World to collide w
 	// NOTE - Mins/Maxs CAN be NULL.  If you are just testing a point, then use NULL (it's faster!!!).
 
 GENESISAPI geBoolean geWorld_GetContents(geWorld *World, const geVec3d *Pos, const geVec3d *Mins, const geVec3d *Maxs, uint32 Flags, uint32 UserFlags, GE_CollisionCB *CollisionCB, void *Context, GE_Contents *Contents);
+// changed texture name
+GENESISAPI geBoolean geWorld_GetTextureName(geWorld *World, const geVec3d *Pos, const geVec3d *Mins, const geVec3d *Maxs, char *TexName);
+// end change texture name
 
 // World Polys
 GENESISAPI	gePoly *geWorld_AddPolyOnce(geWorld *World, 
@@ -574,8 +579,28 @@ GENESISAPI void GENESISCC geCamera_TransformAndProjectLArray(const geCamera *Cam
 GENESISAPI geBoolean		GENESISCC geCamera_SetWorldSpaceXForm(geCamera *Camera, const geXForm3d *XForm);
 GENESISAPI geBoolean		GENESISCC geCamera_SetWorldSpaceVisXForm(geCamera *Camera, const geXForm3d *XForm);
 GENESISAPI const geXForm3d	*GENESISCC geCamera_GetWorldSpaceXForm( const geCamera *Camera);
+GENESISAPI const geXForm3d * GENESISCC geCamera_GetCameraSpaceXForm( const geCamera *Camera);
 GENESISAPI const geXForm3d * GENESISCC geCamera_GetWorldSpaceVisXForm( const geCamera *Camera);
 GENESISAPI geBoolean GENESISCC geCamera_ConvertWorldSpaceToCameraSpace(const geXForm3d *WXForm, geXForm3d *CXForm);
+GENESISAPI const geVec3d *GENESISCC geCamera_GetPov(const geCamera *Camera);
+
+
+
+GENESISAPI void		GENESISCC geTClip_SetupEdges(geEngine *Engine,
+						geFloat	LeftEdge, 
+						geFloat RightEdge,
+						geFloat TopEdge ,
+						geFloat BottomEdge,
+						geFloat BackEdge);
+
+GENESISAPI geBoolean	GENESISCC geTClip_Push(void);
+GENESISAPI geBoolean	GENESISCC geTClip_Pop(void);
+
+GENESISAPI geBoolean	GENESISCC geTClip_SetTexture(const geBitmap * Bitmap);
+GENESISAPI void		GENESISCC geTClip_Triangle(const GE_LVertex TriVertex[3]);
+
+GENESISAPI void		GENESISCC geTClip_SetRenderFlags(uint32 newflags);	// LA
+GENESISAPI void		GENESISCC geTClip_UnclippedTriangle(const GE_LVertex TriVertex[3]);	// LA
 
 
 //================================================================================

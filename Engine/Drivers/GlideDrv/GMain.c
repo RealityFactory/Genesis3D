@@ -363,15 +363,16 @@ geBoolean DRIVERCC GMain_ScreenShot(const char *Name)
 {
 	uint16		*Buffer;
 	
-	Buffer = (uint16*)malloc(sizeof(uint16*)*640*480);
+	Buffer = (uint16*)malloc(sizeof(uint16*)*ClientWindow.Width*ClientWindow.Height);
 	
-	if (!grLfbReadRegion(GR_BUFFER_FRONTBUFFER,0,0,640,480,640*2, (void*)Buffer))
+	if (!grLfbReadRegion(GR_BUFFER_FRONTBUFFER,0,0,ClientWindow.Width,ClientWindow.Height,
+		ClientWindow.Width*2, (void*)Buffer))
 	{
 		SetLastDrvError(DRV_ERROR_GENERIC, "GLIDE: Could not save BMP.");
 		return FALSE;
 	}
 	
-	WriteBMP(Buffer, Name);
+	WriteBMP(Buffer, Name, ClientWindow.Width, ClientWindow.Height);
 
 	free(Buffer);
 

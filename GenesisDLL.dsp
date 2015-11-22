@@ -43,8 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "GENESISDLL_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /G5 /MT /W3 /GX /O2 /Ob2 /I "..\Source" /I "World" /I "Engine" /I "Engine\Drivers" /I "Actor" /I "BSP" /I "Math" /I "Entities" /I "Support" /I "Physics" /I "VFile" /I "Bitmap" /I "Bitmap\Compression" /I "guWorld" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "BUILDGENESIS" /D "GENESISDLLVERSION" /YX /FD /c
-# SUBTRACT CPP /X
+# ADD CPP /nologo /G5 /MT /W3 /GX /O2 /Ob2 /I "..\Source" /I "World" /I "Engine" /I "Engine\Drivers" /I "Actor" /I "BSP" /I "Math" /I "Entities" /I "Support" /I "Physics" /I "VFile" /I "Bitmap" /I "Bitmap\Compression" /I "..\G3D" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "BUILDGENESIS" /D "GENESISDLLVERSION" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -503,6 +502,14 @@ SOURCE=.\Support\ramdll.c
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=".\VFile\dirtree-common.c"
+# End Source File
+# Begin Source File
+
+SOURCE=".\VFile\dirtree-common.h"
+# End Source File
+# Begin Source File
+
 SOURCE=.\VFile\dirtree.c
 # End Source File
 # Begin Source File
@@ -535,11 +542,19 @@ SOURCE=.\VFile\fsvfs.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\VFile\vfile._h
+# End Source File
+# Begin Source File
+
 SOURCE=.\VFile\vfile.c
 # End Source File
 # Begin Source File
 
 SOURCE=.\VFile\vfile.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\VFile\vfile_structs.h
 # End Source File
 # End Group
 # Begin Group "World"
@@ -745,6 +760,14 @@ SOURCE=.\Sound3d.c
 # Begin Source File
 
 SOURCE=.\Sound3d.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\sprite.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\sprite.h
 # End Source File
 # Begin Source File
 

@@ -538,3 +538,31 @@ geBoolean geWBitmap_SetVisFrame(geWBitmap *WBitmap, int32 VisFrame)
 
 	return GE_TRUE;
 }
+
+// changed texture name
+
+//=====================================================================================
+//	geWBitmap_Pool_GetWNameByBitmap
+//=====================================================================================
+char *geWBitmap_Pool_GetWNameByBitmap(geWBitmap_Pool *Pool, const geBitmap *Bitmap)
+{
+	geWBitmap		*pWBitmap;
+	int32			i;
+
+	assert(Pool);
+	assert(Bitmap);
+
+	pWBitmap = Pool->WBitmaps;
+
+	for (i=0; i< Pool->NumWBitmaps; i++, pWBitmap++)
+	{
+		char str[100];
+		sprintf(str,"WBitmap : %x\n",pWBitmap->Bitmap);
+		OutputDebugString(str);
+		if (pWBitmap->Bitmap == Bitmap)
+			return pWBitmap->Name;
+	}
+
+	return NULL;
+}
+// end change texture name

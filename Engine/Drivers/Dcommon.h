@@ -249,6 +249,7 @@ typedef struct
 #define DRV_RENDER_NO_ZMASK		(1<<2)	// No zbuffering should be performed
 #define DRV_RENDER_NO_ZWRITE	(1<<3)	// No z writing will be performed
 #define DRV_RENDER_CLAMP_UV		(1<<4)	// Clamp UV in both directions
+#define DRV_RENDER_POLY_NO_FOG	(1<<5)  // Don't render this poly with fog 
 
 //
 //  PolyMode flags	(A method to override how polys are drawn for debugging purposes...)

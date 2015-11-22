@@ -3018,7 +3018,7 @@ static void RenderSkyThroughFrustum(World_SkyBox *SkyBox, geWorld_SkyBoxTData *S
 	if (!SkyTData->NumTransformed)
 		return;
 
-	SkyFlags = DRV_RENDER_FLUSH;
+	SkyFlags = DRV_RENDER_FLUSH | DRV_RENDER_POLY_NO_FOG; // skybox fog
 
 	if (SkyBox->DrawScale <= 1.0f)
 		SkyFlags |= DRV_RENDER_CLAMP_UV;
@@ -3058,8 +3058,9 @@ static void RenderSkyThroughFrustum(World_SkyBox *SkyBox, geWorld_SkyBoxTData *S
 //	..fall prey to the far clip plane, if active.
 
     nFoo = Fi->NumPlanes;			// EVIL HACK
-	  if(nFoo == 5)							// EVIL HACK - 5 planes means far clip enabled
-	    nFoo = 4;								// EVIL HACK - leave my skybox alone!
+
+	  if(nFoo > 4)							// EVIL HACK - 5 planes means far clip enabled
+	    nFoo = Fi->NumPlanes-1;								// EVIL HACK - leave my skybox alone!
 
 		for (p=0; p< nFoo; p++)
 		{
@@ -3159,8 +3160,9 @@ static void SetupSkyBoxFaceForScene(World_SkyBox *SkyBox, int32 Face, const geXF
 //	..fall prey to the far clip plane, if active.
 
   nFoo = Fi->NumPlanes;			// EVIL HACK
-	if(nFoo == 5)							// EVIL HACK - 5 planes means far clip enabled
-	  nFoo = 4;								// EVIL HACK - leave my skybox alone!
+
+	if(nFoo > 4)							// EVIL HACK - 5 planes means far clip enabled
+	  nFoo = Fi->NumPlanes-1;								// EVIL HACK - leave my skybox alone!
 
 	for (p=0; p< nFoo; p++, pFPlane++)
 	{

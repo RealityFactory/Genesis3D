@@ -29,6 +29,7 @@
 
 #define BIG_DISTANCE 30000.0f
 
+extern geBoolean geBitmap_IsValid(const geBitmap *Bmp);
 
 // sprites are rectangular
 #define SPRITE_NUM_CORNERS 4

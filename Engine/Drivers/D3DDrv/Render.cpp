@@ -74,7 +74,7 @@ geBoolean DRIVERCC RenderGouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint32
 		pD3DPnts->rhw = ZRecip;
 		pD3DPnts->color = SAlpha | ((int32)pPnts->r<<16) | ((int32)pPnts->g<<8) | (int32)pPnts->b;
 
-		if (AppInfo.FogEnable)
+		if (AppInfo.FogEnable && !(Flags & DRV_RENDER_POLY_NO_FOG)) // poly fog
 		{
 			DWORD	FogVal;
 			geFloat	Val;

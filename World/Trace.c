@@ -2227,3 +2227,133 @@ geBoolean Trace_CollideBeam(int32 Node, geVec3d *s, geVec3d *e, geFloat Radius)
 	//this will nullify farther collisions
 	return	GE_FALSE;
 }
+
+// changed texture name
+
+
+//=====================================================================================
+//	FillContents_tr
+//	Traverses the leafs and or's all the contents together
+//=====================================================================================
+static void FillContents_tr(geWorld *World, int32 Node, const geVec3d *Pos, char *texname)
+{
+	int32		Side;
+
+	if (Node < 0)		// At a leaf, fill contens and return
+	{
+		int32		Leaf;
+
+		Leaf = -(Node+1);
+		if (PointInLeafSides(Pos, &MiscLeafs[Leaf]))
+		{
+			//gePoly *Poly = World->CurrentBSP->LeafData[Leaf].PolyList;
+			//if(Poly)
+			{
+				//const geBitmap *Bitmap = Poly->Bitmap;
+				//char *name = geWBitmap_Pool_GetWNameByBitmap(World->CurrentBSP->WBitmapPool, Bitmap);
+				char str[100];
+				sprintf(str,"Leaf : %d\n",Leaf);
+				OutputDebugString(str);
+				//if(name)
+				//{
+				//	strcpy(str, name);
+				//	OutputDebugString(str); OutputDebugString("\n");
+				//}
+			}
+		}
+		return;
+	}
+
+	Side = Trace_BoxOnPlaneSide(&GMins2, &GMaxs2, &MiscPlanes[MiscNodes[Node].PlaneNum]);
+
+	// Go down the sides that the box lands in
+	if (Side & PSIDE_FRONT)
+		FillContents_tr(World, MiscNodes[Node].Children[0], Pos, texname);
+
+	if (Side & PSIDE_BACK)
+		FillContents_tr(World, MiscNodes[Node].Children[1], Pos, texname);
+}
+
+//===================================================================================
+//	Trace_GetexureName
+//	Get texture name and returns GE_TRUE if somthing was occupied
+//	Otherwise, it returns GE_FALSE and nothing is assumed to be occupied
+//===================================================================================
+geBoolean Trace_GetTexureName(geWorld *World, const geVec3d *Pos, const geVec3d *Mins, const geVec3d *Maxs, char *TexName)
+{
+	geVec3d						TMins, TMaxs;
+	geBoolean					Hit;
+	int32						i, k;
+	geWorld_Model				*Models, *ModelHit;
+	GFX_Model					*GFXModels;
+
+	assert(World);
+	
+	ModelHit = NULL;
+	Hit = GE_FALSE;
+
+	BSPData = &World->CurrentBSP->BSPData;
+
+	// Get the translated box from the input pos...
+	geVec3d_Add(Mins, Pos, &TMins);
+	geVec3d_Add(Maxs, Pos, &TMaxs);
+
+	MiscNodes = World->CurrentBSP->BSPData.GFXNodes;
+	MiscPlanes = World->CurrentBSP->BSPData.GFXPlanes;
+	MiscLeafs = World->CurrentBSP->BSPData.GFXLeafs;
+	MiscSides = BSPData->GFXLeafSides;
+
+	Models = World->CurrentBSP->Models;
+	GFXModels = World->CurrentBSP->BSPData.GFXModels;
+
+	GMins1 = *Mins;
+	GMaxs1 = *Maxs;
+
+	GMins2 = TMins;
+	GMaxs2 = TMaxs;
+
+	for (i = 0; i < BSPData->NumGFXModels; i++, Models++, GFXModels++)
+	{
+		geVec3d	TPos;
+
+		if (i > 0)		// Ignore model 0 box (main world, we should always try to collide with world)
+		{
+			for (k=0; k<3; k++)
+			{
+				if (VectorToSUB(TMaxs, k) < VectorToSUB(Models->TMins, k))
+					break;
+				if (VectorToSUB(TMins, k) > VectorToSUB(Models->TMaxs, k))
+					break;
+			}
+
+			if (k != 3)			// Couldn't possibly hit if box's don't hit...
+				continue;
+		}
+
+		geVec3d_Subtract(Pos, &Models->RealCenter, &TPos);
+
+		// InverseTransform the point about models center of rotation
+		geXForm3d_TransposeTransform(&Models->XForm, &TPos, &TPos);
+
+		// push back into world
+
+		geVec3d_Add(&TPos, &Models->RealCenter, &TPos);
+
+		FillContents_tr(World, GFXModels->RootNode[0], &TPos, TexName);
+
+		if (!ModelHit)
+		{
+			ModelHit = Models;						// First model hit for any arbritrary contents
+			Hit = GE_TRUE;
+		}
+	}
+
+	if (Hit)
+	{
+		return GE_TRUE;
+	}
+
+	return GE_FALSE;
+}
+
+// end change texture name

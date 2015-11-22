@@ -75,6 +75,10 @@ geBitmap *geWBitmap_GetBitmap(geWBitmap *WBitmap);
 int32 geWBitmap_GetVisFrame(geWBitmap *WBitmap);
 geBoolean geWBitmap_SetVisFrame(geWBitmap *WBitmap, int32 VisFrame);
 
+// changed texture name
+char *geWBitmap_Pool_GetWNameByBitmap(geWBitmap_Pool *Pool, const geBitmap *Bitmap);
+// end change texture name
+
 #ifdef __cplusplus
 }
 #endif

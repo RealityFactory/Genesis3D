@@ -245,7 +245,7 @@ BOOL PCache_InsertWorldPoly(DRV_TLVertex *Verts, int32 NumVerts, geRDriver_THand
 		pD3DVerts->z = (1.0f - ZRecip);	// ZBUFFER
 		pD3DVerts->rhw = ZRecip;
 
-		if (AppInfo.FogEnable)
+		if (AppInfo.FogEnable && !(Flags & DRV_RENDER_POLY_NO_FOG)) // poly fog
 		{
 			DWORD	FogVal;
 			geFloat	Val;
@@ -790,7 +790,13 @@ BOOL PCache_FlushMiscPolys(void)
 		if (!SetupTexture(0, pPoly->THandle, pPoly->MipLevel))
 			return GE_FALSE;
 
+		if ( (pPoly->Flags & DRV_RENDER_POLY_NO_FOG) && AppInfo.FogEnable) // poly fog
+			AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , FALSE);
+
 		D3DTexturedPoly(&MiscCache.Verts[pPoly->FirstVert], pPoly->NumVerts);
+
+		if ( (pPoly->Flags & DRV_RENDER_POLY_NO_FOG) && AppInfo.FogEnable) // poly fog
+			AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , TRUE);
 	}
 
 	// Turn z stuff back on...
@@ -878,7 +884,7 @@ BOOL PCache_InsertMiscPoly(DRV_TLVertex *Verts, int32 NumVerts, geRDriver_THandl
 
 		pD3DVerts->color = SAlpha | ((int32)pVerts->r<<16) | ((int32)pVerts->g<<8) | (int32)pVerts->b;
 
-		if (AppInfo.FogEnable)		// We might get hit on this first "if" but it should predict pretty well in the rest of the tight loop
+		if (AppInfo.FogEnable && !(Flags & DRV_RENDER_POLY_NO_FOG) ) // poly fog
 		{
 			DWORD	FogVal;
 			geFloat	Val;
@@ -1246,9 +1252,15 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 				// Prep the verts for a lightmap and texture map
 				World_PolyPrepVerts(pPoly, PREP_WORLD_VERTS_SINGLE_PASS, TSTAGE_0, TSTAGE_1);
 
+				if ( (pPoly->Flags & DRV_RENDER_POLY_NO_FOG) && AppInfo.FogEnable) // poly fog
+						AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , FALSE);
+
 				// Draw the texture
 				D3DTexturedPoly(&WorldCache.Verts[pPoly->FirstVert], pPoly->NumVerts);
-				
+
+				if ( (pPoly->Flags & DRV_RENDER_POLY_NO_FOG) && AppInfo.FogEnable) // poly fog
+						AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , TRUE);
+
 				// Render any fog maps
 				if (pPoly->LInfo->RGBLight[1])
 				{
@@ -1317,8 +1329,14 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 				// Prep verts as if there was no lightmap
 				World_PolyPrepVerts(pPoly, PREP_WORLD_VERTS_NORMAL, TSTAGE_0, TSTAGE_1);
 
+				if ( (pPoly->Flags & DRV_RENDER_POLY_NO_FOG) && AppInfo.FogEnable) // poly fog
+						AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , FALSE);
+
 				// Draw the texture
 				D3DTexturedPoly(&WorldCache.Verts[pPoly->FirstVert], pPoly->NumVerts);
+
+				if ( (pPoly->Flags & DRV_RENDER_POLY_NO_FOG) && AppInfo.FogEnable) // poly fog
+					AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , TRUE);
 			}
 
 			break;						 

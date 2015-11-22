@@ -648,7 +648,7 @@ GENESISAPI const geXForm3d * GENESISCC geCamera_GetWorldSpaceXForm( const geCame
 //========================================================================================
 //	geCamera_GetCameraSpaceXForm
 //========================================================================================
-const geXForm3d * GENESISCC geCamera_GetCameraSpaceXForm( const geCamera *Camera)
+GENESISAPI const geXForm3d * GENESISCC geCamera_GetCameraSpaceXForm( const geCamera *Camera)
 {
 	assert(Camera != NULL);
 	return &(Camera->XForm);

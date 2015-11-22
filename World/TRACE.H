@@ -125,6 +125,9 @@ geBoolean Trace_ModelCollision(geWorld		*World,
 geBoolean Trace_InverseTreeFromBox(geVec3d *Mins, geVec3d *Maxs, GFX_BNode *BNodes, GFX_Plane *Planes);
 
 geBoolean Trace_GetContents(geWorld *World, const geVec3d *Pos, const geVec3d *Mins, const geVec3d *Maxs, uint32 Flags, uint32 UserFlags, GE_CollisionCB *CollisionCB, void *Context, GE_Contents *Contents);
+// changed texture name
+geBoolean Trace_GetTexureName(geWorld *World, const geVec3d *Pos, const geVec3d *Mins, const geVec3d *Maxs, char *TexName);
+// end change texture name
 
 void Trace_GetMoveBox(const geVec3d *Mins, const geVec3d *Maxs, const geVec3d *Front, const geVec3d *Back, geVec3d *OMins, geVec3d *OMaxs);
 

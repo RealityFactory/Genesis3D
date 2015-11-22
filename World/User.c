@@ -554,6 +554,9 @@ static geBoolean RenderTexturedPoint(DRV_Driver *RDriver, gePoly *Poly, Frustum_
 		if (Poly->RenderFlags & GE_RENDER_CLAMP_UV)
 			RenderFlags |= DRV_RENDER_CLAMP_UV;
 
+		if (Poly->RenderFlags & GE_RENDER_NO_FOG) // skybox fog
+			RenderFlags |= DRV_RENDER_POLY_NO_FOG;
+
 		assert(geWorld_HasBitmap(gWorld, Bitmap));
 		assert(geBitmap_GetTHandle(Bitmap));
 
@@ -578,6 +581,8 @@ static void RenderTexturedPoly(DRV_Driver *RDriver, gePoly *Poly, Frustum_Info *
 	GFX_Plane		*pFPlanes;
 	int32			i, p;
 	uint32			RenderFlags;
+// skydome
+	int32			plan;
 
 	assert(geWorld_PolyIsValid(Poly));
 
@@ -610,7 +615,12 @@ static void RenderTexturedPoly(DRV_Driver *RDriver, gePoly *Poly, Frustum_Info *
 	pTex2 = Tex2;
 	Length1 = Poly->NumVerts;
 
-	for (p=0; p< FInfo->NumPlanes; p++, pFPlanes++)
+// skydome
+	plan = FInfo->NumPlanes;
+	if (((Poly->RenderFlags & GE_RENDER_NO_CLIP)==GE_RENDER_NO_CLIP) && plan==5)
+		plan -= 1;
+
+	for (p=0; p< plan; p++, pFPlanes++)
 	{
 		if (!Frustum_ClipToPlaneUVRGB(pFPlanes, pDest1, pDest2, pTex1, pTex2, Length1, &Length2))
 			return;
@@ -661,6 +671,9 @@ static void RenderTexturedPoly(DRV_Driver *RDriver, gePoly *Poly, Frustum_Info *
 
 	if (Poly->RenderFlags & GE_RENDER_CLAMP_UV)
 		RenderFlags |= DRV_RENDER_CLAMP_UV;
+
+	if (Poly->RenderFlags & GE_RENDER_NO_FOG) // skybox fog
+		RenderFlags |= DRV_RENDER_POLY_NO_FOG;
 
 	// Render it...
 	assert(geWorld_HasBitmap(gWorld, pBitmap));
@@ -771,7 +784,8 @@ void User_EngineFillRect(geEngine *Engine, const GE_Rect *Rect, const GE_RGBA *C
 	RDriver = Engine->DriverInfo.RDriver;
 
 	assert(RDriver != NULL);
-#define NEARZ	0.5f
+// changed for RF
+#define NEARZ	1.0f
 	DrvVertex[0].x = (geFloat)Rect->Left;
 	DrvVertex[0].y = (geFloat)Rect->Top;
 	DrvVertex[0].z = NEARZ;

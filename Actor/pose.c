@@ -397,8 +397,9 @@ static void GENESISCC gePose_UpdateRelativeToParent(gePose *P)
 	if ( P->Parent != NULL )
 		{
 			gePose_UpdateRelativeToParent(P->Parent);
+// Wismerhill Attach Fix RF064
 			if (gePose_TransformCompare(
-						(P->Parent->RootJoint.Transform),&(P->ParentsLastTransform)) != GE_FALSE)
+						(P->Parent->RootJoint.Transform),&(P->ParentsLastTransform)) == GE_FALSE)
 				{
 					P->Touched = GE_TRUE;
 					P->RootJoint.Touched = GE_TRUE;  // bubble touched down entire hierarchy

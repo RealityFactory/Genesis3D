@@ -350,6 +350,17 @@ GENESISAPI geBoolean geWorld_GetContents(geWorld *World, const geVec3d *Pos, con
 	return Trace_GetContents(World, Pos, Mins, Maxs, Flags, UserFlags, CollisionCB, Context, Contents);
 }
 
+// changed texture name
+
+//========================================================================================
+//	geWorld_GetContents
+//========================================================================================
+GENESISAPI geBoolean geWorld_GetTextureName(geWorld *World, const geVec3d *Pos, const geVec3d *Mins, const geVec3d *Maxs, char *TexName)
+{
+	return Trace_GetTexureName(World, Pos, Mins, Maxs, TexName);
+}
+// end change texture name
+
 //========================================================================================
 //	NetPlay
 //========================================================================================

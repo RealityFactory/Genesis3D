@@ -816,9 +816,9 @@ static BOOL D3DMain_CreateViewPort(int w, int h)
 		memset(&Material, 0, sizeof(D3DMATERIAL));
 
 		Material.dwSize       = sizeof(D3DMATERIAL);
-		Material.dcvDiffuse.r = Material.dcvAmbient.r = 0.0f;
-		Material.dcvDiffuse.g = Material.dcvAmbient.g = 0.0f;
-		Material.dcvDiffuse.b = Material.dcvAmbient.b = 0.0f;
+		Material.dcvDiffuse.r = Material.dcvAmbient.r = 255.0f;
+		Material.dcvDiffuse.g = Material.dcvAmbient.g = 255.0f;
+		Material.dcvDiffuse.b = Material.dcvAmbient.b = 255.0f;
 		Material.dwRampSize   = 16L; // A default ramp size
 
 	    AppInfo.BackgroundMaterial->SetMaterial(&Material);
@@ -1079,6 +1079,7 @@ static BOOL D3DMain_ClearBuffers(void)
     
 		// Clear the front buffer to black
 		memset(&ddbltfx, 0, sizeof(ddbltfx));
+		//memset(&ddbltfx, 0xffffff, sizeof(ddbltfx));
 		ddbltfx.dwSize = sizeof(DDBLTFX);
 		SetRect(&dst, 0, 0, ddsd.dwWidth, ddsd.dwHeight);
     
@@ -1120,6 +1121,7 @@ static BOOL D3DMain_ClearBuffers(void)
 		
 		// Clear the back buffer to black
 		memset(&ddbltfx, 0, sizeof(ddbltfx));
+		//memset(&ddbltfx, 0xffffff, sizeof(ddbltfx));
 		ddbltfx.dwSize = sizeof(DDBLTFX);
 		SetRect(&dst, 0, 0, ddsd.dwWidth, ddsd.dwHeight);
 		LastError = AppInfo.lpBackBuffer->Blt(&dst, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT,

@@ -88,10 +88,10 @@ GENESISAPI void GENESISCC geCamera_TransformAndProjectL(const geCamera *Camera,
 GENESISAPI geBoolean GENESISCC geCamera_SetWorldSpaceXForm(geCamera *Camera, const geXForm3d *XForm);
 GENESISAPI geBoolean GENESISCC geCamera_SetWorldSpaceVisXForm(geCamera *Camera, const geXForm3d *XForm);
 GENESISAPI const geXForm3d * GENESISCC geCamera_GetWorldSpaceXForm( const geCamera *Camera);
-const geXForm3d * GENESISCC geCamera_GetCameraSpaceXForm( const geCamera *Camera);
+GENESISAPI const geXForm3d * GENESISCC geCamera_GetCameraSpaceXForm( const geCamera *Camera);
 GENESISAPI const geXForm3d * GENESISCC geCamera_GetCameraSpaceVisXForm( const geCamera *Camera);
 GENESISAPI const geXForm3d * GENESISCC geCamera_GetWorldSpaceVisXForm( const geCamera *Camera);
-const geVec3d *GENESISCC geCamera_GetPov(const geCamera *Camera);
+GENESISAPI const geVec3d *GENESISCC geCamera_GetPov(const geCamera *Camera);
 const geVec3d *GENESISCC geCamera_GetVisPov(const geCamera *Camera);
 GENESISAPI geBoolean GENESISCC geCamera_ConvertWorldSpaceToCameraSpace(const geXForm3d *WXForm, geXForm3d *CXForm);
 
