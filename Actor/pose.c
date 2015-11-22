@@ -620,6 +620,96 @@ void GENESISCC gePose_SetJointAttachment(gePose *P,
 	P->Touched = GE_TRUE;
 }
 
+void GENESISCC gePose_SetJointAttachmentG(gePose *P,
+	int JointIndex, 
+	const geXForm3d *AttachmentTransform)
+{
+	assert( P != NULL );
+	assert( AttachmentTransform != NULL );
+	{
+		geQuaternion MyRot, /*RotRoot,*/ RotParent, /*RotBase,*/ RotInv;
+		gePose_Joint *J, *J2;
+
+		J = (gePose_Joint *)gePose_JointByIndex(P, JointIndex);
+		geQuaternion_FromMatrix(AttachmentTransform,&MyRot);
+
+		J2 = (gePose_Joint *)gePose_JointByIndex(P, J->ParentJoint); 
+		RotParent = J->Rotation;
+
+		//geQuaternion_Multiply(&RotRoot, &RotParent, &RotBase);
+		geQuaternion_Inverse(&RotParent, &RotInv);
+
+		//geQuaternion_Inverse(&RotParent, &RotInv);
+	
+
+		geQuaternion_Multiply(&RotInv, &MyRot, &(J->LocalRotation));
+		
+		J->Touched = GE_TRUE;
+		//gePose_SetAttachmentRotationFlag(J);
+	}
+	P->Touched = GE_TRUE;
+}
+
+void GENESISCC gePose_SetJointGlobalAttachment(gePose *P,
+	int JointIndex, 
+	const geXForm3d *AttachmentTransform,
+	const geXForm3d *OffsetTransform)
+{
+	/* // works with the first joint to rotate after the root (UpLeg UpArm)
+	assert( P != NULL );
+	assert( AttachmentTransform != NULL );
+	{
+		geQuaternion MyRot, RotRoot, RotParent, RotBase, RotInv, RotOff;
+		gePose_Joint *J;
+		gePose_Joint *Parent;
+
+		J = (gePose_Joint *)gePose_JointByIndex(P, JointIndex);
+		geQuaternion_FromMatrix(AttachmentTransform,&MyRot);
+		geQuaternion_FromMatrix(OffsetTransform,&RotOff);
+
+		RotParent = J->Rotation;
+
+		geQuaternion_Multiply(&MyRot, &RotOff, &RotBase);
+		geQuaternion_Inverse(&RotParent, &RotInv);
+
+		geQuaternion_Multiply(&RotInv, &RotBase, &(J->LocalRotation));
+		
+		
+		J->Touched = GE_TRUE;
+		//gePose_SetAttachmentRotationFlag(J);
+	}
+	P->Touched = GE_TRUE;
+	*/
+	assert( P != NULL );
+	assert( AttachmentTransform != NULL );
+	{
+		geQuaternion LocRot, MyRot, RotRoot, RotParent, RotBase, RotInv, RotOff;
+		gePose_Joint *J;
+		gePose_Joint *Parent;
+
+		J = (gePose_Joint *)gePose_JointByIndex(P, JointIndex);
+		geQuaternion_FromMatrix(AttachmentTransform,&MyRot);
+		geQuaternion_FromMatrix(OffsetTransform,&RotOff);
+
+		RotRoot = J->Rotation;
+		Parent = (gePose_Joint *)gePose_JointByIndex(P, J->ParentJoint);
+
+		LocRot = Parent->LocalRotation;
+
+		geQuaternion_Multiply(&RotRoot, &LocRot, &RotParent);
+		geQuaternion_Multiply(&MyRot, &RotOff, &RotBase);
+		geQuaternion_Inverse(&RotParent, &RotInv);
+
+		geQuaternion_Multiply(&RotInv, &RotBase, &(J->LocalRotation));
+		
+		
+		J->Touched = GE_TRUE;
+		//gePose_SetAttachmentRotationFlag(J);
+	}
+	P->Touched = GE_TRUE;
+}
+
+
 void GENESISCC gePose_GetJointTransform(const gePose *P, int JointIndex,geXForm3d *Transform)
 {
 	assert( P != NULL );

@@ -488,6 +488,8 @@ GENESISAPI geEntity_EntitySet *geWorld_GetEntitySet(geWorld *World, const char *
 GENESISAPI geEntity		*geEntity_EntitySetGetNextEntity(geEntity_EntitySet *EntitySet, geEntity *Entity);
 GENESISAPI void			*geEntity_GetUserData(geEntity *Entity);
 GENESISAPI void			geEntity_GetName(const geEntity *Entity, char *Buff, int MaxLen);
+// QoD Oct 2007
+GENESISAPI geEntity* geWorld_AddEntity(geWorld *World, const char *ClassName, const char *EntityName, void *UserData);
 
 // World collision
 GENESISAPI geBoolean	geWorld_ModelCollision(	geWorld			*World, 

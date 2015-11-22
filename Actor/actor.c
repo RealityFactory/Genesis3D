@@ -1364,6 +1364,29 @@ GENESISAPI geBoolean GENESISCC geActor_SetBoneAttachment(geActor *A,
 }
 
 
+GENESISAPI geBoolean GENESISCC geActor_SetBoneGlobalAttachment(geActor *A,
+								const char *BoneName,
+								geXForm3d *Attachment,
+								geXForm3d *OffsetTransform)
+{
+
+	int BoneIndex;
+
+	assert( geActor_IsValid(A) != GE_FALSE);
+	assert( geXForm3d_IsOrthonormal(Attachment) != GE_FALSE );
+	
+	if (geActor_GetBoneIndex(A,BoneName,&(BoneIndex))==GE_FALSE)
+		{
+			geErrorLog_AddString(-1,"Named bone not found", BoneName);
+			return GE_FALSE;
+		}
+	
+	gePose_SetJointGlobalAttachment(A->Pose,BoneIndex, Attachment, OffsetTransform);
+
+	return GE_TRUE;
+}
+
+
 //-------------------------------------------------------------------------------------------------
 // Actor Cuing system
 //-------------------------------------------------------------------------------------------------

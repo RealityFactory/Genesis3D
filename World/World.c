@@ -4513,3 +4513,223 @@ GENESISAPI geBoolean geWorld_BitmapIsVisible(geWorld *World, const geBitmap *Bit
 }
 
 
+
+// sirkorgan 01/05/2004
+
+//	Returns the world geometry as a triangle list. You must free()
+
+//	the indices array yourself once you're done with it.
+
+GENESISAPI geBoolean geWorld_GetWorldGeometry(geWorld* world,
+
+							geVec3d** verts, int* numVerts,
+
+							long** indices, long* numIndices)
+
+{
+
+	int i,j,k;
+
+	GBSP_BSPData* bspData; // convenience pointer
+
+	int numTris;
+
+
+
+	if ( !world )
+
+		return GE_FALSE;
+
+
+
+	assert(verts && numVerts && indices && numIndices);
+
+
+
+	bspData = &world->CurrentBSP->BSPData;
+
+
+
+	*verts = bspData->GFXVerts;
+
+	*numVerts = bspData->NumGFXVerts;
+
+
+
+	// determine how many tris exist
+
+	for(i = 0, numTris = 0; i < bspData->NumGFXFaces; i++)
+
+		numTris += bspData->GFXFaces[i].NumVerts-2; // assuming stored as fans or strips
+
+
+
+	*numIndices = numTris*3; // returning a triangle list
+
+	*indices = malloc( sizeof(long)*(*numIndices) );
+
+	
+
+	// FANS
+
+	j = 0; // j is the index into the vert index array
+
+	for(i = 0; i < bspData->NumGFXFaces; i++)
+
+	{ // loop through each brush face in the world
+
+		GFX_Face* face = &bspData->GFXFaces[i];
+
+		for(k = 0; k < face->NumVerts-2; k++)
+
+		{ // loop through each tri in the face
+
+			// build list from fan
+
+			(*indices)[j++] = bspData->GFXVertIndexList[face->FirstVert];
+
+			(*indices)[j++] = bspData->GFXVertIndexList[face->FirstVert + (k+1)];
+
+			(*indices)[j++] = bspData->GFXVertIndexList[face->FirstVert + (k+2)];
+
+		}
+
+	}
+
+
+
+	return GE_TRUE;
+
+}
+
+// end sirkorgan 01/05/2004
+
+//========================================================================================
+//   geWorld_AddEntity
+//========================================================================================
+GENESISAPI geEntity* geWorld_AddEntity(
+      geWorld      *World,
+      const char   *ClassName,
+      const char   *EntityName,
+      void      *UserData)
+{
+   geWorld_EntClassSet   *WSets;
+   int32            i;
+   geEntity         *Entity;
+   geEntity_Class      *Class;
+   
+   assert(World);
+
+   // No classname, just return
+   if(!ClassName || !EntityName ||!UserData)
+   {
+      return NULL;
+   }
+
+   WSets = World->EntClassSets;
+   
+   Entity = geEntity_Create();
+   if(!Entity)
+   {
+      return NULL;
+   }
+
+   // Add it to the main set
+   if(!geEntity_EntitySetAddEntity(WSets[0].Set, Entity))
+   {
+      geEntity_Destroy(Entity);
+      return NULL;
+   }
+
+   // create Epair for name (every entity needs one - should be unique but we don't check for it here)
+   {
+      geEntity_Epair *EntityNameEpair = geEntity_EpairCreate();
+      
+      EntityNameEpair->Key = geRam_Allocate(strlen("%Name%")+1);
+      strcpy(EntityNameEpair->Key, "%Name%");
+      
+      EntityNameEpair->Value = geRam_Allocate(strlen(EntityName)+1);
+      strcpy(EntityNameEpair->Value, EntityName);
+      
+      geEntity_AddEpair(Entity, EntityNameEpair);
+   }
+
+   // remember type class
+   Class = geEntity_EntitySetFindClassByName(WSets[0].Set, ClassName);
+   if(!Class)
+   {
+      geEntity_Destroy(Entity);
+      return NULL;
+   }
+
+   Entity->Class = Class;
+
+   // allocate space for user data
+   Entity->UserData = GE_RAM_ALLOCATE_ARRAY(char, Entity->Class->FieldSize);
+   if(!Entity->UserData)
+   {
+      geEntity_Destroy(Entity);
+      return NULL;
+   }
+   memcpy(Entity->UserData, UserData, Entity->Class->FieldSize);
+   
+   // check all fields and look if there are any strings in this entity class
+   // if so, add a new Epair, copy the string to the Epair->Value and
+   // set the char pointer in the UserData to point to Epair->Value
+   {
+      geEntity_Field   *Field;
+      char         *UData = Entity->UserData;
+      
+      for(Field=Class->Fields; Field; Field=Field->Next)
+      {
+         if(Field->TypeClass->Type == TYPE_STRING)
+         {
+            if(*(char**)(UData + Field->Offset) != NULL)
+            {
+               geEntity_Epair *Epair = geEntity_EpairCreate();
+
+               // get fieldname
+               Epair->Key = geRam_Allocate(strlen(Field->Name)+1);
+               strcpy(Epair->Key, Field->Name);
+            
+               // copy string
+               Epair->Value = geRam_Allocate(strlen(*(char**)(UData + Field->Offset))+1);
+               strcpy(Epair->Value, *(char**)(UData + Field->Offset));
+               *(char**)(UData + Field->Offset) = Epair->Value;
+
+               // add epair to entity
+               geEntity_AddEpair(Entity, Epair);
+            }
+         }
+      }
+   }
+   
+   // insert entity in class list
+   for(i=1; i<World->NumEntClassSets; i++)
+   {
+      assert(WSets[i].Set);
+
+      if(!stricmp(WSets[i].ClassName, ClassName))
+      {         
+         geEntity_EntitySetAddEntity(WSets[i].Set, Entity);
+         return Entity;
+      }
+   }
+
+   if(i >= MAX_WORLD_ENT_CLASS_SETS)
+   {
+      geEntity_Destroy(Entity);
+      return NULL;               // oh well...
+   }
+
+   // Create a new entity set
+   WSets[i].Set = geEntity_EntitySetCreate();
+
+   // Insert the entity into a new class set
+   WSets[i].ClassName = Entity->Class->Name;
+   geEntity_EntitySetAddEntity(WSets[i].Set, Entity);
+
+   World->NumEntClassSets++;
+
+   return Entity;
+}

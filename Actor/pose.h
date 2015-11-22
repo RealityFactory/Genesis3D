@@ -141,6 +141,7 @@ void GENESISCC gePose_GetJointAttachment(const gePose *P,int JointIndex,geXForm3
 	// adjust how a joint is attached to it's parent.  These changes are permanent:  all
 	//  future pose motions will incorporate this joint's new relation to it's parent */
 void GENESISCC gePose_SetJointAttachment(gePose *P,int JointIndex,const geXForm3d *AttachmentTransform);
+void GENESISCC gePose_SetJointGlobalAttachment(gePose *P,int JointIndex,const geXForm3d *AttachmentTransform, const geXForm3d *OffsetTransform);
 
 const char* GENESISCC gePose_GetJointName(const gePose* P, int JointIndex);
 

@@ -345,6 +345,7 @@ GENESISAPI void GENESISCC geActor_BlendPose(geActor *A, const geMotion *Motion, 
 
 GENESISAPI geBoolean GENESISCC geActor_GetBoneAttachment(const geActor *A, const char *BoneName, geXForm3d *Transform);
 GENESISAPI geBoolean GENESISCC geActor_SetBoneAttachment(geActor *A, const char *BoneName, geXForm3d *Transform);
+GENESISAPI geBoolean GENESISCC geActor_SetBoneGlobalAttachment(geActor *A, const char *BoneName, geXForm3d *Transform,geXForm3d *OffsetTransform);
 
 // GENESIS_PRIVATE_APIS
 
