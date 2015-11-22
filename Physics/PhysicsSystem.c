@@ -37,27 +37,27 @@
 
 typedef struct LinearSystemStruct
 {	
-	float ** M;
-	float * X;
-	float * KVector;
+	geFloat ** M;
+	geFloat * X;
+	geFloat * KVector;
 }	LinearSystemStruct;
 
 typedef struct gePhysicsSystem
 {	
 	int										sumOfConstraintDimensions;
-	LinearSystemStruct *	linsys;
+	LinearSystemStruct						*linsys;
 	int										PhysicsObjectCount;
 	int										PhysicsJointCount;
-	gePhysicsObject **							Objects;
-	gePhysicsJoint **						Joints;
-	float physicsScale;
+	gePhysicsObject							**Objects;
+	gePhysicsJoint							**Joints;
+	geFloat physicsScale;
 
 	int sourceConfigIndex, targetConfigIndex;
 
 }	gePhysicsSystem;
 
 
-static geBoolean gePhysicsSystem_EnforceConstraints(gePhysicsSystem* physsysPtr, float subStepSize);
+static geBoolean gePhysicsSystem_EnforceConstraints(gePhysicsSystem* physsysPtr, geFloat subStepSize);
 static geBoolean gePhysicsSystem_SolveForConstraintForces(gePhysicsSystem* physsysPtr);
 
 static	Matrix33 gePhysicsSystemIdentityMatrix;
@@ -131,6 +131,7 @@ GENESISAPI geBoolean	GENESISCC gePhysicsSystem_AddJoint(gePhysicsSystem *PS, geP
 		geRam_Free(PS->linsys->M);
 		geRam_Free(PS->linsys->X);
 		geRam_Free(PS->linsys->KVector);
+		geRam_Free(PS->linsys);
 	}
 
 	PS->linsys = GE_RAM_ALLOCATE_STRUCT(LinearSystemStruct);
@@ -166,7 +167,7 @@ GENESISAPI geBoolean	GENESISCC gePhysicsSystem_AddJoint(gePhysicsSystem *PS, geP
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// alloc mem for the linear system and handle exceptions
 
-	PS->linsys->M = (float**)geRam_Allocate(PS->sumOfConstraintDimensions * sizeof(float*));
+	PS->linsys->M = (geFloat**)geRam_Allocate(PS->sumOfConstraintDimensions * sizeof(geFloat*));
 
 	if (PS->linsys->M == NULL)
 	{
@@ -175,7 +176,7 @@ GENESISAPI geBoolean	GENESISCC gePhysicsSystem_AddJoint(gePhysicsSystem *PS, geP
 
 	for (i = 0; i < PS->sumOfConstraintDimensions; i++)
 	{
-		PS->linsys->M[i] = (float*)geRam_Allocate(PS->sumOfConstraintDimensions * sizeof(float));
+		PS->linsys->M[i] = (geFloat*)geRam_Allocate(PS->sumOfConstraintDimensions * sizeof(geFloat));
 
 		if (PS->linsys->M[i] == NULL)
 		{
@@ -183,14 +184,14 @@ GENESISAPI geBoolean	GENESISCC gePhysicsSystem_AddJoint(gePhysicsSystem *PS, geP
 		}
 	}
 
-	PS->linsys->X = (float*)geRam_Allocate(PS->sumOfConstraintDimensions * sizeof(float));
+	PS->linsys->X = (geFloat*)geRam_Allocate(PS->sumOfConstraintDimensions * sizeof(geFloat));
 
 	if (PS->linsys->X == NULL)
 	{
 		return GE_FALSE;
 	}
 
-	PS->linsys->KVector = (float*)geRam_Allocate(PS->sumOfConstraintDimensions * sizeof(float));
+	PS->linsys->KVector = (geFloat*)geRam_Allocate(PS->sumOfConstraintDimensions * sizeof(geFloat));
 
 	if (PS->linsys->KVector == NULL)
 	{
@@ -202,13 +203,14 @@ GENESISAPI geBoolean	GENESISCC gePhysicsSystem_AddJoint(gePhysicsSystem *PS, geP
 
 GENESISAPI geBoolean GENESISCC gePhysicsSystem_Destroy(gePhysicsSystem** ppPhyssys)
 {
-	gePhysicsSystem *	pPhyssys;
+	gePhysicsSystem *pPhyssys;
 	int				i;
 
-	assert(ppPhyssys != NULL);
-	assert(*ppPhyssys != NULL);
-
 	pPhyssys = *ppPhyssys;
+
+	geRam_Free(pPhyssys->Objects);
+	geRam_Free(pPhyssys->Joints);
+
 	// Free any old data
 	if	(pPhyssys->linsys)
 	{
@@ -227,6 +229,7 @@ GENESISAPI geBoolean GENESISCC gePhysicsSystem_Destroy(gePhysicsSystem** ppPhyss
 		geRam_Free(pPhyssys->linsys->KVector);
 	}
 
+	geRam_Free(pPhyssys->linsys);
 	geRam_Free(*ppPhyssys);
 	*ppPhyssys = NULL;
 
@@ -236,18 +239,18 @@ GENESISAPI geBoolean GENESISCC gePhysicsSystem_Destroy(gePhysicsSystem** ppPhyss
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // physics stuff follows
 
-static float fmin(float a, float b)
+static geFloat fmin(geFloat a, geFloat b)
 {
 	return a < b ? a : b;
 }
 
-GENESISAPI geBoolean GENESISCC gePhysicsSystem_Iterate(gePhysicsSystem* psPtr, float Time)
+GENESISAPI geBoolean GENESISCC gePhysicsSystem_Iterate(gePhysicsSystem* psPtr, geFloat Time)
 {
 	int				i;
 
 	int numIntegrationSteps;
-	float minAssemblyRate, subStepSize;
-	float amountIntegrated = 0.f;
+	geFloat minAssemblyRate, subStepSize;
+	geFloat amountIntegrated = 0.f;
 
 	assert( psPtr != NULL );
 
@@ -314,9 +317,9 @@ GENESISAPI geBoolean GENESISCC gePhysicsSystem_Iterate(gePhysicsSystem* psPtr, f
 	return GE_TRUE;
 }
 
-static geBoolean gePhysicsSystem_EnforceConstraints(gePhysicsSystem* PS, float subStepSize)
+static geBoolean gePhysicsSystem_EnforceConstraints(gePhysicsSystem* PS, geFloat subStepSize)
 {
-	float h, hSquared;
+	geFloat h, hSquared;
 	geVec3d beta, D0, D1;
 	geVec3d K;
 	geVec3d rA, rB;
@@ -724,10 +727,10 @@ static geBoolean gePhysicsSystem_SolveForConstraintForces(gePhysicsSystem* PS)
 {
 	int i, j, k, n;
 	int ixend1, ixend2;
-	float num;
-	float** M;
-	float* b;
-	float* x;
+	geFloat num;
+	geFloat** M;
+	geFloat* b;
+	geFloat* x;
 
 	assert(PS != NULL);
 	
@@ -745,7 +748,7 @@ static geBoolean gePhysicsSystem_SolveForConstraintForces(gePhysicsSystem* PS)
 	{
 		assert(M[i] != NULL);
 
-		if ((float)fabs(M[i][i]) < (float)(1e-5))
+		if ((geFloat)fabs(M[i][i]) < (geFloat)(1e-5))
 		{
 			return GE_FALSE;
 		}

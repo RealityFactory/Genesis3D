@@ -31,6 +31,8 @@
 
 //	"VF00"
 #define	VFSFILEHEADER_SIGNATURE	0x30304656
+//	"CF00"
+#define	VCFSFILEHEADER_SIGNATURE	0x30304643
 
 //	"VF01"
 #define	VFSFILE_SIGNATURE		0x31304656
@@ -66,6 +68,7 @@ typedef	struct	VFSFile
 	long			RWOpsStartPos;		// Starting position in the RWOps file
 	long			CurrentRelPos;		// Current file pointer (relative to our start)
 	long			Length;				// Current file size
+	char			Mask;
 
 	unsigned int	OpenModeFlags;
 
@@ -234,6 +237,7 @@ static	void *	GENESISCC FSVFS_Open(
 	NewFile->RWOps	   	  = Context->RWOps;
 	NewFile->Dispersed	  = GE_FALSE;
 	NewFile->System		  = Context->System;
+	NewFile->Mask		  = Context->Mask;
 
 	// If we're a directory, make us a first class operator with the child
 	if	(OpenModeFlags & GE_VFILE_OPEN_DIRECTORY)
@@ -282,10 +286,23 @@ static	void *	GENESISCC FSVFS_OpenNewSystem(
 {
 	VFSFile *	NewFS;
 	long		RWOpsStartPos;
+	char *TStr;
+	char EString[256];
+	char Mask;
 
 	assert(RWOps != NULL);
 	assert(Name == NULL);
-	assert(Context == NULL);
+	if(Context == NULL)
+		Mask = 0;
+	else
+	{
+		TStr = (char *)Context;
+		strncpy(EString, TStr, 4);
+		Mask = (EString[0]<<2) & 0xc0;
+		Mask |= EString[1] & 0x30;
+		Mask |= EString[2] & 0x0c;
+		Mask |= EString[3] & 0x03;
+	}
 
 	// All VFS are directories
 	if	(!(OpenModeFlags & GE_VFILE_OPEN_DIRECTORY))
@@ -305,7 +322,7 @@ static	void *	GENESISCC FSVFS_OpenNewSystem(
 		if	(geVFile_Read(RWOps, &Header, sizeof(Header)) == GE_FALSE)
 			return NULL;
 
-		if	(Header.Signature != VFSFILEHEADER_SIGNATURE)
+		if	(!((Header.Signature == VFSFILEHEADER_SIGNATURE) || (Header.Signature == VCFSFILEHEADER_SIGNATURE)))
 			return NULL;
 
 		if	(Header.Version != HEADER_VERSION)
@@ -334,6 +351,7 @@ static	void *	GENESISCC FSVFS_OpenNewSystem(
 		NewFS->RWOpsStartPos = RWOpsStartPos;
 		NewFS->DataLength = Header.DataLength;
 		NewFS->EndPosition = Header.EndPosition;
+		NewFS->Mask	= Mask;
 
 		// Read the directory
 		NewFS->Directory = DirTree_CreateFromFile(RWOps);
@@ -362,6 +380,7 @@ static	void *	GENESISCC FSVFS_OpenNewSystem(
 		NewFS->RWOpsStartPos = RWOpsStartPos;
 		NewFS->Directory = DirTree_Create();
 		NewFS->DataLength = sizeof(VFSFileHeader);
+		NewFS->Mask	= Mask;
 	}
 
 	NewFS->Signature	 = VFSFILE_SIGNATURE;
@@ -418,7 +437,10 @@ static	void	GENESISCC FSVFS_Close(void *Handle)
 					// What to do on failure?
 					assert(!"Can't fail");
 				}
-				Header.Signature = VFSFILEHEADER_SIGNATURE;
+				if(File->Mask==0)
+					Header.Signature = VFSFILEHEADER_SIGNATURE;
+				else
+					Header.Signature = VCFSFILEHEADER_SIGNATURE;
 				Header.Version = HEADER_VERSION;
 				Header.Dispersed = GE_FALSE;
 				Header.EndPosition = EndPosition;
@@ -528,6 +550,10 @@ static	geBoolean	GENESISCC FSVFS_Read(void *Handle, void *Buff, int Count)
 {
 	VFSFile *	File;
 	geBoolean	Res;
+	int i;
+	char Bbyte;
+	char *TBuffer;
+
 #ifndef	NDEBUG
 	int			CurRelPos;
 #endif
@@ -555,6 +581,13 @@ static	geBoolean	GENESISCC FSVFS_Read(void *Handle, void *Buff, int Count)
 	CurRelPos = File->CurrentRelPos;
 #endif
 	Res = geVFile_Read(File->RWOps, Buff, Count);
+	TBuffer = Buff;
+	for(i=0;i<Count;i++)
+	{
+		memcpy(&Bbyte, (TBuffer+i),1);
+		Bbyte ^=File->Mask;
+		memcpy((TBuffer+i),&Bbyte,1);
+	}
 
 	UpdateFilePos(File);
 	assert(File->CurrentRelPos - CurRelPos == Count);
@@ -566,6 +599,10 @@ static	geBoolean	GENESISCC FSVFS_Write(void *Handle, const void *Buff, int Count
 {
 	VFSFile *	File;
 	geBoolean	Res;
+	int i;
+	char Bbyte;
+	char *TBuffer;
+
 #ifndef	NDEBUG
 	int			CurRelPos;
 #endif
@@ -592,6 +629,13 @@ static	geBoolean	GENESISCC FSVFS_Write(void *Handle, const void *Buff, int Count
 #ifndef	NDEBUG
 	CurRelPos = File->CurrentRelPos;
 #endif
+	TBuffer = (char *)Buff;
+	for(i=0;i<Count;i++)
+	{
+		memcpy(&Bbyte, (TBuffer+i),1);
+		Bbyte ^=File->Mask;
+		memcpy((TBuffer+i),&Bbyte,1);
+	}
 	Res = geVFile_Write(File->RWOps, Buff, Count);
 
 	UpdateFilePos(File);
@@ -604,7 +648,7 @@ static	geBoolean	GENESISCC FSVFS_Seek(void *Handle, int Where, geVFile_Whence Wh
 {
 	VFSFile *	File;
 	geBoolean	Res;
-	long		AbsolutePos;
+	long		AbsolutePos=0;
 
 	File = Handle;
 

@@ -36,6 +36,8 @@
 #include	"fsdos.h"
 #include	"fsmemory.h"
 #include	"fsvfs.h"
+//
+// add include files for file types here
 
 typedef	struct	FSSearchList
 {
@@ -87,6 +89,11 @@ static	geBoolean GENESISCC geVFile_RegisterFileSystemInternal(const geVFile_Syst
 	return GE_TRUE;
 }
 
+void GENESISCC geVFile_CloseAPI (void)
+{
+	geRam_Free(RegisteredAPIs);
+}
+
 static	geBoolean	RegisterBuiltInAPIs(void)
 {
 	geVFile_TypeIdentifier 	Type;
@@ -109,6 +116,12 @@ static	geBoolean	RegisterBuiltInAPIs(void)
 	if	(Type != GE_VFILE_TYPE_VIRTUAL)
 		return GE_FALSE;
 
+//  Register New APIs here
+/*	if	(geVFile_RegisterFileSystemInternal(FSVCFS_GetAPIs(), &Type) == GE_FALSE)
+		return GE_FALSE;
+	if	(Type != GE_VFILE_TYPE_CVIRTUAL)
+		return GE_FALSE;
+*/
 	BuiltInAPIsRegistered = GE_TRUE;
 
 	return GE_TRUE;
@@ -174,7 +187,13 @@ GENESISAPI geVFile * GENESISCC geVFile_OpenNewSystem(
 		return NULL;
 
 	// Sugarcoating support for a taste test
-	if	(FS == NULL && FileSystemType == GE_VFILE_TYPE_VIRTUAL)
+	if	(FS == NULL && (FileSystemType == GE_VFILE_TYPE_VIRTUAL
+//
+// add tests for file types here
+
+//		|| FileSystemType == GE_VFILE_TYPE_CVIRTUAL
+
+		))
 	{
 		assert(Name);
 		BaseFile = geVFile_OpenNewSystem(NULL,

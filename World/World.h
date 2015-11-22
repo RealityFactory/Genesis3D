@@ -41,6 +41,7 @@
 extern "C" {
 #endif
 
+
 #define MAX_MODELS	256
 
 // Upper limits on misc things
@@ -126,11 +127,11 @@ typedef struct
 	Surf_TexVert	TexVerts[6][4];
 	
 	geVec3d			Axis;								// Rotation axis
-	float			Dpm;								// Degres per minute
-	float			DrawScale;							// Texture drawscale
+	geFloat			Dpm;								// Degres per minute
+	geFloat			DrawScale;							// Texture drawscale
 	int32			Textures[6];
 	
-	float			Angle;								// Current rotation angle around roation axis
+	geFloat			Angle;								// Current rotation angle around roation axis
 
 } World_SkyBox;
 
@@ -190,7 +191,7 @@ typedef struct geWorld
 {
 	int32				CurFrameStatic;						// World CurrentFrame
 	int32				CurFrameDynamic;					// World CurrentFrame
-	float				CurTime;							// World CurrentTime
+	geFloat				CurTime;							// World CurrentTime
 	int32				CurrentLeaf;
 	geBoolean			ForceVis;
 
@@ -269,6 +270,10 @@ GENESISAPI geMotion * geWorld_ModelGetMotion(geWorld_Model *Model);
 GENESISAPI void * geWorld_ModelGetUserData(const geWorld_Model *Model);
 
 GENESISAPI void	geWorld_ModelSetUserData(geWorld_Model *Model, void *UserData);
+
+//	eaa3 07/28/2000
+
+GENESISAPI void geWorld_ModelGetCenter(geWorld_Model *Model, geVec3d *Center);
 
 GENESISAPI geWorld_Model *geWorld_WorldGetNextModel(geWorld *World, geWorld_Model *Start);
 

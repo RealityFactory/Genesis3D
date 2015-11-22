@@ -32,7 +32,7 @@
 
 
 //#define D3D_MANAGE_TEXTURES
-#define SUPER_FLUSH
+//#define SUPER_FLUSH
 
 //====================================================================================
 //	Local static variables
@@ -46,11 +46,11 @@ DRV_CacheInfo						CacheInfo;
 
 #if 1
 
-#define MAX_WORLD_POLYS				256
-#define MAX_WORLD_POLY_VERTS		1024
+#define MAX_WORLD_POLYS				512
+#define MAX_WORLD_POLY_VERTS		2048
 
-#define MAX_MISC_POLYS				256
-#define MAX_MISC_POLY_VERTS			1024
+#define MAX_MISC_POLYS				512
+#define MAX_MISC_POLY_VERTS			2048
 
 #else
 
@@ -64,9 +64,9 @@ DRV_CacheInfo						CacheInfo;
 
 typedef struct
 {
-	float		u;
-	float		v;
-	//float		a;
+	geFloat		u;
+	geFloat		v;
+	//geFloat		a;
 	uint32		Color;
 } PCache_TVert;
 
@@ -76,10 +76,10 @@ typedef struct
 
 	DRV_LInfo	*LInfo;						// Original pointer to linfo
 	uint32		Flags;						// Flags for this poly
-	float		ShiftU;
-	float		ShiftV;
-	float		ScaleU;
-	float		ScaleV;
+	geFloat		ShiftU;
+	geFloat		ShiftV;
+	geFloat		ScaleU;
+	geFloat		ScaleV;
 	int32		MipLevel;
 	uint32		SortKey;
 	int32		FirstVert;
@@ -92,13 +92,13 @@ typedef struct
 // This is a transformed and lit vertex definition, with up to 8 sets of uvs
 typedef struct
 {
-	float			u,v;
+	geFloat			u,v;
 } PCache_UVSet;
 
 typedef struct
 {
-	float			x,y,z;					// Screen x, y, z
-	float			rhw;					// homogenous w
+	geFloat			x,y,z;					// Screen x, y, z
+	geFloat			rhw;					// homogenous w
 	DWORD			color;					// color
 	DWORD			specular;
 	PCache_UVSet	uv[MAX_TEXTURE_STAGES];	// uv sets for each stage
@@ -148,7 +148,7 @@ typedef struct
 	Misc_Poly		Polys[MAX_MISC_POLYS];
 	Misc_Poly		*SortedPolys[MAX_MISC_POLYS];
 	PCache_Vert		Verts[MAX_MISC_POLY_VERTS];
-	//float			ZVert[MAX_MISC_POLY_VERTS];
+	//geFloat			ZVert[MAX_MISC_POLY_VERTS];
 
 	int32			NumPolys;
 	int32			NumVerts;
@@ -163,7 +163,7 @@ geBoolean World_PolyPrepVerts(World_Poly *pPoly, int32 PrepMode, int32 Stage1, i
 
 static BOOL RenderWorldPolys(int32 RenderMode);
 static BOOL ClearWorldCache(void);
-static int32 GetMipLevel(DRV_TLVertex *Verts, int32 NumVerts, float ScaleU, float ScaleV, int32 MaxMipLevel);
+static int32 GetMipLevel(DRV_TLVertex *Verts, int32 NumVerts, geFloat ScaleU, geFloat ScaleV, int32 MaxMipLevel);
 
 #include <Math.h>
 
@@ -173,7 +173,7 @@ static int32 GetMipLevel(DRV_TLVertex *Verts, int32 NumVerts, float ScaleU, floa
 BOOL PCache_InsertWorldPoly(DRV_TLVertex *Verts, int32 NumVerts, geRDriver_THandle *THandle, DRV_TexInfo *TexInfo, DRV_LInfo *LInfo, uint32 Flags)
 {
 	int32			Mip;
-	float			ZRecip, DrawScaleU, DrawScaleV;
+	geFloat			ZRecip, DrawScaleU, DrawScaleV;
 	World_Poly		*pCachePoly;
 	DRV_TLVertex	*pVerts;
 	PCache_TVert	*pTVerts;
@@ -248,7 +248,7 @@ BOOL PCache_InsertWorldPoly(DRV_TLVertex *Verts, int32 NumVerts, geRDriver_THand
 		if (AppInfo.FogEnable)
 		{
 			DWORD	FogVal;
-			float	Val;
+			geFloat	Val;
 
 			Val = pVerts->z;
 
@@ -378,13 +378,13 @@ static void FillLMapSurface(DRV_LInfo *LInfo, int32 LNum)
 	THandle_Lock(THandle, 0, (void**)&pTempBits);
 
 	Extra = Size - Width;
+	U8	R, G, B;
+	U16	Color;
 
 	for (h=0; h< Height; h++)
 	{
 		for (w=0; w< Width; w++)
 		{
-			U8	R, G, B;
-			U16	Color;
 			R = *pBitPtr++;
 			G = *pBitPtr++;
 			B =  *pBitPtr++;
@@ -494,6 +494,8 @@ static void LoadLMapFromSystem(DRV_LInfo *LInfo, int32 Log, int32 LNum)
     ddrval = Surface->Lock(NULL, &ddsd, DDLOCK_WAIT, NULL);
 
 	assert(ddrval == DD_OK);
+	U8	R, G, B;
+	U16	Color;
 
 	pTempBits = (USHORT*)ddsd.lpSurface;
 
@@ -501,8 +503,6 @@ static void LoadLMapFromSystem(DRV_LInfo *LInfo, int32 Log, int32 LNum)
 	{
 		for (w=0; w< Width; w++)
 		{
-			U8	R, G, B;
-			U16	Color;
 			R = *pBitPtr++;
 			G = *pBitPtr++;
 			B =  *pBitPtr++;
@@ -755,17 +755,15 @@ BOOL PCache_FlushMiscPolys(void)
 		D3DSetTexture(1, NULL);		// Reset texture stage 1
 	}
 	
-	AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_TEXCOORDINDEX, 0);
-
-	AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
-	AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
-	AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );
-	AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
-	AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );
-	AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP,   D3DTOP_MODULATE);
-
-	D3DBlendFunc (D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA);
-	D3DBlendEnable(TRUE);
+	  AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_TEXCOORDINDEX, 0);
+	  AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
+	  AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
+	  AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );
+	  AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
+	  AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );
+	  AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP,   D3DTOP_MODULATE);
+	  D3DBlendFunc (D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA);
+	  D3DBlendEnable(TRUE);
 
 	// Sort the polys by handle
 	SortMiscPolysByHandle();
@@ -817,7 +815,7 @@ BOOL PCache_FlushMiscPolys(void)
 BOOL PCache_InsertMiscPoly(DRV_TLVertex *Verts, int32 NumVerts, geRDriver_THandle *THandle, uint32 Flags)
 {
 	int32			Mip;
-	float			ZRecip, u, v, ScaleU, ScaleV, InvScale;
+	geFloat			ZRecip, u, v, ScaleU, ScaleV, InvScale;
 	Misc_Poly		*pCachePoly;
 	DRV_TLVertex	*pVerts;
 	PCache_Vert		*pD3DVerts;
@@ -834,7 +832,7 @@ BOOL PCache_InsertMiscPoly(DRV_TLVertex *Verts, int32 NumVerts, geRDriver_THandl
 		PCache_FlushMiscPolys();
 	}
 
-	Mip = GetMipLevel(Verts, NumVerts, (float)THandle->Width, (float)THandle->Height, THandle->NumMipLevels-1);
+	Mip = GetMipLevel(Verts, NumVerts, (geFloat)THandle->Width, (geFloat)THandle->Height, THandle->NumMipLevels-1);
 
 	// Store info about this poly in the cache
 	pCachePoly = &MiscCache.Polys[MiscCache.NumPolys];
@@ -848,11 +846,11 @@ BOOL PCache_InsertMiscPoly(DRV_TLVertex *Verts, int32 NumVerts, geRDriver_THandl
 
 	// Get scale value for vertices
 	//TCache_GetUVInvScale(Bitmap, Mip, &InvScale);
-	InvScale = 1.0f / (float)((1<<THandle->Log));
+	InvScale = 1.0f / (geFloat)((1<<THandle->Log));
 
 	// Convert them to take account that the vertices are allready from 0 to 1
-	ScaleU = (float)THandle->Width * InvScale;
-	ScaleV = (float)THandle->Height * InvScale;
+	ScaleU = (geFloat)THandle->Width * InvScale;
+	ScaleV = (geFloat)THandle->Height * InvScale;
 
 	// Precompute the alpha value...
 	SAlpha = ((int32)Verts->a)<<24;
@@ -883,7 +881,7 @@ BOOL PCache_InsertMiscPoly(DRV_TLVertex *Verts, int32 NumVerts, geRDriver_THandl
 		if (AppInfo.FogEnable)		// We might get hit on this first "if" but it should predict pretty well in the rest of the tight loop
 		{
 			DWORD	FogVal;
-			float	Val;
+			geFloat	Val;
 
 			Val = pVerts->z;
 
@@ -922,10 +920,11 @@ BOOL PCache_InsertMiscPoly(DRV_TLVertex *Verts, int32 NumVerts, geRDriver_THandl
 //====================================================================================
 geBoolean World_PolyPrepVerts(World_Poly *pPoly, int32 PrepMode, int32 Stage1, int32 Stage2)
 {
-	float			InvScale, u, v;
+	geFloat			InvScale, u, v;
 	PCache_TVert	*pTVerts;
 	PCache_Vert		*pVerts;
-	float			ShiftU, ShiftV, ScaleU, ScaleV;
+	geFloat			ShiftU, ShiftV, ScaleU, ScaleV;
+	geFloat InvScale2, ShiftU2, ShiftV2;
 	int32			j;
 
 	switch (PrepMode)
@@ -940,7 +939,7 @@ geBoolean World_PolyPrepVerts(World_Poly *pPoly, int32 PrepMode, int32 Stage1, i
 			ScaleV = pPoly->ScaleV;
 
 			// Get scale value for vertices
-			InvScale = 1.0f / (float)((1<<pPoly->THandle->Log));
+			InvScale = 1.0f / (geFloat)((1<<pPoly->THandle->Log));
 
 			pVerts = &WorldCache.Verts[pPoly->FirstVert];
 			
@@ -966,11 +965,11 @@ geBoolean World_PolyPrepVerts(World_Poly *pPoly, int32 PrepMode, int32 Stage1, i
 			if (!pPoly->LInfo)
 				return GE_TRUE;
 
-			ShiftU = (float)-pPoly->LInfo->MinU + 8.0f;
-			ShiftV = (float)-pPoly->LInfo->MinV + 8.0f;
+			ShiftU = (geFloat)-pPoly->LInfo->MinU + 8.0f;
+			ShiftV = (geFloat)-pPoly->LInfo->MinV + 8.0f;
 
 			// Get scale value for vertices
-			InvScale = 1.0f/(float)((1<<pPoly->LInfo->THandle->Log)<<4);
+			InvScale = 1.0f/(geFloat)((1<<pPoly->LInfo->THandle->Log)<<4);
 				
 			pTVerts = &WorldCache.TVerts[pPoly->FirstVert];
 			pVerts = &WorldCache.Verts[pPoly->FirstVert];
@@ -993,7 +992,6 @@ geBoolean World_PolyPrepVerts(World_Poly *pPoly, int32 PrepMode, int32 Stage1, i
 
 		case PREP_WORLD_VERTS_SINGLE_PASS:
 		{
-			float InvScale2, ShiftU2, ShiftV2;
 
 			assert(pPoly->LInfo);
 
@@ -1006,12 +1004,12 @@ geBoolean World_PolyPrepVerts(World_Poly *pPoly, int32 PrepMode, int32 Stage1, i
 			ScaleV = pPoly->ScaleV;
 
 			// Get scale value for vertices
-			InvScale = 1.0f / (float)((1<<pPoly->THandle->Log));
+			InvScale = 1.0f / (geFloat)((1<<pPoly->THandle->Log));
 
 			// Set up shifts and scaled for lightmap uv's
-			ShiftU2 = (float)-pPoly->LInfo->MinU + 8.0f;
-			ShiftV2 = (float)-pPoly->LInfo->MinV + 8.0f;
-			InvScale2 = 1.0f/(float)((1<<pPoly->LInfo->THandle->Log)<<4);
+			ShiftU2 = (geFloat)-pPoly->LInfo->MinU + 8.0f;
+			ShiftV2 = (geFloat)-pPoly->LInfo->MinV + 8.0f;
+			InvScale2 = 1.0f/(geFloat)((1<<pPoly->LInfo->THandle->Log)<<4);
 
 			pVerts = &WorldCache.Verts[pPoly->FirstVert];
 
@@ -1142,10 +1140,10 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 			D3DBlendFunc (D3DBLEND_DESTCOLOR, D3DBLEND_ZERO);
 
 			pPoly = WorldCache.Polys;
+			BOOL	Dynamic = 0;
 
 			for (i=0; i< WorldCache.NumPolys; i++, pPoly++)
 			{
-				BOOL	Dynamic = 0;
 
 				if (!pPoly->LInfo)
 					continue;
@@ -1361,7 +1359,7 @@ BOOL PCache_Reset(void)
 //====================================================================================
 //	GetMipLevel
 //====================================================================================
-static int32 GetMipLevel(DRV_TLVertex *Verts, int32 NumVerts, float ScaleU, float ScaleV, int32 MaxMipLevel)
+static int32 GetMipLevel(DRV_TLVertex *Verts, int32 NumVerts, geFloat ScaleU, geFloat ScaleV, int32 MaxMipLevel)
 {
 	int32		Mip;
 
@@ -1372,18 +1370,19 @@ static int32 GetMipLevel(DRV_TLVertex *Verts, int32 NumVerts, float ScaleU, floa
 	//	Get the MipLevel
 	//
 	{
-		float		du, dv, dx, dy, MipScale;
+		geFloat		du, dv, dx, dy, MipScale;
 
 	#if 1		// WAY slower, but more accurate
 		int32		i;
 
 		MipScale = 999999.0f;
 
+		geFloat			MipScaleT;
+		DRV_TLVertex	*pVert0, *pVert1;
+		int32			i2;
+
 		for (i=0; i< NumVerts; i++)
 		{
-			float			MipScaleT;
-			DRV_TLVertex	*pVert0, *pVert1;
-			int32			i2;
 
 			i2 = i+1;
 

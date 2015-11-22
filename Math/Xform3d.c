@@ -777,10 +777,10 @@ GENESISAPI void GENESISCC geXForm3d_SetFromLeftUpIn(
 GENESISAPI void GENESISCC geXForm3d_Mirror(
 	const		geXForm3d *Source, 
 	const		geVec3d *PlaneNormal, 
-	float		PlaneDist, 
+	geFloat		PlaneDist, 
 	geXForm3d	*Dest)
 {
-	float			Dist;
+	geFloat			Dist;
 	geVec3d			In, Left, Up;
 	geXForm3d		Original;
 	geVec3d			MirrorTranslation;

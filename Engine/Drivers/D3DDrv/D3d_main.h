@@ -170,17 +170,17 @@ typedef struct
 
 	DWORD				VidMemFree;
 
-	float				Gamma;
+	geFloat				Gamma;
 	BOOL				GammaChanged;
 
 	geBoolean			CanDoMultiTexture;
 
 	geBoolean			FogEnable;
-	float				FogStart;
-	float				FogEnd;
-	float				FogR;
-	float				FogG;
-	float				FogB;
+	geFloat				FogStart;
+	geFloat				FogEnd;
+	geFloat				FogR;
+	geFloat				FogG;
+	geFloat				FogB;
 
 	// DD / D3D Flags
 	uint32				Flags;
@@ -217,11 +217,11 @@ BOOL				D3DMain_GetSurfaceFormats(void);
 
 BOOL				Main_CheckDD(void);
 BOOL				D3DMain_GetTextureMemory(void);
-void				Main_BuildRGBGammaTables(float Gamma);
+void				Main_BuildRGBGammaTables(geFloat Gamma);
 
 BOOL				D3DMain_GetClientWindowOffset(HWND hWnd);
 geBoolean DRIVERCC	D3DMain_UpdateWindow(void);
 geBoolean DRIVERCC	D3DMain_SetActive(geBoolean wParam);
-geBoolean DRIVERCC	D3DMain_SetFogEnable(geBoolean Enable, float r, float g, float b, float Start, float End);
+geBoolean DRIVERCC	D3DMain_SetFogEnable(geBoolean Enable, geFloat r, geFloat g, geFloat b, geFloat Start, geFloat End);
 
 #endif

@@ -41,9 +41,10 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /X /I "..\SDK\DXSDK\Include" /I "..\Source" /I "World" /I "Engine" /I "Engine\Drivers" /I "Actor" /I "BSP" /I "Math" /I "Entities" /I "Support" /I "Physics" /I "VFile" /I "Bitmap" /I "Bitmap\Compression" /I "..\MSDev60\Include" /I "..\MSDev60\MFC\Include" /I "..\SDK\DX6SDK\Include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fd"Release/genesis.pdb" /FD /c
+# ADD CPP /nologo /G5 /MT /W3 /GX /Ot /Ow /Og /Oi /Op /Ob2 /I "..\G3D" /I "World" /I "Engine" /I "Engine\Drivers" /I "Actor" /I "BSP" /I "Math" /I "Entities" /I "Support" /I "Physics" /I "VFile" /I "Bitmap" /I "Bitmap\Compression" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fd"Release/genesis.pdb" /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
-# ADD RSC /l 0x409 /x /i "..\MSDev60\Include" /i "..\MSDev60\MFC\Include" /d "NDEBUG"
+# ADD RSC /l 0x409 /d "NDEBUG"
+# SUBTRACT RSC /x
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -64,15 +65,16 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /X /I "..\SDK\DX6SDK\Include" /I "..\Source" /I "World" /I "Engine" /I "Engine\Drivers" /I "Actor" /I "BSP" /I "Math" /I "Entities" /I "Support" /I "Physics" /I "VFile" /I "Bitmap" /I "Bitmap\Compression" /I "..\MSDev60\Include" /I "..\MSDev60\MFC\Include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /Fd"Debug/genesis.pdb" /FD /GZ /c
+# ADD CPP /nologo /G5 /MTd /W3 /Gm /GX /ZI /Od /I "..\G3D" /I "World" /I "Engine" /I "Engine\Drivers" /I "Actor" /I "BSP" /I "Math" /I "Entities" /I "Support" /I "Physics" /I "VFile" /I "Bitmap" /I "Bitmap\Compression" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /Fd"Debug/genesis.pdb" /FD /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
-# ADD RSC /l 0x409 /x /i "..\MSDev60\Include" /i "..\MSDev60\MFC\Include" /d "_DEBUG"
+# ADD RSC /l 0x409 /d "_DEBUG"
+# SUBTRACT RSC /x
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
+# SUBTRACT BSC32 /nologo
 LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
-# ADD LIB32 /nologo
+# ADD LIB32 /nologo /out:"Debug\GenesisD.lib"
 
 !ENDIF 
 
@@ -516,6 +518,14 @@ SOURCE=.\Physics\PhysicsSystem.h
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=".\VFile\dirtree-common.c"
+# End Source File
+# Begin Source File
+
+SOURCE=".\VFile\dirtree-common.h"
+# End Source File
+# Begin Source File
+
 SOURCE=.\VFile\dirtree.c
 # End Source File
 # Begin Source File
@@ -548,11 +558,19 @@ SOURCE=.\VFile\fsvfs.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\VFile\vfile._h
+# End Source File
+# Begin Source File
+
 SOURCE=.\VFile\vfile.c
 # End Source File
 # Begin Source File
 
 SOURCE=.\VFile\vfile.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\VFile\vfile_structs.h
 # End Source File
 # End Group
 # Begin Group "Bitmap"
@@ -673,10 +691,6 @@ SOURCE=.\CSNetMgr.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\CSNetMgr.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\Ge.c
 # End Source File
 # Begin Source File
@@ -702,10 +716,6 @@ SOURCE=.\list.h
 # Begin Source File
 
 SOURCE=.\Netplay.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\Netplay.h
 # End Source File
 # Begin Source File
 
@@ -759,10 +769,14 @@ SOURCE=.\tsc.h
 # Begin Group "Libraries"
 
 # PROP Default_Filter ""
+# End Group
 # Begin Source File
 
-SOURCE=..\Sdk\Dx6sdk\Lib\dxguid.lib
+SOURCE=.\CSNetMgr.h
 # End Source File
-# End Group
+# Begin Source File
+
+SOURCE=.\Netplay.h
+# End Source File
 # End Target
 # End Project

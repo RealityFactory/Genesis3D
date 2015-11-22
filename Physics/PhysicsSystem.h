@@ -34,7 +34,7 @@ typedef struct gePhysicsSystem gePhysicsSystem;
 GENESISAPI gePhysicsSystem *GENESISCC gePhysicsSystem_Create(void);
 GENESISAPI geBoolean GENESISCC gePhysicsSystem_Destroy(gePhysicsSystem** ppSys);
 
-GENESISAPI geBoolean GENESISCC gePhysicsSystem_Iterate(gePhysicsSystem* psPtr, float Time);
+GENESISAPI geBoolean GENESISCC gePhysicsSystem_Iterate(gePhysicsSystem* psPtr, geFloat Time);
 
 GENESISAPI geBoolean GENESISCC gePhysicsSystem_AddJoint(gePhysicsSystem *psPtr, gePhysicsJoint *Joint);
 GENESISAPI geBoolean GENESISCC gePhysicsSystem_AddObject(gePhysicsSystem *psPtr, gePhysicsObject *Object);

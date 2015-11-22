@@ -43,8 +43,8 @@ typedef struct
 	unsigned short *BitPtr;						// pointer to lightmap bits
 	int Height;									// Lightmap Height
 	int Width;									// Lightmap Width
-	float LightMapShiftU,LightMapShiftV;		// Lightmap coordinates u (LMU) = (TextureU-LightMapShiftU)*LightMapScaleU
-	float LightMapScaleU,LightMapScaleV;		// Lightmap coordinates v (LMV) = (TextureV-LightMapShiftV)*LightMapScaleV
+	geFloat LightMapShiftU,LightMapShiftV;		// Lightmap coordinates u (LMU) = (TextureU-LightMapShiftU)*LightMapScaleU
+	geFloat LightMapScaleU,LightMapScaleV;		// Lightmap coordinates v (LMV) = (TextureV-LightMapShiftV)*LightMapScaleV
 	int MipIndex;								// Texture's mipping level
 } TRaster_Lightmap;
 

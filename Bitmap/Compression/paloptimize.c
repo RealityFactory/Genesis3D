@@ -98,7 +98,7 @@ int pal,R,G,B,A;
 uint32 mse,last_mse;
 uint8 *palPtr;
 uint8 savePalette[768];
-int extraStepIndex,extraStepSize,extraStepSizeBytes,samples,totSamples;
+int extraStepIndex,extraStepSize,extraStepSizeBytes=0,samples,totSamples;
 gePixelFormat_ColorGetter GetColor;
 const gePixelFormat_Operations * PixelOps;
 uint8 *ptr,*ptrEnd;

@@ -99,7 +99,7 @@ void Frustum_ProjectRGBNoClamp(geVec3d *pIn, Surf_TexVert *pTIn, DRV_TLVertex *p
 
 geBoolean Frustum_PointsInFrustum(const geVec3d *Pin, const GFX_Plane *Plane, int32 NumVerts, int32 *c);
 
-geBoolean Frustum_PointInFrustum(const Frustum_Info *Fi, const geVec3d *Point, float Radius);
+geBoolean Frustum_PointInFrustum(const Frustum_Info *Fi, const geVec3d *Point, geFloat Radius);
 
 geBoolean Frustum_ClipAllPlanesL(const Frustum_Info * Fi,uint32 ClipFlags,GE_LVertex *Verts, int32 *pNumVerts);
 

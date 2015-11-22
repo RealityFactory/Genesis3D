@@ -58,9 +58,9 @@ void geEngine_SetAllWorldChangedFlag(geEngine *Engine, geBoolean Flag);
 //-------- engine attach/detach thandle funcs
 
 // call updategamma when drivers change
-GENESISAPI geBoolean geEngine_SetGamma(geEngine *Engine, float Gamma);
-GENESISAPI geBoolean geEngine_GetGamma(geEngine *Engine, float *Gamma);
-GENESISAPI geBoolean geEngine_SetFogEnable(geEngine *Engine, geBoolean Enable, float r, float g, float b, float Start, float End);
+GENESISAPI geBoolean geEngine_SetGamma(geEngine *Engine, geFloat Gamma);
+GENESISAPI geBoolean geEngine_GetGamma(geEngine *Engine, geFloat *Gamma);
+GENESISAPI geBoolean geEngine_SetFogEnable(geEngine *Engine, geBoolean Enable, geFloat r, geFloat g, geFloat b, geFloat Start, geFloat End);
 void geEngine_UpdateGamma(geEngine *Engine);
 
 geBoolean geEngine_BitmapListInit(geEngine *Engine);
@@ -93,6 +93,17 @@ GENESISAPI geBoolean geEngine_SetDriverAndMode(	geEngine *Engine,
 GENESISAPI geBoolean GENESISCC geEngine_DrawBitmap(const geEngine *Engine,
 	const geBitmap *Bitmap,
 	const geRect * Source, uint32 x, uint32 y);
+
+GENESISAPI geBoolean GENESISCC geEngine_DrawAlphaBitmap(	
+		geEngine * Engine,
+		geBitmap * pBitmap,
+		geVec3d * VertUVArray,
+		geCamera * ClipCamera,	// if null, uses full screen
+		GE_Rect * PixelRect,		// pixels in the "camera" view
+		GE_Rect * PercentRect,	// percent of the "camera" view
+		geFloat   Alpha,
+		GE_RGBA * RGBA_Array
+		);
 
 GENESISAPI void GENESISCC geEngine_RenderPoly(const geEngine *Engine, const GE_TLVertex *Points, 
 						int NumPoints, const geBitmap *Texture, uint32 Flags);

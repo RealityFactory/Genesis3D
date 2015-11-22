@@ -152,7 +152,9 @@ GENESISAPI geBoolean GENESISCC geActor_SetBody( geActor_Def *ActorDefinition, ge
 GENESISAPI geBoolean GENESISCC geActor_AddMotion(geActor_Def *ActorDefinition, geMotion *M, int *Index);
 
 	// Destroy an Actor.  
-GENESISAPI void GENESISCC geActor_Destroy(geActor **pA);
+GENESISAPI geBoolean GENESISCC geActor_Destroy(geActor **pA);
+
+GENESISAPI geBoolean GENESISCC geActor_DestroyDirect(geActor **pA);
 
 GENESISAPI geBoolean GENESISCC geActor_DefIsValid(const geActor_Def *A);
 GENESISAPI geBoolean GENESISCC geActor_IsValid(const geActor *A);
@@ -328,6 +330,10 @@ GENESISAPI geBoolean GENESISCC geActor_Attach( geActor *Slave,  const char *Slav
 
 GENESISAPI void GENESISCC geActor_Detach(geActor *Slave);
 
+//Environmental mapping...
+GENESISAPI void GENESISCC geActor_SetEnvironOptions( geActor *A, geEnvironmentOptions *opts );
+
+GENESISAPI geEnvironmentOptions GENESISCC geActor_GetEnvironOptions( geActor *A );
 
 // GENESIS_PUBLIC_APIS
 GENESISAPI geBoolean GENESISCC geActor_SetLightingOptions(geActor *A,
@@ -363,6 +369,18 @@ GENESISAPI geBoolean GENESISCC geActor_GetLightingOptions(const geActor *A,
 
 
 GENESISAPI void GENESISCC geActor_SetScale(geActor *A, geFloat ScaleX,geFloat ScaleY,geFloat ScaleZ);
+
+// LWM_ACTOR_RENDERING:
+GENESISAPI geFloat GENESISCC geActor_GetAlpha(const geActor *A) ;
+// LWM_ACTOR_RENDERING:
+GENESISAPI void GENESISCC geActor_SetAlpha(geActor *A, geFloat Alpha) ;
+
+GENESISAPI geBoolean GENESISCC geActor_GetStaticLightingOptions(const geActor *Actor,	geBoolean *UseAmbientLightFromStaticLights,	geBoolean *TestRayCollision,	int *MaxStaticLightsToUse	);
+GENESISAPI geBoolean GENESISCC geActor_SetStaticLightingOptions(geActor    *A,
+   geBoolean AmbientLightFromStaticLights,
+   geBoolean TestRayCollision,
+   int MaxStaticLightsToUse
+   );
 
 GENESISAPI geBoolean GENESISCC geActor_SetShadow(geActor *A, 
 						geBoolean DoShadow, 
@@ -428,6 +446,24 @@ GENESISAPI geBoolean GENESISCC geActor_GetAnimationEvent(geActor *A,
 
 	// returns number of actors that are currently created.
 GENESISAPI int GENESISCC geActor_GetCount(void);
+
+//	eaa3 07/21/2000 Mods for detailed collision detection
+
+GENESISAPI geBoolean GENESISCC geActor_GetBoneExtBoxByIndex(
+	const geActor *A, 
+	int BoneIndex,
+	geExtBox *ExtBox);
+
+GENESISAPI geBoolean GENESISCC geActor_GetBoneTransformByIndex(const geActor *A, int BoneIndex, geXForm3d *Transform);
+
+GENESISAPI int geActor_GetBoneCount(const geActor *A);
+
+//MRB BEGIN	
+// Unlike geActor_GetExtBox, this gets the bounding box in non-world coordinates.	
+// Whatever you put in with geActor_SetExtBox, you get out with this function.
+GENESISAPI void GENESISCC geActor_GetNonWorldExtBox(const geActor *A, geExtBox *ExtBox);
+GENESISAPI void GENESISCC geActor_GetPosition(const geActor *A, geVec3d *Pos);
+//MRB END
 
 // GENESIS_PRIVATE_APIS
 	// call setscale and setshadow after preparing the actor for rendering (renderprep)

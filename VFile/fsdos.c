@@ -345,9 +345,9 @@ static	void *	GENESISCC FSDos_Open(
 	}
 	else
 	{
-		DWORD			ShareMode;
+		DWORD			ShareMode=0;
 		DWORD			CreationMode;
-		DWORD			Access;
+		DWORD			Access=0;
 		DWORD			LastError;
 
 		CreationMode = OPEN_EXISTING;
@@ -589,7 +589,7 @@ static	geBoolean	GENESISCC FSDos_Write(void *Handle, const void *Buff, int Count
 
 static	geBoolean	GENESISCC FSDos_Seek(void *Handle, int Where, geVFile_Whence Whence)
 {
-	int			RTLWhence;
+	int			RTLWhence=0;
 	DosFile *	File;
 
 	File = Handle;

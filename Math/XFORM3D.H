@@ -199,7 +199,7 @@ GENESISAPI void GENESISCC geXForm3d_SetFromLeftUpIn(
 GENESISAPI void GENESISCC geXForm3d_Mirror(
 	const		geXForm3d *Source, 
 	const		geVec3d *PlaneNormal, 
-	float		PlaneDist, 
+	geFloat		PlaneDist, 
 	geXForm3d	*Dest);
 	// Mirrors a XForm3d about a plane
 

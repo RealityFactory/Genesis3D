@@ -75,17 +75,17 @@ extern	double	Magic, MipMagic, MipMagic2;
 
 void	SetupMiscConstants(void)
 {
-	*(((float *)((&QZBufferPrec)))+1)	=-ZBUFFER_PREC;
-	*((float *)(&QZBufferPrec))			=-ZBUFFER_PREC;
+	*(((geFloat *)((&QZBufferPrec)))+1)	=-ZBUFFER_PREC;
+	*((geFloat *)(&QZBufferPrec))			=-ZBUFFER_PREC;
 
-	*(((float *)((&QFixedScale16)))+1)	=4096.0f;
-	*((float *)(&QFixedScale16))		=4096.0f;
+	*(((geFloat *)((&QFixedScale16)))+1)	=4096.0f;
+	*((geFloat *)(&QFixedScale16))		=4096.0f;
 
-	*(((float *)((&QFixedScale)))+1)	=65536.0f;
-	*((float *)(&QFixedScale))			=65536.0f;
+	*(((geFloat *)((&QFixedScale)))+1)	=65536.0f;
+	*((geFloat *)(&QFixedScale))			=65536.0f;
 
-	*((float *)&Q128)					=128.0f;
-	*(((float *)((&Q128)))+1)			=128.0f;
+	*((geFloat *)&Q128)					=128.0f;
+	*(((geFloat *)((&Q128)))+1)			=128.0f;
 
 	Magic		=ldexp(1.5, 60);
 	MipMagic	=ldexp(1.5, 52-16);
@@ -185,7 +185,7 @@ BOOL DRIVERCC DrvInit(DRV_DriverHook *Hook)
 			if(VInfo->VidModes[Hook->Mode].width > 640)
 			{
 //				ClientWindow.Width	=640;
-//				ClientWindow.Height	=(((float)ClientWindow.Width)/(float)Hook->Width)*(float)Hook->Height;
+//				ClientWindow.Height	=(((geFloat)ClientWindow.Width)/(geFloat)Hook->Width)*(geFloat)Hook->Height;
 			}
 		}
 
@@ -233,12 +233,12 @@ void DRIVERCC ErrorBox(char *Str)
 	DumpErrorLogToFile("softdrv.log");
 }
 
-BOOL DRIVERCC SetGamma(float Gamma)
+BOOL DRIVERCC SetGamma(geFloat Gamma)
 {
 	return TRUE;
 }
 
-BOOL DRIVERCC GetGamma(float *Gamma)
+BOOL DRIVERCC GetGamma(geFloat *Gamma)
 {
 	assert(Gamma);
 
@@ -252,7 +252,7 @@ geBoolean	DRIVERCC DrvUpdateWindow(void)
 	return	GE_TRUE;
 }
 
-geBoolean DRIVERCC Drv_SetFogEnable(geBoolean Enable, float r, float g, float b, float Start, float End)
+geBoolean DRIVERCC Drv_SetFogEnable(geBoolean Enable, geFloat r, geFloat g, geFloat b, geFloat Start, geFloat End)
 {
 	Enable,r,g,b,Start,End;
 	return GE_FALSE;

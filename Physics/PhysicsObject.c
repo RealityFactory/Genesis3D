@@ -47,7 +47,7 @@ typedef struct
 
 typedef struct gePhysicsObject
 {
-	float mass, oneOverMass;
+	geFloat mass, oneOverMass;
 	
 	geVec3d	OriginalLocation;
 	
@@ -55,13 +55,13 @@ typedef struct gePhysicsObject
 		inertiaTensorInverse;
 	geBoolean							isAffectedByGravity;
 	geBoolean							respondsToForces;
-	float						linearDamping;
-	float						angularDamping;
+	geFloat						linearDamping;
+	geFloat						angularDamping;
 
 	int activeConfig;
 	gePhysicsObject_Config configs[2];
 
-	float physicsScale;
+	geFloat physicsScale;
 
 }	gePhysicsObject;
 
@@ -70,14 +70,14 @@ typedef struct gePhysicsObject
 
 GENESISAPI gePhysicsObject * GENESISCC gePhysicsObject_Create(
 	const geVec3d *StartLocation,
-	float mass,
+	geFloat mass,
 	geBoolean IsAffectedByGravity,
 	geBoolean RespondsToForces,
-	float linearDamping,
-	float angularDamping,
+	geFloat linearDamping,
+	geFloat angularDamping,
 	const geVec3d *	Mins,
 	const geVec3d *	Maxs,
-	float physicsScale)
+	geFloat physicsScale)
 {
 	gePhysicsObject*	pgePhysicsObject;
 	geVec3d defaultAxis;
@@ -147,9 +147,9 @@ GENESISAPI gePhysicsObject * GENESISCC gePhysicsObject_Create(
 	pgePhysicsObject->inertiaTensor.x[1][1] = pgePhysicsObject->mass / 12.f * (bbScale.X * bbScale.X + bbScale.Z * bbScale.Z);
 	pgePhysicsObject->inertiaTensor.x[2][2] = pgePhysicsObject->mass / 12.f * (bbScale.X * bbScale.X + bbScale.Y * bbScale.Y);
 
-	assert(pgePhysicsObject->inertiaTensor.x[0][0] > (float)1e-5);
-	assert(pgePhysicsObject->inertiaTensor.x[1][1] > (float)1e-5);
-	assert(pgePhysicsObject->inertiaTensor.x[2][2] > (float)1e-5);
+	assert(pgePhysicsObject->inertiaTensor.x[0][0] > (geFloat)1e-5);
+	assert(pgePhysicsObject->inertiaTensor.x[1][1] > (geFloat)1e-5);
+	assert(pgePhysicsObject->inertiaTensor.x[2][2] > (geFloat)1e-5);
 
 	pgePhysicsObject->inertiaTensorInverse.x[0][0] = 1 / pgePhysicsObject->inertiaTensor.x[0][0];
 	pgePhysicsObject->inertiaTensorInverse.x[1][1] = 1 / pgePhysicsObject->inertiaTensor.x[1][1];
@@ -274,7 +274,7 @@ GENESISAPI geBoolean GENESISCC gePhysicsObject_ComputeForces(gePhysicsObject* po
 
 GENESISAPI geBoolean GENESISCC gePhysicsObject_Integrate(
 				gePhysicsObject* pod, 
-				float dt, 
+				geFloat dt, 
 				int sourceConfigIndex)
 {
 	gePhysicsObject_Config* pSourceConfig, *pTargetConfig;
@@ -284,12 +284,12 @@ GENESISAPI geBoolean GENESISCC gePhysicsObject_Integrate(
 	geVec3d omega_x_L, term1, dtTimesOmega;
 	Matrix33 R, Rt;
 	
-	float qmag;
+	geFloat qmag;
 	geQuaternion qdot;
-	float G[3][4], Gt[4][3];
+	geFloat G[3][4], Gt[4][3];
 	int i, j;
 	static int M[]={0x696C6345,0x21657370};
-	float dt2 = 0.5f * (dt * dt);
+	geFloat dt2 = 0.5f * (dt * dt);
 
 	assert( sourceConfigIndex >= 0 );
 	assert( sourceConfigIndex <  2 );
@@ -371,14 +371,14 @@ GENESISAPI geBoolean GENESISCC gePhysicsObject_Integrate(
 	return GE_TRUE;
 }
 
-GENESISAPI float GENESISCC gePhysicsObject_GetMass(const gePhysicsObject* po)
+GENESISAPI geFloat GENESISCC gePhysicsObject_GetMass(const gePhysicsObject* po)
 {
 	assert(po != NULL);
 
 	return po->mass;
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_SetMass(gePhysicsObject* po, float mass)
+GENESISAPI void GENESISCC gePhysicsObject_SetMass(gePhysicsObject* po, geFloat mass)
 {
 	assert(po != NULL);
 
@@ -387,7 +387,7 @@ GENESISAPI void GENESISCC gePhysicsObject_SetMass(gePhysicsObject* po, float mas
 	#pragma message("TODO: set i tensor")
 }
 
-GENESISAPI float GENESISCC gePhysicsObject_GetOneOverMass(const gePhysicsObject* po)
+GENESISAPI geFloat GENESISCC gePhysicsObject_GetOneOverMass(const gePhysicsObject* po)
 {
 	assert(po != NULL);
 
@@ -808,14 +808,14 @@ GENESISAPI void GENESISCC gePhysicsObject_SetRespondsToForces(gePhysicsObject* p
 	po->respondsToForces = flag;
 }
 
-GENESISAPI float GENESISCC gePhysicsObject_GetLinearDamping(const gePhysicsObject* po)
+GENESISAPI geFloat GENESISCC gePhysicsObject_GetLinearDamping(const gePhysicsObject* po)
 {
 	assert(po != NULL);
 
 	return po->linearDamping;
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_SetLinearDamping(gePhysicsObject* po, float linearDamping)
+GENESISAPI void GENESISCC gePhysicsObject_SetLinearDamping(gePhysicsObject* po, geFloat linearDamping)
 {
 	assert(po != NULL);
 	assert(linearDamping >= 0.f && linearDamping <= 1.f);
@@ -823,14 +823,14 @@ GENESISAPI void GENESISCC gePhysicsObject_SetLinearDamping(gePhysicsObject* po, 
 	po->linearDamping = linearDamping;
 }
 
-GENESISAPI float GENESISCC gePhysicsObject_GetAngularDamping(const gePhysicsObject* po)
+GENESISAPI geFloat GENESISCC gePhysicsObject_GetAngularDamping(const gePhysicsObject* po)
 {
 	assert(po != NULL);
 
 	return po->angularDamping;
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_SetAngularDamping(gePhysicsObject* po, float angularDamping)
+GENESISAPI void GENESISCC gePhysicsObject_SetAngularDamping(gePhysicsObject* po, geFloat angularDamping)
 {
 	assert(po != NULL);
 	assert(angularDamping >= 0.f && angularDamping <= 1.f);
@@ -850,13 +850,13 @@ GENESISAPI int GENESISCC gePhysicsObject_GetActiveConfig(gePhysicsObject* pPhyso
 	return pPhysob->activeConfig;
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_SetPhysicsScale(gePhysicsObject* pPhysob, float scale)
+GENESISAPI void GENESISCC gePhysicsObject_SetPhysicsScale(gePhysicsObject* pPhysob, geFloat scale)
 {
 	assert(pPhysob != NULL);
 	pPhysob->physicsScale = scale;
 }
 
-GENESISAPI float GENESISCC gePhysicsObject_GetPhysicsScale(gePhysicsObject* pPhysob)
+GENESISAPI geFloat GENESISCC gePhysicsObject_GetPhysicsScale(gePhysicsObject* pPhysob)
 {
 	assert(pPhysob != NULL);
 	return pPhysob->physicsScale;

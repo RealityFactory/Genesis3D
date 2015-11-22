@@ -20,7 +20,7 @@
 /*                                                                                      */
 /****************************************************************************************/
 #include <Assert.h>
-
+ 
 #include "XForm3d.h"
 #include "BaseType.h"
 #include "GBSPFile.h"
@@ -43,7 +43,7 @@ static	GFX_Plane		GlobalPlane;
 static	int32			GlobalNode;
 static	int32			GlobalSide;
 static	geVec3d			GlobalI;
-static	float			GRatio;
+static	geFloat			GRatio;
 static	int32			GlobalLeaf;
 static	int32			GlobalLeaf;
 
@@ -184,9 +184,11 @@ geBoolean Trace_GEWorldCollision(geWorld *World, const geVec3d *Mins, const geVe
 	// Reset all the collision feedback pointers
 	Model = NULL;
 	Mesh = NULL;
+	Actor = NULL;
 
 	Col->Model = NULL;
 	Col->Mesh = NULL;
+	Col->Actor = NULL;
 
 	if (Mins && Maxs)
 	{
@@ -249,13 +251,13 @@ geBoolean Trace_WorldCollisionExact(geWorld *World,
 	geVec3d			NewFront2, NewBack2;
 	geWorld_Model	*Models, *BestModel;
 	GFX_Plane		BestPlane, Plane2;
-	Mesh_RenderQ	*BestMesh;
-	geActor			*BestActor;
+	Mesh_RenderQ	*BestMesh=NULL;
+	geActor			*BestActor=NULL;
 	geVec3d			OMins, OMaxs, Vect, Impact2, BestI;
 	static geVec3d	MMins = {-1.0f, -1.0f, -1.0f};
 	static geVec3d	MMaxs = { 1.0f,  1.0f,  1.0f};
 	geBoolean		Hit;
-	float			Dist, BestD;
+	geFloat			Dist, BestD;
 
 	assert(World != NULL);
 	assert(World->CurrentBSP != NULL);
@@ -414,6 +416,8 @@ geBoolean Trace_WorldCollisionExact2(	geWorld *World,
 	
 	GPlaneNum = -1;
 
+	gContents = GE_CONTENTS_SOLID_CLIP;
+
 	for (i = 0; i < BSPData->NumGFXModels; i++)
 	{
 		
@@ -458,7 +462,7 @@ geBoolean Trace_WorldCollisionExact2(	geWorld *World,
 //=====================================================================================
 static geBoolean BSPIntersect(geVec3d *Front, geVec3d *Back, int32 Node)
 {
-    float		Fd, Bd, Dist;
+    geFloat		Fd, Bd, Dist;
     int32		Side;
     geVec3d		I;
 	GFX_Plane	*Plane;
@@ -528,11 +532,11 @@ static geVec3d			GMins1, GMaxs1;
 static geVec3d			GMins2, GMaxs2;
 static geVec3d			GFront, GBack;
 static BOOL				LeafHit;
-static float			BestDist;
+static geFloat			BestDist;
 
 static geBoolean BSPIntersectMisc(geVec3d *Front, geVec3d *Back, int32 Node)
 {
-    float		Fd, Bd, Dist;
+    geFloat		Fd, Bd, Dist;
     uint8		Side;
 	GFX_Plane	Plane;
     geVec3d		I;
@@ -663,7 +667,7 @@ geBoolean Trace_MiscCollision(GFX_BNode *BNodes, GFX_Plane *Planes, const geVec3
 //=====================================================================================
 static geBoolean BSPIntersectMisc2(const geVec3d *Front, const geVec3d *Back, int32 Node)
 {
-    float		Fd, Bd, Dist;
+    geFloat		Fd, Bd, Dist;
     uint8		Side;
 	GFX_Plane	Plane;
     geVec3d		I;
@@ -753,7 +757,7 @@ int32 Trace_BoxOnPlaneSide(const geVec3d *Mins, const geVec3d *Maxs, GFX_Plane *
 	int32	Side;
 	int32	i;
 	geVec3d	Corners[2];
-	float	Dist1, Dist2;
+	geFloat	Dist1, Dist2;
 
 	// Axial planes are easy
 	if (Plane->Type < PLANE_ANYX)
@@ -826,7 +830,7 @@ static geBoolean PointInLeafSides(const geVec3d *Pos, const GFX_Leaf *Leaf)
 {
 	int32		i, f;
 	GFX_Plane	Plane;
-	float		Dist;
+	geFloat		Dist;
 
 	f = Leaf->FirstSide;
 
@@ -858,7 +862,7 @@ static geBoolean PointInLeafSides(const geVec3d *Pos, const GFX_Leaf *Leaf)
 //=====================================================================================
 BOOL IntersectLeafSides_r(geVec3d *Front, geVec3d *Back, int32 Leaf, int32 Side, int32 PSide)
 {
-	float		Fd, Bd, Dist;
+	geFloat		Fd, Bd, Dist;
 	GFX_Plane	Plane;
 	int32		RSide, Side2;
 	geVec3d		I, Vec;
@@ -956,7 +960,7 @@ BOOL IntersectLeafSides2(geVec3d *Pos, int32 Leaf)
 {
 	GFX_Plane	Plane;
 	int32		i;
-	float		Dist;
+	geFloat		Dist;
 
 	for (i=0; i< MiscLeafs[Leaf].NumSides; i++)
 	{
@@ -1037,7 +1041,7 @@ geBoolean Trace_WorldCollisionBBox(	geWorld	*World,
 	geVec3d			NewFront, NewBack, OMins, OMaxs, BestI, Vect;
 	geVec3d			Impact;
 	int32			i, b;
-	float			Dist, BestD;
+	geFloat			Dist, BestD;
 	Mesh_RenderQ	*BestMesh;
 	#ifdef MESHES
 	Mesh_RenderQ    *Mesh2;
@@ -1155,6 +1159,7 @@ geBoolean Trace_WorldCollisionBBox(	geWorld	*World,
 		geVec3d_Add(&NewBack , &Models->Pivot, &GBack);
 		
 		// Make out box out of this move so we only check the leafs it intersected with...
+
 		Trace_GetMoveBox(Mins, Maxs, &GFront, &GBack, &GMins2, &GMaxs2);
 
 		FindClosestLeafIntersection_r(BSPData->GFXModels[i].RootNode[0]);
@@ -1175,6 +1180,7 @@ geBoolean Trace_WorldCollisionBBox(	geWorld	*World,
 			GlobalPlane.Dist = geVec3d_DotProduct(&GlobalPlane.Normal, &GlobalI);
 
 			geVec3d_Subtract(&GlobalI, Front, &Vect);
+
 			Dist = geVec3d_Length(&Vect);
 			if (Dist < BestD)
 			{
@@ -1301,108 +1307,102 @@ geBoolean Trace_TestModelMove(	geWorld			*World,
 }
 
 //=====================================================================================
-//	Trace_ModelCollisionBBox
+// Trace_ModelCollisionBBox
 //=====================================================================================
 static
-geBoolean Trace_ModelCollisionBBox(geWorld			*World, 
-									geWorld_Model		*Model, 
-									const geXForm3d	*DXForm, 
-									const geVec3d	*Mins, const geVec3d *Maxs,
-									const geVec3d	*In,
-									geVec3d			*ImpactPoint)
+geBoolean Trace_ModelCollisionBBox(geWorld *World, 
+								   geWorld_Model *Model, 
+								   const geXForm3d *DXForm, 
+								   const geVec3d *Mins, const geVec3d *Maxs,
+								   const geVec3d *In,
+								   geVec3d *ImpactPoint)
 {
-	geVec3d		NewFront, NewBack, Original;
-
+	//MRB BEGIN
+	// geVec3d NewFront, NewBack, Original;
+	geVec3d NewFront, NewBack;
+	//MRB END
 	assert(World != NULL);
 	assert(Model != NULL);
-
 	BSPData = &World->CurrentBSP->BSPData;
-
 	MiscNodes = BSPData->GFXNodes;
 	MiscPlanes = BSPData->GFXPlanes;
 	MiscLeafs = BSPData->GFXLeafs;
 	MiscSides = BSPData->GFXLeafSides;
-
 	assert(MiscNodes != NULL);
 	assert(MiscPlanes != NULL);
 	assert(MiscLeafs != NULL);
 	assert(MiscSides != NULL);
-
-	Original = *In;		// Save original
-
+	//MRB BEGIN
+	// Original = *In; // Save original
+	//MRB END
 	GMins1 = *Mins;
 	GMaxs1 = *Maxs;
 	
 	// Put point about models origin
 	geVec3d_Subtract(In, &Model->Pivot, &GFront);
 	GBack = GFront;
-
 	// InverseTransform the points about models center of rotation
 	geXForm3d_TransposeTransform(&Model->XForm, &GFront, &NewFront);
 	// The back gets applied by the dest XForm
 	geXForm3d_TransposeTransform(DXForm, &GBack, &NewBack);
-
 	// push back into world
 	geVec3d_Add(&NewFront, &Model->Pivot, &GFront);
 	geVec3d_Add(&NewBack , &Model->Pivot, &GBack);
-
 	// Make out box out of this move so we only check the leafs it intersected with...
 	Trace_GetMoveBox(Mins, Maxs, &GFront, &GBack, &GMins2, &GMaxs2);
 	
 	BestDist = 9999.0f;
 	LeafHit = FALSE;
-
 	FindClosestLeafIntersection_r(BSPData->GFXModels[Model->GFXModelNum].RootNode[0]);
-
 	if (LeafHit)
 	{
 		// Rotate the impact plane
 		geXForm3d_Rotate(DXForm, &GlobalPlane.Normal, &GlobalPlane.Normal);
-			
+		
 		// Rotate the impact point
-		geVec3d_Subtract(&GlobalI, &Model->Pivot, &NewFront);
-		geXForm3d_Transform(DXForm, &NewFront, &GlobalI);
-		geVec3d_Add(&GlobalI, &Model->Pivot, &NewFront);
-		GlobalI = NewFront;
-
+		//MRB BEGIN
+		// geVec3d_Subtract(&GlobalI, &Model->Pivot, &NewFront);
+		// geXForm3d_Transform(DXForm, &NewFront, &GlobalI);
+		// geVec3d_Add(&GlobalI, &Model->Pivot, &NewFront);
+		// GlobalI = NewFront;
+		geVec3d_Subtract(&GlobalI, &Model->Pivot, &GlobalI);
+		geXForm3d_Transform(DXForm, &GlobalI, &NewFront);
+		geVec3d_Add(&NewFront, &Model->Pivot, &GlobalI);
+		//MRB END
 		// Find the new plane distance based on the new impact point with the new plane
 		GlobalPlane.Dist = geVec3d_DotProduct(&GlobalPlane.Normal, &GlobalI);
-
 		geVec3d_MA(&GlobalI, ON_EPSILON, &GlobalPlane.Normal, &GlobalI);
-
 		*ImpactPoint = GlobalI;
-
 		return GE_TRUE;
 	}
-
 	return GE_FALSE;
 }
-
 //=====================================================================================
-//	Trace_ModelCollision
+// Trace_ModelCollision
 //=====================================================================================
-geBoolean Trace_ModelCollision(geWorld			*World, 
-								geWorld_Model	*Model, 
-								const geXForm3d	*DXForm,
-								GE_Collision	*Collision,
-								geVec3d			*ImpactPoint)
+geBoolean Trace_ModelCollision(geWorld *World, 
+							   geWorld_Model *Model, 
+							   const geXForm3d *DXForm,
+							   GE_Collision *Collision,
+							   geVec3d *ImpactPoint)
 {
 	geExtBox ExtBox;
-	geVec3d	Pos;
+	geVec3d Pos;
+	geXForm3d myXForm;
 #ifdef MESHES
-	Mesh_RenderQ *				CollidableMesh;
-	Mesh_CollidableMeshIterator	Iter;
+	Mesh_RenderQ * CollidableMesh;
+	Mesh_CollidableMeshIterator Iter;
 #endif
+  gContents = GE_CONTENTS_SOLID_CLIP;		// eaa3 from G3D BBS posting 01/29/2001
 	memset(Collision, 0, sizeof(GE_Collision));
-
-	// Fixed bug that mike pointed out.  I was using 0, instead of 0xffffffff
-#ifdef	MESHES
+	// Fixed bug that mike pointed out. I was using 0, instead of 0xffffffff
+#ifdef MESHES
 	CollidableMesh = Mesh_FirstCollidableMesh(World, &Iter, 0xffffffff);
-	while	(CollidableMesh)
+	while (CollidableMesh)
 	{
 		Mesh_MeshGetBox(World, CollidableMesh->MeshDef, &Mins, &Maxs);
 		Mesh_MeshGetPosition(CollidableMesh, &Pos);
-		if	(Trace_ModelCollisionBBox(World, Model, DXForm, &Mins, &Maxs, &Pos, ImpactPoint))
+		if (Trace_ModelCollisionBBox(World, Model, DXForm, &Mins, &Maxs, &Pos, ImpactPoint))
 		{
 			Collision->Mesh = (geMesh *)CollidableMesh;
 			return GE_TRUE;
@@ -1410,33 +1410,64 @@ geBoolean Trace_ModelCollision(geWorld			*World,
 		CollidableMesh = Mesh_NextCollidableMesh(&Iter, 0xffffffff);
 	}
 #endif
-
 	{
 		int i,Count;
 		World_Actor *WA;
-			
+		//MRB BEGIN
+		geActor *BestActor;
+		geFloat BestActorDist;
+		geVec3d PossibleImpactPoint;
+		BestActor = NULL;
+		BestActorDist = 9999.0f;
+		//MRB END
+		
 		Count = World->ActorCount;
 		WA = &(World->ActorArray[0]);
-
-		for (i=0; i<Count; i++, WA++)
+		for (i=0; i < Count; i++, WA++)
+		{
+			// if it's active (ignore userflags?)
+			if ( (WA->Flags & GE_ACTOR_COLLIDE) ) 
 			{
-				// if it's active	(ignore userflags?)
-				if ( (WA->Flags & GE_ACTOR_COLLIDE) )	
+				//MRB BEGIN
+				// if (geActor_GetExtBox(WA->Actor,&ExtBox)!=GE_FALSE)
+				// {
+				geActor_GetNonWorldExtBox(WA->Actor,&ExtBox);
+				geActor_GetPosition(WA->Actor, &Pos);
+				// eaa3 from posting on G3D message board 01/29/2001
+				geActor_GetBoneTransform(WA->Actor, NULL, &myXForm);
+				geVec3d_Copy(&myXForm.Translation, &Pos);
+				geVec3d_Subtract(&ExtBox.Min, &Pos, &ExtBox.Min);
+				geVec3d_Subtract(&ExtBox.Max, &Pos, &ExtBox.Max);
+				// end eaa3 01/29/2001
+				// if (Trace_ModelCollisionBBox(World, Model, DXForm, &(ExtBox.Min), &(ExtBox.Max), &Pos, ImpactPoint))
+				if (Trace_ModelCollisionBBox(World, Model, DXForm, &(ExtBox.Min), &(ExtBox.Max), &Pos, &PossibleImpactPoint))
+				{
+					// Collision->Actor = WA->Actor;
+					if (GlobalPlane.Dist < BestActorDist)
 					{
-						if (geActor_GetExtBox(WA->Actor,&ExtBox)!=GE_FALSE)
-							{
-								if (Trace_ModelCollisionBBox(World, Model, DXForm, &(ExtBox.Min), &(ExtBox.Max), &Pos, ImpactPoint))
-								{
-									Collision->Actor = WA->Actor;
-									return GE_TRUE;
-								}
-							}
+						BestActorDist = GlobalPlane.Dist;
+						BestActor = WA->Actor;
+						(*ImpactPoint) = PossibleImpactPoint;
+						Collision->Plane.Normal = GlobalPlane.Normal;
+						Collision->Plane.Dist = GlobalPlane.Dist;
+						Collision->Ratio = geVec3d_DistanceBetween(&DXForm->Translation, &Model->XForm.Translation);
 					}
+					// return GE_TRUE;
+				}
+				// }
+				//MRB END
 			}
+		}
+		//MRB BEGIN
+		if (BestActor) {
+			Collision->Actor = BestActor;
+			return GE_TRUE;
+		}
+		//MRB END
 	}
-
 	return GE_FALSE;
 }
+
 
 //=====================================================================================
 //	MoveBox
@@ -1517,7 +1548,7 @@ geBoolean Trace_BBoxInVisibleLeaf(geWorld *World, geVec3d *Mins, geVec3d *Maxs)
 geBoolean Trace_InverseTreeFromBox(geVec3d *Mins, geVec3d *Maxs, GFX_BNode *BNodes, GFX_Plane *Planes)
 {
 	int32		i,j,n;
-	float		Bounds[2][3];
+	geFloat		Bounds[2][3];
 	GFX_Plane	*Plane;
 
 	for (i=0; i< 3; i++)
@@ -1577,7 +1608,7 @@ int32 Plane_FindBNodeContents(	const GFX_BNode *Nodes,
 								int32 Node, 
 								const geVec3d *POV)
 {
-    float		Dist;
+    geFloat		Dist;
 
     while (Node >= 0)		// < 0 == leaf with contents
 	{
@@ -1730,13 +1761,14 @@ geBoolean Trace_GetContents(geWorld *World, const geVec3d *Pos, const geVec3d *M
 				continue;
 		}
 
-		geVec3d_Subtract(Pos, &Models->Pivot, &TPos);
+		geVec3d_Subtract(Pos, &Models->RealCenter, &TPos);
 
 		// InverseTransform the point about models center of rotation
 		geXForm3d_TransposeTransform(&Models->XForm, &TPos, &TPos);
 
 		// push back into world
-		geVec3d_Add(&TPos, &Models->Pivot, &TPos);
+
+		geVec3d_Add(&TPos, &Models->RealCenter, &TPos);
 
 		// Reset contents
 		NewContents = 0;
@@ -1802,7 +1834,7 @@ void Trace_SetupIntersect(geWorld *World)
 //=====================================================================================
 geBoolean Trace_IntersectWorldBSP(geVec3d *Front, geVec3d *Back, int32 Node)
 {
-    float		Fd, Bd, Dist;
+    geFloat		Fd, Bd, Dist;
     int32		Side;
     geVec3d		I;
 	GFX_Plane	*Plane;
@@ -1855,7 +1887,7 @@ static	GFX_Plane	gPlane;
 
 geBoolean Trace_CollideBeam(int32 Node, geVec3d *s, geVec3d *e, geFloat Radius)
 {
-	float		dd, sDist, eDist;
+	geFloat		dd, sDist, eDist;
 	geVec3d		tempVec, tempVec2;
 	geBoolean	FrontLeaf, BackLeaf;
 	GFX_Plane	*Plane;

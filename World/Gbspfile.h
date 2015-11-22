@@ -162,9 +162,9 @@ typedef struct
 typedef struct
 {
 	geVec3d				Axis;						// Axis of rotation
-	float				Dpm;						// Degres per minute
+	geFloat				Dpm;						// Degres per minute
 	int32				Textures[6];				// Texture indexes for all six sides...
-	float				DrawScale;
+	geFloat				DrawScale;
 } GFX_SkyData;
 
 typedef struct
@@ -273,13 +273,13 @@ typedef struct
 typedef struct
 {
 	geVec3d			Vecs[2];
-	float			Shift[2];
-	float			DrawScale[2];
+	geFloat			Shift[2];
+	geFloat			DrawScale[2];
 	int32			Flags;
-	float			FaceLight;			// Used in radiosity satge only (remove?)
-	float			ReflectiveScale;
-	float			Alpha;
-	float			MipMapBias;
+	geFloat			FaceLight;			// Used in radiosity satge only (remove?)
+	geFloat			ReflectiveScale;
+	geFloat			Alpha;
+	geFloat			MipMapBias;
 	int32			Texture;
 } GFX_TexInfo;
 

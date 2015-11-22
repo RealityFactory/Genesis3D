@@ -199,7 +199,7 @@ GENESISAPI     void *geRam_Realloc
 
     // header and trailer stuff...
     static char MemStamp[] = {"!CHECKME!"};
-    static const int MemStampSize = sizeof (MemStamp)-1;
+    static const int MemStampSize = sizeof (MemStamp);
     static const int SizeSize = sizeof (uint32);
 	// <> CB : pad sized to multiples of 8 !!!
     #define HEADER_SIZE		(((SizeSize		+ MemStampSize)+7)&(~(uint32)7))

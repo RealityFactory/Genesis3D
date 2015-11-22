@@ -83,7 +83,7 @@ geBoolean GENESISCC Plane_SetGBSP(World_BSP *BSP)
 //=====================================================================================
 int32 GENESISCC Plane_FindLeaf(const geWorld *World, int32 Node, const geVec3d *POV)
 {
-    float		Dist;
+    geFloat		Dist;
 	GFX_Node	*GFXNodes;
 	GFX_Plane	*GFXPlanes;
 	int32		Leaf;
@@ -115,9 +115,9 @@ int32 GENESISCC Plane_FindLeaf(const geWorld *World, int32 Node, const geVec3d *
 //	Plane_PlaneDistanceFast
 //	Fast axial aligned plane distance
 //=====================================================================================
-float GENESISCC Plane_PlaneDistanceFast(const GFX_Plane *Plane, const geVec3d *Point)
+geFloat GENESISCC Plane_PlaneDistanceFast(const GFX_Plane *Plane, const geVec3d *Point)
 {
-	float	Dist, PDist;
+	geFloat	Dist, PDist;
 
 	assert(Plane != NULL);
 	assert(Point != NULL);
@@ -148,9 +148,9 @@ float GENESISCC Plane_PlaneDistanceFast(const GFX_Plane *Plane, const geVec3d *P
 //	Plane_PlaneDistance
 //	Normal (slow) plane distance
 //=====================================================================================
-float GENESISCC Plane_PlaneDistance(const GFX_Plane *Plane, const geVec3d *Point)
+geFloat GENESISCC Plane_PlaneDistance(const GFX_Plane *Plane, const geVec3d *Point)
 {
-	float	Dist;
+	geFloat	Dist;
 
 	assert(Plane != NULL);
 	assert(Point != NULL);
@@ -164,9 +164,9 @@ float GENESISCC Plane_PlaneDistance(const GFX_Plane *Plane, const geVec3d *Point
 //	Plane_PlaneDistanceFast
 //	Fast axial aligned face distance
 //=====================================================================================
-float GENESISCC Plane_FaceDistanceFast(const GFX_Face *Face, const geVec3d *Point)
+geFloat GENESISCC Plane_FaceDistanceFast(const GFX_Face *Face, const geVec3d *Point)
 {
-	float		Dist, PDist;
+	geFloat		Dist, PDist;
 	GFX_Plane	*Plane;
 
 	assert(Face != NULL);

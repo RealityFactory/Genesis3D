@@ -1635,7 +1635,7 @@ BOOL D3DMain_GetTextureMemory(void)
 
 //==========================================================================================
 //==========================================================================================
-void Main_BuildRGBGammaTables(float Gamma)
+void Main_BuildRGBGammaTables(geFloat Gamma)
 {
 	int32				i, Val;
 	int32				GammaTable[256];
@@ -1653,9 +1653,9 @@ void Main_BuildRGBGammaTables(float Gamma)
 	}
 	else for (i=0 ; i<256 ; i++)
 	{
-		float Ratio = (i+0.5f)/255.5f;
+		geFloat Ratio = (i+0.5f)/255.5f;
 
-		float RGB = (float)(255.0 * pow((double)Ratio, 1.0/(double)Gamma) + 0.5);
+		geFloat RGB = (geFloat)(255.0 * pow((double)Ratio, 1.0/(double)Gamma) + 0.5);
 		
 		if (RGB < 0.0f)
 			RGB = 0.0f;
@@ -1778,7 +1778,7 @@ geBoolean DRIVERCC D3DMain_SetActive(geBoolean wParam)
 //========================================================================================================
 //	D3DMain_SetFogEnable
 //========================================================================================================
-geBoolean DRIVERCC D3DMain_SetFogEnable(geBoolean Enable, float r, float g, float b, float Start, float End)
+geBoolean DRIVERCC D3DMain_SetFogEnable(geBoolean Enable, geFloat r, geFloat g, geFloat b, geFloat Start, geFloat End)
 {
 	D3DMATERIAL			Material;
 

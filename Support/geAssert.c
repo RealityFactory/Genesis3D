@@ -27,6 +27,7 @@
 	   
 // See geAssert.h for details.
 
+//void __cdecl _assertge (void *expr,void *filename,unsigned lineno);
 void geAssertDefault(void *, void *, unsigned);
 geAssertCallbackFn *geAssertCallback = &geAssertDefault;
 
@@ -71,8 +72,8 @@ void geAssert_SetCriticalShutdownCallback( geAssert_CriticalShutdownCallback CB 
 #include <signal.h>
 
 #define MAX_ASSERT_STRING_LENGTH 4096
-
-void __cdecl _assert (void *expr,void *filename,unsigned lineno)
+/*
+void __cdecl _assertge (void *expr,void *filename,unsigned lineno)
 {
 int nCode;
 char assertbuf[MAX_ASSERT_STRING_LENGTH];	
@@ -125,7 +126,7 @@ static int in_assert_cnt = 0; // a semaphore
 
 	in_assert_cnt --;
 }
-
+*/
 #endif	// NDEBUG
 
 

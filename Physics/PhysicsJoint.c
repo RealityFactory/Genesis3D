@@ -40,13 +40,13 @@ typedef struct gePhysicsJoint
 	geVec3d				locationBInWorldSpace;
 	gePhysicsObject *		Object1;
 	gePhysicsObject *		Object2;
-	float				assemblyRate;
+	geFloat				assemblyRate;
 }	gePhysicsJoint;
 
 #define JOINT_ASSEMBLY_RATE_MULTIPLIER (4.f)
 
 GENESISAPI gePhysicsJoint * GENESISCC gePhysicsJoint_Create(gePhysicsJoint_Kind Kind, const geVec3d *Location, 
-	float assemblyRate, gePhysicsObject *PS1, gePhysicsObject *PS2, float physicsScale)
+	geFloat assemblyRate, gePhysicsObject *PS1, gePhysicsObject *PS2, geFloat physicsScale)
 {
 	gePhysicsJoint*	pPhysjnt;
 	geVec3d		POLocation;
@@ -251,17 +251,17 @@ GENESISAPI gePhysicsObject* GENESISCC gePhysicsJoint_GetObject2(const gePhysicsJ
 	return pPhysjnt->Object2;
 }
 
-GENESISAPI float GENESISCC gePhysicsJoint_GetAssemblyRate(const gePhysicsJoint* pPhysjnt)
+GENESISAPI geFloat GENESISCC gePhysicsJoint_GetAssemblyRate(const gePhysicsJoint* pPhysjnt)
 {
 	assert(pPhysjnt != NULL);
 
 	return pPhysjnt->assemblyRate;
 }
 
-GENESISAPI void GENESISCC gePhysicsJoint_SetAssemblyRate(gePhysicsJoint* pPhysjnt, float assemblyRate)
+GENESISAPI void GENESISCC gePhysicsJoint_SetAssemblyRate(gePhysicsJoint* pPhysjnt, geFloat assemblyRate)
 {
 	assert(pPhysjnt != NULL);
-	assert(assemblyRate >= (float)(1e-5));
+	assert(assemblyRate >= (geFloat)(1e-5));
 
 	pPhysjnt->assemblyRate = assemblyRate;
 }

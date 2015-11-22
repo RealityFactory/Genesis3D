@@ -31,7 +31,7 @@
 #include "Camera.h"
 #include "PtrTypes.h"
 
-#define		VectorToSUB(a, b) ( *(((float*)&a) + b) )
+#define		VectorToSUB(a, b) ( *(((geFloat*)&a) + b) )
 
 #define		MAX_SUB_DRIVERS				12
 #define		MAX_DRIVER_MODES			32
@@ -193,15 +193,15 @@ typedef struct geEngine
 	geBoolean			HasPixelFormat[ENGINE_PF_COUNT];
 	geRDriver_PixelFormat PixelFormats[ENGINE_PF_COUNT];
 
-	float				CurrentGamma;
-	float				BitmapGamma;
+	geFloat				CurrentGamma;
+	geFloat				BitmapGamma;
 
 	geBoolean			FogEnable;
-	float				FogR;
-	float				FogG;
-	float				FogB;
-	float				FogStart;
-	float				FogEnd;
+	geFloat				FogR;
+	geFloat				FogG;
+	geFloat				FogB;
+	geFloat				FogStart;
+	geFloat				FogEnd;
 
 	geEngine_FrameState	FrameState;
 

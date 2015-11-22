@@ -70,7 +70,7 @@ geBoolean GTHandle_Startup(void)
 
 		MinAddress = grTexMinAddress(GR_TMU0);
 		MaxAddress = grTexMaxAddress(GR_TMU0);
-		MidAddress = MinAddress + (uint32)((float)(MaxAddress - MinAddress)*TEXTURE_CACHE_PERCENT);
+		MidAddress = MinAddress + (uint32)((geFloat)(MaxAddress - MinAddress)*TEXTURE_CACHE_PERCENT);
 
 		MemMgr[0] = GMemMgr_Create(GR_TMU0, MinAddress, MidAddress);
 		if (!MemMgr[0])
@@ -383,7 +383,7 @@ geRDriver_THandle *Create3DTexture(int32 Width, int32 Height, int32 NumMipLevels
 	THandle->Width = Width;					// Original Width
 	THandle->Height = Height;
 	
-	THandle->OneOverLogSize_255 = 255.0f / (float)THandle->LogSize;
+	THandle->OneOverLogSize_255 = 255.0f / (geFloat)THandle->LogSize;
 
 	THandle->CacheType = GCache_TypeCreate(TextureCache, THandle->LogSize, THandle->LogSize, NumMipLevels, &Info);
 
@@ -408,7 +408,7 @@ geRDriver_THandle *Create3DTexture(int32 Width, int32 Height, int32 NumMipLevels
 geRDriver_THandle *CreateLightmapTexture(int32 Width, int32 Height, int32 NumMipLevels, const geRDriver_PixelFormat *PixelFormat)
 {	
 	geRDriver_THandle	*THandle;
-	float				Size;
+	geFloat				Size;
 
 	THandle = GTHandle_FindTextureHandle();
 
@@ -443,7 +443,7 @@ geRDriver_THandle *CreateLightmapTexture(int32 Width, int32 Height, int32 NumMip
 		THandle->CacheType = GCache_TypeCreate(LMapCache, THandle->LogSize, THandle->LogSize, NumMipLevels, &Info);
 	}
 
-	Size = (float)(THandle->LogSize<<4);
+	Size = (geFloat)(THandle->LogSize<<4);
 
  	THandle->OneOverLogSize_255 = 255.0f / Size;
 

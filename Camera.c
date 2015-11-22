@@ -182,7 +182,7 @@ void GENESISCC geCamera_GetWidthHeight(const geCamera *Camera,geFloat *Width,geF
 //=====================================================================================
 //	geCamera_GetScale
 //=====================================================================================
-float GENESISCC geCamera_GetScale(const geCamera *Camera)
+geFloat GENESISCC geCamera_GetScale(const geCamera *Camera)
 {
 	assert( Camera != NULL );
 
@@ -291,9 +291,9 @@ GENESISAPI void GENESISCC geCamera_ScreenPointToWorld (	const geCamera	*Camera,
 {
 	geVec3d In,Left,Up;
 	geVec3d ScaledIn,ScaledLeft,ScaledUp ;
-	float	XCenter ;
-	float	YCenter ;
-	float	Scale ;
+	geFloat	XCenter ;
+	geFloat	YCenter ;
+	geFloat	Scale ;
 	const geXForm3d *pM;
 
 	pM = &(Camera->TransposeXForm);

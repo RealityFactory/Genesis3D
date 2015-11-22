@@ -62,10 +62,10 @@ extern "C" {
 #define RGB_FXP_SHIFTER (15)	
 #define Z_FXP_SHIFTER (8)
 
-#define Z_FXP_MULTIPLIER   ((float)( 1 <<   Z_FXP_SHIFTER ))	
-#define OOZ_FXP_MULTIPLIER ((float)( 1 << OOZ_FXP_SHIFTER ))	
-#define OZ_FXP_MULTIPLIER  ((float)( 1 <<  OZ_FXP_SHIFTER )) 
-#define RGB_FXP_MULTIPLIER ((float)( 1 << RGB_FXP_SHIFTER ))
+#define Z_FXP_MULTIPLIER   ((geFloat)( 1 <<   Z_FXP_SHIFTER ))	
+#define OOZ_FXP_MULTIPLIER ((geFloat)( 1 << OOZ_FXP_SHIFTER ))	
+#define OZ_FXP_MULTIPLIER  ((geFloat)( 1 <<  OZ_FXP_SHIFTER )) 
+#define RGB_FXP_MULTIPLIER ((geFloat)( 1 << RGB_FXP_SHIFTER ))
 
 #define OOZ_MUL_PREP_RSHIFT  (OOZ_NUMERATOR_SHIFTER - OOZ_FXP_SHIFTER + OOZ_DIV_PREP_RSHIFT - OOZ_MULTIPLY_PRECISION_BITS)		
 #define  OZ_MUL_PREP_RSHIFT  (OZ_FXP_SHIFTER - OZ_MULTIPLY_PRECISION_BITS)									
@@ -183,28 +183,28 @@ extern "C" {
 
 typedef struct Triangle_Gradients 
 {
-	float OneOverZ[3];			// 1/Z per vtx	(if Affine Z per vtx)  Normalized!
+	geFloat OneOverZ[3];			// 1/Z per vtx	(if Affine Z per vtx)  Normalized!
 								// all Z's stored here are normalized to [0..1]  see FZScale below
-	float UOverZ[3];			// U/Z per vtx	(if Affine U per vtx)  
-	float VOverZ[3];			// V/Z per vtx	(if Affine V per vtx)  
-	float FdOneOverZdX;			// d(1/Z)/dX	(if Affine dZ/dX )
-	float dOneOverZdY;			// d(1/Z)/dY	(if Affine dZ/dY )
-	float FdUOverZdX;			// d(U/Z)/dX	(if Affine dU/dX )
-	float dUOverZdY;			// d(U/Z)/dY	(if Affine dU/dY )
-	float FdVOverZdX;			// d(V/Z)/dX	(if Affine dV/dX )
-	float dVOverZdY;			// d(V/Z)/dY	(if Affine dV/dY )
+	geFloat UOverZ[3];			// U/Z per vtx	(if Affine U per vtx)  
+	geFloat VOverZ[3];			// V/Z per vtx	(if Affine V per vtx)  
+	geFloat FdOneOverZdX;			// d(1/Z)/dX	(if Affine dZ/dX )
+	geFloat dOneOverZdY;			// d(1/Z)/dY	(if Affine dZ/dY )
+	geFloat FdUOverZdX;			// d(U/Z)/dX	(if Affine dU/dX )
+	geFloat dUOverZdY;			// d(U/Z)/dY	(if Affine dU/dY )
+	geFloat FdVOverZdX;			// d(V/Z)/dX	(if Affine dV/dX )
+	geFloat dVOverZdY;			// d(V/Z)/dY	(if Affine dV/dY )
 
 	int SubSpanWidth;			// maximum affine subdivision width for this poly (power of 2)
 	int SubSpanShift;			//   shift to divide by SubSpanLength   1<<SubSpanShift == SubSpanWidth
 	int Affine;					// flag:  if true, then all gradients are NOT 1/Z, just Z
 
 	// lighting interpolation is always affine
-	float FdRdX;				// dR/dX (the F means float, since there is a fixed point version of this also)
-	float  dRdY;				// dR/dY  
-	float FdGdX;				// dG/dX (the F means float, since there is a fixed point version of this also)
-	float  dGdY;				// dG/dY  
-	float FdBdX;				// dB/dX (the F means float, since there is a fixed point version of this also)
-	float  dBdY;				// dB/dY  
+	geFloat FdRdX;				// dR/dX (the F means geFloat, since there is a fixed point version of this also)
+	geFloat  dRdY;				// dR/dY  
+	geFloat FdGdX;				// dG/dX (the F means geFloat, since there is a fixed point version of this also)
+	geFloat  dGdY;				// dG/dY  
+	geFloat FdBdX;				// dB/dX (the F means geFloat, since there is a fixed point version of this also)
+	geFloat  dBdY;				// dB/dY  
 
 	FXFL dOneOverZdX;			// fixed point FdOneOverZdX (FXFL_OOZ)		 see precision comments
 	FXFL dUOverZdX;				// fixed point FdUOverZdX   (FXFL_OZ)
@@ -213,7 +213,7 @@ typedef struct Triangle_Gradients
 	FXFL dGdX;					// fixed point FdGdX        (FXFL_RGB)
 	FXFL dBdX;					// fixed point FdBdX        (FXFL_RGB)
 
-	float FZScale;				// Z is normalized to a max Z of 1.0.  so Normalized_Z = Z/FZScale;
+	geFloat FZScale;				// Z is normalized to a max Z of 1.0.  so Normalized_Z = Z/FZScale;
 	FXFL  ZScale;				// fixed point FZScale      (FXFL_Z)
 } Triangle_Gradients;
 
@@ -294,7 +294,7 @@ typedef struct Triangle_Triangle
 
 	int SmallDivideTable[TRASTER_SMALL_DIVIDE_TABLESIZE];	// for quick divides by 1..TRASTER_SMALL_DIVIDE_TABLESIZE
 
-	float MaxAffineSize;				// if triangle is smaller than this, the rasterizer reverts to affine.
+	geFloat MaxAffineSize;				// if triangle is smaller than this, the rasterizer reverts to affine.
 
 	geBoolean IsLightMapSetup;			// GE_TRUE if light map is already set up. 
 	void (*LightMapSetup)();			// called to set up lightmap 
@@ -320,8 +320,8 @@ Triangle_Triangle Triangle;
 geBoolean GENESISCC Triangle_GradientsCompute( 
 					Triangle_Gradients *G,			// Gradients to compute (yeah, this is also global)
 					const DRV_TLVertex *pVertices,	// vertex corners of triangle (U,V,R,G,B,etc are [0..1])
-					float TextureWidth,				// Width of texture in pixels  (scale U up to [0..Width])
-					float TextureHeight);			// Height of texture in pixels (scale V up to [0..Height])
+					geFloat TextureWidth,				// Width of texture in pixels  (scale U up to [0..Width])
+					geFloat TextureHeight);			// Height of texture in pixels (scale V up to [0..Height])
 
 
 	//	computes gradients for an edge of the triangle.

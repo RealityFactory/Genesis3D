@@ -482,7 +482,7 @@ GENESISAPI geBoolean GENESISCC gePath_InsertKeyframe(
 	const geXForm3d *Matrix)
 {
 	int VIndex;
-	int QIndex;
+	int QIndex=0;
 	assert( P != NULL );
 	assert( Matrix != NULL );
 	assert( ( ChannelMask & GE_PATH_ROTATION_CHANNEL    ) ||

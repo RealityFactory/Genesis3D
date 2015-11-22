@@ -29,12 +29,7 @@
 #include	"ram.h"
 
 #include	"dirtree.h"
-
-#ifndef	MAKEFOURCC
-#define MAKEFOURCC(ch0, ch1, ch2, ch3)                              \
-		((unsigned long)(unsigned char)(ch0) | ((unsigned long)(unsigned char)(ch1) << 8) |   \
-		((unsigned long)(unsigned char)(ch2) << 16) | ((unsigned long)(unsigned char)(ch3) << 24 ))
-#endif
+#include	"dirtree-common.h"
 
 #define	DIRTREE_FILE_SIGNATURE	MAKEFOURCC('D', 'T', '0', '1')
 static int DirTree_SignatureBase=0x696C6345;
@@ -59,18 +54,6 @@ typedef struct	DirTree_Finder
 	char *		MatchExt;
 	DirTree *	Current;
 }	DirTree_Finder;
-
-static	char *	DuplicateString(const char *String)
-{
-	int		Length;
-	char *	NewString;
-
-	Length = strlen(String) + 1;
-	NewString = geRam_Allocate(Length);
-	if	(NewString)
-		memcpy(NewString, String, Length);
-	return NewString;
-}
 
 DirTree *DirTree_Create(void)
 {
@@ -107,16 +90,6 @@ void	DirTree_Destroy(DirTree *Tree)
 	geRam_Free(Tree->Name);
 	geRam_Free(Tree);
 }
-
-typedef	struct	DirTree_Header
-{
-	unsigned long	Signature;
-	int				Size;
-	
-}	DirTree_Header;
-
-#define	DIRTREE_LIST_TERMINATED		0xffffffff
-#define DIRTREE_LIST_NOTTERMINATED	0
 
 static	geBoolean	WriteTree(const DirTree *Tree, geVFile *File)
 {
@@ -157,7 +130,8 @@ static	geBoolean	WriteTree(const DirTree *Tree, geVFile *File)
 		return GE_FALSE;
 
 	if	(Tree->Hints.HintDataLength != 0)
-		if	(geVFile_Write(File, &Tree->Hints.HintData, Tree->Hints.HintDataLength) == GE_FALSE)
+		//bug fix. someone got copy happy and forgot to remove the & from Tree->Hints.HintData
+		if	(geVFile_Write(File, Tree->Hints.HintData, Tree->Hints.HintDataLength) == GE_FALSE)
 			return GE_FALSE;
 	
 	// Write out the Children
@@ -336,7 +310,8 @@ static	geBoolean	ReadTree(geVFile *File, DirTree **TreePtr)
 		Tree->Hints.HintData = geRam_Allocate(Tree->Hints.HintDataLength);
 		if	(!Tree->Hints.HintData)
 			goto fail;
-		if	(geVFile_Read(File, &Tree->Hints.HintData, Tree->Hints.HintDataLength) == GE_FALSE)
+		//bug fix. someone got copy happy and forgot to remove the & from Tree->Hints.HintData
+		if	(geVFile_Read(File, Tree->Hints.HintData, Tree->Hints.HintDataLength) == GE_FALSE)
 			goto fail;
 	}
 
@@ -388,18 +363,6 @@ DirTree *DirTree_CreateFromFile(geVFile *File)
 	}
 
 	return Res;
-}
-
-static	const char *GetNextDir(const char *Path, char *Buff)
-{
-	while	(*Path && *Path != '\\')
-		*Buff++ = *Path++;
-	*Buff = '\0';
-
-	if	(*Path == '\\')
-		Path++;
-
-	return Path;
 }
 
 DirTree *DirTree_FindExact(const DirTree *Tree, const char *Path)
@@ -468,14 +431,6 @@ DirTree *DirTree_FindPartial(
 	}
 
 	return (DirTree *)Tree;
-}
-
-static	geBoolean	PathHasDir(const char *Path)
-{
-	if	(strchr(Path, '\\'))
-		return GE_TRUE;
-
-	return GE_FALSE;
 }
 
 DirTree * DirTree_AddFile(DirTree *Tree, const char *Path, geBoolean IsDirectory)
@@ -716,45 +671,6 @@ void DirTree_DestroyFinder(DirTree_Finder *Finder)
 	geRam_Free(Finder);
 }
 
-static geBoolean	MatchPattern(const char *Source, const char *Pattern)
-{
-	assert(Source);
-	assert(Pattern);
-
-	switch	(*Pattern)
-	{
-	case	'\0':
-		if	(*Source)
-			return GE_FALSE;
-		break;
-
-	case	'*':
-		if	(*(Pattern + 1) != '\0')
-		{
-			Pattern++;
-			while	(*Source)
-			{
-				if	(MatchPattern(Source, Pattern) == GE_TRUE)
-					return GE_TRUE;
-				Source++;
-			}
-			return GE_FALSE;
-		}
-		break;
-
-	case	'?':
-		return MatchPattern(Source + 1, Pattern + 1);
-
-	default:
-		if	(*Source == *Pattern)
-			return MatchPattern(Source + 1, Pattern + 1);
-		else
-			return GE_FALSE;
-	}
-
-	return GE_TRUE;
-}
-
 DirTree * DirTree_FinderGetNextFile(DirTree_Finder *Finder)
 {
 	DirTree *	Res;
@@ -788,11 +704,6 @@ DirTree * DirTree_FinderGetNextFile(DirTree_Finder *Finder)
 }
 
 #ifdef	DEBUG
-static	void	indent(int i)
-{
-	while	(i--)
-		printf(" ");
-}
 
 static	void DirTree_Dump1(const DirTree *Tree, int i)
 {
@@ -819,4 +730,3 @@ void DirTree_Dump(const DirTree *Tree)
 }
 
 #endif
-

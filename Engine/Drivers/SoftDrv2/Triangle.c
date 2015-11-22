@@ -52,18 +52,18 @@
 geBoolean GENESISCC Triangle_GradientsCompute( 
 					Triangle_Gradients *G, 
 					const DRV_TLVertex *pVertices, 
-					float TextureWidth, 
-					float TextureHeight)
+					geFloat TextureWidth, 
+					geFloat TextureHeight)
 {
-	float OneOverdX;
-	float OneOverdY;
-	float Denominator;
-	float Width02  = pVertices[0].x-pVertices[2].x;
-	float Height02 = pVertices[0].y-pVertices[2].y;
-	float Width12  = pVertices[1].x-pVertices[2].x;
-	float Height12 = pVertices[1].y-pVertices[2].y;
-	float d02,d12;
-	float Size;
+	geFloat OneOverdX;
+	geFloat OneOverdY;
+	geFloat Denominator;
+	geFloat Width02  = pVertices[0].x-pVertices[2].x;
+	geFloat Height02 = pVertices[0].y-pVertices[2].y;
+	geFloat Width12  = pVertices[1].x-pVertices[2].x;
+	geFloat Height12 = pVertices[1].y-pVertices[2].y;
+	geFloat d02,d12;
+	geFloat Size;
 	assert( pVertices[0].z != 0.0f );
 	assert( pVertices[1].z != 0.0f );
 	assert( pVertices[2].z != 0.0f );
@@ -79,10 +79,10 @@ geBoolean GENESISCC Triangle_GradientsCompute(
 	OneOverdY = -OneOverdX;
 
 	{
-		float Right   = MAX(pVertices[0].x,MAX(pVertices[1].x,pVertices[2].x));
-		float Left    = MIN(pVertices[0].x,MIN(pVertices[1].x,pVertices[2].x));
-		float Top     = MIN(pVertices[0].y,MIN(pVertices[1].y,pVertices[2].y));
-		float Bottom  = MAX(pVertices[0].y,MAX(pVertices[1].y,pVertices[2].y));
+		geFloat Right   = MAX(pVertices[0].x,MAX(pVertices[1].x,pVertices[2].x));
+		geFloat Left    = MIN(pVertices[0].x,MIN(pVertices[1].x,pVertices[2].x));
+		geFloat Top     = MIN(pVertices[0].y,MIN(pVertices[1].y,pVertices[2].y));
+		geFloat Bottom  = MAX(pVertices[0].y,MAX(pVertices[1].y,pVertices[2].y));
 		Size = MAX(Right-Left,Bottom-Top);
 	}
 
@@ -94,8 +94,8 @@ geBoolean GENESISCC Triangle_GradientsCompute(
 
 	if (Triangle.ROPFlags & (TMAP | ZBUF))
 		{
-			float zmax = MAX(pVertices[0].z,MAX(pVertices[1].z,pVertices[2].z));
-			float zmin = MIN(pVertices[0].z,MIN(pVertices[1].z,pVertices[2].z));
+			geFloat zmax = MAX(pVertices[0].z,MAX(pVertices[1].z,pVertices[2].z));
+			geFloat zmin = MIN(pVertices[0].z,MIN(pVertices[1].z,pVertices[2].z));
 			// G->FZScale is used to scale the range of all the interpolators to fit nicely 
 			// in the predeterminted fixed point ranges.  These fixed point ranges are setup
 			// to minimize visible errors.
@@ -134,7 +134,7 @@ geBoolean GENESISCC Triangle_GradientsCompute(
 				}
 			else
 				{
-					float OneOverZScale = 1.0f / G->FZScale;
+					geFloat OneOverZScale = 1.0f / G->FZScale;
 					G->OneOverZ[0] = pVertices[0].z  * OneOverZScale;
 					G->OneOverZ[1] = pVertices[1].z  * OneOverZScale;
 					G->OneOverZ[2] = pVertices[2].z  * OneOverZScale;
@@ -209,7 +209,7 @@ geBoolean GENESISCC Triangle_GradientsCompute(
 	
 	if (!G->Affine)
 		{
-			float ChangeIndicator = (float)fabs(G->FdOneOverZdX) + (float)fabs(G->dOneOverZdY);
+			geFloat ChangeIndicator = (geFloat)fabs(G->FdOneOverZdX) + (geFloat)fabs(G->dOneOverZdY);
 
 			if (Triangle.ROPFlags & LMAP) 
 				{
@@ -335,8 +335,8 @@ void GENESISCC Triangle_EdgeCompute(
 
 	if (IsLeftEdge)
 		{
-			float XPrestep		= E->X - (float)TopX * (1.0f/16.0f);
-			float YPrestep		= E->Y - (float)TopY * (1.0f/16.0f);
+			geFloat XPrestep		= E->X - (geFloat)TopX * (1.0f/16.0f);
+			geFloat YPrestep		= E->Y - (geFloat)TopY * (1.0f/16.0f);
 			
 			if (Triangle.ROPFlags & (TMAP | ZBUF))
 				{

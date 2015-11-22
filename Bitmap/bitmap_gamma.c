@@ -578,9 +578,8 @@ uint16 * ptr;
 																	
 void geBitmap_Gamma_Compute_Lut(double Gamma)
 {
-uint32 c,gc,lgc;
+uint32 c=0,gc=0,lgc=0;
 
-	lgc = 0;
 	for(c=0;c<256;c++)
 	{
 		gc = (uint32)( 255.0 * pow( c * (1.0/255.0) , 1.0 / Gamma ) + 0.4 );
@@ -599,7 +598,7 @@ uint32 c,gc,lgc;
 	Gamma_Lut[255] = 255;
 	Gamma_Lut_Inverse[255] = 255;
 
-	ComputedGamma_Lut = (float)Gamma;
+	ComputedGamma_Lut = (geFloat)Gamma;
 }
 
 /*}{*******************************************************/

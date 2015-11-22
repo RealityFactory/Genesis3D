@@ -503,11 +503,11 @@ GENESISAPI geBoolean GENESISCC geFont_DrawText(geFont *font, const char *textStr
    int32 lineLen;
 
    uint32 colorArray[256];
-   float  fcolorX, fcolorR, fcolorG, fcolorB;
+   geFloat  fcolorX, fcolorR, fcolorG, fcolorB;
 
    int32 stringLen;
    int32 currentCharIndex;
-   int32 lineEndIndex;
+   int32 lineEndIndex=0;
    geFontCharacterRecord *charRec;
 
    geBoolean success;
@@ -785,11 +785,11 @@ GENESISAPI geBoolean GENESISCC geFont_DrawTextToBitmap(geFont *font, const char 
    int32 lineLen;
 
    uint32 colorArray[256];
-   float  fcolorX, fcolorR, fcolorG, fcolorB;
+   geFloat  fcolorX, fcolorR, fcolorG, fcolorB;
 
    int32 stringLen;
    int32 currentCharIndex;
-   int32 lineEndIndex;
+   int32 lineEndIndex=0;
    geFontCharacterRecord *charRec;
 
    geBoolean success;
@@ -1006,7 +1006,7 @@ GENESISAPI geBoolean GENESISCC geFont_DrawUsingDIB(geFont *font, const char *tex
 
    HDC      hdc, drawDC;
 
-   float  fcolorR, fcolorG, fcolorB;
+   geFloat  fcolorR, fcolorG, fcolorB;
 
    int32          x,y;
 

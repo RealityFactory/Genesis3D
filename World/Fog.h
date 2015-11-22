@@ -45,11 +45,11 @@ typedef struct geFog
 {
 	geVec3d			Pos;
 	GE_RGBA			Color;
-	float			LightBrightness;
-	float			VolumeBrightness;
-	float			VolumeRadius;
-	float			VolumeRadius2;				// *2
-	float			VolumeRadiusSquared;		// Radius squared
+	geFloat			LightBrightness;
+	geFloat			VolumeBrightness;
+	geFloat			VolumeRadius;
+	geFloat			VolumeRadius2;				// *2
+	geFloat			VolumeRadiusSquared;		// Radius squared
 
 	void			*UserData;	
 
@@ -69,9 +69,9 @@ GENESISAPI		void geFog_Destroy(geFog *Fog);
 GENESISAPI		geBoolean geFog_SetAttributes(	geFog			*Fog, 
 												const geVec3d	*Pos, 
 												GE_RGBA			*Color,
-												float			LightBrightness, 
-												float			VolumeBrightness, 
-												float			VolumeRadius);
+												geFloat			LightBrightness, 
+												geFloat			VolumeBrightness, 
+												geFloat			VolumeRadius);
 
 GENESISAPI		geBoolean geFog_SetUserData(geFog *Fog, void *UserData);
 GENESISAPI		void *geFog_GetUserData(geFog *Fog);

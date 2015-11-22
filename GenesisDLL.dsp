@@ -43,7 +43,8 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "GENESISDLL_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /X /I "..\SDK\DX6SDK\Include" /I "..\Source" /I "World" /I "Engine" /I "Engine\Drivers" /I "Actor" /I "BSP" /I "Math" /I "Entities" /I "Support" /I "Physics" /I "VFile" /I "Bitmap" /I "Bitmap\Compression" /I "..\MSDev60\Include" /I "..\MSDev60\MFC\Include" /I "guWorld" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "BUILDGENESIS" /D "GENESISDLLVERSION" /YX /FD /c
+# ADD CPP /nologo /G5 /MT /W3 /GX /O2 /Ob2 /I "..\Source" /I "World" /I "Engine" /I "Engine\Drivers" /I "Actor" /I "BSP" /I "Math" /I "Entities" /I "Support" /I "Physics" /I "VFile" /I "Bitmap" /I "Bitmap\Compression" /I "guWorld" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "BUILDGENESIS" /D "GENESISDLLVERSION" /YX /FD /c
+# SUBTRACT CPP /X
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -53,7 +54,8 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 libcmt.lib kernel32.lib user32.lib gdi32.lib oldnames.lib ole32.lib urlmon.lib uuid.lib winmm.lib /nologo /dll /machine:I386 /nodefaultlib /out:"ReleaseDLL/Genesis.dll"
+# ADD LINK32 libcmt.lib kernel32.lib user32.lib gdi32.lib oldnames.lib ole32.lib urlmon.lib uuid.lib winmm.lib /nologo /dll /machine:I386 /out:"ReleaseDLL/Genesis.dll"
+# SUBTRACT LINK32 /nodefaultlib
 # Begin Custom Build
 IntDir=.\ReleaseDLL
 OutDir=.\ReleaseDLL
@@ -79,7 +81,8 @@ SOURCE="$(InputPath)"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "GENESISDLL_EXPORTS" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /X /I "..\SDK\DX6SDK\Include" /I "..\Source" /I "World" /I "Engine" /I "Engine\Drivers" /I "Actor" /I "BSP" /I "Math" /I "Entities" /I "Support" /I "Physics" /I "VFile" /I "Bitmap" /I "Bitmap\Compression" /I "..\MSDev60\Include" /I "..\MSDev60\MFC\Include" /I "guWorld" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "BUILDGENESIS" /D "GENESISDLLVERSION" /YX /FD /GZ /c
+# ADD CPP /nologo /G5 /MTd /W3 /Gm /GX /ZI /Od /I "..\Source" /I "World" /I "Engine" /I "Engine\Drivers" /I "Actor" /I "BSP" /I "Math" /I "Entities" /I "Support" /I "Physics" /I "VFile" /I "Bitmap" /I "Bitmap\Compression" /I "guWorld" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "BUILDGENESIS" /D "GENESISDLLVERSION" /YX /FD /GZ /c
+# SUBTRACT CPP /X
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -89,7 +92,8 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 libcmtd.lib kernel32.lib user32.lib gdi32.lib oldnames.lib ole32.lib urlmon.lib uuid.lib winmm.lib /nologo /dll /debug /machine:I386 /nodefaultlib /out:"DebugDLL/Genesis.dll" /pdbtype:sept
+# ADD LINK32 libcmtd.lib kernel32.lib user32.lib gdi32.lib oldnames.lib ole32.lib urlmon.lib uuid.lib winmm.lib /nologo /dll /debug /machine:I386 /out:"DebugDLL/Genesis.dll" /pdbtype:sept
+# SUBTRACT LINK32 /nodefaultlib
 # Begin Custom Build
 IntDir=.\DebugDLL
 OutDir=.\DebugDLL
@@ -696,14 +700,6 @@ SOURCE=.\Camera.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\CSNetMgr.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\CSNetMgr.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\Ge.c
 # End Source File
 # Begin Source File
@@ -725,14 +721,6 @@ SOURCE=.\list.c
 # Begin Source File
 
 SOURCE=.\list.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\Netplay.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\Netplay.h
 # End Source File
 # Begin Source File
 
@@ -786,15 +774,6 @@ SOURCE=.\tsc.h
 # Begin Group "Libraries"
 
 # PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\Sdk\Dx6sdk\Lib\dxguid.lib
-# End Source File
 # End Group
-# Begin Source File
-
-SOURCE=.\GenesisDLL.mak
-# PROP Exclude_From_Build 1
-# End Source File
 # End Target
 # End Project

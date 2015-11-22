@@ -278,7 +278,7 @@ GENESISAPI geBoolean geWorld_SetLightAttributes(	geWorld *World,
 										geLight		*Light, 
 										const		geVec3d *Pos, 
 										const		GE_RGBA *RGBA, 
-										float		Radius,
+										geFloat		Radius,
 										geBoolean	CastShadow)
 {
 	assert(World != NULL);

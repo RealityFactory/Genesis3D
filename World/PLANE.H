@@ -44,9 +44,9 @@ geBoolean GENESISCC Plane_SetGBSP(World_BSP *BSP);
 
 int32 GENESISCC Plane_FindLeaf(const geWorld *World, int32 Node, const geVec3d *POV);
 
-float GENESISCC Plane_PlaneDistanceFast(const GFX_Plane *Plane, const geVec3d *Point);
-float GENESISCC Plane_FaceDistanceFast(const GFX_Face *Face, const geVec3d *Point);
-float GENESISCC Plane_PlaneDistance(const GFX_Plane *Plane, const geVec3d *Point);
+geFloat GENESISCC Plane_PlaneDistanceFast(const GFX_Plane *Plane, const geVec3d *Point);
+geFloat GENESISCC Plane_FaceDistanceFast(const GFX_Face *Face, const geVec3d *Point);
+geFloat GENESISCC Plane_PlaneDistance(const GFX_Plane *Plane, const geVec3d *Point);
 void gePlane_SetFromVerts(GFX_Plane *Plane, const geVec3d *V1, const geVec3d *V2, const geVec3d *V3);
 
 

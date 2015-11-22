@@ -48,7 +48,7 @@ GENESISAPI void GENESISCC geCamera_SetFarClipPlane(geCamera *Camera, geBoolean E
 GENESISAPI void GENESISCC geCamera_GetFarClipPlane(const geCamera *Camera, geBoolean *Enable, geFloat *ZFar);
 GENESISAPI void GENESISCC geCamera_GetClippingRect(const geCamera *Camera, geRect *Rect);
 void GENESISCC geCamera_GetWidthHeight(const geCamera *Camera,geFloat *Width,geFloat *Height);
-float GENESISCC geCamera_GetScale(const geCamera *Camera);
+geFloat GENESISCC geCamera_GetScale(const geCamera *Camera);
 GENESISAPI void GENESISCC geCamera_SetAttributes(geCamera *Camera, geFloat Fov, const geRect *Rect);
 void geCamera_FillDriverInfo(geCamera *Camera);
 GENESISAPI void GENESISCC geCamera_ScreenPointToWorld (	const geCamera	*Camera,

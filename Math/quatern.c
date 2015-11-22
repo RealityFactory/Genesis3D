@@ -134,8 +134,8 @@ GENESISAPI void GENESISCC geQuaternion_SetFromAxisAngle(geQuaternion *Q, const g
 
 geBoolean GENESISCC geQuaternion_GetAxisAngle(const geQuaternion *Q, geVec3d *Axis, geFloat *Theta)
 {	
-	float OneOverSinTheta;
-	float HalfTheta;
+	geFloat OneOverSinTheta;
+	geFloat HalfTheta;
 	assert( Q != NULL );
 	assert( Axis != NULL );
 	assert( Theta != NULL );

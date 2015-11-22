@@ -142,12 +142,12 @@ geBoolean DRIVERCC EnumPixelFormats(DRV_ENUM_PFORMAT_CB *Cb, void *Context)
 	return TRUE;
 }
 
-geBoolean DRIVERCC SetGamma(float Gamma)
+geBoolean DRIVERCC SetGamma(geFloat Gamma)
 {
 	return GE_TRUE;
 }
 
-geBoolean DRIVERCC GetGamma(float *Gamma)
+geBoolean DRIVERCC GetGamma(geFloat *Gamma)
 {
 	*Gamma = 1.0f;
 		
@@ -256,8 +256,113 @@ void SetLastDrvError(int32 Error, char *ErrorStr)
     D3DDRV.LastError = LastError;
 }
 
+//	eaa3 05/31/2000 Added Orf's Direct3D screenshot code to the driver
+//	..so we can get SCREENSHOTS out of both Glide and D3d.
+
 BOOL DRIVERCC ScreenShot(const char *Name)
-{
-	return FALSE;
-}
+{	
+  DDSURFACEDESC2 ddsd;
+	BITMAPFILEHEADER bfh;
+	BITMAPINFOHEADER bih;
+	HRESULT result;
+	HDC surfDC = NULL;
+	HDC memDC = NULL;
+	HBITMAP bitmap = NULL;
+	HBITMAP oldbit = NULL;
+	FILE *file = NULL;
+	void *data= NULL;
+	int width, height, bpp;
+	int datasize;
+	BOOL success = FALSE;
+	
+	memset(&ddsd,0,sizeof(ddsd));
+	ddsd.dwSize = sizeof(ddsd);
+	result = AppInfo.lpBackBuffer->GetSurfaceDesc(&ddsd);
+	if(FAILED(result))
+	  goto cleanup;
+	
+	width = ddsd.dwWidth;
+	height= ddsd.dwHeight;
+	bpp = ddsd.ddpfPixelFormat.dwRGBBitCount / 8;
+	
+	if(bpp < 2)
+	  bpp = 2;
+	if(bpp > 3)
+	  bpp = 3;
+	
+	datasize = width * bpp * height;
+	if(width * bpp % 4)
+		datasize += height * (4 - width * bpp % 4);
+			
+	memset((void*)&bfh, 0, sizeof(bfh));
+	bfh.bfType = 'B'+('M'<<8);
+	bfh.bfSize = sizeof(bfh) + sizeof(bih) + datasize;
+	bfh.bfOffBits = sizeof(bfh) + sizeof(bih);
+	memset((void*)&bih, 0, sizeof(bih));
+	bih.biSize = sizeof(bih);
+	bih.biWidth = ddsd.dwWidth;
+	bih.biHeight = ddsd.dwHeight;
+	bih.biPlanes = 1;
+	bih.biBitCount = bpp * 8;
+	bih.biCompression = BI_RGB;
+	result = AppInfo.lpBackBuffer->GetDC(&surfDC);
+	
+	if(FAILED(result))
+	  goto cleanup;
+		
+	bitmap = CreateDIBSection(NULL, (BITMAPINFO *)&bih, DIB_RGB_COLORS, 
+				&data, NULL, 0);
+				
+	if(!bitmap)
+	  goto cleanup;
+	if(!data)
+	  goto cleanup;
+		
+	memDC = CreateCompatibleDC(surfDC);
+	if(!memDC)
+	  goto cleanup;
+		
+	oldbit = (HBITMAP)SelectObject(memDC, bitmap);
+	if(!oldbit || FAILED(oldbit))
+	  goto cleanup;
+		
+	result = BitBlt(memDC, 0, 0, width, height, surfDC, 0, 0, SRCCOPY);
+	if(!result)
+	  goto cleanup;
+		
+	AppInfo.lpBackBuffer->ReleaseDC(surfDC);
+	surfDC = NULL;
+	
+	file = fopen(Name, "wb");
+	
+	if(!file)
+	  goto cleanup;
+		
+	fwrite((void*)&bfh, sizeof(bfh), 1, file);
+	fwrite((void*)&bih, sizeof(bih), 1, file);
+	fwrite((void*)data, 1, datasize, file);
+	
+	success = TRUE;
+	
+cleanup:
+
+	if(oldbit && !FAILED(oldbit))
+	  SelectObject(memDC, oldbit);
+	
+	if(memDC)
+	  DeleteDC(memDC);
+	
+	if(surfDC)
+	  AppInfo.lpBackBuffer->ReleaseDC(surfDC);
+
+	if(bitmap)
+	  DeleteObject(bitmap);
+		
+	if(file)
+	  fclose(file);
+		
+	return success;
+	
+} 
+
 

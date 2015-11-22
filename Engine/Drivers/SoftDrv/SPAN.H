@@ -31,7 +31,7 @@ typedef struct SList
 {
     uint8		Used;
 	int32		Min, Max;
-	float	z1, z2;		// So we can spit z spans out for other spans that need to be occluded
+	geFloat	z1, z2;		// So we can spit z spans out for other spans that need to be occluded
     uint32		Flags;
     struct SList	*Last;
     struct SList	*Next;

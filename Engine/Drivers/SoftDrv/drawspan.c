@@ -47,12 +47,12 @@ int32	CKeyTest=0;
 
 geFloat			FloatTemp, FTemp0, FTemp1, FTemp2;
 geFloat			FTemp3, FTemp4, FTemp5, FTemp6, FTemp7, FTemp8;
-float const		One			=1.0f;
-float const		Two			=2.0f;
+geFloat const		One			=1.0f;
+geFloat const		Two			=2.0f;
 
 extern	U32 UMask, VShift, VMask;
 int32	ZDelta, ZVal;
-float	ZBufferPrec = (float)-ZBUFFER_PREC;
+geFloat	ZBufferPrec = (geFloat)-ZBUFFER_PREC;
 __int64	RedDelta, GreenDelta, BlueDelta;
 uint32	NumASpans, RemainingCount;
 double	DeltaU, DeltaV;

@@ -167,7 +167,7 @@ geBoolean DoSplashScreen(geEngine *Engine, geDriver_Mode *DriverMode)
 	geVec3d				LightingNormal;
 	LARGE_INTEGER		CurrentTic;
 
-	_Electric_BoltEffect *Bolt;
+	_Electric_BoltEffect *Bolt=NULL;
 	geVec3d				BoltStart;
 	geVec3d				BoltEnd;
 
@@ -394,7 +394,7 @@ static	geBoolean		DisplayedOnceAlready = GE_FALSE;
 
 		if (CoronaLight)
 			{
-				static float Random = 0.76324f;
+				static geFloat Random = 0.76324f;
 				GE_RGBA Color;
 				geFloat Attenuation = 0.97f * CurrentTime;
 				Attenuation += (Random*0.15f)*(CurrentTime>1.0f?0:(1.0f-CurrentTime));
@@ -456,17 +456,31 @@ static	geBoolean		DisplayedOnceAlready = GE_FALSE;
 
 		SubLarge(&CurrentTic, &NowTic, &DeltaTic);
 
-//		CurrentTime += ((float)DeltaTic.LowPart / (float)Engine->CPUInfo.Freq) / 10.0f;
-//		CurrentTime += ((float)DeltaTic.LowPart / (float)Engine->CPUInfo.Freq) / 45.0f;
-		CurrentTime += ((float)DeltaTic.LowPart / (float)Engine->CPUInfo.Freq) / 75.0f;
+//		CurrentTime += ((geFloat)DeltaTic.LowPart / (geFloat)Engine->CPUInfo.Freq) / 10.0f;
+//		CurrentTime += ((geFloat)DeltaTic.LowPart / (geFloat)Engine->CPUInfo.Freq) / 45.0f;
+		CurrentTime += ((geFloat)DeltaTic.LowPart / (geFloat)Engine->CPUInfo.Freq) / 75.0f;
 	}
 
 	Sleep(500);
 
+	// Remove Bolt and Bitmaps that were causing leak
+	if (Bolt)
+		_Electric_BoltEffectDestroy(Bolt);
+
+	geWorld_RemoveBitmap(World, Corona);
+	geWorld_RemoveBitmap(World, Streak);
+	geWorld_RemoveBitmap(World, WebUrl);
+	
+	// Destroy Bmps
+	geBitmap_Destroy(&Corona);
+	geBitmap_Destroy(&Streak);
+	geBitmap_Destroy(&WebUrl);
+
 	// Remove the actor from the world
 	geWorld_RemoveActor(World,Actor);
-	// Destroy the actor
-	geActor_Destroy(&Actor);
+
+	// Utterly Destroy the actor
+	geActor_DestroyDirect(&Actor);
 
 	// Rmeove the world from the engine
 	if (!geEngine_RemoveWorld(Engine, World))

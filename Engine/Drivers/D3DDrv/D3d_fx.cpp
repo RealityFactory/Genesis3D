@@ -113,14 +113,14 @@ void D3DViewport (int32 x, int32 y, int32 width, int32 height)
     vport.dwHeight = height;
     vport.dvClipX = -1.0f;
     vport.dvClipY = 1.0f;
-    vport.dvClipWidth = (float)width /2.0f;
-    vport.dvClipHeight = (float)height/2.0f;
+    vport.dvClipWidth = (geFloat)width /2.0f;
+    vport.dvClipHeight = (geFloat)height/2.0f;
     AppInfo.lpD3DViewport->SetViewport2(&vport);
 }
 
 //======================================================================================================
 //======================================================================================================
-void D3DDepthRange (float zNear, float zFar)
+void D3DDepthRange (geFloat zNear, geFloat zFar)
 {
     D3DVIEWPORT2 vport;
     vport.dwSize = sizeof(D3DVIEWPORT2);

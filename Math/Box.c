@@ -64,7 +64,7 @@ static void geBox_ComputeGlobalFrameAxes(geBox* Box)
 // set up a Box; call when initializing an Box or when
 // the Box's scale(s) change
 
-void geBox_Set(geBox* Box, float xScale, float yScale, float zScale, const geXForm3d* Transform)
+void geBox_Set(geBox* Box, geFloat xScale, geFloat yScale, geFloat zScale, const geXForm3d* Transform)
 {
 	geBoolean isOrthonormal;
 
@@ -113,7 +113,7 @@ void geBox_SetXForm(geBox* Box, const geXForm3d* Transform)
 geBoolean geBox_DetectCollisionBetween(const geBox* Box1, const geBox* Box2)
 {
 	int i, c;
-	float radius;
+	geFloat radius;
 	const geBox* BoxA;
 	const geBox* BoxB;
 	static geVec3d centerToCenterVector, xformedCenterToCenterVector;

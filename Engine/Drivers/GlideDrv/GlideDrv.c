@@ -31,7 +31,7 @@
 int32				LastError;
 char				LastErrorStr[255];
 
-static float		CurrentGamma;
+static geFloat		CurrentGamma;
 
 DRV_EngineSettings	EngineSettings;
 #define ENABLE_WIREFRAME	
@@ -71,7 +71,7 @@ geBoolean DRIVERCC DrvResetAll(void)
 
 //================================================================================================
 //================================================================================================
-geBoolean DRIVERCC SetGamma(float Gamma)
+geBoolean DRIVERCC SetGamma(geFloat Gamma)
 {
 	CurrentGamma = Gamma;
 
@@ -81,7 +81,7 @@ geBoolean DRIVERCC SetGamma(float Gamma)
 
 //================================================================================================
 //================================================================================================
-geBoolean DRIVERCC GetGamma(float *Gamma)
+geBoolean DRIVERCC GetGamma(geFloat *Gamma)
 {
 	//*Gamma = CurrentGamma;
 	*Gamma = 1.0f;

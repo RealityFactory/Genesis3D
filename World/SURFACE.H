@@ -58,8 +58,8 @@ typedef struct Surf_SurfInfo
 	int32		XScale;
 	int32		YScale;
 
-	float		ShiftU;
-	float		ShiftV;
+	geFloat		ShiftU;
+	geFloat		ShiftV;
 	
 	int32		NumLTypes;						// Number of lightmap types this face has...
 	int32		DLightFrame;					// == Globals->CurFrame if dlighted
@@ -70,24 +70,24 @@ typedef struct Surf_SurfInfo
 
 typedef struct Surf_TexVert
 {
-	float		u, v;
-	float		r, g, b, a;
+	geFloat		u, v;
+	geFloat		r, g, b, a;
 } Surf_TexVert;
 
 // Lit vertex
 typedef struct
 {
-	float X, Y, Z;									// 3d vertex
-	float u, v;										// Uv's
-	float r, g, b, a;								// color
+	geFloat X, Y, Z;									// 3d vertex
+	geFloat u, v;										// Uv's
+	geFloat r, g, b, a;								// color
 } Surf_LVertex;
 
 // Transformed Lit vertex
 typedef struct
 {
-	float x, y, z;									// screen points
-	float u, v;										// Uv's
-	float r, g, b, a;								// color
+	geFloat x, y, z;									// screen points
+	geFloat u, v;										// Uv's
+	geFloat r, g, b, a;								// color
 } Surf_TLVertex;
 
 //	Surface Flags
@@ -107,7 +107,7 @@ geBoolean Surf_SetGBSP(World_BSP *BSP);
 geBoolean Surf_WorldInit(geWorld *World);
 void Surf_WorldShutdown(geWorld *World);
 
-BOOL Surf_InSurfBoundingBox(Surf_SurfInfo *Surf, geVec3d *Pos, float Box);
+BOOL Surf_InSurfBoundingBox(Surf_SurfInfo *Surf, geVec3d *Pos, geFloat Box);
 
 #ifdef __cplusplus
 }

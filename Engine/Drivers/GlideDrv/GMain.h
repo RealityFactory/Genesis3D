@@ -46,9 +46,9 @@ extern GrHwConfiguration	GlideHwConfig;
 extern GMain_BoardInfo		g_BoardInfo;			// Global board info for current hardware
 
 extern geBoolean			g_FogEnable;
-extern float				g_FogR;
-extern float				g_FogG;
-extern float				g_FogB;
+extern geFloat				g_FogR;
+extern geFloat				g_FogG;
+extern geFloat				g_FogB;
 
 //============================================================================================
 //============================================================================================
@@ -59,7 +59,7 @@ geBoolean GMain_GetBoardInfo(GMain_BoardInfo *Info);
 geBoolean GMain_InitGlideRegisters(void);
 geBoolean GMain_ResetAll(void);
 geBoolean DRIVERCC GMain_ScreenShot(const char *Name);
-geBoolean DRIVERCC GMain_SetFogEnable(geBoolean Enable, float r, float g, float b, float Start, float End);
+geBoolean DRIVERCC GMain_SetFogEnable(geBoolean Enable, geFloat r, geFloat g, geFloat b, geFloat Start, geFloat End);
 
 #ifdef __cplusplus
 }

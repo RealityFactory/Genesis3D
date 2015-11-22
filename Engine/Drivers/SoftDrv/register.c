@@ -369,7 +369,7 @@ BOOL	DRIVERCC	DrvResetAll(void)
 
 static	int	Brighten(int Color)
 {
-	Color	=(int)((float)Color * 1.5f);
+	Color	=(int)((geFloat)Color * 1.5f);
 
 	return((Color > 255)? 255 : Color);
 }

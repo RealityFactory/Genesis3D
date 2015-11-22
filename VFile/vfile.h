@@ -56,7 +56,7 @@ typedef	struct	geVFile_Properties
 	geVFile_Time				Time;
 	geVFile_Attributes		AttributeFlags;
 	long					Size;
-	geVFile_Hints				Hints;
+	geVFile_Hints			Hints;
 	char					Name[1024];
 }	geVFile_Properties;
 
@@ -94,6 +94,7 @@ typedef	struct	geVFile_MemoryContext
 #define GE_VFILE_TYPE_DOS	    ( (geVFile_TypeIdentifier) 1L )
 #define GE_VFILE_TYPE_MEMORY	( (geVFile_TypeIdentifier) 2L )
 #define GE_VFILE_TYPE_VIRTUAL	( (geVFile_TypeIdentifier) 3L )
+//#define GE_VFILE_TYPE_CVIRTUAL	( (geVFile_TypeIdentifier) 4L )
 
 // First three flags are mutually exclusive.  Combining them will result in failure
 // returns for both geVFile_OpenNewSystem and geVFile_Open.
@@ -103,13 +104,6 @@ typedef	struct	geVFile_MemoryContext
 
 #define GE_VFILE_OPEN_DIRECTORY  0x00000008
 
-#if 0
-geBoolean GENESISCC	geVFile_Startup(void);
-	// Initializes the VFile System.  This API MUST be called before any other
-	// VFile APIs are called.  This API ensures that the rest of the VFile systems
-	// will be thread safe.  Hence the application should ensure that this function
-	// is called once and only once.
-#endif
 
 GENESISAPI geVFile * GENESISCC geVFile_OpenNewSystem(
 	geVFile *					FS,
@@ -161,6 +155,8 @@ GENESISAPI geBoolean GENESISCC geVFile_FileExists(geVFile *FS, const char *FileN
 
 GENESISAPI geBoolean GENESISCC geVFile_Close (geVFile *File);
 	// closes and destroys the File
+
+GENESISAPI void GENESISCC geVFile_CloseAPI (void);
 
 //---------- File Specific Operations -----------
 

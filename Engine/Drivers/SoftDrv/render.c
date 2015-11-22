@@ -52,25 +52,25 @@ extern 		CPUInfo			ProcessorInfo;
 typedef struct EdgeAsmWorldTag
 {
 	int		X, y, Height;
-	float	x, r, g, b;
-	float	xstep, rstep, gstep, bstep;
+	geFloat	x, r, g, b;
+	geFloat	xstep, rstep, gstep, bstep;
 	U32		R, G, B, X2, pad;	//x2 for clip check
 } EdgeAsmWorld;
 
 typedef struct EdgeAsmTag
 {
 	int		X, y, Height;
-	float	x, u, v, z, r, g, b;
-	float	xstep, ustep, vstep, zstep;
-	float	rstep, gstep, bstep;
+	geFloat	x, u, v, z, r, g, b;
+	geFloat	xstep, ustep, vstep, zstep;
+	geFloat	rstep, gstep, bstep;
 } EdgeAsm;
 
 typedef struct EdgeAsmFPUTag
 {
 	int		X, y, Height;
-	float	x, u, v, z, r, g, b;
-	float	xstep, ustep, vstep, zstep;
-	float	rstep, gstep, bstep;
+	geFloat	x, u, v, z, r, g, b;
+	geFloat	xstep, ustep, vstep, zstep;
+	geFloat	rstep, gstep, bstep;
 	U32		R, G, B;
 } EdgeAsmFPU;
 
@@ -78,12 +78,12 @@ typedef struct EdgeAsmFPUTag
 __int64		Bucket, Bucket2, Bucket3, Magic, Red, Green;
 uint32		Blue, UMask, VShift, VMask, widTemp, TDest, TempPix;
 
-float		BlueMask	=0x001f001f;
-float		GreenMask	=0x07e007e0;
-float		MiniRedMask	=0xf800f800;
+geFloat		BlueMask	=0x001f001f;
+geFloat		GreenMask	=0x07e007e0;
+geFloat		MiniRedMask	=0xf800f800;
 double		RedMask		=0xf800f800;
-float		GreenMask2	=0x03e003e0;
-float		MiniRedMask2=0x7c007c00;
+geFloat		GreenMask2	=0x03e003e0;
+geFloat		MiniRedMask2=0x7c007c00;
 double		RedMask2	=0x7c007c00;
 
 
@@ -115,13 +115,13 @@ uint8			*GLightData;
 int32			DeltaX, Remaining, N_Runs, PixelCount;
 uint16			*Source, *Dest;
 int32			U2, V2, StepU, StepV;
-float			UDivZ, VDivZ, Zi, Z, Dx, Dy, PixelEnd;
+geFloat			UDivZ, VDivZ, Zi, Z, Dx, Dy, PixelEnd;
 int32			TxWhole, TyWhole, TxFract, TyFract;
-float			UDivZnStepX, VDivZnStepX, ZinStepX;
+geFloat			UDivZnStepX, VDivZnStepX, ZinStepX;
 int32			Junk[2];
 
-float			Real16 = 16.0f;	
-float			Real65536 = (float)65536;
+geFloat			Real16 = 16.0f;	
+geFloat			Real65536 = (geFloat)65536;
 
 int32			U, V;
 
@@ -152,7 +152,7 @@ __int64			QDibOrCan=0, QZOrCan=0;
 __int64			QZVal=0, QZDelta=0, UV16V=0;
 __int64			QZOut=0, QDibOut=0, QShiftV=0;
 __int64			QZVal32_0=0, QZVal32_1=0;
-float			QFixedScaleLUT[34]={ 0.0f, 0.0f, 65536.0f, 65536.0f, 32768.0f, 32768.0f,
+geFloat			QFixedScaleLUT[34]={ 0.0f, 0.0f, 65536.0f, 65536.0f, 32768.0f, 32768.0f,
 									21845.3333f, 21845.3333f, 16384.0f, 16384.0f,
 									13107.2f, 13107.2f, 10922.6666f, 10922.6666f,
 									9362.2857f, 9362.2857f, 8192.0f, 8192.0f,
@@ -161,27 +161,27 @@ float			QFixedScaleLUT[34]={ 0.0f, 0.0f, 65536.0f, 65536.0f, 32768.0f, 32768.0f,
 									5041.2307f, 5041.2307f, 4681.1428f, 4681.1428f,
 									4369.0666f, 4369.0666f, 4096.0f, 4096.0f };
 int				SCan[16];	//for zbuffer fake ptr
-float			GLMapMulU;	//lightscale
-float			GLMapMulV;	//lightscale
+geFloat			GLMapMulU;	//lightscale
+geFloat			GLMapMulV;	//lightscale
 
 // 16bit zbuffer
 U16				*ZBuffer;
 uint16			*ZBufLine;
 
 // Gradients info
-float	UDivZStepX;
-float	UDivZStepY;
-float	VDivZStepX;
-float	VDivZStepY;
+geFloat	UDivZStepX;
+geFloat	UDivZStepY;
+geFloat	VDivZStepX;
+geFloat	VDivZStepY;
 
-float	UDivZOrigin;
-float	VDivZOrigin;
-float	UDivZ16StepX, VDivZ16StepX, Zi16StepX;
-float	UDivZ32StepX, VDivZ32StepX, Zi32StepX;
+geFloat	UDivZOrigin;
+geFloat	VDivZOrigin;
+geFloat	UDivZ16StepX, VDivZ16StepX, Zi16StepX;
+geFloat	UDivZ32StepX, VDivZ32StepX, Zi32StepX;
 
-float	ZiStepX;
-float	ZiStepY;
-float	ZiOrigin;
+geFloat	ZiStepX;
+geFloat	ZiStepY;
+geFloat	ZiOrigin;
 
 GInfo *GlobalInfo;
 
@@ -197,10 +197,10 @@ Fixed16 VAdjust2;
 Fixed16	MaxU;
 Fixed16	MaxV;
 
-//magic numbers for float to int conversion
+//magic numbers for geFloat to int conversion
 //only works on values between -4194304 and 4194303
-float FistMagic=12582912.0f;
-float FistTruncate=0.5f;
+geFloat FistMagic=12582912.0f;
+geFloat FistTruncate=0.5f;
 
 
 void TmapTriangle_32(DRV_TLVertex *verts);
@@ -214,7 +214,7 @@ typedef void (* MapperPtrFPU) (EdgeAsmFPU *, EdgeAsmFPU *);
 
 static MapperPtrFPU	CurMapperFPU;
 
-typedef void (* MapperPtrWorld) (int32 x1, int32 x2, int32 y, float r1, float g1, float b1, float r2, float g2, float b2);
+typedef void (* MapperPtrWorld) (int32 x1, int32 x2, int32 y, geFloat r1, geFloat g1, geFloat b1, geFloat r2, geFloat g2, geFloat b2);
 
 static MapperPtrWorld	CurMapperWorld;
 
@@ -225,22 +225,22 @@ static MapperPtrWorldFPU	CurMapperWorldFPU;
 static	geVec3d		TVectU, TVectV;
 static	geVec3d		TVectUL, TVectVL;
 
-static void	CalcGradients(S32 MipLevel, float DrawScaleU, float DrawScaleV)
+static void	CalcGradients(S32 MipLevel, geFloat DrawScaleU, geFloat DrawScaleV)
 {
-	float		MipScale;
+	geFloat		MipScale;
 	geVec3d		SOrigin;
-	float		t, dsui, dsvi;
+	geFloat		t, dsui, dsvi;
 	Fixed16		UAdjust1L, VAdjust1L;
 	int			GW_log2;
 	geVec3d		Temp	=GlobalInfo->Pov;
-	float		distinv, ZScaleInv;
+	geFloat		distinv, ZScaleInv;
 
 	distinv		=1.0f / (GlobalInfo->ZScale * (GlobalInfo->PlaneDist - geVec3d_DotProduct(&Temp, &GlobalInfo->PlaneNormal)));
 	ZScaleInv	=1.0f / GlobalInfo->ZScale;
 	dsui		=1.0f / DrawScaleU;
 	dsvi		=1.0f / DrawScaleV;
 
-	MipScale	=(1.0f / (float)(1 << MipLevel));
+	MipScale	=(1.0f / (geFloat)(1 << MipLevel));
 
 	geXForm3d_Rotate(&GlobalInfo->CXForm, &GlobalInfo->VecU, &TVectUL);
 	geXForm3d_Rotate(&GlobalInfo->CXForm, &GlobalInfo->VecV, &TVectVL);
@@ -260,8 +260,8 @@ static void	CalcGradients(S32 MipLevel, float DrawScaleU, float DrawScaleV)
 	GLMapMulU	=DrawScaleU;
 	GLMapMulV	=DrawScaleV;
 
-	*((float *)(&GLMapMulUV))		=DrawScaleV;
-	*(((float *)((&GLMapMulUV)))+1)	=DrawScaleU;
+	*((geFloat *)(&GLMapMulUV))		=DrawScaleV;
+	*(((geFloat *)((&GLMapMulUV)))+1)	=DrawScaleU;
 
 	UDivZOrigin	=TVectU.Z * ZScaleInv * MipScale
 		- GlobalInfo->XCenter * UDivZStepX
@@ -285,8 +285,8 @@ static void	CalcGradients(S32 MipLevel, float DrawScaleU, float DrawScaleV)
 	UAdjustL	=UAdjust1L - UAdjust2;
 	VAdjustL	=VAdjust1L - VAdjust2;
 
-	UAdjust2	=(int)(((float)UAdjust2) * dsui);
-	VAdjust2	=(int)(((float)VAdjust2) * dsvi);
+	UAdjust2	=(int)(((geFloat)UAdjust2) * dsui);
+	VAdjust2	=(int)(((geFloat)VAdjust2) * dsvi);
 
 	*((int *)(&UVAdjustL))		=VAdjustL;
 	*(((int *)((&UVAdjustL)))+1)=UAdjustL;
@@ -334,17 +334,17 @@ static void	CalcGradients(S32 MipLevel, float DrawScaleU, float DrawScaleV)
 	*((U32 *)(&QZDelta))		=(U32)(ZiStepX * -ZBUFFER_PREC);
 	*(((U32 *)((&QZDelta)))+1)	=(U32)(ZiStepX * -ZBUFFER_PREC);
 
-	*(((float *)((&UVDivZ16StepX)))+1)	=UDivZ16StepX;
-	*((float *)(&UVDivZ16StepX))		=VDivZ16StepX;
+	*(((geFloat *)((&UVDivZ16StepX)))+1)	=UDivZ16StepX;
+	*((geFloat *)(&UVDivZ16StepX))		=VDivZ16StepX;
 
-	*(((float *)((&UVDivZStepX)))+1)	=UDivZStepX;
-	*((float *)(&UVDivZStepX))			=VDivZStepX;
+	*(((geFloat *)((&UVDivZStepX)))+1)	=UDivZStepX;
+	*((geFloat *)(&UVDivZStepX))			=VDivZStepX;
 
-	*(((float *)((&UVDivZStepY)))+1)	=UDivZStepY;
-	*((float *)(&UVDivZStepY))			=VDivZStepY;
+	*(((geFloat *)((&UVDivZStepY)))+1)	=UDivZStepY;
+	*((geFloat *)(&UVDivZStepY))			=VDivZStepY;
 
-	*(((float *)((&UVDivZOrigin)))+1)	=UDivZOrigin;
-	*((float *)(&UVDivZOrigin))			=VDivZOrigin;
+	*(((geFloat *)((&UVDivZOrigin)))+1)	=UDivZOrigin;
+	*((geFloat *)(&UVDivZOrigin))			=VDivZOrigin;
 }
 
 
@@ -558,7 +558,7 @@ void StepWorld(EdgeAsmWorld *edge)
 void setup_edgeWorld(EdgeAsmWorld *edge, DRV_TLVertex *verts, int top, int end)
 {
 	int		ey,ty;
-	float	yd;
+	geFloat	yd;
 
 	_asm
 	{
@@ -901,7 +901,7 @@ void SpanOutWorldTri(DRV_TLVertex *verts)
 {
 	int			Top, Middle, Bottom, MiddleForCompare;
 	int			MiddleIsLeft, BottomForCompare, Height;
-	float		Y0=verts[0].y, Y1=verts[1].y, Y2=verts[2].y;
+	geFloat		Y0=verts[0].y, Y1=verts[1].y, Y2=verts[2].y;
 	EdgeAsmWorld	TopToBottom, TopToMiddle, MiddleToBottom;
 	EdgeAsmWorld	*pLeft, *pRight;
 
@@ -1036,7 +1036,7 @@ void SpanOutWorldTri3DNow(DRV_TLVertex *verts)
 {
 	int			Top, Middle, Bottom, MiddleForCompare;
 	int			MiddleIsLeft, BottomForCompare, Height;
-	float		Y0=verts[0].y, Y1=verts[1].y, Y2=verts[2].y;
+	geFloat		Y0=verts[0].y, Y1=verts[1].y, Y2=verts[2].y;
 	EdgeAsmWorld	TopToBottom, TopToMiddle, MiddleToBottom;
 	EdgeAsmWorld	*pLeft, *pRight;
 
@@ -1150,7 +1150,7 @@ void SpanOutWorldTriAlpha(DRV_TLVertex *verts)
 {
 	int			Top, Middle, Bottom, MiddleForCompare;
 	int			MiddleIsLeft, BottomForCompare, Height;
-	float		Y0=verts[0].y, Y1=verts[1].y, Y2=verts[2].y;
+	geFloat		Y0=verts[0].y, Y1=verts[1].y, Y2=verts[2].y;
 	EdgeAsmWorld	TopToBottom, TopToMiddle, MiddleToBottom;
 	EdgeAsmWorld	*pLeft, *pRight;
 
@@ -1293,7 +1293,7 @@ void SpanOutWorldTriAlpha3DNow(DRV_TLVertex *verts)
 {
 	int			Top, Middle, Bottom, MiddleForCompare;
 	int			MiddleIsLeft, BottomForCompare, Height;
-	float		Y0=verts[0].y, Y1=verts[1].y, Y2=verts[2].y;
+	geFloat		Y0=verts[0].y, Y1=verts[1].y, Y2=verts[2].y;
 	EdgeAsmWorld	TopToBottom, TopToMiddle, MiddleToBottom;
 	EdgeAsmWorld	*pLeft, *pRight;
 
@@ -1429,7 +1429,7 @@ BOOL DRIVERCC RenderWorldPoly(DRV_TLVertex *Pnts, S32 NumPoints, geRDriver_THand
 	//	Get the mip level
 	//
 	{
-		float	du, dv, dx, dy, MipScale;
+		geFloat	du, dv, dx, dy, MipScale;
 
 		du	=Pnts[1].u - Pnts[0].u;
 		dv	=Pnts[1].v - Pnts[0].v;
@@ -1829,7 +1829,7 @@ void StepFPU(EdgeAsmFPU *edge)
 void setup_edge(EdgeAsm *edge, DRV_TLVertex *verts, int top, int end)
 {
 	int		ey,ty;
-	float	yd;
+	geFloat	yd;
 
 	_asm
 	{
@@ -1889,8 +1889,8 @@ void setup_edge(EdgeAsm *edge, DRV_TLVertex *verts, int top, int end)
 	edge->v		=verts[top].v;
 	edge->vstep	=(verts[end].v-edge->v)*yd;
 
-	edge->z		=(1.0f / verts[top].z) * (float)ZBUFFER_PREC;
-	edge->zstep	=(((1.0f / verts[end].z) * (float)ZBUFFER_PREC)-edge->z)*yd;
+	edge->z		=(1.0f / verts[top].z) * (geFloat)ZBUFFER_PREC;
+	edge->zstep	=(((1.0f / verts[end].z) * (geFloat)ZBUFFER_PREC)-edge->z)*yd;
 
 	edge->r		=verts[top].r;
 	edge->rstep	=(verts[end].r-edge->r)*yd;
@@ -1905,7 +1905,7 @@ void setup_edge(EdgeAsm *edge, DRV_TLVertex *verts, int top, int end)
 void setup_edgeFPU(EdgeAsmFPU *edge, DRV_TLVertex *verts, int top, int end)
 {
 	int		ey,ty;
-	float	yd;
+	geFloat	yd;
 
 	_asm
 	{
@@ -1965,8 +1965,8 @@ void setup_edgeFPU(EdgeAsmFPU *edge, DRV_TLVertex *verts, int top, int end)
 	edge->v		=verts[top].v;
 	edge->vstep	=(verts[end].v-edge->v)*yd;
 
-	edge->z		=(1.0f / verts[top].z) * (float)ZBUFFER_PREC;
-	edge->zstep	=(((1.0f / verts[end].z) * (float)ZBUFFER_PREC)-edge->z)*yd;
+	edge->z		=(1.0f / verts[top].z) * (geFloat)ZBUFFER_PREC;
+	edge->zstep	=(((1.0f / verts[end].z) * (geFloat)ZBUFFER_PREC)-edge->z)*yd;
 
 	edge->r		=verts[top].r;
 	edge->rstep	=(verts[end].r-edge->r)*yd;
@@ -1989,7 +1989,7 @@ void TmapTriangle_32(DRV_TLVertex *verts)
 	int		MiddleIsLeft, BottomForCompare, Height;
 	EdgeAsm	TopToBottom, TopToMiddle, MiddleToBottom;
 	EdgeAsm	*pLeft, *pRight;
-	float	Y0=verts[0].y, Y1=verts[1].y, Y2=verts[2].y;
+	geFloat	Y0=verts[0].y, Y1=verts[1].y, Y2=verts[2].y;
 
 	// sort vertices in y
 	if(Y0 < Y1)
@@ -2210,7 +2210,7 @@ void TmapTriangle_16(DRV_TLVertex *verts)
 	int			MiddleIsLeft, BottomForCompare, Height;
 	EdgeAsmFPU	TopToBottom, TopToMiddle, MiddleToBottom;
 	EdgeAsmFPU	*pLeft, *pRight;
-	float		Y0=verts[0].y, Y1=verts[1].y, Y2=verts[2].y;
+	geFloat		Y0=verts[0].y, Y1=verts[1].y, Y2=verts[2].y;
 
 	// sort vertices in y
 	if(Y0 < Y1)
@@ -2403,8 +2403,8 @@ BOOL DRIVERCC RenderMiscTexturePoly(DRV_TLVertex *Pnts, S32 NumPoints, geRDriver
 		*((int *)(&WrapMask))		=GHMask<<16;
 		*(((int *)((&WrapMask)))+1)	=GWMask<<16;
 
-		*((float *)(&GBL))			=(float)GH;//Mask;
-		*(((float *)((&GBL)))+1)	=(float)GW;//Mask;
+		*((geFloat *)(&GBL))			=(geFloat)GH;//Mask;
+		*(((geFloat *)((&GBL)))+1)	=(geFloat)GW;//Mask;
 
 		//find log2 of the texture width
 		for(GW_log2=1;((1<<GW_log2) < GW); GW_log2++);
@@ -3400,8 +3400,8 @@ BOOL RenderInit(DRV_Window *Window)
 		return FALSE;
 	}
 	
-	#define Mul(a) (uint32)((1.0f/(float)(a))*65536*32768)
-	//#define Mul(a) ((uint32)((1.0f/(float)(a))*(1<<31)))
+	#define Mul(a) (uint32)((1.0f/(geFloat)(a))*65536*32768)
+	//#define Mul(a) ((uint32)((1.0f/(geFloat)(a))*(1<<31)))
 
 	return GE_TRUE;
 }

@@ -37,9 +37,9 @@ permission.  http://www.d6.com/users/checker
 typedef struct EdgeAsmFPUTag
 {
 	int		X, y, Height;
-	float	x, u, v, z, r, g, b;
-	float	xstep, ustep, vstep, zstep;
-	float	rstep, gstep, bstep;
+	geFloat	x, u, v, z, r, g, b;
+	geFloat	xstep, ustep, vstep, zstep;
+	geFloat	rstep, gstep, bstep;
 	uint32	R, G, B;
 } EdgeAsmFPU;
 

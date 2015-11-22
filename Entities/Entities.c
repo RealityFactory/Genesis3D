@@ -658,8 +658,11 @@ static geBoolean BuildClassTypes(geEntity_EntitySet *EntitySet)
 	// Fill in the pre-defined atomic types
 	Class = geEntity_ClassCreate(TYPE_INT, "int", sizeof(int32));
 	geEntity_EntitySetAddClass(EntitySet, Class);
-
-	Class = geEntity_ClassCreate(TYPE_FLOAT, "float", sizeof(float));
+//
+// For Reality Factory floating point data type in entities
+// is set to be geFloat, not float as in Gedit
+//
+	Class = geEntity_ClassCreate(TYPE_FLOAT, "geFloat", sizeof(geFloat));
 	geEntity_EntitySetAddClass(EntitySet, Class);
 
 	Class = geEntity_ClassCreate(TYPE_COLOR, "color", sizeof(GE_RGBA));
@@ -743,8 +746,14 @@ static geBoolean BuildClassTypes(geEntity_EntitySet *EntitySet)
 				continue;
 
 			assert(stricmp(Epair->Key, "%defaultvalue%"));
-
-			TypeClass = geEntity_EntitySetFindClassByName(EntitySet, Epair->Value);
+//
+// 18/11/00 Changed engine to accept float as well as geFloat
+//  in entity definition
+//
+			if(!stricmp(Epair->Value, "float"))
+				TypeClass = geEntity_EntitySetFindClassByName(EntitySet, "geFloat");
+			else
+				TypeClass = geEntity_EntitySetFindClassByName(EntitySet, Epair->Value);
 
 			if (!TypeClass)
 				goto ExitWithError;		// Type not defined for this field!!!
@@ -820,21 +829,21 @@ static geBoolean ParseClassUserData(geEntity_EntitySet *EntitySet, geEntity *Ent
 
 			case TYPE_FLOAT:
 				sscanf(Epair->Value, "%lf", &f);
-				*(float *)(UData + Field->Offset) = (float)f;
+				*(geFloat *)(UData + Field->Offset) = (geFloat)f;
 				break;
 
 			case TYPE_POINT:
 				sscanf(Epair->Value, "%lf %lf %lf", &X, &Y, &Z);
-				((geVec3d *)(UData + Field->Offset))->X = (float)X;
-				((geVec3d *)(UData + Field->Offset))->Y = (float)Y;
-				((geVec3d *)(UData + Field->Offset))->Z = (float)Z;
+				((geVec3d *)(UData + Field->Offset))->X = (geFloat)X;
+				((geVec3d *)(UData + Field->Offset))->Y = (geFloat)Y;
+				((geVec3d *)(UData + Field->Offset))->Z = (geFloat)Z;
 				break;
 
 			case TYPE_COLOR:
 				sscanf(Epair->Value, "%lf %lf %lf", &X, &Y, &Z);
-				((GE_RGBA *)(UData + Field->Offset))->r = (float)X;
-				((GE_RGBA *)(UData + Field->Offset))->g = (float)Y;
-				((GE_RGBA *)(UData + Field->Offset))->b = (float)Z;
+				((GE_RGBA *)(UData + Field->Offset))->r = (geFloat)X;
+				((GE_RGBA *)(UData + Field->Offset))->g = (geFloat)Y;
+				((GE_RGBA *)(UData + Field->Offset))->b = (geFloat)Z;
 				((GE_RGBA *)(UData + Field->Offset))->a = 0.0f;
 				break;
 

@@ -185,7 +185,7 @@ typedef geBoolean GE_CollisionCB(geWorld_Model *Model, geActor *Actor, void *Con
 typedef struct
 {
 	geVec3d	Normal;									// Orientation of plane
-	float	Dist;									// Distance from origin
+	geFloat	Dist;									// Distance from origin
 } GE_Plane;
 
 typedef struct
@@ -194,7 +194,7 @@ typedef struct
 	geMesh			*Mesh;							// Pointer to what mesh was hit (if any)
 	geActor			*Actor;							// Pointer to what actor was hit (if any)	
 	geVec3d			Impact;							// Impact Point
-	float			Ratio;							// Percent from 0 to 1.0, how far along the line for the impact point
+	geFloat			Ratio;							// Percent from 0 to 1.0, how far along the line for the impact point
 	GE_Plane		Plane;							// Impact Plane
 } GE_Collision;
 
@@ -267,6 +267,17 @@ GENESISAPI void			GENESISCC geEngine_RenderPoly(const geEngine *Engine, const GE
 GENESISAPI void			GENESISCC geEngine_RenderPolyArray(const geEngine *Engine, const GE_TLVertex ** pPoints, int * pNumPoints, int NumPolys, 
 								const geBitmap *Texture, uint32 Flags);
 
+GENESISAPI geBoolean GENESISCC geEngine_DrawAlphaBitmap(	
+		geEngine * Engine,
+		geBitmap * pBitmap,
+		geVec3d * VertUVArray,
+		geCamera * ClipCamera,	// if null, uses full screen
+		GE_Rect * PixelRect,		// pixels in the "camera" view
+		GE_Rect * PercentRect,	// percent of the "camera" view
+		geFloat   Alpha,
+		GE_RGBA * RGBA_Array
+		);
+
 GENESISAPI geBoolean	GENESISCC geEngine_DrawBitmap(const geEngine *Engine,const geBitmap *Bitmap,
 								const geRect * Source, uint32 x, uint32 y);
 							//DrawBitmap & RenderPoly : must Engine_AddBitmap first!
@@ -274,10 +285,10 @@ GENESISAPI geBoolean	GENESISCC geEngine_DrawBitmap(const geEngine *Engine,const 
 
 GENESISAPI void			geEngine_FillRect(geEngine *Engine, const GE_Rect *Rect, const GE_RGBA *Color);
 
-GENESISAPI geBoolean	geEngine_SetGamma(geEngine *Engine, float Gamma);
-GENESISAPI geBoolean	geEngine_GetGamma(geEngine *Engine, float *Gamma);
+GENESISAPI geBoolean	geEngine_SetGamma(geEngine *Engine, geFloat Gamma);
+GENESISAPI geBoolean	geEngine_GetGamma(geEngine *Engine, geFloat *Gamma);
 
-GENESISAPI geBoolean	geEngine_SetFogEnable(geEngine *Engine, geBoolean Enable, float r, float g, float b, float Start, float End);
+GENESISAPI geBoolean	geEngine_SetFogEnable(geEngine *Engine, geBoolean Enable, geFloat r, geFloat g, geFloat b, geFloat Start, geFloat End);
 						// enables/disables distance fogging.  (based on Enable)
 						//  r,g,b is the color of the fog
 						//  Start is how far out from the camera is not fogged - this is where the fog begins
@@ -352,6 +363,9 @@ GENESISAPI	void geSound3D_GetConfigIgnoreObstructions(
 		geFloat *Pan,
 		geFloat *Frequency);
 
+//	Added 11/08/1999 Ed Averill API call to return DSOUND object
+GENESISAPI void *geSound_GetDSound(void);
+//	End 11/08/1999 modification
 
 //================================================================================
 //  Path Support
@@ -394,6 +408,9 @@ GENESISAPI geBoolean		geWorld_OpenModel(geWorld *World, geWorld_Model *Model, ge
 GENESISAPI geBoolean		geWorld_GetModelRotationalCenter(const geWorld *World, const geWorld_Model *Model, geVec3d *Center);
 GENESISAPI geBoolean		geWorld_ModelGetBBox(const geWorld *World, const geWorld_Model *Model, geVec3d *Mins, geVec3d *Maxs);
 GENESISAPI geMotion *		geWorld_ModelGetMotion(geWorld_Model *Model);
+//	eaa3 07/28/2000
+
+GENESISAPI void geWorld_ModelGetCenter(geWorld_Model *Model, geVec3d *Center);
 
 GENESISAPI void			*geWorld_ModelGetUserData(const geWorld_Model *Model);
 GENESISAPI void			geWorld_ModelSetUserData(geWorld_Model *Model, void *UserData);
@@ -407,7 +424,7 @@ GENESISAPI geBoolean	geWorld_SetLightAttributes(	geWorld *World,
 										geLight		*Light, 
 										const		geVec3d *Pos, 
 										const		GE_RGBA *RGBA, 
-										float		Radius,
+										geFloat		Radius,
 										geBoolean	CastShadow);
 GENESISAPI geBoolean	geWorld_SetLTypeTable(geWorld *World, int32 LType, const char *Table);
 
@@ -418,9 +435,9 @@ GENESISAPI geBoolean	geWorld_RemoveFog(geWorld *World, geFog *Fog);
 GENESISAPI geBoolean geFog_SetAttributes(	geFog			*Fog, 
 											const geVec3d	*Pos, 
 											GE_RGBA			*Color,
-											float			LightBrightness, 
-											float			VolumeBrightness, 
-											float			VolumeRadius);
+											geFloat			LightBrightness, 
+											geFloat			VolumeBrightness, 
+											geFloat			VolumeRadius);
 
 // World Classes/Entities
 GENESISAPI geEntity_EntitySet *geWorld_GetEntitySet(geWorld *World, const char *ClassName);
@@ -461,14 +478,14 @@ GENESISAPI	gePoly *geWorld_AddPolyOnce(geWorld *World,
 										geBitmap *Bitmap,
 										gePoly_Type Type, 
 										uint32 RenderFlags,
-										float Scale);
+										geFloat Scale);
 GENESISAPI	gePoly *geWorld_AddPoly(geWorld *World, 
 									GE_LVertex *Verts, 
 									int32 NumVerts, 
 									geBitmap *Bitmap,
 									gePoly_Type Type,
 									uint32 RenderFlags,
-									float Scale);
+									geFloat Scale);
 
 GENESISAPI	void geWorld_RemovePoly(geWorld *World, gePoly *Poly);
 GENESISAPI	geBoolean gePoly_GetLVertex(gePoly *Poly, int32 Index, GE_LVertex *LVert);

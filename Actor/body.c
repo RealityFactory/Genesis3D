@@ -1055,8 +1055,8 @@ geBody *GENESISCC geBody_CreateFromFile(geVFile *pFile)
 	int i;
 
 	geVFile *VFile;
-	geVFile *SubFile;
-	geVFile *BitmapDirectory;	
+	geVFile *SubFile=NULL;
+	geVFile *BitmapDirectory=NULL;	
 	
 	assert( pFile != NULL );
 

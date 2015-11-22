@@ -52,10 +52,11 @@
 //=====================================================================================
 static char DriverFileNames[][200] = 
 {
-	{"GlideDrv.dll"},
 	{"D3DDrv.dll"},
+	{"GlideDrv.dll"},
 	{"SoftDrv.dll"},
 	{"SoftDrv2.dll"},
+	{"OglDrv.dll"},
 	{""}
 };
 
@@ -449,8 +450,8 @@ static geBoolean EnumSubDrivers(Sys_DriverInfo *DriverInfo, const char *DriverDi
 
 	for (i=0; DriverFileNames[i][0]!=0; i++)
 	{
-		if (!strcmp(DriverFileNames[i], "D3DDrv.dll") && GlideFound)
-			continue;			// Skip D3D if we found a glidedrv
+	//	if (!strcmp(DriverFileNames[i], "D3DDrv.dll") && GlideFound)
+	//		continue;			// Skip D3D if we found a glidedrv
 
 		Handle = geEngine_LoadLibrary(DriverFileNames[i], DriverDirectory);
 

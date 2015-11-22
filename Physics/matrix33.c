@@ -144,7 +144,7 @@ void Matrix33_Subtract(const Matrix33* m1, const Matrix33* m2, Matrix33* res)
 			res->x[i][j] = m1->x[i][j] - m2->x[i][j];
 }
 
-void Matrix33_MultiplyScalar(float s, const Matrix33* m, Matrix33* res)
+void Matrix33_MultiplyScalar(geFloat s, const Matrix33* m, Matrix33* res)
 {
 	int i, j;
 
@@ -171,7 +171,7 @@ void Matrix33_GetInverse(const Matrix33* m, Matrix33* inv)
 	{
 		if (copy.x[i][i] != 1.0f)
 		{
-			float divby = copy.x[i][i];
+			geFloat divby = copy.x[i][i];
 
 			assert(fabs(divby) >= 1e-5);
 			
@@ -187,7 +187,7 @@ void Matrix33_GetInverse(const Matrix33* m, Matrix33* inv)
 			{
 				if (copy.x[j][i] != 0.0f)
 				{
-					float mulby = copy.x[j][i];
+					geFloat mulby = copy.x[j][i];
 					for (k = 0; k < 3; k++)
 					{
 						copy.x[j][k] -= mulby * copy.x[i][k];

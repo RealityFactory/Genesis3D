@@ -37,18 +37,18 @@ extern "C" {
 //=====================================================================================
 //	Defines / Structure defines
 //=====================================================================================
-#define MAX_DYNAMIC_LIGHTS		32	// Maximum number of moving lights in map
-#define MAX_LTYPES				12	// Max number of ltypes
+#define MAX_DYNAMIC_LIGHTS		64	// Maximum number of moving lights in map
+#define MAX_LTYPES				24	// Max number of ltypes
 //#define	MAX_LMAP_SIZE			128
 //#define	MAX_LMAP_SIZE			18
-#define	MAX_LMAP_SIZE			18
+#define	MAX_LMAP_SIZE			36
 
 typedef struct
 {
 	geBoolean	Active;					// Is this light in use?
 	GE_RGBA		Color;					// Color of light (0...255.0f)
 	geVec3d		Pos;					// Position of this light
-	float		Radius;					// Intensity of this light (Radius)
+	geFloat		Radius;					// Intensity of this light (Radius)
 
 	// Fixed point color
 	uint32		FColorR;
@@ -72,6 +72,14 @@ typedef struct Light_LightInfo
 	int32			NumDynamicLights;
 } Light_LightInfo;
 
+typedef struct tag_light
+{
+	int light;
+   GE_RGBA color;
+   int style;
+   geVec3d origin;
+} light;
+
 //=====================================================================================
 //	Function ProtoTypes
 //=====================================================================================
@@ -89,7 +97,7 @@ geBoolean	 Light_SetupLights(geWorld *World);
 geBoolean	Light_SetAttributes(	Light_DLight *Light, 
 								const geVec3d *Pos, 
 								const GE_RGBA *RGBA, 
-								float Radius,
+								geFloat Radius,
 								geBoolean CastShadow);
 geBoolean	Light_WorldSetLTypeTable(geWorld *World, int32 LType, const char *Table);
 

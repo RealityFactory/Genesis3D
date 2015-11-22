@@ -126,17 +126,17 @@ GENESISAPI geBoolean GENESISCC geVec3d_Compare(const geVec3d *V1, const geVec3d 
 
 GENESISAPI geFloat GENESISCC geVec3d_Normalize(geVec3d *V1)
 {
-float *fPtr;
-float Dist,OneOverDist;
+geFloat *fPtr;
+geFloat Dist,OneOverDist;
 	
-	fPtr = (float *)V1;
+	fPtr = (geFloat *)V1;
 	Dist =  (*fPtr) * (*fPtr); fPtr++;
 	Dist += (*fPtr) * (*fPtr); fPtr++;
 	Dist += (*fPtr) * (*fPtr);
 
-	// Vtune shows the float <-> double conversions
+	// Vtune shows the geFloat <-> double conversions
 	// required for the clib sqrt() are taking a lot of time.
-	// hence we use asm to access the float fsqrt() directly
+	// hence we use asm to access the geFloat fsqrt() directly
 
 	__asm 
 	{
@@ -150,7 +150,7 @@ float Dist,OneOverDist;
 
 	OneOverDist = 1.0f/Dist;
 		
-	fPtr = (float *)V1;
+	fPtr = (geFloat *)V1;
 	*fPtr *= OneOverDist; fPtr++;
 	*fPtr *= OneOverDist; fPtr++;
 	*fPtr *= OneOverDist;

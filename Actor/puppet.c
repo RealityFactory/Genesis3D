@@ -62,6 +62,7 @@ typedef struct gePuppet_Material
 	geBoolean			 UseTexture;
 	geBitmap			*Bitmap;
 	const char			*TextureName;
+	const char			*MaterialName;
 	const char			*AlphaName;
 } gePuppet_Material;
 
@@ -77,7 +78,8 @@ typedef struct gePuppet
 	geVec3d				 FillLightNormal;
 	gePuppet_Color		 FillLightColor;			// 0..255
 	geBoolean			 UseFillLight;				// use fill light normal
-	
+	//Environment mapping...
+	geEnvironmentOptions	 internal_env;
 	gePuppet_Color		 AmbientLightIntensity;		// 0..1
 	geBoolean			 AmbientLightFromFloor;		// use local lighting from floor
 
@@ -88,8 +90,14 @@ typedef struct gePuppet
 	const geBitmap		*ShadowMap;
 	int					 ShadowBoneIndex;
 
+    // LWM_ACTOR_RENDERING:
+	geFloat				 OverallAlpha ;
+
 		#pragma message ("this goes away!: World")
 	geWorld				*World;
+	geBoolean			 AmbientLightFromStaticLights;	// use static lights from map   
+	geBoolean			 DoTestRayCollision;			//test static light in shadow   
+	int					 MaxStaticLightsToUse; 			//max number of light to use
 } gePuppet;
 
 typedef struct
@@ -108,6 +116,8 @@ typedef struct
 	gePuppet_Color  FillLightColor;
 	gePuppet_Color	Ambient;
 	geVec3d			SurfaceNormal;
+	gePuppet_Light StaticLights[MAX_DYNAMIC_LIGHTS];
+	int StaticLightCount;
 	gePuppet_Light	Lights[MAX_DYNAMIC_LIGHTS];
 	int				LightCount;
 	geBoolean		PerBoneLighting;
@@ -174,6 +184,7 @@ static geBoolean GENESISCC gePuppet_FetchTextures(gePuppet *P, const geBody *B)
 				return GE_FALSE;
 			}
 		}
+		M->MaterialName = Name;
 	}
 
 	return GE_TRUE;
@@ -284,6 +295,8 @@ gePuppet *GENESISCC gePuppet_Create(geVFile *TextureFS, const geBody *B, geWorld
 	P->FillLightColor.Green  = 0.25f;
 	P->FillLightColor.Blue   = 0.25f;
 	P->UseFillLight = GE_TRUE;
+	// LWM_ACTOR_RENDERING:
+	P->OverallAlpha = 255.0f ;
 
 	P->AmbientLightIntensity.Red   = 0.1f;
 	P->AmbientLightIntensity.Green = 0.1f;
@@ -296,7 +309,18 @@ gePuppet *GENESISCC gePuppet_Create(geVFile *TextureFS, const geBody *B, geWorld
 	P->TextureFileContext = TextureFS;
 
 	P->World = World;
-				
+	
+	P->AmbientLightFromStaticLights = GE_FALSE;	//BY DEFAULT DO NOTHING 
+	P->DoTestRayCollision = GE_FALSE; 
+	P->MaxStaticLightsToUse = PUPPET_DEFAULT_MAX_DYNAMIC_LIGHTS;
+ 
+	//Set default environment options
+	P->internal_env.PercentEnvironment = 0.0f;
+	P->internal_env.PercentPuppet = 1.0f;
+	P->internal_env.PercentMaterial = 1.0f;
+	P->internal_env.UseEnvironmentMapping = GE_FALSE;
+	P->internal_env.Supercede = GE_TRUE;
+
 	if (gePuppet_FetchTextures(P,B)==GE_FALSE)
 	{
 		geRam_Free(P);
@@ -365,6 +389,21 @@ void GENESISCC gePuppet_Destroy(gePuppet **P)
 		}	
 }
 
+void GENESISCC gePuppet_GetStaticLightingOptions(const gePuppet *P,	geBoolean *UseAmbientLightFromStaticLights,	geBoolean *TestRayCollision, int *MaxStaticLightsToUse	)
+{	assert( P != NULL);
+	assert( UseAmbientLightFromStaticLights );
+	assert( MaxStaticLightsToUse );
+	*UseAmbientLightFromStaticLights = P->AmbientLightFromStaticLights;
+	*TestRayCollision = P->DoTestRayCollision;
+	*MaxStaticLightsToUse = P->MaxStaticLightsToUse;
+}	
+
+void GENESISCC gePuppet_SetStaticLightingOptions(gePuppet *P, geBoolean UseAmbientLightFromStaticLights, geBoolean TestRayCollision, int MaxStaticLightsToUse	)
+{	assert( P!= NULL);
+	P->AmbientLightFromStaticLights = UseAmbientLightFromStaticLights;
+	P->DoTestRayCollision = TestRayCollision;
+	P->MaxStaticLightsToUse = MaxStaticLightsToUse;
+}	
 
 void GENESISCC gePuppet_GetLightingOptions(const gePuppet *P,
 	geBoolean *UseFillLight,
@@ -494,19 +533,16 @@ static int GENESISCC gePuppet_PrepLights(const gePuppet *P,
 		}
 
 	// sort dynamic lights by distance (squared)
-	for (i=0; i<cnt; i++)
-		for (j=0; j<cnt-1; j++)
-			{
-				if (LP[j].Distance > LP[j+1].Distance)
-					{
-						gePuppet_Light Swap = LP[j];
-						LP[j] = LP[j+1];
-						LP[j+1] = Swap;
-					}
-			}
-
-	if (cnt > P->MaxDynamicLightsToUse)
-		cnt = P->MaxDynamicLightsToUse;
+	for(i=0; i<P->MaxDynamicLightsToUse && i<cnt; i++) //rush out    when enough lights sorted
+     for(j=i+1; j<cnt; j++)
+     {
+       if (LP[i].Distance > LP[j].Distance)
+       {
+         gePuppet_Light Swap = LP[j];
+         LP[j] = LP[i];
+         LP[i] = Swap;
+       }
+     }
 
 	// go back and finish setting up closest lights
 	for (i=0; i<cnt; i++)
@@ -535,90 +571,169 @@ static int GENESISCC gePuppet_PrepLights(const gePuppet *P,
 	return cnt;			
 }
 	
-static void GENESISCC gePuppet_ComputeAmbientLight(
+static int  GENESISCC gePuppet_ComputeAmbientLight(
 		const gePuppet *P, 
 		const geWorld *World, 
 		gePuppet_Color *Ambient,
+		gePuppet_Light *LP, //Xing studios
 		const geVec3d *ReferencePoint)
 {
 	assert( P );
 	assert( World );
 	assert( Ambient );
-
+	
 	if (P->AmbientLightFromFloor != GE_FALSE)
+	{
+#define GE_PUPPET_MAX_AMBIENT (0.3f)
+		int32			Node, Plane, i;
+		geVec3d			Pos1, Pos2, Impact;
+		GFX_Node		*GFXNodes;
+		Surf_SurfInfo	*Surf;
+		GE_RGBA			RGBA;
+		//geBoolean		Col1, Col2;
+		
+		GFXNodes = World->CurrentBSP->BSPData.GFXNodes;
+		
+		Pos1 = *ReferencePoint;
+		
+		Pos2 = Pos1;
+		
+		Pos2.Y -= 30000.0f;
+		
+		if(!Trace_WorldCollisionExact2((geWorld*)World, &Pos1, &Pos1, &Impact,    &Node, &Plane, NULL))		//just save one test	//xing studios
 		{
-			#define GE_PUPPET_MAX_AMBIENT (0.3f)
-			int32			Node, Plane, i;
-			geVec3d			Pos1, Pos2, Impact;
-			GFX_Node		*GFXNodes;
-			Surf_SurfInfo	*Surf;
-			GE_RGBA			RGBA;
-			geBoolean		Col1, Col2;
-			
-			GFXNodes = World->CurrentBSP->BSPData.GFXNodes;
-			
-			Pos1 = *ReferencePoint;
-			
-			Pos2 = Pos1;
-
-			Pos2.Y -= 30000.0f;
-
-			// Get shadow hit plane impact point
-			Col1 = Trace_WorldCollisionExact2((geWorld*)World, &Pos1, &Pos1, &Impact, &Node, &Plane, NULL);
-			Col2 = Trace_WorldCollisionExact2((geWorld*)World, &Pos1, &Pos2, &Impact, &Node, &Plane, NULL);
-
-			// Now find the color of the mesh by getting the lightmap point he is standing on...
-			if (!Col1 && Col2)
+			// Now find the color of the mesh by getting the lightmap point he is standing    on...
+			if (Trace_WorldCollisionExact2((geWorld*)World, &Pos1, &Pos2, &Impact,    &Node, &Plane, NULL))
+			{
+				Surf = &(World)->CurrentBSP->SurfInfo[GFXNodes[Node].FirstFace];
+				if (Surf->LInfo.Face<0)
+				{ // FIXME? surface has no light...
+					Ambient->Red = Ambient->Green = Ambient->Blue = 0.0f;
+				}
+				else 
 				{
-					Surf = &(World)->CurrentBSP->SurfInfo[GFXNodes[Node].FirstFace];
-					if (Surf->LInfo.Face<0)
-						{	// FIXME?  surface has no light...
-							Ambient->Red = Ambient->Green = Ambient->Blue = 0.0f;
-							return;
-						}
-
 					for (i=0; i< GFXNodes[Node].NumFaces; i++)
+					{
+						if (Surf_InSurfBoundingBox(Surf, &Impact, 20.0f))
 						{
-							if (Surf_InSurfBoundingBox(Surf, &Impact, 20.0f))
+							Light_SetupLightmap(&Surf->LInfo, NULL); 
+							
+							if (Light_GetLightmapRGB(Surf, &Impact, &RGBA))
+							{
+								geFloat Scale = 1.0f / 255.0f;
+								Ambient->Red = RGBA.r * Scale;
+								Ambient->Green = RGBA.g * Scale;
+								Ambient->Blue = RGBA.b * Scale;
+								if (Ambient->Red > GE_PUPPET_MAX_AMBIENT) 
 								{
-									Light_SetupLightmap(&Surf->LInfo, NULL);			
-
-									if (Light_GetLightmapRGB(Surf, &Impact, &RGBA))
-										{
-											geFloat Scale = 1.0f / 255.0f;
-											Ambient->Red   = RGBA.r * Scale;
-											Ambient->Green = RGBA.g * Scale;
-											Ambient->Blue  = RGBA.b * Scale;
-											if (Ambient->Red > GE_PUPPET_MAX_AMBIENT) 
-												{
-													Ambient->Red = GE_PUPPET_MAX_AMBIENT;
-												}
-											if (Ambient->Green > GE_PUPPET_MAX_AMBIENT) 
-												{
-													Ambient->Green = GE_PUPPET_MAX_AMBIENT;
-												}
-											if (Ambient->Blue > GE_PUPPET_MAX_AMBIENT) 
-												{
-													Ambient->Blue = GE_PUPPET_MAX_AMBIENT;
-												}
-											break;
-										}
+									Ambient->Red = GE_PUPPET_MAX_AMBIENT;
 								}
-							Surf++;
+								if (Ambient->Green > GE_PUPPET_MAX_AMBIENT) 
+								{
+									Ambient->Green = GE_PUPPET_MAX_AMBIENT;
+								}
+								if (Ambient->Blue > GE_PUPPET_MAX_AMBIENT) 
+								{
+									Ambient->Blue = GE_PUPPET_MAX_AMBIENT;
+								}
+								break;
+							}
 						}
+						Surf++;
+					}
 				}
-			else
-				{
-					*Ambient = P->AmbientLightIntensity;
-				}
+			}
 		}
-	else
+	}
+	
+	if(P->AmbientLightFromStaticLights != GE_FALSE) 
+	{
+		int i,j,cnt;
+		geEntity_EntitySet * entitySet = NULL;
+		geEntity * entity = NULL;
+		light * aLight;
+		entitySet = geWorld_GetEntitySet(World, "light");
+		if (entitySet != NULL)
+			entity = geEntity_EntitySetGetNextEntity(entitySet, entity);
+		
+		//loop through all static lights and select the ones that touch the actor, with    a max limit of MAX_DYNAMIC_LIGHTS
+		for (i=0,cnt=0; entity != NULL && cnt<MAX_DYNAMIC_LIGHTS; i++)
 		{
-			*Ambient = P->AmbientLightIntensity;
+			geVec3d *Position;
+			geVec3d Normal;
+			geBoolean keepLight = GE_TRUE;
+			aLight = (light*)geEntity_GetUserData(entity);
+			Position = &(aLight->origin);
+			geVec3d_Subtract(Position,ReferencePoint,&Normal);
+			LP[cnt].Distance = Normal.X * Normal.X    + 
+				Normal.Y * Normal.Y +
+				Normal.Z * Normal.Z;
+			if (LP[cnt].Distance < aLight->light * aLight->light)
+			{
+				if (P->DoTestRayCollision == GE_TRUE)
+				{
+					if (!Trace_WorldCollisionExact2((geWorld*)World, ReferencePoint, Position, NULL,    NULL, NULL, NULL))
+					{
+						LP[cnt].Color.Red = aLight->color.r;
+						LP[cnt].Color.Green = aLight->color.g;
+						LP[cnt].Color.Blue = aLight->color.b;
+						LP[cnt].Radius = (float)aLight->light;
+						LP[cnt].Normal = Normal;
+						cnt++;
+					}
+				}
+				else 
+				{
+					LP[cnt].Color.Red = aLight->color.r;
+					LP[cnt].Color.Green = aLight->color.g;
+					LP[cnt].Color.Blue = aLight->color.b;
+					LP[cnt].Radius = (float)aLight->light;
+					LP[cnt].Normal = Normal;
+					cnt++;
+				}
+			}
+			entity = geEntity_EntitySetGetNextEntity(entitySet,    entity);
 		}
+		// sort static lights by distance    (squared)
+		// for(i=0; i<cnt; i++)
+		for(i=0; i<P->MaxDynamicLightsToUse && i<cnt; i++) //rush out    when enough lights sorted
+			for(j=i+1; j<cnt; j++)
+			{
+				if (LP[i].Distance > LP[j].Distance)
+				{
+					gePuppet_Light Swap = LP[j];
+					LP[j] = LP[i];
+					LP[i] = Swap;
+				}
+			}
+			// go back and finish setting up    closest lights
+			for (i=0; i<cnt; i++)
+			{
+				geFloat Distance = (geFloat)sqrt(LP[i].Distance);
+				geFloat OneOverDistance;
+				geFloat Scale;
+				if (Distance < 1.0f)
+					Distance = 1.0f;
+				OneOverDistance = 1.0f / Distance;
+				LP[i].Normal.X *= OneOverDistance;
+				LP[i].Normal.Y *= OneOverDistance;
+				LP[i].Normal.Z *= OneOverDistance;
+				LP[i].Distance = Distance;
+				Scale = 1.0f - Distance / LP[i].Radius    ;
+				Scale *= (1.0f/255.0f);
+				LP[i].Color.Red *= Scale;
+				LP[i].Color.Green *= Scale;
+				LP[i].Color.Blue *= Scale;
+			}
+			return cnt;
+	} 
+	//if ambient light is static
+	if (P->AmbientLightFromFloor == GE_FALSE && P->AmbientLightFromStaticLights    == GE_FALSE)
+	{
+		*Ambient = P->AmbientLightIntensity;
+	}
+	return 0;
 }
-
-
 
 static void GENESISCC gePuppet_SetVertexColor(
 	GE_LVertex *v,int BoneIndex)
@@ -655,7 +770,7 @@ static void GENESISCC gePuppet_SetVertexColor(
 			for (l=0; l<L->LightCount; l++)
 				{
 					geVec3d *LightNormal;
-					float Intensity;
+					geFloat Intensity;
 				
 					LightNormal = &(L->Lights[l].Normal);
 
@@ -675,7 +790,7 @@ static void GENESISCC gePuppet_SetVertexColor(
 			for (l=0; l<gePuppet_StaticLightGrp.LightCount; l++)
 				{
 					geVec3d *LightNormal;
-					float Intensity;
+					geFloat Intensity;
 				
 					LightNormal = &(gePuppet_StaticLightGrp.Lights[l].Normal);
 
@@ -690,7 +805,23 @@ static void GENESISCC gePuppet_SetVertexColor(
 						}
 				}
 		}
-
+	for (l=0; l<gePuppet_StaticLightGrp.StaticLightCount; l++)
+	{
+		geVec3d *LightNormal;
+		float Intensity;
+		
+		LightNormal = &(gePuppet_StaticLightGrp.StaticLights[l].Normal);
+		Intensity= LightNormal->X * gePuppet_StaticLightGrp.SurfaceNormal.X + 
+			LightNormal->Y * gePuppet_StaticLightGrp.SurfaceNormal.Y + 
+			LightNormal->Z * gePuppet_StaticLightGrp.SurfaceNormal.Z;
+		if (Intensity > 0.0f)
+		{
+			RedIntensity += Intensity * gePuppet_StaticLightGrp.StaticLights[l].Color.Red;
+			GreenIntensity += Intensity * gePuppet_StaticLightGrp.StaticLights[l].Color.Green;
+			BlueIntensity += Intensity * gePuppet_StaticLightGrp.StaticLights[l].Color.Blue;
+		}
+	}
+	
 	Color = gePuppet_StaticLightGrp.MaterialColor.Red * RedIntensity;
 	if (Color > 255.0f)
 		Color = 255.0f;
@@ -740,14 +871,8 @@ static void GENESISCC gePuppet_DrawShadow(const gePuppet *P,
 	
 	{
 		geVec3d			Pos1, Pos2;
-		GFX_Node		*GFXNodes;
-		geWorld_Model	*Model;
-		Mesh_RenderQ	*Mesh;
-		geActor         *Actor;
+		GE_Collision	Collision;
 
-			
-		GFXNodes = (World)->CurrentBSP->BSPData.GFXNodes;
-		
 		Pos1 = RootTransform.Translation;
 			
 		Pos2 = Pos1;
@@ -755,9 +880,22 @@ static void GENESISCC gePuppet_DrawShadow(const gePuppet *P,
 		Pos2.Y -= 30000.0f;
 
 		// Get shadow hit plane impact point
-		GoodImpact = Trace_WorldCollisionExact(World, 
-									&Pos1,&Pos2,GE_COLLIDE_MODELS,&Impact,&Plane,&Model,&Mesh,&Actor,0, NULL, NULL);
+		GoodImpact = Trace_GEWorldCollision(World,
+		 		NULL,
+		 		NULL,
+				&Pos1,  
+				&Pos2, 
+				GE_CONTENTS_SOLID_CLIP,  
+				GE_COLLIDE_MODELS,
+				0,
+				NULL,
+				NULL,
+				&Collision);
 
+   		if(GoodImpact) 
+	   		Impact = Collision.Impact;
+   		else
+	   		return;
 	}
 
 	Impact.Y += 1.0f;
@@ -920,7 +1058,7 @@ static void GENESISCC gePuppet_DrawShadow(const gePuppet *P,
 				assert( Command == GE_BODY_FACE_TRIANGLE );
 
 				{
-					float AX,AY,BXMinusAX,BYMinusAY,CYMinusAY,CXMinusAX;
+					geFloat AX,AY,BXMinusAX,BYMinusAY,CYMinusAY,CXMinusAX;
 					geBodyInst_Index *List2;
 					
 					List2 = List;
@@ -961,10 +1099,36 @@ static void GENESISCC gePuppet_DrawShadow(const gePuppet *P,
 
 						v[j].X = SV->SVPoint.X;
 						v[j].Y = SV->SVPoint.Y;
-
+						
 						v[j].Z = SV->SVPoint.Z;
-						v[j].u = SV->SVU;
-						v[j].v = SV->SVV;
+						//Environment mapping code
+						if( P->internal_env.UseEnvironmentMapping )
+						{
+							v[j].u = ( SV->SVU * P->internal_env.PercentPuppet );
+							v[j].v = ( SV->SVV * P->internal_env.PercentPuppet );
+							
+							if( P->internal_env.Supercede && PM->MaterialName[0] == 'g' )
+							{
+								v[j].u += ( (G->NormalArray[ *List ]).X * P->internal_env.PercentMaterial);
+								v[j].v += ( (G->NormalArray[ *List ]).Y * P->internal_env.PercentMaterial);
+							}
+							else
+							{
+								v[j].u += ( (G->NormalArray[ *List ]).X * P->internal_env.PercentEnvironment);
+								v[j].v += ( (G->NormalArray[ *List ]).Y * P->internal_env.PercentEnvironment);
+							}
+						}
+						else
+						{
+							v[j].u = SV->SVU;
+							v[j].v = SV->SVV;
+							
+							if( P->internal_env.Supercede && PM->MaterialName[0] == 'g' )
+							{
+								v[j].u += ( (G->NormalArray[ *List ]).X * P->internal_env.PercentMaterial);
+								v[j].v += ( (G->NormalArray[ *List ]).Y * P->internal_env.PercentMaterial);
+							}
+						}
 						
 						List++;
 						v[j].a = (255.0f- (SV->SVU * SOME_SCALE));
@@ -980,8 +1144,46 @@ static void GENESISCC gePuppet_DrawShadow(const gePuppet *P,
 #endif
 }
 
+//Environment mapping code...
+void GENESISCC gePuppet_SetEnvironmentOptions( gePuppet *P, geEnvironmentOptions *envop )
+{
+	assert ( P );
+	assert ( (envop->UseEnvironmentMapping == GE_TRUE) || (envop->UseEnvironmentMapping == GE_FALSE ) );
+	assert ( (envop->Supercede == GE_TRUE) || (envop->Supercede == GE_FALSE) );
+	assert ( (envop->PercentEnvironment >= 0.0f) && (envop->PercentEnvironment <= 1.0f) );
+	assert ( (envop->PercentMaterial >= 0.0f) && (envop->PercentMaterial <= 1.0f) );
+	assert ( (envop->PercentPuppet >= 0.0f) && (envop->PercentPuppet <= 1.0f) );
+
+	P->internal_env.UseEnvironmentMapping = envop->UseEnvironmentMapping;
+	P->internal_env.Supercede = envop->Supercede;
+	P->internal_env.PercentEnvironment = envop->PercentEnvironment;
+	P->internal_env.PercentMaterial = envop->PercentEnvironment;
+	P->internal_env.PercentPuppet = envop->PercentPuppet;
+}
+
+geEnvironmentOptions GENESISCC gePuppet_GetEnvironmentOptions( gePuppet *P )
+{
+	assert ( P );
+	return P->internal_env;
+}
+
 int32		NumClips;
 
+// LWM_ACTOR_RENDERING
+geFloat GENESISCC gePuppet_GetAlpha( const gePuppet *P )
+{
+	assert( P ) ;
+	return P->OverallAlpha ;
+}
+
+// LWM_ACTOR_RENDERING
+void GENESISCC gePuppet_SetAlpha( gePuppet *P, geFloat Alpha )
+{
+	assert( P ) ;
+	P->OverallAlpha = Alpha ;
+}
+
+// LWM_ACTOR_RENDERING
 geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P, 
 						const gePose *Joints, 
 						const geExtBox *Box, 
@@ -1070,6 +1272,8 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 
 		gePose_GetJointTransform(Joints,P->LightReferenceBoneIndex,&(RootTransform));
 
+		// LWM_OPTIMIZATION: It seems that if you know that there are 
+		// no dynamic lights anywhere you could skip this test easily
 		if (P->MaxDynamicLightsToUse > 0)
 		{
 			if (P->PerBoneLighting)
@@ -1109,8 +1313,13 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 			gePuppet_StaticLightGrp.LightCount = 0;
 		}
 
-		gePuppet_ComputeAmbientLight(P,World,&(gePuppet_StaticLightGrp.Ambient),&(RootTransform.Translation));
-		NumFaces	= G->FaceCount;
+		//XING Studios code
+		gePuppet_StaticLightGrp.StaticLightCount = gePuppet_ComputeAmbientLight(P,
+																			   World,
+																			   &(gePuppet_StaticLightGrp.Ambient),
+																			   gePuppet_StaticLightGrp.StaticLights,
+																			   &(RootTransform.Translation));
+	 	NumFaces	= G->FaceCount;
 		List		= G->FaceList;
 		
 		// For each face, clip it to the view frustum supplied...
@@ -1128,7 +1337,7 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 			GFX_Plane			*FPlanes;
 			geBodyInst_Index		Command, Material;
 			gePuppet_Material	*PM;
-			float				Dist;
+			geFloat				Dist;
 
 			Command	= *List;
 			List++;
@@ -1158,7 +1367,7 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 
 				*pVerts = SVert->SVPoint;
 
-				assert( ((float)fabs(1.0-geVec3d_Length( &(G->NormalArray[ *List ] ))))< 0.001f );
+				assert( ((geFloat)fabs(1.0-geVec3d_Length( &(G->NormalArray[ *List ] ))))< 0.001f );
 						
 				gePuppet_StaticLightGrp.SurfaceNormal = (G->NormalArray[ *List ]);
 						
@@ -1169,8 +1378,34 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 				pTexVerts->r = lvert.r;
 				pTexVerts->g = lvert.g;
 				pTexVerts->b = lvert.b;
-				pTexVerts->u = SVert->SVU;
-				pTexVerts->v = SVert->SVV;
+				//Environment mapping code...
+				if( P->internal_env.UseEnvironmentMapping )
+				{
+					pTexVerts->u = ( SVert->SVU * P->internal_env.PercentPuppet );
+					pTexVerts->v = ( SVert->SVV * P->internal_env.PercentPuppet );
+					
+					if( P->internal_env.Supercede && PM->MaterialName[0] == 'g' )
+					{
+						pTexVerts->u += ( (G->NormalArray[ *List ]).X * P->internal_env.PercentMaterial);
+						pTexVerts->v += ( (G->NormalArray[ *List ]).Y * P->internal_env.PercentMaterial);
+					}
+					else
+					{
+						pTexVerts->u += ( (G->NormalArray[ *List ]).X * P->internal_env.PercentEnvironment);
+						pTexVerts->v += ( (G->NormalArray[ *List ]).Y * P->internal_env.PercentEnvironment);
+					}
+				}
+				else
+				{
+					pTexVerts->u = SVert->SVU;
+					pTexVerts->v = SVert->SVV;
+					
+					if( P->internal_env.Supercede && PM->MaterialName[0] == 'g' )
+					{
+						pTexVerts->u += ( (G->NormalArray[ *List ]).X * P->internal_env.PercentMaterial);
+						pTexVerts->v += ( (G->NormalArray[ *List ]).Y * P->internal_env.PercentMaterial);
+					}
+				}
 			}
 
 			geVec3d_Subtract(&Verts[2], &Verts[1], &v1);
@@ -1236,7 +1471,12 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 			// Project the face, and combine tex coords into one structure (Clipped1)
 			Frustum_ProjectRGBA(pDest2, pTex1, (DRV_TLVertex*)ScreenPts, Length1, Camera);
 
+			// LWM_ACTOR_RENDERING
+			#if 1
+			ScreenPts[0].a = P->OverallAlpha ;
+			#else
 			ScreenPts[0].a = 255.0f;
+			#endif
 
 			geEngine_RenderPoly(Engine, (GE_TLVertex*)ScreenPts, Length1, PM->Bitmap, 0 );
 		}
@@ -1251,7 +1491,6 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 	*/
 	return GE_TRUE;
 }
-
 
 #ifdef PROFILE
 #define PUPPET_AVERAGE_ACROSS 60
@@ -1301,14 +1540,13 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 		// see if the test box is visible on the screen.  If not: don't draw actor.
 		// (transform and project it to the screen, then check extents of that projection
 		//  against the clipping rect)
-		geVec3d				BoxCorners[8];
-		const geXForm3d		*ObjectToCamera;
-		geVec3d				Maxs,Mins;
-		int					i;
-		geBoolean			ZFarEnable;
-		geFloat				ZFar;
-
+		geVec3d BoxCorners[8];
+		const geXForm3d *ObjectToCamera;
+		geVec3d Maxs,Mins;
 		#define BIG_NUMBER (99e9f)  
+		int i;
+		geBoolean ZFarEnable;
+		geFloat ZFar;
 
 		BoxCorners[0] = TestBox->Min;
 		BoxCorners[1] = BoxCorners[0];  BoxCorners[1].X = TestBox->Max.X;
@@ -1325,36 +1563,46 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 		geVec3d_Set(&Maxs,-BIG_NUMBER,-BIG_NUMBER,-BIG_NUMBER);
 		geVec3d_Set(&Mins, BIG_NUMBER, BIG_NUMBER, BIG_NUMBER);
 		for (i=0; i<8; i++)
-			{
-				geVec3d V;
-				geXForm3d_Transform(  ObjectToCamera,&(BoxCorners[i]),&(BoxCorners[i]));
-				geCamera_Project(  Camera,&(BoxCorners[i]),&V);
-				if (V.X > Maxs.X ) Maxs.X = V.X;
-				if (V.X < Mins.X ) Mins.X = V.X;
-				if (V.Y > Maxs.Y ) Maxs.Y = V.Y;
-				if (V.Y < Mins.Y ) Mins.Y = V.Y;
-				if (V.Z > Maxs.Z ) Maxs.Z = V.Z;
-				if (V.Z < Mins.Z ) Mins.Z = V.Z;
-			}
-
-		if (   (Maxs.X < ClippingRect.Left) 
-			|| (Mins.X > ClippingRect.Right)
-			|| (Maxs.Y < ClippingRect.Top) 
-			|| (Mins.Y > ClippingRect.Bottom)
-			|| (Maxs.Z < BACK_EDGE))
+		{
+			geVec3d V;
+			geXForm3d_Transform(  ObjectToCamera,&(BoxCorners[i]),&(BoxCorners[i]));
+			geCamera_Project(  Camera,&(BoxCorners[i]),&V);
+			if (V.X > Maxs.X ) Maxs.X = V.X;
+			if (V.X < Mins.X ) Mins.X = V.X;
+			if (V.Y > Maxs.Y ) Maxs.Y = V.Y;
+			if (V.Y < Mins.Y ) Mins.Y = V.Y;
+			if (V.Z > Maxs.Z ) Maxs.Z = V.Z;
+			if (V.Z < Mins.Z ) Mins.Z = V.Z;
+		}
+		
+		// Reject against ZFar clipplane if enabled...
+		geCamera_GetFarClipPlane(Camera, &ZFarEnable, &ZFar);
+		if (ZFarEnable) 
+		{
+			if ( (Maxs.X < ClippingRect.Left) 
+				|| (Mins.X > ClippingRect.Right)
+				|| (Maxs.Z < BACK_EDGE) 				//Test X and Z first, and Y
+				|| (Mins.Z > ZFar)
+				|| (Maxs.Y < ClippingRect.Top) 
+				|| (Mins.Y > ClippingRect.Bottom))
 			{
 				// not gonna draw: box is not visible.
 				return GE_TRUE;
 			}
-
-			// Reject against ZFar clipplane if enabled...
-			geCamera_GetFarClipPlane(Camera, &ZFarEnable, &ZFar);
-
-			if (ZFarEnable)
+			
+		} else 
+		{
+			if ( (Maxs.X < ClippingRect.Left) 
+				|| (Mins.X > ClippingRect.Right)
+				|| (Maxs.Y < ClippingRect.Top) 
+				|| (Mins.Y > ClippingRect.Bottom)
+				|| (Maxs.Z < BACK_EDGE))
 			{
-				if (Mins.Z > ZFar)
-					return GE_TRUE;				// Beyond ZFar ClipPlane
+				// not gonna draw: box is not visible.
+				return GE_TRUE;
 			}
+		}
+ 
 	}
 
 	Engine->DebugInfo.NumActors++;
@@ -1392,9 +1640,9 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 	{
 		if (   (G->Maxs.X < ClippingRect.Left) 
 			|| (G->Mins.X > ClippingRect.Right)
+			|| ( TEST_Z_OUT( G->Maxs.Z, BACK_EDGE) )		//test Y last
 			|| (G->Maxs.Y < ClippingRect.Top) 
-			|| (G->Mins.Y > ClippingRect.Bottom)
-			|| ( TEST_Z_OUT( G->Maxs.Z, BACK_EDGE) ) )
+			|| (G->Mins.Y > ClippingRect.Bottom) )
 			{
 				// not gonna draw
 				return GE_TRUE;
@@ -1412,7 +1660,7 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 		else
 			{
 				Clipping = GE_TRUE;
-			}
+			} 
 	}
 
 	{
@@ -1473,11 +1721,20 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 			gePuppet_StaticLightGrp.LightCount = 0;
 		}
 
-		gePuppet_ComputeAmbientLight(P,World,&(gePuppet_StaticLightGrp.Ambient),&(RootTransform.Translation));
 		
-		Count = G->FaceCount;
+   //XING Studios code
+		gePuppet_StaticLightGrp.StaticLightCount = gePuppet_ComputeAmbientLight(P,
+																			   World,
+																			   &(gePuppet_StaticLightGrp.Ambient),
+																			   gePuppet_StaticLightGrp.StaticLights ,
+																			   &(RootTransform.Translation));
+   		Count = G->FaceCount;
 		List  = G->FaceList;
+		#if 1
+		v[0].a = v[1].a= v[2].a = P->OverallAlpha ;
+		#else
 		v[0].a = v[1].a= v[2].a = 255.0f;
+		#endif
 
 		LastMaterial = -1;
 
@@ -1494,7 +1751,7 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 			assert( Material<P->MaterialCount);
 
 			{
-				float AX,AY,BXMinusAX,BYMinusAY,CYMinusAY,CXMinusAX;
+				geFloat AX,AY,BXMinusAX,BYMinusAY,CYMinusAY,CXMinusAX;
 				geBodyInst_Index *List2;
 				
 				List2 = List;
@@ -1546,7 +1803,7 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 				v[j].u = SV->SVU;
 				v[j].v = SV->SVV;
 				
-				assert( ((float)fabs(1.0-geVec3d_Length( &(G->NormalArray[ *List ] ))))< 0.001f );
+//				assert( ((geFloat)fabs(1.0-geVec3d_Length( &(G->NormalArray[ *List ] ))))< 0.001f );
 				
 				gePuppet_StaticLightGrp.SurfaceNormal = (G->NormalArray[ *List ]);
 				List++;

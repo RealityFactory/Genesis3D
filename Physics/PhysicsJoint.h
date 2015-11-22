@@ -41,7 +41,7 @@ typedef struct gePhysicsJoint gePhysicsJoint;
 
 //gePhysicsJoint* gePhysicsJoint_Create(ItemJoint* pItemJoint);
 GENESISAPI gePhysicsJoint * GENESISCC gePhysicsJoint_Create(gePhysicsJoint_Kind Kind, const geVec3d *Location, 
-	float assemblyRate, gePhysicsObject *PS1, gePhysicsObject *PS2, float physicsScale);
+	geFloat assemblyRate, gePhysicsObject *PS1, gePhysicsObject *PS2, geFloat physicsScale);
 GENESISAPI geBoolean GENESISCC gePhysicsJoint_Destroy(gePhysicsJoint** ppPhysjnt);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -58,8 +58,8 @@ GENESISAPI void GENESISCC gePhysicsJoint_SetLocationAInWorldSpace(gePhysicsJoint
 GENESISAPI void GENESISCC gePhysicsJoint_SetLocationBInWorldSpace(gePhysicsJoint* pPhysjnt, const geVec3d* pLoc);
 GENESISAPI gePhysicsObject* GENESISCC gePhysicsJoint_GetObject1(const gePhysicsJoint* pPhysjnt);
 GENESISAPI gePhysicsObject* GENESISCC gePhysicsJoint_GetObject2(const gePhysicsJoint* pPhysjnt);
-GENESISAPI float GENESISCC gePhysicsJoint_GetAssemblyRate(const gePhysicsJoint* pPhysjnt);
-GENESISAPI void GENESISCC gePhysicsJoint_SetAssemblyRate(gePhysicsJoint* pPhysjnt, float assemblyRate);
+GENESISAPI geFloat GENESISCC gePhysicsJoint_GetAssemblyRate(const gePhysicsJoint* pPhysjnt);
+GENESISAPI void GENESISCC gePhysicsJoint_SetAssemblyRate(gePhysicsJoint* pPhysjnt, geFloat assemblyRate);
 
 #ifdef __cplusplus
 }

@@ -364,13 +364,13 @@ geBoolean DRIVERCC SoftDrv_Shutdown(void)
 	return	TRUE;
 }
 
-geBoolean DRIVERCC SoftDrv_SetGamma(float Gamma)
+geBoolean DRIVERCC SoftDrv_SetGamma(geFloat Gamma)
 {
 	Gamma;
 	return TRUE;
 }
 
-geBoolean DRIVERCC SoftDrv_GetGamma(float *Gamma)
+geBoolean DRIVERCC SoftDrv_GetGamma(geFloat *Gamma)
 {
 	assert(Gamma);
 
@@ -631,11 +631,11 @@ geROP SoftDrv_MiscFlagsToRop[16][2] =
 
 static int SoftDrv_ComputeMipLevel(
 	const DRV_TLVertex 	*Pnts,	
-	float ScaleU,float ScaleV,
+	geFloat ScaleU,geFloat ScaleV,
 	int MipCount,
 	int NumPoints)
 {
-	float	du, dv, dx, dy, MipScale;
+	geFloat	du, dv, dx, dy, MipScale;
 	int MipLevel;
 	int i;
 
@@ -643,7 +643,7 @@ static int SoftDrv_ComputeMipLevel(
 	MipScale= 999999.999f;
 	for (i=0; i<NumPoints; i++)
 	{
-		float MipScaleT;
+		geFloat MipScaleT;
 		int Nexti=  (i+1)%NumPoints;
 		du	=Pnts[Nexti].u - Pnts[i].u;
 		dv	=Pnts[Nexti].v - Pnts[i].v;
@@ -764,19 +764,19 @@ void SoftDrv_LightMapSetupCallback(TRaster_Lightmap *LM)
 	#pragma message ("SetupLightmap callback: can it fail?")
 
 	{
-		float MipScale;
-		float ShiftU,ShiftV;
-		float ScaleU,ScaleV;
-		float LightMapShiftU,LightMapShiftV;
+		geFloat MipScale;
+		geFloat ShiftU,ShiftV;
+		geFloat ScaleU,ScaleV;
+		geFloat LightMapShiftU,LightMapShiftV;
 	
 		ShiftU = SoftDrv_TempTexInfo->ShiftU;
 		ShiftV = SoftDrv_TempTexInfo->ShiftV;
-		MipScale = (float)( 1<<LM->MipIndex);
+		MipScale = (geFloat)( 1<<LM->MipIndex);
 		ScaleU = (1.0f/SoftDrv_TempTexInfo->DrawScaleU);
 		ScaleV = (1.0f/SoftDrv_TempTexInfo->DrawScaleV);
 		
-		LightMapShiftU = ((float)(SoftDrv_TempLInfo->MinU));// - 8.0f?;
-		LightMapShiftV = ((float)(SoftDrv_TempLInfo->MinV));// - 8.0f?;
+		LightMapShiftU = ((geFloat)(SoftDrv_TempLInfo->MinU));// - 8.0f?;
+		LightMapShiftV = ((geFloat)(SoftDrv_TempLInfo->MinV));// - 8.0f?;
 
 		LM->LightMapShiftU = (ShiftU+LightMapShiftU*ScaleU)/MipScale;
 		LM->LightMapScaleU = (1.0f/(16.0f * /*LogSize? */ ScaleU )) * MipScale;
@@ -868,15 +868,15 @@ geBoolean DRIVERCC SoftDrv_RenderWorldPoly(	DRV_TLVertex		*Pnts,
 	assert(NumPoints > 2);
 	{
 		DRV_TLVertex Pnts2[3];
-		float OOW,OOH;
-		float ShiftU,ShiftV,ScaleU,ScaleV;
+		geFloat OOW,OOH;
+		geFloat ShiftU,ShiftV,ScaleU,ScaleV;
 		// this scaling work can be done once at texture setup time
 		ShiftU = TexInfo->ShiftU;
 		ShiftV = TexInfo->ShiftV;
 		ScaleU = 1.0f/TexInfo->DrawScaleU;
 		ScaleV = 1.0f/TexInfo->DrawScaleV;
-		OOW = 1.0f / (float)THandle->Width;
-		OOH = 1.0f / (float)THandle->Height;
+		OOW = 1.0f / (geFloat)THandle->Width;
+		OOH = 1.0f / (geFloat)THandle->Height;
 		
 		SoftDrv_TempTexInfo = TexInfo;
 		SoftDrv_TempLInfo = LInfo;
@@ -1015,7 +1015,7 @@ geBoolean	DRIVERCC	SoftDrv_ResetAll(void)
 	return SWTHandle_FreeAllTextureHandles();
 }
 
-geBoolean DRIVERCC SoftDrv_SetFogEnable(geBoolean Enable, float r, float g, float b, float Start, float End)
+geBoolean DRIVERCC SoftDrv_SetFogEnable(geBoolean Enable, geFloat r, geFloat g, geFloat b, geFloat Start, geFloat End)
 {
 	Enable,r,g,b,Start,End;
 	return GE_FALSE;

@@ -42,7 +42,7 @@ typedef struct geSound3d_Cfg
 //  A 10 db reduction means half the intensity.
 //  In our volume routine 0.01 represents a decible
 //=====================================================================================
-static void geSound3D_RollOut(geSound3d_Cfg *Cfg, float Dist, float Min, float Max)
+static void geSound3D_RollOut(geSound3d_Cfg *Cfg, geFloat Dist, geFloat Min, geFloat Max)
 {
 	geFloat Volume;
 	assert( Cfg != NULL );
@@ -63,16 +63,16 @@ static void geSound3D_RollOut(geSound3d_Cfg *Cfg, float Dist, float Min, float M
 //=====================================================================================
 //	Snd3D_Pan
 //=====================================================================================
-static void geSound3D_Pan(geSound3d_Cfg *Cfg, float FaceOffset )
+static void geSound3D_Pan(geSound3d_Cfg *Cfg, geFloat FaceOffset )
 {
 	assert(Cfg != NULL);
-	Cfg->Pan = (float)sin((double)FaceOffset )*0.1f;
+	Cfg->Pan = (geFloat)sin((double)FaceOffset )*0.1f;
 }
 
 //=====================================================================================
 //	Mps is the reletive velocity in  meters per second 
 //=====================================================================================
-static void geSound3D_Doppler(geSound3d_Cfg *Cfg, float Mps )
+static void geSound3D_Doppler(geSound3d_Cfg *Cfg, geFloat Mps )
 {
 	//331 mps is the velocity of sound through air in standard conditions.
 	assert(Cfg != NULL);
@@ -96,7 +96,7 @@ GENESISAPI	void geSound3D_GetConfig(
 {
 	geVec3d			ViewPos, LocalPos, Dist;
 	geSound3d_Cfg	Cfg;
-	float			Magnitude;
+	geFloat			Magnitude;
 	geVec3d			Origin = {0.0f, 0.0f, 0.0f};
 	geXForm3d		CXForm;
 	int32			Leaf1, Leaf2;
@@ -140,7 +140,7 @@ GENESISAPI	void geSound3D_GetConfig(
 		geSound3D_RollOut(&Cfg, Magnitude, Min, Min*10);
 	}
 
-	geSound3D_Pan(&Cfg, (float)atan2( (double)ViewPos.X, (double)ViewPos.Z ) );
+	geSound3D_Pan(&Cfg, (geFloat)atan2( (double)ViewPos.X, (double)ViewPos.Z ) );
 	//Cfg->Frequency = 1.0f;
 	geSound3D_Doppler(&Cfg, Ds);
 
@@ -165,7 +165,7 @@ GENESISAPI	void geSound3D_GetConfigIgnoreObstructions(
 {
 	geVec3d			ViewPos, LocalPos, Dist;
 	geSound3d_Cfg	Cfg;
-	float			Magnitude;
+	geFloat			Magnitude;
 	geVec3d			Origin = {0.0f, 0.0f, 0.0f};
 	geXForm3d		CXForm;
 	int32			Leaf1, Leaf2;
@@ -204,7 +204,7 @@ GENESISAPI	void geSound3D_GetConfigIgnoreObstructions(
 		geSound3D_RollOut(&Cfg, Magnitude, Min, Min*10);
 	}
 
-	geSound3D_Pan(&Cfg, (float)atan2( (double)ViewPos.X, (double)ViewPos.Z ) );
+	geSound3D_Pan(&Cfg, (geFloat)atan2( (double)ViewPos.X, (double)ViewPos.Z ) );
 	//Cfg->Frequency = 1.0f;
 	geSound3D_Doppler(&Cfg, Ds);
 

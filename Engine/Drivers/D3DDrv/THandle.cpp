@@ -36,12 +36,12 @@
 
 //#define D3D_MANAGE_TEXTURES
 
-//#define USE_ONE_CACHE
+#define USE_ONE_CACHE
 
-#define MAX_TEXTURE_HANDLES					15000
+#define MAX_TEXTURE_HANDLES					132000
 
-#define TEXTURE_CACHE_PERCENT				0.75f
-#define LMAP_CACHE_PERCENT					0.25f
+#define TEXTURE_CACHE_PERCENT				0.70f
+#define LMAP_CACHE_PERCENT					0.30f
 
 #define TSTAGE_0			0
 #define TSTAGE_1			1
@@ -167,7 +167,7 @@ geBoolean THandle_Startup(void)
 		goto ExitWithError;
 
 	// Create partition 0
-	Partition[0] = DDMemMgr_PartitionCreate(MemMgr, (uint32)((float)DDMemMgr_GetFreeMem(MemMgr)*TEXTURE_CACHE_PERCENT));
+	Partition[0] = DDMemMgr_PartitionCreate(MemMgr, (uint32)((geFloat)DDMemMgr_GetFreeMem(MemMgr)*TEXTURE_CACHE_PERCENT));
 
 	if (!Partition[0])
 		goto ExitWithError;

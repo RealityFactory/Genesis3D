@@ -68,6 +68,18 @@ geBoolean GENESISCC gePuppet_SetMaterial(gePuppet *P, int MaterialIndex, geBitma
 void GENESISCC gePuppet_SetShadow(gePuppet *P, geBoolean DoShadow, geFloat Scale, 
 						const geBitmap *ShadowMap,int BoneIndex);
 
+// LWM_ACTOR_RENDERING
+geFloat GENESISCC gePuppet_GetAlpha( const gePuppet *P ) ;
+// LWM_ACTOR_RENDERING
+void GENESISCC gePuppet_SetAlpha( gePuppet *P, geFloat Alpha ) ;
+//Environment mapping code...
+void GENESISCC gePuppet_SetEnvironmentOptions( gePuppet *P, geEnvironmentOptions *envop );
+
+geEnvironmentOptions GENESISCC gePuppet_GetEnvironmentOptions( gePuppet *P );
+
+void GENESISCC gePuppet_GetStaticLightingOptions(const gePuppet *P,	geBoolean *AmbientLightFromStaticLights,	geBoolean *TestRayCollision,	int *MaxStaticLightsToUse	);	
+void GENESISCC gePuppet_SetStaticLightingOptions(gePuppet *P,	geBoolean AmbientLightFromStaticLights,	geBoolean TestRayCollision,	int MaxStaticLightsToUse	);
+
 void GENESISCC gePuppet_GetLightingOptions(const gePuppet *P,
 	geBoolean *UseFillLight,
 	geVec3d *FillLightNormal,

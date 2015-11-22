@@ -91,14 +91,14 @@ BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, RECT *pWorldRect)
 	{
 		if(cmode->flags & STRETCHMODE)
 		{
-			float	xstrch, ystrch;
+			geFloat	xstrch, ystrch;
 
-			xstrch			=640.0f / ((float)ClientWindow.Width);
-			ystrch			=480.0f / ((float)ClientWindow.Height);
-			FrontRect.left	=(int)(xstrch * (float)WorldRect.left);
-			FrontRect.right	=(int)(xstrch * (float)WorldRect.right);
-			FrontRect.bottom=(int)(ystrch * (float)WorldRect.bottom);
-			FrontRect.top	=(int)(ystrch * (float)WorldRect.top);
+			xstrch			=640.0f / ((geFloat)ClientWindow.Width);
+			ystrch			=480.0f / ((geFloat)ClientWindow.Height);
+			FrontRect.left	=(int)(xstrch * (geFloat)WorldRect.left);
+			FrontRect.right	=(int)(xstrch * (geFloat)WorldRect.right);
+			FrontRect.bottom=(int)(ystrch * (geFloat)WorldRect.bottom);
+			FrontRect.top	=(int)(ystrch * (geFloat)WorldRect.top);
 		}
 	}
 

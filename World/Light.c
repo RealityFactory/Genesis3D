@@ -92,8 +92,8 @@ static void UpdateLTypeTables(geWorld *World);
 static int32 FastDist(int32 dx, int32 dy, int32 dz);
 static void SetupWavyColorLight1(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32 lh);
 static void SetupWavyColorLight2(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32 lh);
-static void SetupColorLight1(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32 lh, float intensity);
-static void SetupColorLight2(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32 lh, float intensity);
+static void SetupColorLight1(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32 lh, geFloat intensity);
+static void SetupColorLight2(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32 lh, geFloat intensity);
 static BOOL CombineDLightWithRGBMap(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo);
 static BOOL CombineDLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo);
 static void BuildLightLUTS(geEngine *Engine);
@@ -229,7 +229,7 @@ void Light_FogVerts(const geFog *Fog, const geVec3d *POV, const geVec3d *Verts, 
 
 	geVec3d_Subtract(&Fog->Pos, POV, &FogRay);
 	FogRayDot = geVec3d_DotProduct(&FogRay,&FogRay);
-	EyeDist = (float)sqrt(FogRayDot);
+	EyeDist = (geFloat)sqrt(FogRayDot);
 
 	for (i=0; i< NumVerts; i++, Verts++, TexVerts++)
 	{
@@ -319,12 +319,12 @@ static geBoolean FogLightmap1(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 	geBoolean	Hit;
 	geVec3d		Start, UV, Ray;
 	int32		Light1, Light2, Light3;
-	float		Dist, d2, UVDist, DistSq;
+	geFloat		Dist, d2, UVDist, DistSq;
 	geVec3d		FogRay, Ray2;
-	float		v,disc, d;
+	geFloat		v,disc, d;
 	geVec3d		Impact1, Impact2;
-	float		Radius, Red, Grn, Blu, EyeDist;
-	float		RadiusSq, FogRayDot, Radius2;
+	geFloat		Radius, Red, Grn, Blu, EyeDist;
+	geFloat		RadiusSq, FogRayDot, Radius2;
 	geVec3d		UAdd, VAdd, FogPos;
 	int32		Width, Height;
 	
@@ -362,14 +362,14 @@ static geBoolean FogLightmap1(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 	{
 		for (w=0; w< Width; w++)
 		{
-			float OneOver;
+			geFloat OneOver;
 
 			Ray.X = UV.X - GlobalEyePos.X;
 			Ray.Y = UV.Y - GlobalEyePos.Y;
 			Ray.Z = UV.Z - GlobalEyePos.Z;
 				
 			DistSq = Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z;
-			Dist = (float)FastSqrt(DistSq);
+			Dist = (geFloat)FastSqrt(DistSq);
 
 			OneOver = 1.0f / Dist;
 			Ray.X *= OneOver;
@@ -382,9 +382,9 @@ static geBoolean FogLightmap1(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 
 			if (disc > 0)
 			{
-				float t0, t1, t;
+				geFloat t0, t1, t;
 
-				d = (float)FastSqrt(disc);
+				d = (geFloat)FastSqrt(disc);
 
 				t0 = v - d;
 				t1 = v + d;
@@ -411,7 +411,7 @@ static geBoolean FogLightmap1(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 				Ray2.Z = UV.Z - FogPos.Z;
 
 				//UVDist = sqrt(Ray2.X*Ray2.X + Ray2.Y*Ray2.Y + Ray2.Z*Ray2.Z);
-				UVDist = (float)FastSqrt(Ray2.X*Ray2.X + Ray2.Y*Ray2.Y + Ray2.Z*Ray2.Z);
+				UVDist = (geFloat)FastSqrt(Ray2.X*Ray2.X + Ray2.Y*Ray2.Y + Ray2.Z*Ray2.Z);
 					
 				if (EyeDist < Radius && UVDist < Radius)
 				{
@@ -450,7 +450,7 @@ static geBoolean FogLightmap1(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 					Ray.Z = Impact1.Z - GlobalEyePos.Z;
 					
 					//d2 = sqrt(Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z);
-					//d2 = (float)FastSqrt(Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z);
+					//d2 = (geFloat)FastSqrt(Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z);
 					d2 = Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z;
 
 					if (d2 > DistSq)
@@ -484,7 +484,7 @@ static geBoolean FogLightmap1(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 				Ray.Y = Impact1.Y - Impact2.Y;
 				Ray.Z = Impact1.Z - Impact2.Z;
 
-				//d = (float)FastSqrt(Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z);
+				//d = (geFloat)FastSqrt(Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z);
 				//d = ((Radius / d)*18);
 				//Dist = (Fog->VolumeBrightness) / (d*d);
 				d = Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z;
@@ -534,12 +534,12 @@ static geBoolean FogLightmap2(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 	geBoolean	Hit;
 	geVec3d		Start, UV, Ray;
 	int32		Light1, Light2, Light3;
-	float		Dist, d2, UVDist, DistSq;
+	geFloat		Dist, d2, UVDist, DistSq;
 	geVec3d		FogRay, Ray2;
-	float		v,disc, d;
+	geFloat		v,disc, d;
 	geVec3d		Impact1, Impact2;
-	float		Radius, Red, Grn, Blu, EyeDist;
-	float		RadiusSq, FogRayDot, Radius2;
+	geFloat		Radius, Red, Grn, Blu, EyeDist;
+	geFloat		RadiusSq, FogRayDot, Radius2;
 	geVec3d		UAdd, VAdd, FogPos;
 	int32		LightAdd, Width, Height;
 	
@@ -579,15 +579,15 @@ static geBoolean FogLightmap2(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 	{
 		for (w=0; w< Width; w++)
 		{
-			float OneOver;
+			geFloat OneOver;
 
 			Ray.X = UV.X - GlobalEyePos.X;
 			Ray.Y = UV.Y - GlobalEyePos.Y;
 			Ray.Z = UV.Z - GlobalEyePos.Z;
 				
-			//Dist = (float)sqrt(Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z);
+			//Dist = (geFloat)sqrt(Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z);
 			DistSq = Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z;
-			Dist = (float)FastSqrt(DistSq);
+			Dist = (geFloat)FastSqrt(DistSq);
 
 			OneOver = 1.0f / Dist;
 			Ray.X *= OneOver;
@@ -600,10 +600,10 @@ static geBoolean FogLightmap2(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 
 			if (disc > 0)
 			{
-				float t0, t1, t;
+				geFloat t0, t1, t;
 
-				d = (float)FastSqrt(disc);
-				//d = (float)sqrt(disc);
+				d = (geFloat)FastSqrt(disc);
+				//d = (geFloat)sqrt(disc);
 
 				t0 = v - d;
 				t1 = v + d;
@@ -628,7 +628,7 @@ static geBoolean FogLightmap2(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 				Ray2.Z = UV.Z - FogPos.Z;
 
 				//UVDist = sqrt(Ray2.X*Ray2.X + Ray2.Y*Ray2.Y + Ray2.Z*Ray2.Z);
-				UVDist = (float)FastSqrt(Ray2.X*Ray2.X + Ray2.Y*Ray2.Y + Ray2.Z*Ray2.Z);
+				UVDist = (geFloat)FastSqrt(Ray2.X*Ray2.X + Ray2.Y*Ray2.Y + Ray2.Z*Ray2.Z);
 					
 				if (EyeDist < Radius && UVDist < Radius)
 				{
@@ -667,7 +667,7 @@ static geBoolean FogLightmap2(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 					Ray.Z = Impact1.Z - GlobalEyePos.Z;
 					
 					//d2 = sqrt(Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z);
-					//d2 = (float)FastSqrt(Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z);
+					//d2 = (geFloat)FastSqrt(Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z);
 					d2 = Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z;
 
 					if (d2 > DistSq)
@@ -699,7 +699,7 @@ static geBoolean FogLightmap2(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 				Ray.Y = Impact1.Y - Impact2.Y;
 				Ray.Z = Impact1.Z - Impact2.Z;
 
-				//d = (float)FastSqrt(Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z);
+				//d = (geFloat)FastSqrt(Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z);
 				//d = ((Radius / d)*18);
 				//Dist = (Fog->VolumeBrightness) / (d*d);
 				d = Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z;
@@ -1036,7 +1036,7 @@ static void AddLightType1(int32 *LightDest, uint8 *LightData, int32 lw, int32 lh
 static BOOL CombineDLightWithRGBMap(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo)
 {
 	BOOL		Hit;
-	float		Radius, Dist;
+	geFloat		Radius, Dist;
 	GFX_Plane	*Plane;
 	GFX_TexInfo	*TexInfo;
 	geVec3d		LPos;
@@ -1058,7 +1058,7 @@ static BOOL CombineDLightWithRGBMap(int32 *LightData, Light_DLight *Light, GFX_F
 	Dist = geVec3d_DotProduct(&LPos, &Plane->Normal) - Plane->Dist;
 
 	// Shrink the radius by the dist so we can avoid using z in the fast sqrt routine...
-	Radius -= (float)fabs(Dist);
+	Radius -= (geFloat)fabs(Dist);
 
 	if (Radius <= 0)		// We can leave now if the dist is > radius
 		return FALSE;
@@ -1137,7 +1137,7 @@ static BOOL CombineDLightWithRGBMap(int32 *LightData, Light_DLight *Light, GFX_F
 static BOOL CombineDLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo)
 {
 	BOOL		Hit;
-	float		Radius, Dist;
+	geFloat		Radius, Dist;
 	GFX_Plane	*Plane;
 	GFX_TexInfo	*TexInfo;
 	geVec3d		LPos, LMapPos, Right, Down, Start;
@@ -1159,7 +1159,7 @@ static BOOL CombineDLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Li
 	Dist = geVec3d_DotProduct(&LPos, &Plane->Normal) - Plane->Dist;
 
 	// Shrink the radius by the dist so we can avoid using z in the fast sqrt routine...
-	Radius -= (float)fabs(Dist);
+	Radius -= (geFloat)fabs(Dist);
 
 	if (Radius <= 0)		// We can leave now if the dist is > radius
 		return FALSE;
@@ -1336,7 +1336,7 @@ char		Light_WorldGetLTypeCurrent(geWorld *World, int32 LType)
 static void UpdateLTypeTables(geWorld *World)
 {
 	int32			s;
-	float			i;
+	geFloat			i;
 	Light_LightInfo	*LInfo;
 
 	LInfo = World->LightInfo;
@@ -1348,7 +1348,7 @@ static void UpdateLTypeTables(geWorld *World)
 		if (LInfo->LTypeTable[s][LInfo->IPos[s]] == 0) 
 			LInfo->IPos[s] = 0;
 
-		i = (float)(LInfo->LTypeTable[s][LInfo->IPos[s]]-96) / 27.0f;
+		i = (geFloat)(LInfo->LTypeTable[s][LInfo->IPos[s]]-96) / 27.0f;
 
 		LInfo->LTypeIntensities[s] = (int32)(i * (1<<LIGHT_FRACT));
 
@@ -1423,7 +1423,7 @@ void Light_WorldRemoveLight(geWorld *World, Light_DLight *DLight)
 geBoolean Light_SetAttributes(	Light_DLight *Light, 
 								const geVec3d *Pos, 
 								const GE_RGBA *RGBA, 
-								float Radius,
+								geFloat Radius,
 								geBoolean CastShadow)
 {
 	assert(Light != NULL);
@@ -1602,7 +1602,7 @@ static void SetupWavyColorLight2(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32
 //=====================================================================================
 //	SetupColorLight1
 //=====================================================================================
-static void SetupColorLight1(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32 lh, float intensity)
+static void SetupColorLight1(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32 lh, geFloat intensity)
 {	
 	int32	h;
 	DRV_RGB *rgb;
@@ -1641,7 +1641,7 @@ static void SetupColorLight1(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32 lh,
 //=====================================================================================
 //	SetupColorLight2
 //=====================================================================================
-static void SetupColorLight2(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32 lh, float intensity)
+static void SetupColorLight2(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32 lh, geFloat intensity)
 {
 	int32	h;
 	DRV_RGB *rgb;
@@ -1768,9 +1768,9 @@ static void BuildLightLUTS(geEngine *Engine)
 	{
 		for (k=0; k< 64; k++)
 		{
-			float ii = (float)i;
-			float kk = (float)k;
-			float Intensity = (ii * (kk / 62.0f));// * 5.0f;
+			geFloat ii = (geFloat)i;
+			geFloat kk = (geFloat)k;
+			geFloat Intensity = (ii * (kk / 62.0f));// * 5.0f;
 			if (Intensity > 255) 
 				Intensity = 255.0f;
 			Engine->StyleLUT1[k][i] = (U8)Intensity;
@@ -1783,7 +1783,7 @@ static void BuildLightLUTS(geEngine *Engine)
 //=====================================================================================
 static void SetupDynamicLight_r(Light_DLight *pLight, geVec3d *Pos, int32 LNum, int32 Node)
 {
-	float			Dist;
+	geFloat			Dist;
 	GFX_Plane		*pPlane;
 	GFX_Node		*pNode;
 	Surf_SurfInfo	*pSInfo;
@@ -1839,9 +1839,9 @@ geBoolean Light_GetLightmapRGB(Surf_SurfInfo *Surf, geVec3d *Pos, GE_RGBA *RGBA)
 {
 
 	DRV_RGB		*RGBLight;
-	float		fr = 0.0f, fg = 0.0f, fb = 0.0f;
+	geFloat		fr = 0.0f, fg = 0.0f, fb = 0.0f;
 	geVec3d		VecU, VecV;
-	float		TexU, TexV;
+	geFloat		TexU, TexV;
 	int32		Index, Width, Height;
 	
 	// Make sure this is a lightmaped face
@@ -1878,17 +1878,17 @@ geBoolean Light_GetLightmapRGB(Surf_SurfInfo *Surf, geVec3d *Pos, GE_RGBA *RGBA)
 	Height = Surf->LInfo.Height;
 
 	// Cap it off if invalid (for some funky reason)
-	if (TexU > Width) TexU = (float)Width;
-	if (TexV > Height) TexV = (float)Height;
+	if (TexU > Width) TexU = (geFloat)Width;
+	if (TexV > Height) TexV = (geFloat)Height;
 	if (TexU < 0) TexU = 0.0f;
 	if (TexV < 0) TexV = 0.0f;
 
 	Index = (int32)TexV * Width + (int32)TexU;
 	
 	// Return the color dude...
-	RGBA->r = (float)RGBLight[Index].r;
-	RGBA->g = (float)RGBLight[Index].g;
-	RGBA->b = (float)RGBLight[Index].b;
+	RGBA->r = (geFloat)RGBLight[Index].r;
+	RGBA->g = (geFloat)RGBLight[Index].g;
+	RGBA->b = (geFloat)RGBLight[Index].b;
 
 	return GE_TRUE;
 }
@@ -1900,9 +1900,9 @@ geBoolean Light_GetLightmapRGBBlended(Surf_SurfInfo *Surf, geVec3d *Pos, GE_RGBA
 {
 
 	DRV_RGB		*RGBLight;
-	float		fr = 0.0f, fg = 0.0f, fb = 0.0f;
+	geFloat		fr = 0.0f, fg = 0.0f, fb = 0.0f;
 	geVec3d		VecU, VecV;
-	float		TexU, TexV;
+	geFloat		TexU, TexV;
 	int32		Index, Width, Height;
 	
 	// Make sure this is a lightmaped face
@@ -1935,17 +1935,17 @@ geBoolean Light_GetLightmapRGBBlended(Surf_SurfInfo *Surf, geVec3d *Pos, GE_RGBA
 	Height = Surf->LInfo.Height;
 
 	// Cap it off if invalid (for some funky reason)
-	if (TexU > Width) TexU = (float)Width;
-	if (TexV > Height) TexV = (float)Height;
+	if (TexU > Width) TexU = (geFloat)Width;
+	if (TexV > Height) TexV = (geFloat)Height;
 	if (TexU < 0) TexU = 0.0f;
 	if (TexV < 0) TexV = 0.0f;
 
 	Index = (int32)TexV * Width + (int32)TexU;
 	
 	// Return the color dude...
-	RGBA->r = (float)RGBLight[Index].r;
-	RGBA->g = (float)RGBLight[Index].g;
-	RGBA->b = (float)RGBLight[Index].b;
+	RGBA->r = (geFloat)RGBLight[Index].r;
+	RGBA->g = (geFloat)RGBLight[Index].g;
+	RGBA->b = (geFloat)RGBLight[Index].b;
 
 	return GE_TRUE;
 }

@@ -56,7 +56,7 @@ typedef struct	gePoly
 	GE_LVertex		Verts[MAX_USER_VERTS];	// Copy of user verts					
 
 	geWorld_Leaf	*LeafData;
-	float			ZOrder;
+	geFloat			ZOrder;
 
 	int32			NumVerts;
 
@@ -65,7 +65,7 @@ typedef struct	gePoly
 	gePoly_Type		Type;					// Type of poly
 	int32			RenderFlags;			// Fx of poly
 
-	float			Scale;					// Currently only used for TexturedPoint
+	geFloat			Scale;					// Currently only used for TexturedPoint
 
 	struct gePoly	*Prev;
 	struct gePoly	*Next;
@@ -98,14 +98,14 @@ GENESISAPI	gePoly *geWorld_AddPolyOnce(	geWorld *World,
 										geBitmap *Bitmap,
 										gePoly_Type Type, 
 										uint32 RenderFlags,
-										float Scale);
+										geFloat Scale);
 GENESISAPI	gePoly *geWorld_AddPoly(	geWorld *World, 
 									GE_LVertex *Verts, 
 									int32 NumVerts, 
 									geBitmap *Bitmap,
 									gePoly_Type Type,
 									uint32 RenderFlags,
-									float Scale);
+									geFloat Scale);
 
 GENESISAPI	void geWorld_RemovePoly(geWorld *World, gePoly *Poly);
 GENESISAPI	geBoolean gePoly_GetLVertex(gePoly *Poly, int32 Index, GE_LVertex *LVert);

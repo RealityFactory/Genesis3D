@@ -330,9 +330,9 @@ geBoolean gePlane_ClipVertsFanned(	const geVec3d *In, int32 NumIn,
 
 	geVec3d		*pIn, *pOut, *pFirst;
 	int32		i, Count[2], NextVert;
-	float		Dist[MAX_VERT];
+	geFloat		Dist[MAX_VERT];
 	int32		CurIn, NextIn, FirstIn;
-	float		CurDist, FirstDist, PlaneDist, NextDist;
+	geFloat		CurDist, FirstDist, PlaneDist, NextDist;
 
 	assert(NumIn < MAX_VERT);
 	
@@ -391,7 +391,7 @@ geBoolean gePlane_ClipVertsFanned(	const geVec3d *In, int32 NumIn,
 		// First clip the edges on the poly
 		if (CurIn != NextIn)
 		{
-			float	Scale;
+			geFloat	Scale;
 
 			Scale = (PlaneDist - CurDist) / (NextDist - CurDist);
 
@@ -407,7 +407,7 @@ geBoolean gePlane_ClipVertsFanned(	const geVec3d *In, int32 NumIn,
 		{
 			if (FirstIn != NextIn)		// The fanned edge crosses the plane, clip it, and store it in the out list
 			{
-				float	Scale;
+				geFloat	Scale;
 
 				Scale = (Plane->Dist - FirstDist) / (NextDist - FirstDist);
 
@@ -440,10 +440,10 @@ geBoolean gePlane_ClipVertsFannedUVRGB(	const geVec3d *In, const Surf_TexVert *T
 
 	geVec3d			*pIn, *pOut, *pFirst;
 	Surf_TexVert	*pTIn, *pTOut, *pTFirst;
-	int32			i, Count[2], FirstVert, NextVert;
-	float			Dist[MAX_VERT];
+	int32			i=0, Count[2], FirstVert=0, NextVert=0;
+	geFloat			Dist[MAX_VERT];
 	int32			CurIn, NextIn, FirstIn;
-	float			CurDist, FirstDist, PlaneDist, NextDist;
+	geFloat			CurDist, FirstDist, PlaneDist, NextDist;
 	int32			Temp;
 
 	assert(NumIn < MAX_VERT);
@@ -523,7 +523,7 @@ geBoolean gePlane_ClipVertsFannedUVRGB(	const geVec3d *In, const Surf_TexVert *T
 		// First clip the edges on the poly
 		if (CurIn != NextIn)
 		{
-			float	Scale;
+			geFloat	Scale;
 
 			Scale = (PlaneDist - CurDist) / (NextDist - CurDist);
 
@@ -547,7 +547,7 @@ geBoolean gePlane_ClipVertsFannedUVRGB(	const geVec3d *In, const Surf_TexVert *T
 		{
 			if (FirstIn != NextIn)		// The fanned edge crosses the plane, clip it, and store it in the out list
 			{
-				float	Scale;
+				geFloat	Scale;
 
 				Scale = (PlaneDist - FirstDist) / (NextDist - FirstDist);
 
@@ -585,7 +585,7 @@ geBoolean Frustum_ClipToPlane(	GFX_Plane *pPlane,
 								int32 NumVerts, int32 *OutVerts)
 {
     int32	i, NextVert, CurIn, NextIn;
-    float	CurDot, NextDot, Scale;
+    geFloat	CurDot, NextDot, Scale;
     geVec3d	*pInVert, *pOutVert, *pNext;
 	geVec3d	*pNormal;
 
@@ -647,7 +647,7 @@ geBoolean Frustum_ClipToPlaneUV(	GFX_Plane *pPlane,
 									int32 NumVerts, int32 *OutVerts)
 {
     int32		i, NextVert, CurIn, NextIn;
-    float		CurDot, NextDot, Scale;
+    geFloat		CurDot, NextDot, Scale;
     geVec3d		*pInVert, *pOutVert, *pNext;
     Surf_TexVert *pTInVert, *pTOutVert, *pTNext;
 	geVec3d		*pNormal;
@@ -725,7 +725,7 @@ geBoolean Frustum_ClipToPlaneUVRGB(GFX_Plane *pPlane,
 									int32 NumVerts, int32 *OutVerts)
 {
     int32		i, NextVert, CurIn, NextIn;
-    float		CurDot, NextDot, Scale;
+    geFloat		CurDot, NextDot, Scale;
     geVec3d		*pInVert, *pOutVert, *pNext;
     Surf_TexVert *pTInVert, *pTOutVert, *pTNext;
 	geVec3d		*pNormal;
@@ -803,7 +803,7 @@ geBoolean Frustum_ClipToPlaneUVRGBA(GFX_Plane *pPlane,
 									int32 NumVerts, int32 *OutVerts)
 {
     int32		i, NextVert, CurIn, NextIn;
-    float		CurDot, NextDot, Scale;
+    geFloat		CurDot, NextDot, Scale;
     geVec3d		*pInVert, *pOutVert, *pNext;
     Surf_TexVert *pTInVert, *pTOutVert, *pTNext;
 	geVec3d		*pNormal;
@@ -882,7 +882,7 @@ geBoolean Frustum_ClipToPlaneRGB(	GFX_Plane *pPlane,
 									int32 NumVerts, int32 *OutVerts)
 {
     int32		i, NextVert, CurIn, NextIn;
-    float		CurDot, NextDot, Scale;
+    geFloat		CurDot, NextDot, Scale;
     geVec3d		*pInVert, *pOutVert, *pNext;
     Surf_TexVert *pTInVert, *pTOutVert, *pTNext;
 	geVec3d		*pNormal;
@@ -1090,11 +1090,11 @@ geBoolean Frustum_PointsInFrustum(const geVec3d *Pin, const GFX_Plane *Plane, in
 //================================================================================
 //	Frustum_PointInFrustum
 //================================================================================
-geBoolean Frustum_PointInFrustum(const Frustum_Info *Fi, const geVec3d *Point, float Radius)
+geBoolean Frustum_PointInFrustum(const Frustum_Info *Fi, const geVec3d *Point, geFloat Radius)
 {
 	int32			i;
 	const GFX_Plane	*Plane;
-	float			Dist;
+	geFloat			Dist;
 
 	Plane = Fi->Planes;
 
@@ -1159,7 +1159,7 @@ geBoolean Frustum_ClipToPlaneL(GFX_Plane *pPlane,
 								int32 NumVerts, int32 *NumOutVerts)
 {
     int32		i, NextVert, CurIn, NextIn;
-    float		CurDot, NextDot, Scale;
+    geFloat		CurDot, NextDot, Scale;
     GE_LVertex	*pInVert, *pOutVert, *pNext;
 	geVec3d		*pNormal;
 

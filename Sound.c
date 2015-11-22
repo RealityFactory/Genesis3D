@@ -104,6 +104,13 @@ static	LPDIRECTSOUND			lpDirectSound;
 // This isn't really safe as a global.  But it's consistent with the global lpDirectSound.
 static  HMODULE					hmodDirectSound = NULL;
 
+//	Added 11/08/1999 Ed Averill to expose DSound object for external code
+GENESISAPI void *geSound_GetDSound()
+{
+  return (void *)lpDirectSound;
+}
+//	End 11/08/1999 addition
+
 //=====================================================================================
 //	geSound_SystemCreate
 //=====================================================================================
@@ -206,6 +213,16 @@ GENESISAPI	void geSound_FreeSoundDef(geSound_System *SoundS, geSound_Def *SoundD
 }
 
 //=====================================================================================
+//	Sound_FreeAllChannels
+//=====================================================================================
+GENESISAPI	void geSound_FreeAllChannels(geSound_System *SoundS)
+{
+	if (!SoundS) return;
+
+	FreeAllChannels( SoundS->SoundM );
+}
+
+//=====================================================================================
 //	Sound_SetGlobalVolume
 //=====================================================================================
 GENESISAPI	geBoolean geSound_SetMasterVolume( geSound_System *SoundS, geFloat Volume )
@@ -293,7 +310,8 @@ GENESISAPI	geBoolean geSound_SoundIsPlaying(geSound_System *SoundS, geSound *Sou
 	Channel*	Channel;
 
 	assert(SoundS != NULL);
-	assert(Sound  != NULL);	
+  if(Sound == NULL)
+	  return GE_FALSE;												// eaa3 05/29/2000 don't assert if NULL handle!
 
 	Channel = GetChannel(SoundS->SoundM, (unsigned int)Sound);
 
@@ -589,7 +607,7 @@ static	BOOL ParseData( const uint8* data, DSBUFFERDESC* dsBD, BYTE ** pbWaveData
 	memset(dsBD, 0, sizeof(DSBUFFERDESC));
 
 	dsBD->dwSize = sizeof(DSBUFFERDESC);
-	dsBD->dwFlags = DSBCAPS_STATIC | DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_CTRLDEFAULT;
+	dsBD->dwFlags = DSBCAPS_STATIC | DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;
 	if	(!DSParseWaveResource(data, &dsBD->lpwfxFormat, pbWaveData, &dsBD->dwBufferBytes))
 	{
 		geErrorLog_Add(GE_ERR_INVALID_WAV, NULL);
@@ -1012,6 +1030,10 @@ static	BOOL	ModifyChannel( Channel *channel, geSound_Cfg *cfg )
 	{
 
 		Freq = (DWORD)(channel->BaseFreq * cfg->Frequency);
+		
+		if(Freq < 0)
+			Freq = 0;
+
 		Error = IDirectSoundBuffer_SetFrequency(channel->buffer, Freq);
 		if (Error != DS_OK)
 		{

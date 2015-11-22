@@ -53,7 +53,7 @@ typedef struct
 	geRDriver_PixelFormat	PixelFormat;
 
 	uint8					Log;
-	float					OneOverLogSize_255;
+	geFloat					OneOverLogSize_255;
 } THandle_Info;
 
 typedef struct geRDriver_THandle
@@ -64,7 +64,7 @@ typedef struct geRDriver_THandle
 	int32					Height;
 	int32					LogSize;			// Square width/height in cache
 	uint8					NumMipLevels;
-	float					OneOverLogSize_255;
+	geFloat					OneOverLogSize_255;
 	uint8					Log;
 	geRDriver_PixelFormat	PixelFormat;
 	//GrTexInfo				Info;

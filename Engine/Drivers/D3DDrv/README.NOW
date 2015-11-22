@@ -1,0 +1,22 @@
+D3DDRV.DLL MIPMAP SELECTION MODIFICATION
+by Ed Averill, Rabid Games
+11/03/1999
+
+	Here is the modified PCACHE.CPP and the release-compiled
+D3DDRV.DLL.  This driver has a modification to take the AVERAGE
+of all polygon edges and perform MIP selection computation on
+this average, instead of the shipping drivers computation based
+on only the first edge in the list.  This driver appears to
+remove most MIP artifacts, at least in the levels I've tested
+it with.
+
+	BE SURE TO BACK UP YOUR OLD DRIVER IN CASE THIS ONE
+DOESN'T WORK FOR YOU!!!!  There may be a small loss in frame
+rate as more detailed MIPS are selected more often than with
+the original driver.  Note that my bias is in favor of visual
+accuracy at the cost of frame-rate, your mileage may vary,
+this offer void where prohibited by law, all the usual
+disclaimers apply.  When in doubt, Use the Source, Luke.
+
+Ed Averill, Rabid Games
+http://www.rabidgames.com

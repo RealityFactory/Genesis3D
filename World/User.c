@@ -173,7 +173,7 @@ void User_WorldShutdown(geWorld *World)
 //=====================================================================================
 static int PolyComp(const void *a, const void *b)
 {
-	float	z1, z2;
+	geFloat	z1, z2;
 
 	z1 = (*(gePoly**)a)->ZOrder;
 	z2 = (*(gePoly**)b)->ZOrder;
@@ -327,7 +327,7 @@ static geBoolean RenderTexturedPoint(DRV_Driver *RDriver, gePoly *Poly, Frustum_
 	{
 		GE_LVertex		*pVerts, Save;
 		geVec3d			Up, Left, Start;
-		float			Scale, XScale, YScale;
+		geFloat			Scale, XScale, YScale;
 		const geXForm3d	*MXForm;
 
 		pVerts = Poly->Verts;
@@ -347,8 +347,8 @@ static geBoolean RenderTexturedPoint(DRV_Driver *RDriver, gePoly *Poly, Frustum_
 
 		Scale = Poly->Scale * 0.5f;
 
-		XScale = (float)geBitmap_Width(Poly->Bitmap) * Scale;
-		YScale = (float)geBitmap_Height(Poly->Bitmap) * Scale;
+		XScale = (geFloat)geBitmap_Width(Poly->Bitmap) * Scale;
+		YScale = (geFloat)geBitmap_Height(Poly->Bitmap) * Scale;
 
 		geVec3d_Scale(&Left, XScale, &Left);
 		geVec3d_Scale(&Up, YScale, &Up);
@@ -395,9 +395,9 @@ static geBoolean RenderTexturedPoint(DRV_Driver *RDriver, gePoly *Poly, Frustum_
 		GE_LVertex		*pVerts;
 		DRV_TLVertex	ScreenPnts[4];
 		geBitmap		*Bitmap;
-		float			Sx, Sy, z, UVAdd, Width, Height;
-		float			Left, Right, Top, Bottom;
-		float			Scale;
+		geFloat			Sx, Sy, z, UVAdd, Width, Height;
+		geFloat			Left, Right, Top, Bottom;
+		geFloat			Scale;
 		uint32			RenderFlags;
 		int32			i;
 		
@@ -435,17 +435,17 @@ static geBoolean RenderTexturedPoint(DRV_Driver *RDriver, gePoly *Poly, Frustum_
 			geRect Rect;
 			geCamera_GetClippingRect(Camera,&Rect);
 
-			Left   = (float)Rect.Left;
-			Right  = (float)Rect.Right+1.0f;
-			Top    = (float)Rect.Top;
-			Bottom = (float)Rect.Bottom+1.0f;
+			Left   = (geFloat)Rect.Left;
+			Right  = (geFloat)Rect.Right+1.0f;
+			Top    = (geFloat)Rect.Top;
+			Bottom = (geFloat)Rect.Bottom+1.0f;
 		}
 
 		Scale = ((geCamera_GetScale(Camera) / z) * Poly->Scale);
 
 		Bitmap = Poly->Bitmap;
-		Width = (float)geBitmap_Width(Bitmap) * Scale;
-		Height = (float)geBitmap_Height(Bitmap) * Scale;
+		Width = (geFloat)geBitmap_Width(Bitmap) * Scale;
+		Height = (geFloat)geBitmap_Height(Bitmap) * Scale;
 
 		Sx = Width * 0.5f;
 		Sy = Height * 0.5f;
@@ -772,8 +772,8 @@ void User_EngineFillRect(geEngine *Engine, const GE_Rect *Rect, const GE_RGBA *C
 
 	assert(RDriver != NULL);
 #define NEARZ	0.5f
-	DrvVertex[0].x = (float)Rect->Left;
-	DrvVertex[0].y = (float)Rect->Top;
+	DrvVertex[0].x = (geFloat)Rect->Left;
+	DrvVertex[0].y = (geFloat)Rect->Top;
 	DrvVertex[0].z = NEARZ;
 	DrvVertex[0].u =
 	DrvVertex[0].v = 0.0f;
@@ -782,8 +782,8 @@ void User_EngineFillRect(geEngine *Engine, const GE_Rect *Rect, const GE_RGBA *C
 	DrvVertex[0].b = Color->b;
 	DrvVertex[0].a = Color->a;
 
-	DrvVertex[1].x = (float)Rect->Right;
-	DrvVertex[1].y = (float)Rect->Top;
+	DrvVertex[1].x = (geFloat)Rect->Right;
+	DrvVertex[1].y = (geFloat)Rect->Top;
 	DrvVertex[1].z = NEARZ;
 	DrvVertex[1].u =
 	DrvVertex[1].v = 0.0f;
@@ -792,8 +792,8 @@ void User_EngineFillRect(geEngine *Engine, const GE_Rect *Rect, const GE_RGBA *C
 	DrvVertex[1].b = Color->b;
 	DrvVertex[1].a = Color->a;
 
-	DrvVertex[2].x = (float)Rect->Right;
-	DrvVertex[2].y = (float)Rect->Bottom;
+	DrvVertex[2].x = (geFloat)Rect->Right;
+	DrvVertex[2].y = (geFloat)Rect->Bottom;
 	DrvVertex[2].z = NEARZ;
 	DrvVertex[2].u =
 	DrvVertex[2].v = 0.0f;
@@ -802,8 +802,8 @@ void User_EngineFillRect(geEngine *Engine, const GE_Rect *Rect, const GE_RGBA *C
 	DrvVertex[2].b = Color->b;
 	DrvVertex[2].a = Color->a;
 
-	DrvVertex[3].x = (float)Rect->Left;
-	DrvVertex[3].y = (float)Rect->Bottom;
+	DrvVertex[3].x = (geFloat)Rect->Left;
+	DrvVertex[3].y = (geFloat)Rect->Bottom;
 	DrvVertex[3].z = NEARZ;
 	DrvVertex[3].u =
 	DrvVertex[3].v = 0.0f;
@@ -957,7 +957,7 @@ GENESISAPI gePoly *geWorld_AddPoly(		geWorld *World,
 										geBitmap *Bitmap,
 										gePoly_Type Type, 
 										uint32 RenderFlags,
-										float Scale)
+										geFloat Scale)
 {
 	gePoly		*Poly;
 
@@ -1013,7 +1013,7 @@ GENESISAPI gePoly *geWorld_AddPolyOnce(	geWorld *World,
 										geBitmap *Bitmap,
 										gePoly_Type Type,
 										uint32 RenderFlags,
-										float Scale)
+										geFloat Scale)
 {
 	gePoly		*Poly;
 

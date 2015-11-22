@@ -26,13 +26,13 @@ typedef struct EdgeAsmFPUTag EdgeAsmFPU;
 
 extern	uint16	*TDest, *pZBufferPtr, *Dest;
 extern	__int64	Red, Green;
-extern	float	Real65536;
+extern	geFloat	Real65536;
 extern	double	Bucket, Bucket2, Bucket3, Magic, RedMask, RedMask2;
 extern	uint32	UMask, VShift, VMask, TempPix, Blue;
 static	uint32	VStep, UStep, ZStep, u16, v16, z16, Z32;
 
-extern	float	const	Two, MiniRedMask, GreenMask;
-extern	float	const	MiniRedMask2, GreenMask2, BlueMask;
+extern	geFloat	const	Two, MiniRedMask, GreenMask;
+extern	geFloat	const	MiniRedMask2, GreenMask2, BlueMask;
 extern	geFloat			FloatTemp, FTemp0, FTemp1, FTemp2;
 extern	geFloat			FTemp3, FTemp4, FTemp5, FTemp6, FTemp7, FTemp8;
 
@@ -51,10 +51,10 @@ extern	int32	RR1, RR2, GG1, GG2, BB1, BB2;
 extern	int32	StepR, StepG, StepB;
 extern	int32	UDist, VDist;
 extern	int32	U1, V1, CKeyTest;
-extern	float	GLMapMulU;	//lightscale
-extern	float	GLMapMulV;	//lightscale
+extern	geFloat	GLMapMulU;	//lightscale
+extern	geFloat	GLMapMulV;	//lightscale
 extern	int32	ZDelta, ZVal;
-extern	float	ZBufferPrec;
+extern	geFloat	ZBufferPrec;
 extern	__int64	RedDelta, GreenDelta, BlueDelta;
 
 

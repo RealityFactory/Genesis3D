@@ -179,15 +179,29 @@ void Surf_WorldShutdown(geWorld *World)
 //================================================================================
 //	Surf_InSurfBoundingBox
 //================================================================================
-BOOL Surf_InSurfBoundingBox(Surf_SurfInfo *Surf, geVec3d *Pos, float Box)
+BOOL Surf_InSurfBoundingBox(Surf_SurfInfo *Surf, geVec3d *Pos, geFloat Box)
 {
    assert(Surf != NULL);
    assert(Pos != NULL);
 
+/* eaa3 05/31/2000 charlie_x's optimization added */
+
+  if(Pos->Z+Box >= Surf->VMins.Z && Pos->Z-Box <= Surf->VMaxs.Z)
+	  {
+		if(Pos->Y+Box >= Surf->VMins.Y && Pos->Y-Box <= Surf->VMaxs.Y)
+		  {
+			if(Pos->X+Box >= Surf->VMins.X && Pos->X-Box <= Surf->VMaxs.X)
+			  {
+				return TRUE;
+				}
+			}
+		}
+/*
    if (Pos->X+Box >= Surf->VMins.X && Pos->X-Box <= Surf->VMaxs.X)
    if (Pos->Y+Box >= Surf->VMins.Y && Pos->Y-Box <= Surf->VMaxs.Y)
    if (Pos->Z+Box >= Surf->VMins.Z && Pos->Z-Box <= Surf->VMaxs.Z)
         return TRUE;
+*/
 
    return FALSE;
 }
@@ -200,7 +214,7 @@ static geBoolean GetTexVerts(World_BSP *BSP)
 	int32			i, v, vn;
 	int32			*pIndex, TexInfo;
 	geVec3d			*pVert, *pVecU, *pVecV;
-	float			U, V;
+	geFloat			U, V;
 	Surf_TexVert	*TexVerts;
 	GFX_TexInfo		*pTexInfo;
 	GFX_Face		*pFace;
@@ -243,8 +257,8 @@ static geBoolean GetSurfInfo(World_BSP *BSP)
 	int32			NumLTypes;
 	int32			i, k, v;
 	int32			vn, Index;
-	float			U, V;
-	float			Mins[2], Maxs[2];
+	geFloat			U, V;
+	geFloat			Mins[2], Maxs[2];
 	geVec3d			VMins, VMaxs;
 	int32			Size[2];
 	Surf_SurfInfo	*SurfInfo;
@@ -258,11 +272,14 @@ static geBoolean GetSurfInfo(World_BSP *BSP)
 	assert(SurfInfo != NULL);
 	assert(TexVerts != NULL);
 
+	geVec3d_Clear(&VMins);
+	geVec3d_Clear(&VMaxs);
+
 	memset(SurfInfo, 0, sizeof(Surf_SurfInfo)*(BSP->BSPData.NumGFXFaces));
 
 	for (i=0; i< BSP->BSPData.NumGFXFaces; i++)
 	{
-		float	XScale, YScale;
+		geFloat	XScale, YScale;
 
 		// Find number of styles
 		NumLTypes = 0;
@@ -346,7 +363,7 @@ static geBoolean GetSurfInfo(World_BSP *BSP)
 		#if 1
 		{
 			int32			Width, Height;
-			float			au, av, ScaleU, ScaleV;
+			geFloat			au, av, ScaleU, ScaleV;
 
 			#if 0
 				pTexInfo->DrawScale[0] = 1.0f;		// For testing
@@ -360,10 +377,10 @@ static geBoolean GetSurfInfo(World_BSP *BSP)
 			Height = pTexture->Height;
 
 			// Interpret the uv's the same way the drivers will
-			au = (float)(((int32)((Mins[0]*ScaleU+pTexInfo->Shift[0])/Width ))*Width);
-			av = (float)(((int32)((Mins[1]*ScaleV+pTexInfo->Shift[1])/Height))*Height);
-			//au = (float)(((int32)((Mins[0]*ScaleU)/Width ))*Width);
-			//av = (float)(((int32)((Mins[1]*ScaleV)/Height))*Height);
+			au = (geFloat)(((int32)((Mins[0]*ScaleU+pTexInfo->Shift[0])/Width ))*Width);
+			av = (geFloat)(((int32)((Mins[1]*ScaleV+pTexInfo->Shift[1])/Height))*Height);
+			//au = (geFloat)(((int32)((Mins[0]*ScaleU)/Width ))*Width);
+			//av = (geFloat)(((int32)((Mins[1]*ScaleV)/Height))*Height);
 
 			SurfInfo[i].ShiftU = pTexInfo->Shift[0] - au;
 			SurfInfo[i].ShiftV = pTexInfo->Shift[1] - av;
@@ -383,8 +400,8 @@ static geBoolean GetSurfInfo(World_BSP *BSP)
 		
 		for (k=0; k< 2; k++)
 		{
-			Mins[k] = (float)floor(Mins[k]/16);
-			Maxs[k] = (float)ceil(Maxs[k]/16);
+			Mins[k] = (geFloat)floor(Mins[k]/16);
+			Maxs[k] = (geFloat)ceil(Maxs[k]/16);
 			
 			Size[k] = (S32)(Maxs[k] - Mins[k]) + 1;
 			
@@ -532,15 +549,15 @@ void CalcSurfVectors (World_BSP *BSP)
 	GFX_TexInfo		*Tex;
 	geVec3d			TexNormal;
 	geVec3d			FaceNormal;
-	float			DistScale, PlaneDist;
-	float			Dist, Len;
+	geFloat			DistScale, PlaneDist;
+	geFloat			Dist, Len;
 	geVec3d			Ws[3];
 	int32			i, k;
 	GBSP_BSPData	*BSPData;
 	GFX_Plane		*GFXPlanes;
 	GFX_Face		*pFace;
 	int32			Startx, Starty;
-	float			UU, VV;
+	geFloat			UU, VV;
 
 	BSPData = &BSP->BSPData;
 	
@@ -604,19 +621,19 @@ void CalcSurfVectors (World_BSP *BSP)
 		Startx = Si->LInfo.MinU;
 		Starty = Si->LInfo.MinV;
 	
-		UU = (float)Startx;
-		VV = (float)Starty;
+		UU = (geFloat)Startx;
+		VV = (geFloat)Starty;
 	
 		Ws[0].X = Si->TexOrg.X + Si->T2WVecs[0].X*UU + Si->T2WVecs[1].X*VV;
 		Ws[0].Y = Si->TexOrg.Y + Si->T2WVecs[0].Y*UU + Si->T2WVecs[1].Y*VV;
 		Ws[0].Z = Si->TexOrg.Z + Si->T2WVecs[0].Z*UU + Si->T2WVecs[1].Z*VV;
-		UU = (float)Startx+16.0f;
-		VV = (float)Starty;
+		UU = (geFloat)Startx+16.0f;
+		VV = (geFloat)Starty;
 		Ws[1].X = Si->TexOrg.X + Si->T2WVecs[0].X*UU + Si->T2WVecs[1].X*VV;
 		Ws[1].Y = Si->TexOrg.Y + Si->T2WVecs[0].Y*UU + Si->T2WVecs[1].Y*VV;
 		Ws[1].Z = Si->TexOrg.Z + Si->T2WVecs[0].Z*UU + Si->T2WVecs[1].Z*VV;
-		UU = (float)Startx;
-		VV = (float)Starty+16.0f;
+		UU = (geFloat)Startx;
+		VV = (geFloat)Starty+16.0f;
 		Ws[2].X = Si->TexOrg.X + Si->T2WVecs[0].X*UU + Si->T2WVecs[1].X*VV;
 		Ws[2].Y = Si->TexOrg.Y + Si->T2WVecs[0].Y*UU + Si->T2WVecs[1].Y*VV;
 		Ws[2].Z = Si->TexOrg.Z + Si->T2WVecs[0].Z*UU + Si->T2WVecs[1].Z*VV;

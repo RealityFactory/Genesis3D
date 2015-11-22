@@ -204,8 +204,10 @@ GENESISAPI uint32		GENESISCC	geBitmap_MipBytes(const geBitmap * Bitmap,int mip);
 **/
 
 #ifdef _DEBUG
+
 GENESISAPI uint32		GENESISCC	geBitmap_Debug_GetCount(void);
 
+GENESISAPI uint32		GENESISCC	geBitmap_Debug_GetRefs(void);
 	// assert this is zero before you shutdown !
 
 #endif

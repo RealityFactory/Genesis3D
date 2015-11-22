@@ -45,8 +45,8 @@ typedef struct GCache_Type
 	uint8		NumMipLevels;
 	uint32		Size;
 
-	float		OneOverWidth_255;
-	float		OneOverHeight_255;
+	geFloat		OneOverWidth_255;
+	geFloat		OneOverHeight_255;
 
 	GCache_Slot	*Slots;						// Cache slots for this Cache type
 	int32		RefCount;					// How many slots are allocated 

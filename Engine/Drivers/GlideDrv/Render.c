@@ -36,7 +36,7 @@ static int DoWireFrame = 0;
 
 #define MAX_LMAP_SIZE		32
 
-#define SNAP_VERT(v)  ( ( float )( ( long )( ( v ) * 16 ) ) * 0.0625f /* 1/16 */ )
+#define SNAP_VERT(v)  ( ( geFloat )( ( long )( ( v ) * 16 ) ) * 0.0625f /* 1/16 */ )
 
 #define RENDER_MAX_PNTS (64)
 
@@ -714,11 +714,11 @@ geBoolean DRIVERCC Render_GouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint3
 {
 	int32 i;
 	GrVertex	vrtx[RENDER_MAX_PNTS];
-	float		Alpha = Pnts->a;
+	geFloat		Alpha = Pnts->a;
 
 	for (i = 0; i< NumPoints; i++)
 	{
-		float ZRecip;
+		geFloat ZRecip;
 
 		vrtx[i].r = Pnts->r;
 		vrtx[i].g = Pnts->g;
@@ -756,7 +756,7 @@ geBoolean DRIVERCC Render_LinesPoly(DRV_TLVertex *Pnts, int32 NumPoints)
 
 	for (i = 0; i< NumPoints; i++)
 	{
-		float	ZRecip;
+		geFloat	ZRecip;
 
 		vrtx[i].r = 255.0f;//Pnts->r;
 		vrtx[i].g = 255.0f;//Pnts->g;
@@ -795,11 +795,11 @@ geBoolean DRIVERCC Render_LinesPoly(DRV_TLVertex *Pnts, int32 NumPoints)
 geBoolean DRIVERCC Render_WorldPoly(DRV_TLVertex *Pnts, int32 NumPoints, geRDriver_THandle *THandle, DRV_TexInfo *TexInfo, DRV_LInfo *LInfo, uint32 Flags)
 {
 	GrVertex		Vrtx[RENDER_MAX_PNTS], *pVrtx;
-	float			OneOverSize_255;
-	float			ShiftU, ShiftV, ScaleU, ScaleV;
+	geFloat			OneOverSize_255;
+	geFloat			ShiftU, ShiftV, ScaleU, ScaleV;
 	DRV_TLVertex	*pPnts;
 	int32			i;
-	float			Alpha;
+	geFloat			Alpha;
 
 	assert(Pnts);
 	assert(TexInfo);
@@ -839,12 +839,12 @@ geBoolean DRIVERCC Render_WorldPoly(DRV_TLVertex *Pnts, int32 NumPoints, geRDriv
 	// Fix the uv's to be as close to the origin as possible, without affecting their appearance...
 	//if (pPnts->u > 1000.0f || pPnts->v > 1000.0f)
 	{
-		float		OneOverLogSize;
+		geFloat		OneOverLogSize;
 
- 		OneOverLogSize = 1.0f / (float)THandle->LogSize;
+ 		OneOverLogSize = 1.0f / (geFloat)THandle->LogSize;
 		
-		ShiftU -= (float)(((int32)(pPnts->u*ScaleU/THandle->Width))*THandle->Width);
-		ShiftV -= (float)(((int32)(pPnts->v*ScaleV/THandle->Height))*THandle->Height);
+		ShiftU -= (geFloat)(((int32)(pPnts->u*ScaleU/THandle->Width))*THandle->Width);
+		ShiftV -= (geFloat)(((int32)(pPnts->v*ScaleV/THandle->Height))*THandle->Height);
 	}
 #endif
 
@@ -852,7 +852,7 @@ geBoolean DRIVERCC Render_WorldPoly(DRV_TLVertex *Pnts, int32 NumPoints, geRDriv
 
 	for (i = 0; i< NumPoints; i++)
 	{
-		float	ZRecip;
+		geFloat	ZRecip;
 		
 		pVrtx->a = Alpha;
 
@@ -904,8 +904,8 @@ geBoolean DRIVERCC Render_WorldPoly(DRV_TLVertex *Pnts, int32 NumPoints, geRDriv
 		geBoolean  Dynamic;
 
 		// How much to shift u'vs back into lightmap space
-		ShiftU = (float)LInfo->MinU-8.0f;
-		ShiftV = (float)LInfo->MinV-8.0f;
+		ShiftU = (geFloat)LInfo->MinU-8.0f;
+		ShiftV = (geFloat)LInfo->MinV-8.0f;
 		
 		pPnts = Pnts;
 
@@ -918,9 +918,9 @@ geBoolean DRIVERCC Render_WorldPoly(DRV_TLVertex *Pnts, int32 NumPoints, geRDriv
 
 		for (i = 0; i< NumPoints; i++)
 		{
-			float u = pPnts->u-ShiftU;
-			float v = pPnts->v-ShiftV;
-			float ZRecip = pVrtx->oow * OneOverSize_255;
+			geFloat u = pPnts->u-ShiftU;
+			geFloat v = pPnts->v-ShiftV;
+			geFloat ZRecip = pVrtx->oow * OneOverSize_255;
 
 			pVrtx->tmuvtx[TMU[1]].sow = u*ZRecip;
 			pVrtx->tmuvtx[TMU[1]].tow = v*ZRecip;
@@ -1025,7 +1025,7 @@ geBoolean DRIVERCC Render_MiscTexturePoly(DRV_TLVertex *Pnts, int32 NumPoints, g
 	int32				i;
 	GrVertex			vrtx[RENDER_MAX_PNTS];
 	DRV_TLVertex		*pPnt = Pnts;
-	float				Alpha, Width_255, Height_255;
+	geFloat				Alpha, Width_255, Height_255;
 	
 #ifdef ENABLE_WIREFRAME
 	if ( DoWireFrame )
@@ -1037,19 +1037,19 @@ geBoolean DRIVERCC Render_MiscTexturePoly(DRV_TLVertex *Pnts, int32 NumPoints, g
 	assert( THandle != NULL );
 
 	{
-		float OneOverLogSize;
+		geFloat OneOverLogSize;
 		
 		OneOverLogSize = THandle->OneOverLogSize_255;
 
-		Width_255  = (float)THandle->Width  * OneOverLogSize;
-		Height_255 = (float)THandle->Height * OneOverLogSize;
+		Width_255  = (geFloat)THandle->Width  * OneOverLogSize;
+		Height_255 = (geFloat)THandle->Height * OneOverLogSize;
 	}
 
 	Alpha = Pnts->a;
 
 	for (i = 0; i< NumPoints; i++)
 	{
-		float ZRecip;
+		geFloat ZRecip;
 
 		vrtx[i].a = Alpha;
 		vrtx[i].r = pPnt->r;

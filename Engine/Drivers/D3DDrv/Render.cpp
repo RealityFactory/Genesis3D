@@ -34,15 +34,15 @@
 
 #include "PCache.h"
 
-#define SNAP_VERT(v)  ( ( v )  = ( float )( ( long )( ( v ) * 16 ) ) / 16.0f )
+#define SNAP_VERT(v)  ( ( v )  = ( geFloat )( ( long )( ( v ) * 16 ) ) / 16.0f )
 
 geBoolean DRIVERCC RenderGouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint32 Flags)
 {
 	int32			i;
 	DRV_TLVertex	*pPnts;
 	D3DTLVERTEX		D3DPnts[30], *pD3DPnts;
-	float			ZRecip;
-	float			Alpha;
+	geFloat			ZRecip;
+	geFloat			Alpha;
 
 	if(!AppInfo.RenderingIsOK)
 		return	TRUE;
@@ -77,7 +77,7 @@ geBoolean DRIVERCC RenderGouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint32
 		if (AppInfo.FogEnable)
 		{
 			DWORD	FogVal;
-			float	Val;
+			geFloat	Val;
 
 			Val = pPnts->z;
 

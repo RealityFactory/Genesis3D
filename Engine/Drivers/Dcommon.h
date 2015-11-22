@@ -69,7 +69,7 @@ typedef unsigned long       DWORD;
 typedef int                 geBoolean;
 typedef unsigned char       BYTE;
 typedef unsigned short      WORD;
-typedef float               FLOAT;
+typedef geFloat               FLOAT;
 
 typedef struct tagRECT
 {
@@ -236,11 +236,11 @@ typedef struct
 
 typedef struct
 {
-	float		ShiftU;						// How much to shift right before draw
-	float		ShiftV;
+	geFloat		ShiftU;						// How much to shift right before draw
+	geFloat		ShiftV;
 
-	float		DrawScaleU;						// How much to scale right before draw
-	float		DrawScaleV;
+	geFloat		DrawScaleU;						// How much to scale right before draw
+	geFloat		DrawScaleV;
 } DRV_TexInfo;
     
 // Render Flags for ALL render functions
@@ -261,9 +261,9 @@ typedef struct
 
 typedef struct
 {
-	float	x,y,z;						// float 3d z value
-	float	u,v;						// float texture coords
-	float	r,g,b,a;					// Color of point, and Alpha
+	geFloat	x,y,z;						// geFloat 3d z value
+	geFloat	u,v;						// geFloat texture coords
+	geFloat	r,g,b,a;					// Color of point, and Alpha
 } DRV_TLVertex;
 
 typedef struct
@@ -287,25 +287,25 @@ typedef struct
 	int32		TexMinsY;
 	int32		TexWidth;
 	int32		TexHeight;
-	float		TexShiftX;
-	float		TexShiftY;
+	geFloat		TexShiftX;
+	geFloat		TexShiftY;
 
 	// Camera info
 	geXForm3d	CXForm;
 	geVec3d		CPov;
 
-	float		XCenter;
-	float		YCenter;
+	geFloat		XCenter;
+	geFloat		YCenter;
 
-	float		XScale;
-	float		YScale;
-	float		XScaleInv;			// 1 / XScale
-	float		YScaleInv;			// 1 / YScale;
-	float		ZScale;				// camera z scale
+	geFloat		XScale;
+	geFloat		YScale;
+	geFloat		XScaleInv;			// 1 / XScale
+	geFloat		YScaleInv;			// 1 / YScale;
+	geFloat		ZScale;				// camera z scale
 
 
 	geVec3d		PlaneNormal;		// Face normal
-	float		PlaneDist;
+	geFloat		PlaneDist;
 	geVec3d		RPlaneNormal;		// Rotated Face normal
 	geVec3d		Pov;
 } GInfo;
@@ -380,9 +380,9 @@ typedef geBoolean DRIVERCC DRAW_DECAL(geRDriver_THandle *THandle, RECT *SRect, i
 
 typedef geBoolean DRIVERCC SCREEN_SHOT(const char *Name);
 
-typedef geBoolean DRIVERCC SET_GAMMA(float Gamma);
-typedef geBoolean DRIVERCC GET_GAMMA(float *Gamma);
-typedef geBoolean DRIVERCC DRV_SET_FOG_ENABLE(geBoolean Enable, float r, float g, float b, float Start, float End);
+typedef geBoolean DRIVERCC SET_GAMMA(geFloat Gamma);
+typedef geBoolean DRIVERCC GET_GAMMA(geFloat *Gamma);
+typedef geBoolean DRIVERCC DRV_SET_FOG_ENABLE(geBoolean Enable, geFloat r, geFloat g, geFloat b, geFloat Start, geFloat End);
 
 typedef void SETUP_LIGHTMAP_CB(DRV_LInfo *LInfo, geBoolean *Dynamic);
 

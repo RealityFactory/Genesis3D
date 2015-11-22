@@ -31,7 +31,7 @@ typedef struct geBox
 	// all member variables are **PRIVATE**
 	// the Box's scales along the Box's local frame axes
 
-	float xScale, yScale, zScale;
+	geFloat xScale, yScale, zScale;
 
 	// the Box's local frame origin lies at (0, 0, 0) in local space
 	//
@@ -49,7 +49,7 @@ typedef struct geBox
 /////////////////////////////////////////////////////////////////////////////
 // call this to set up a Box for the first time or when the Box's
 // local frame axes scale(s) change
-void geBox_Set(geBox* Box, float xScale, float yScale, float zScale, const geXForm3d* Transform);
+void geBox_Set(geBox* Box, geFloat xScale, geFloat yScale, geFloat zScale, const geXForm3d* Transform);
 
 
 // call this to set the Box's transformation matrix (does not change the

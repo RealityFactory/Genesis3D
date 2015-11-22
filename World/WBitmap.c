@@ -424,7 +424,12 @@ geBoolean geWBitmap_Pool_CreateAllWBitmaps(geWBitmap_Pool *Pool, GBSP_BSPData *B
 
 	}
 
-	
+	// added to stop a leak		
+	if (BitmapIsTransparent)
+	{
+		geRam_Free(BitmapIsTransparent);
+		BitmapIsTransparent = NULL;
+	}
 
 	return GE_TRUE;
 
@@ -466,7 +471,7 @@ void geWBitmap_Pool_DestroyAllWBitmaps(geWBitmap_Pool *Pool)
 			// Destroy the geBitmap 
 			if (pWBitmap->Bitmap)
 			{
-				geBitmap_Destroy(&pWBitmap->Bitmap);
+				geBitmap_Destroy(&pWBitmap->Bitmap); 
 				pWBitmap->Bitmap = NULL;
 			}
 		}

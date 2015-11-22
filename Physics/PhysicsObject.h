@@ -37,14 +37,14 @@ typedef struct gePhysicsObject gePhysicsObject;
 
 GENESISAPI gePhysicsObject * GENESISCC gePhysicsObject_Create(
 	const geVec3d *StartLocation,
-	float mass,
+	geFloat mass,
 	geBoolean IsAffectedByGravity,
 	geBoolean RespondsToForces,
-	float linearDamping,
-	float angularDamping,
+	geFloat linearDamping,
+	geFloat angularDamping,
 	const geVec3d *	Mins,
 	const geVec3d *	Maxs,
-	float physicsScale);
+	geFloat physicsScale);
 GENESISAPI geBoolean GENESISCC gePhysicsObject_Destroy(gePhysicsObject** pPhysob);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,12 +54,12 @@ GENESISAPI geBoolean GENESISCC gePhysicsObject_ApplyGlobalFrameForce(gePhysicsOb
 	int configIndex);
 GENESISAPI geBoolean GENESISCC gePhysicsObject_ApplyGlobalFrameImpulse(gePhysicsObject* pPhysob, geVec3d* pImpulse, geVec3d* pRadVec, int configIndex);
 GENESISAPI geBoolean GENESISCC gePhysicsObject_ComputeForces(gePhysicsObject* pod, int configIndex);
-GENESISAPI geBoolean GENESISCC gePhysicsObject_Integrate(gePhysicsObject* pod, float deltaTime, int SourceConfigIndex);
+GENESISAPI geBoolean GENESISCC gePhysicsObject_Integrate(gePhysicsObject* pod, geFloat deltaTime, int SourceConfigIndex);
 
-GENESISAPI float GENESISCC gePhysicsObject_GetMass(const gePhysicsObject* po);
-GENESISAPI void GENESISCC gePhysicsObject_SetMass(gePhysicsObject* po, float mass);
+GENESISAPI geFloat GENESISCC gePhysicsObject_GetMass(const gePhysicsObject* po);
+GENESISAPI void GENESISCC gePhysicsObject_SetMass(gePhysicsObject* po, geFloat mass);
 
-GENESISAPI float GENESISCC gePhysicsObject_GetOneOverMass(const gePhysicsObject* po);
+GENESISAPI geFloat GENESISCC gePhysicsObject_GetOneOverMass(const gePhysicsObject* po);
 
 GENESISAPI void GENESISCC gePhysicsObject_GetXForm(const gePhysicsObject* po, geXForm3d* xform, int configIndex);
 GENESISAPI void GENESISCC gePhysicsObject_SetXForm(gePhysicsObject* po, const geXForm3d* xform, int configIndex);
@@ -117,17 +117,17 @@ GENESISAPI void GENESISCC gePhysicsObject_SetIsAffectedByGravity(gePhysicsObject
 GENESISAPI geBoolean GENESISCC gePhysicsObject_RespondsToForces(const gePhysicsObject* po);
 GENESISAPI void GENESISCC gePhysicsObject_SetRespondsToForces(gePhysicsObject* po, geBoolean flag);
 
-GENESISAPI float GENESISCC gePhysicsObject_GetLinearDamping(const gePhysicsObject* po);
-GENESISAPI void GENESISCC gePhysicsObject_SetLinearDamping(gePhysicsObject* po, float linearDamping);
+GENESISAPI geFloat GENESISCC gePhysicsObject_GetLinearDamping(const gePhysicsObject* po);
+GENESISAPI void GENESISCC gePhysicsObject_SetLinearDamping(gePhysicsObject* po, geFloat linearDamping);
 
-GENESISAPI float GENESISCC gePhysicsObject_GetAngularDamping(const gePhysicsObject* po);
-GENESISAPI void GENESISCC gePhysicsObject_SetAngularDamping(gePhysicsObject* po, float angularDamping);
+GENESISAPI geFloat GENESISCC gePhysicsObject_GetAngularDamping(const gePhysicsObject* po);
+GENESISAPI void GENESISCC gePhysicsObject_SetAngularDamping(gePhysicsObject* po, geFloat angularDamping);
 
 GENESISAPI void GENESISCC gePhysicsObject_SetActiveConfig(gePhysicsObject* pPhysob, int configIndex);
 GENESISAPI int GENESISCC gePhysicsObject_GetActiveConfig(gePhysicsObject* pPhysob);
 
-GENESISAPI void GENESISCC gePhysicsObject_SetPhysicsScale(gePhysicsObject* pPhysob, float scale);
-GENESISAPI float GENESISCC gePhysicsObject_GetPhysicsScale(gePhysicsObject* pPhysob);
+GENESISAPI void GENESISCC gePhysicsObject_SetPhysicsScale(gePhysicsObject* pPhysob, geFloat scale);
+GENESISAPI geFloat GENESISCC gePhysicsObject_GetPhysicsScale(gePhysicsObject* pPhysob);
 
 #ifdef __cplusplus
 }

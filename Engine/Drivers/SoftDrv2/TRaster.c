@@ -169,7 +169,7 @@ void GENESISCC TRaster_Setup(int MaxAffineSize,geRDriver_THandle *Dest, geRDrive
 	assert( Dest != NULL );
 	assert( LightMapSetup != NULL );
 	
-	Triangle.MaxAffineSize = (float)MaxAffineSize;
+	Triangle.MaxAffineSize = (geFloat)MaxAffineSize;
 
 
 	for (i=1; i<TRASTER_SMALL_DIVIDE_TABLESIZE; i++)
@@ -206,9 +206,9 @@ void GENESISCC TRaster_Rasterize(
 	uint32 DestPtr;
 	int32  DestWidth;
 	int Top,Middle,Bottom;
-	float Y0 = pVertices[0].y; 
-	float Y1 = pVertices[1].y;
-	float Y2 = pVertices[2].y;
+	geFloat Y0 = pVertices[0].y; 
+	geFloat Y1 = pVertices[1].y;
+	geFloat Y2 = pVertices[2].y;
 
 
 	
@@ -243,7 +243,7 @@ void GENESISCC TRaster_Rasterize(
 			W = Texture->Width >> MipIndex;
 			H = Texture->Height >> MipIndex;
 			if (Triangle_GradientsCompute(&(Triangle.Gradients),
-						pVertices,(float)(W),(float)(H))==GE_FALSE)
+						pVertices,(geFloat)(W),(geFloat)(H))==GE_FALSE)
 				return;  // poly has no area.
 
 			for(Triangle.StrideShift=1;((1<<Triangle.StrideShift) < W); Triangle.StrideShift++);

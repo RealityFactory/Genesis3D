@@ -48,6 +48,6 @@ void D3DTexWrap(DWORD Stage, BOOL Wrap);
 void D3DPolygonMode (D3DFILLMODE Mode);
 
 void D3DViewport (int32 x, int32 y, int32 width, int32 height);
-void D3DDepthRange (float zNear, float zFar);
+void D3DDepthRange (geFloat zNear, geFloat zFar);
 
 #endif

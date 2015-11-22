@@ -2940,7 +2940,7 @@ geBoolean geBitmap_BlitMipRect(const geBitmap * Src, int SrcMip, int SrcX,int Sr
 									 geBitmap * Dst, int DstMip, int DstX,int DstY,
 							int SizeX,int SizeY)
 {
-geBitmap * SrcLock,* DstLock;
+geBitmap * SrcLock=NULL,* DstLock=NULL;
 geBoolean SrcUnLock,DstUnLock;
 geBitmap_Info *SrcLockInfo,*DstLockInfo;
 uint8 *SrcBits,*DstBits;
@@ -3057,7 +3057,7 @@ geBitmap_Palette * Pal;
 	Pal = geBitmap_GetPalette(Bmp);
 	if ( Bmp->Info.HasColorKey )
 	{
-	uint32 CK;
+	uint32 CK=0;
 		if ( gePixelFormat_IsRaw(NewFormat) )
 		{
 			if ( gePixelFormat_IsRaw(Bmp->Info.Format) )
@@ -4341,8 +4341,8 @@ geBoolean geBitmap_Palette_BlitData(gePixelFormat SrcFormat,const void *SrcData,
 {
 char *SrcPtr,*DstPtr;
 geBoolean SrcHasCK,DstHasCK;
-uint32 SrcCK,DstCK;
-int SrcCKi,DstCKi;
+uint32 SrcCK=0,DstCK=0;
+int SrcCKi=0,DstCKi=0;
 
 	assert( SrcData && DstData );
 
@@ -4688,7 +4688,7 @@ GENESISAPI geBoolean GENESISCC geBitmap_Palette_UnLock(geBitmap_Palette *P)
 		{
 			if ( P->ColorKeyIndex >= 0 && P->ColorKeyIndex < P->Size )
 			{
-			uint8 *Bits,*pBits;
+			uint8 *Bits=NULL,*pBits=NULL;
 			uint32 Pixel;
 			int p;
 			const gePixelFormat_Operations *ops;
@@ -5200,16 +5200,13 @@ return GE_TRUE;
 #ifdef _DEBUG
 GENESISAPI uint32 GENESISCC geBitmap_Debug_GetCount(void)
 {
-	assert(  _Bitmap_Debug_ActiveRefs >=  _Bitmap_Debug_ActiveCount );
-
-//	Log_Printf("geBitmap_Debug_GetCount : Refs = %d\n",_Bitmap_Debug_ActiveRefs);
-
-//	geBitmap_Gamma_Debug_Report();
-
-	if (  _Bitmap_Debug_ActiveCount == 0 )
-		assert(_Bitmap_Debug_ActiveRefs == 0 );
 
 	return _Bitmap_Debug_ActiveCount;
+}
+GENESISAPI uint32 GENESISCC geBitmap_Debug_GetRefs(void)
+{
+
+	return _Bitmap_Debug_ActiveRefs;
 }
 #endif
 

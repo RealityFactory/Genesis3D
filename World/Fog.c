@@ -63,9 +63,9 @@ GENESISAPI void geFog_Destroy(geFog *Fog)
 GENESISAPI geBoolean geFog_SetAttributes(	geFog			*Fog, 
 											const geVec3d	*Pos, 
 											GE_RGBA			*Color,
-											float			LightBrightness, 
-											float			VolumeBrightness, 
-											float			VolumeRadius)
+											geFloat			LightBrightness, 
+											geFloat			VolumeBrightness, 
+											geFloat			VolumeRadius)
 {
 	Fog->Pos = *Pos;
 	Fog->Color.r = Color->r*(1.0f/255.0f)*(1<<8);

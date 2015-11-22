@@ -71,11 +71,11 @@ extern void DrawScanLineGouraudZBufferNoZWriteSolid_Asm3DNow(EdgeAsm *pLeft, Edg
 extern	void DrawSpan32_AsmLit3DNow(int32 x1, int32 x2, int32 y);
 extern	void DrawSpan32_AsmLitZWrite3DNow(int32 x1, int32 x2, int32 y);
 extern	void DrawSpan32_AsmLitZBuffer3DNow(int32 x1, int32 x2, int32 y);
-extern	void DrawSpan32_AsmGouraud3DNow(int32 x1, int32 x2, int32 y, float r1, float g1, float b1, float r2, float g2, float b2);
-extern	void DrawSpan32_AsmGouraudZWrite3DNow(int32 x1, int32 x2, int32 y, float r1, float g1, float b1, float r2, float g2, float b2);
-extern	void DrawSpan32_AsmGouraudZBuffer3DNow(int32 x1, int32 x2, int32 y, float r1, float g1, float b1, float r2, float g2, float b2);
-extern	void DrawSpan32_AsmGouraudZBufferAlphaARGB3DNow(int32 x1, int32 x2, int32 y, float r1, float g1, float b1, float r2, float g2, float b2);
-extern	void DrawSpan32_AsmGouraudZBufferVertexAlpha3DNow(int32 x1, int32 x2, int32 y, float r1, float g1, float b1, float r2, float g2, float b2);
+extern	void DrawSpan32_AsmGouraud3DNow(int32 x1, int32 x2, int32 y, geFloat r1, geFloat g1, geFloat b1, geFloat r2, geFloat g2, geFloat b2);
+extern	void DrawSpan32_AsmGouraudZWrite3DNow(int32 x1, int32 x2, int32 y, geFloat r1, geFloat g1, geFloat b1, geFloat r2, geFloat g2, geFloat b2);
+extern	void DrawSpan32_AsmGouraudZBuffer3DNow(int32 x1, int32 x2, int32 y, geFloat r1, geFloat g1, geFloat b1, geFloat r2, geFloat g2, geFloat b2);
+extern	void DrawSpan32_AsmGouraudZBufferAlphaARGB3DNow(int32 x1, int32 x2, int32 y, geFloat r1, geFloat g1, geFloat b1, geFloat r2, geFloat g2, geFloat b2);
+extern	void DrawSpan32_AsmGouraudZBufferVertexAlpha3DNow(int32 x1, int32 x2, int32 y, geFloat r1, geFloat g1, geFloat b1, geFloat r2, geFloat g2, geFloat b2);
 
 typedef struct	EdgeAsmWorldTag	EdgeAsmWorld;
 

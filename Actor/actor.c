@@ -43,7 +43,9 @@
 #include "Motion.h"
 #include "ErrorLog.h"
 #include "strblock.h"
-
+#ifdef _DEBUG
+#include <crtdbg.h>
+#endif
 
 /* to do:
 		need to utilize extbox module rather than hard coding vector corners of boxes
@@ -115,6 +117,44 @@ GENESISAPI geBoolean GENESISCC geActor_IsValid(const geActor *A)
 	return GE_TRUE;
 }
 	
+
+//MRB BEGIN
+GENESISAPI void GENESISCC geActor_GetNonWorldExtBox(const geActor *A, geExtBox *ExtBox)
+{
+	assert( geActor_IsValid(A) != GE_FALSE);
+	assert( ExtBox != NULL );
+	
+	geVec3d_Copy(&(A->BoundingBoxMinCorner), &(ExtBox->Min));
+	geVec3d_Copy(&(A->BoundingBoxMaxCorner), &(ExtBox->Max));
+}
+GENESISAPI void GENESISCC geActor_GetPosition(const geActor *A, geVec3d *Pos)
+{
+	geXForm3d Transform;
+	assert( geActor_IsValid(A) != GE_FALSE);
+	assert( Pos != NULL );
+	gePose_GetJointTransform( A->Pose,
+		A->BoundingBoxCenterBoneIndex,
+		&Transform); 
+	assert ( geXForm3d_IsOrthonormal(&Transform) != GE_FALSE );
+	geVec3d_Copy(&(Transform.Translation), Pos);
+}
+//MRB END
+
+// LWM_ACTOR_RENDERING:
+GENESISAPI geFloat GENESISCC geActor_GetAlpha(const geActor *A)
+{
+	assert( A != NULL ) ;
+	assert( A->Puppet != NULL ) ;
+	return gePuppet_GetAlpha(A->Puppet);
+}
+
+// LWM_ACTOR_RENDERING:
+GENESISAPI void GENESISCC geActor_SetAlpha(geActor *A, geFloat Alpha)
+{
+	assert( A != NULL ) ;
+	assert( A->Puppet != NULL ) ;
+	gePuppet_SetAlpha( A->Puppet, Alpha ) ;
+}
 
 GENESISAPI geBoolean GENESISCC geActor_DefIsValid(const geActor_Def *A)
 {
@@ -321,7 +361,7 @@ GENESISAPI geBoolean GENESISCC geActor_DefDestroy(geActor_Def **pActorDefinition
 }
 
 
-GENESISAPI void GENESISCC geActor_Destroy(geActor **pA)
+GENESISAPI geBoolean GENESISCC geActor_Destroy(geActor **pA)
 {
 	geActor *A;
 	assert(  pA != NULL );
@@ -333,7 +373,7 @@ GENESISAPI void GENESISCC geActor_Destroy(geActor **pA)
 		{
 			A->RefCount --;
 			geActor_RefCount--;
-			return;
+			return GE_FALSE;
 		}
 
 	geActor_DefDestroy(&(A->ActorDefinition));
@@ -355,6 +395,65 @@ GENESISAPI void GENESISCC geActor_Destroy(geActor **pA)
 	geRam_Free(*pA);
 	geActor_Count--;
 	*pA = NULL;
+	return GE_TRUE;
+
+}
+
+
+GENESISAPI geBoolean GENESISCC geActor_DestroyDirect(geActor **pA)
+{
+		geActor		*CurrentActor=NULL;
+		int			i=0;
+
+		// dumb brute force deletion of actors in ActorArray
+
+		// destroy the actor
+		CurrentActor = *pA;
+
+		if(!CurrentActor)
+			return GE_FALSE;
+
+		gePuppet_Destroy( &(CurrentActor->Puppet) );
+		gePose_Destroy( &( CurrentActor->Pose ) );
+		geMotion_Destroy(&(CurrentActor->CueMotion));
+
+		assert( _CrtIsValidPointer( &CurrentActor->ActorDefinition, sizeof(CurrentActor->ActorDefinition), FALSE ) );
+
+		if(geActor_DefIsValid(CurrentActor->ActorDefinition)==GE_TRUE )
+		{
+		// destroy the definition
+		if (CurrentActor->ActorDefinition->Body != NULL)
+			{
+			geBody_Destroy( &(CurrentActor->ActorDefinition->Body) );
+			CurrentActor->ActorDefinition->Body = NULL;
+			}
+		if (CurrentActor->ActorDefinition->MotionArray != NULL)
+			{
+				for (i=0; i<CurrentActor->ActorDefinition->MotionCount; i++)
+					{
+					geMotion_Destroy( &(CurrentActor->ActorDefinition->MotionArray[i]) );
+					CurrentActor->ActorDefinition->MotionArray[i] = NULL;
+					}
+				geRam_Free( CurrentActor->ActorDefinition->MotionArray );
+				CurrentActor->ActorDefinition->MotionArray = NULL;
+			}
+					
+		CurrentActor->ActorDefinition->TextureFileContext=NULL;
+		CurrentActor->ActorDefinition->ValidityCheck = NULL;
+		
+		//free the def
+		geRam_Free(CurrentActor->ActorDefinition);
+		CurrentActor->ActorDefinition = NULL;
+		
+		}
+
+		CurrentActor->UserData = NULL;
+
+		// free the actor
+		geRam_Free(CurrentActor);
+		CurrentActor = NULL;
+
+return GE_TRUE;
 }
 
 GENESISAPI geBoolean GENESISCC geActor_SetBody( geActor_Def *ActorDefinition, geBody *BodyGeometry)
@@ -780,6 +879,17 @@ GENESISAPI geBoolean GENESISCC geActor_GetBoneTransform(const geActor *A, const 
 }
 
 
+GENESISAPI geBoolean GENESISCC geActor_GetBoneTransformByIndex(const geActor *A, int BoneIndex, geXForm3d *Transform)
+{
+	assert( geActor_IsValid(A)!=GE_FALSE );
+	assert( Transform!= NULL );
+	
+	gePose_GetJointTransform(   A->Pose, BoneIndex,	Transform);
+	assert ( geXForm3d_IsOrthonormal(Transform) != GE_FALSE );
+
+	return GE_TRUE;
+}
+
 static void GENESISCC geActor_AccumulateMinMax(
 	geVec3d *P,geVec3d *Mins,geVec3d *Maxs)
 {
@@ -861,7 +971,7 @@ static geBoolean GENESISCC geActor_GetBoneBoundingBoxByIndex(
 
 
 
-static geBoolean GENESISCC geActor_GetBoneExtBoxByIndex(
+GENESISAPI geBoolean GENESISCC geActor_GetBoneExtBoxByIndex(
 	const geActor *A, 
 	int BoneIndex,
 	geExtBox *ExtBox)
@@ -1090,6 +1200,13 @@ static void GENESISCC geActor_StretchBoundingBox( geVec3d *Min, geVec3d *Max,
 	geVec3d_Subtract(&P,DX,&P);
 	Min->X = MIN(Min->X,P.X);	Min->Y = MIN(Min->Y,P.Y);	Min->Z = MIN(Min->Z,P.Z);
 	Max->X = MAX(Max->X,P.X);	Max->Y = MAX(Max->Y,P.Y);	Max->Z = MAX(Max->Z,P.Z);
+}
+
+//	eaa3 07/27/2000
+
+GENESISAPI int geActor_GetBoneCount(const geActor *A)
+{
+	return geBody_GetBoneCount( A->ActorDefinition->Body );
 }
 
 GENESISAPI geBoolean GENESISCC geActor_GetDynamicExtBox( const geActor *A, geExtBox *ExtBox)
@@ -1632,6 +1749,21 @@ GENESISAPI geBoolean GENESISCC geActor_GetLightingOptions(const geActor *Actor,
 	return GE_TRUE; // CB
 }
 
+//Actor-level environmental mapping code
+GENESISAPI void GENESISCC geActor_SetEnvironOptions( geActor *A, geEnvironmentOptions *opts )
+{
+	assert ( geActor_IsValid(A) != GE_FALSE );
+	assert ( A->Puppet != NULL );
+	gePuppet_SetEnvironmentOptions( A->Puppet, opts );
+}
+
+GENESISAPI geEnvironmentOptions GENESISCC geActor_GetEnvironOptions( geActor *A )
+{
+	assert ( geActor_IsValid(A) != GE_FALSE );
+	assert ( A->Puppet != NULL );
+	return gePuppet_GetEnvironmentOptions( A->Puppet );
+}
+
 GENESISAPI geBoolean GENESISCC geActor_SetLightingOptions(geActor *A,
 	geBoolean UseFillLight,
 	const geVec3d *FillLightNormal,
@@ -1740,6 +1872,9 @@ geBoolean GENESISCC geActor_RenderPrep( geActor *A, geWorld *World)
 		}
 	{
 		geExtBox EB;
+		//initialize body bounding box
+   		geActor_GetDynamicExtBox(A, &EB);
+   		geBody_SetBoundingBox(A->ActorDefinition->Body, GE_BODY_ROOT, &EB.Min,    &EB.Max);
 		if (geActor_GetBoneExtBoxByIndex(A,GE_POSE_ROOT_JOINT,&EB) == GE_FALSE)
 			{
 				geErrorLog_AddString(-1,"Failure to get Root Bounding box from puppet", NULL);
@@ -1830,4 +1965,37 @@ GENESISAPI geBoolean GENESISCC geActor_SetMaterial(geActor *A, int MaterialIndex
 	assert( A->Puppet != NULL );
 
 	return gePuppet_SetMaterial(A->Puppet,MaterialIndex, Bitmap, Red, Green, Blue );
+}
+
+GENESISAPI geBoolean GENESISCC geActor_SetStaticLightingOptions(geActor *A,	geBoolean AmbientLightFromStaticLights,	geBoolean TestRayCollision,	int MaxStaticLightsToUse	)
+{	assert( geActor_IsValid(A)!=GE_FALSE );
+		if (A->Puppet == NULL)
+		{			
+			geErrorLog_AddString(-1,"Can't set lighting options until actor is prepared for rendering", NULL);
+			return GE_FALSE;		
+		}
+		gePuppet_SetStaticLightingOptions( A->Puppet,
+								  AmbientLightFromStaticLights,
+								  MaxStaticLightsToUse,
+								  TestRayCollision
+								  );
+		return GE_TRUE;
+}
+
+GENESISAPI geBoolean GENESISCC geActor_GetStaticLightingOptions(	const geActor *Actor,	geBoolean *UseAmbientLightFromStaticLights,	geBoolean *TestRayCollision,	int *MaxStaticLightsToUse	)
+{	assert( geActor_IsValid(Actor)!=GE_FALSE );
+	assert( UseAmbientLightFromStaticLights != NULL );
+	assert( TestRayCollision != NULL );
+	if (Actor->Puppet == NULL)
+	{
+		geErrorLog_AddString(-1,"Can't set lighting options until actor is prepared    for rendering", NULL);
+		return GE_FALSE;
+	}
+
+	gePuppet_GetStaticLightingOptions( Actor->Puppet,
+								  UseAmbientLightFromStaticLights,
+								  TestRayCollision,
+								  MaxStaticLightsToUse
+								  );
+	return GE_TRUE;
 }

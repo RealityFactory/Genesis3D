@@ -45,6 +45,15 @@ extern "C" {
 #define GE_ACTOR_RENDER_ALWAYS			(1<<2)		// Render always, skipping all visibility tests
 #define GE_ACTOR_COLLIDE				(1<<3)		// Collide when calling geWorld_Collision
 
+typedef struct
+{
+	geBoolean		UseEnvironmentMapping;	//toggle for actor-level environ-map
+	geBoolean		Supercede;		//toggle for material-level
+	geFloat			PercentEnvironment;
+	geFloat			PercentMaterial;		//Used when Supercede == GE_FALSE
+	geFloat			PercentPuppet;
+} geEnvironmentOptions;
+
 //
 //	Model flags (geWorld_ModelSetFlags)
 //
@@ -55,7 +64,7 @@ extern "C" {
 
 typedef struct
 {
-	float r, g, b, a;
+	geFloat r, g, b, a;
 } GE_RGBA;
 
 typedef struct
@@ -76,18 +85,18 @@ typedef struct
 typedef struct
 {
 	// FIXME:  Convert 3d X,Y,Z to geVec3d
-	float X, Y, Z;									// 3d vertex
-	float u, v;										// Uv's
+	geFloat X, Y, Z;									// 3d vertex
+	geFloat u, v;										// Uv's
 	// FIXME:  Convert r,g,b,a to GE_RGBA
-	float r, g, b, a;								// color
+	geFloat r, g, b, a;								// color
 } GE_LVertex;
 
 // Transformed Lit vertex
 typedef struct
 {
-	float x, y, z;									// screen points
-	float u, v;										// Uv's
-	float r, g, b, a;								// color
+	geFloat x, y, z;									// screen points
+	geFloat u, v;										// Uv's
+	geFloat r, g, b, a;								// color
 } GE_TLVertex;
 
 typedef GE_Rect geRect;

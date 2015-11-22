@@ -40,7 +40,6 @@
 #include "log.h"
 
 //#define DO_ADDREMOVE_MESSAGES
-
 #ifndef _DEBUG
 #undef DO_ADDREMOVE_MESSAGES
 #endif
@@ -65,7 +64,7 @@ static void SubLarge(LARGE_INTEGER *start, LARGE_INTEGER *end, LARGE_INTEGER *de
 //=====================================================================================
 //	geEngine_SetGamma
 //=====================================================================================
-GENESISAPI geBoolean geEngine_SetGamma(geEngine *Engine, float Gamma)
+GENESISAPI geBoolean geEngine_SetGamma(geEngine *Engine, geFloat Gamma)
 {
 	assert(Engine);
 
@@ -85,7 +84,7 @@ GENESISAPI geBoolean geEngine_SetGamma(geEngine *Engine, float Gamma)
 //=====================================================================================
 //	geEngine_GetGamma
 //=====================================================================================
-GENESISAPI geBoolean geEngine_GetGamma(geEngine *Engine, float *Gamma)
+GENESISAPI geBoolean geEngine_GetGamma(geEngine *Engine, geFloat *Gamma)
 {
 	assert(Engine);
 	assert(Gamma);
@@ -116,7 +115,7 @@ static geBoolean geEngine_UpdateFogEnable(geEngine *Engine)
 //=====================================================================================
 //	geEngine_SetFogEnable
 //=====================================================================================
-GENESISAPI geBoolean geEngine_SetFogEnable(geEngine *Engine, geBoolean Enable, float r, float g, float b, float Start, float End)
+GENESISAPI geBoolean geEngine_SetFogEnable(geEngine *Engine, geBoolean Enable, geFloat r, geFloat g, geFloat b, geFloat Start, geFloat End)
 {
 	Engine->FogEnable = Enable;
 	
@@ -309,6 +308,216 @@ GENESISAPI geBoolean geEngine_RemoveBitmap(geEngine *Engine, geBitmap *Bitmap)
 		#endif
 	}
 	
+	return GE_TRUE;
+}
+
+//	DrawAlphaBitmap
+
+///////////////////////////////////////////////////////////////
+//  
+//  geEngine_DrawAlphaBitmap()
+//  
+//  Draw a btimap with alpha transparancy
+//  
+///////////////////////////////////////////////////////////////
+
+GENESISAPI geBoolean GENESISCC geEngine_DrawAlphaBitmap(	
+		geEngine * Engine,
+		geBitmap * pBitmap,
+		geVec3d * VertUVArray,
+		geCamera * ClipCamera,	// if null, uses full screen
+		GE_Rect * PixelRect,		// pixels in the "camera" view
+		GE_Rect * PercentRect,	// percent of the "camera" view
+		geFloat   Alpha,
+		GE_RGBA * RGBA_Array
+		)
+{
+// set up variables
+  GE_TLVertex vertex[4];
+  geFloat fUVAdd = 0.0f;
+  geFloat fWidthBmp = 0;
+  geFloat fHeightBmp = 0;
+  GE_Rect ClipRect = {0,0,0,0};
+	GE_Rect UseRect = {0,0,0,0};
+	geVec3d DefaultUVArray[4] = {{0,0,0},{1,0,0},{1,1,0},{0,1,0}};
+	GE_RGBA DefaultRGBA_Array[4] =
+		{{255,255,255,Alpha},
+		{255,255,255,Alpha},
+		{255,255,255,Alpha},
+		{255,255,255,Alpha}};	
+	geBitmap_Info TempInfo, TempInfo2;
+	geFloat UVbreak = 0.0f;
+
+	if(pBitmap)
+		geBitmap_GetInfo(pBitmap, &TempInfo, &TempInfo2);
+	else
+		TempInfo.Height = TempInfo.Width = 8;
+
+	fWidthBmp = (geFloat)TempInfo.Width;
+	fHeightBmp = (geFloat)TempInfo.Height;
+
+//
+// Clip 2d viewport
+//
+
+#if 0
+//	eaa3 01/14/2001 Right now, you have to pass the camera in.
+//	..I'll fix it eventually...
+  if(!ClipCamera )
+    {
+		ClipRect.Top = 0;
+		ClipRect.Left = 0;
+		ClipRect.Bottom = CHeight-1;
+		ClipRect.Right = CWidth-1;
+    }
+  else
+#endif
+    geCamera_GetClippingRect( ClipCamera, &ClipRect );
+
+	if(!VertUVArray)
+		VertUVArray = &DefaultUVArray[0];
+	if(!RGBA_Array)
+		RGBA_Array = &DefaultRGBA_Array[0];
+	if(PixelRect)
+	  {
+		UseRect.Top = PixelRect->Top + ClipRect.Top;
+		UseRect.Left = PixelRect->Left + ClipRect.Left;
+		UseRect.Bottom = PixelRect->Bottom + ClipRect.Top;
+		UseRect.Right = PixelRect->Right + ClipRect.Left;
+	  }
+	else
+	  {
+		if(PercentRect)
+		  {
+			UseRect.Top		= ClipRect.Top
+				+ (int32)(0.01f * PercentRect->Top	
+				* (ClipRect.Bottom - ClipRect.Top));
+			UseRect.Left	= ClipRect.Left
+				+ (int32)(0.01f * PercentRect->Left
+				* (ClipRect.Right	- ClipRect.Left));
+			UseRect.Bottom	= ClipRect.Bottom	
+				+ (int32)(0.01f * PercentRect->Bottom
+				* (ClipRect.Bottom - ClipRect.Top));
+			UseRect.Right	= ClipRect.Right	
+				+ (int32)(0.01f * PercentRect->Right	
+				* (ClipRect.Right	- ClipRect.Left));
+		  }
+		else
+		  {
+			UseRect = ClipRect;
+		  }
+	  }
+
+	vertex[0].x = (geFloat)UseRect.Left;
+	vertex[0].y = (geFloat)UseRect.Top;
+	vertex[0].z = 1.0f;	
+	vertex[0].r = RGBA_Array[0].r;
+	vertex[0].g = RGBA_Array[0].g;
+	vertex[0].b = RGBA_Array[0].b;
+	vertex[0].a = RGBA_Array[0].a;
+	vertex[0].u = VertUVArray[0].X + UVbreak/fWidthBmp;
+	vertex[0].v = VertUVArray[0].Y + UVbreak/fHeightBmp;
+
+	vertex[1].x = (geFloat)UseRect.Right;
+	vertex[1].y = (geFloat)UseRect.Top;
+	vertex[1].z = vertex[0].z;
+	vertex[1].r = RGBA_Array[1].r;
+	vertex[1].g = RGBA_Array[1].g;
+	vertex[1].b = RGBA_Array[1].b;
+	vertex[1].a = RGBA_Array[1].a;
+	vertex[1].u = VertUVArray[1].X - UVbreak/fWidthBmp;
+	vertex[1].v = VertUVArray[1].Y + UVbreak/fHeightBmp;
+	
+	vertex[2].x = (geFloat)UseRect.Right;
+	vertex[2].y = (geFloat)UseRect.Bottom;
+	vertex[2].z = vertex[0].z;
+	vertex[2].r = RGBA_Array[2].r;
+	vertex[2].g = RGBA_Array[2].g;
+	vertex[2].b = RGBA_Array[2].b;
+	vertex[2].a = RGBA_Array[2].a;
+	vertex[2].u = VertUVArray[2].X - UVbreak/fWidthBmp;
+	vertex[2].v = VertUVArray[2].Y - UVbreak/fHeightBmp;
+
+	vertex[3].x = (geFloat)UseRect.Left;
+	vertex[3].y = (geFloat)UseRect.Bottom;
+	vertex[3].z = vertex[0].z;
+	vertex[3].r = RGBA_Array[3].r;
+	vertex[3].g = RGBA_Array[3].g;
+	vertex[3].b = RGBA_Array[3].b;
+	vertex[3].a = RGBA_Array[3].a;
+	vertex[3].u = VertUVArray[3].X + UVbreak/fWidthBmp;	
+	vertex[3].v = VertUVArray[3].Y - UVbreak/fHeightBmp;
+
+  if(vertex[0].x < ClipRect.Left )
+    {
+    if(vertex[1].x <= ClipRect.Left )
+      {
+			geErrorLog_AddString(-1, "Clipping Rect has negative dimension",
+				NULL);
+			return GE_FALSE;
+      }
+    fUVAdd = ( ClipRect.Left - vertex[0].x ) / fWidthBmp;
+    fWidthBmp -= ( ClipRect.Left - vertex[0].x );
+    vertex[0].u += fUVAdd;
+    vertex[3].u = vertex[0].u;
+    vertex[0].x = (geFloat)ClipRect.Left;
+    vertex[3].x = vertex[0].x;
+    }
+
+  if( vertex[0].y < ClipRect.Top )
+    {
+    if( vertex[2].y <= ClipRect.Top )
+      {
+			geErrorLog_AddString(-1, "Clipping Rect has negative dimension",
+				NULL);
+			return GE_FALSE;
+      }
+    fUVAdd = ( ClipRect.Top - vertex[0].y ) / fHeightBmp;
+    fHeightBmp -= ( ClipRect.Top - vertex[0].y );
+    vertex[0].v += fUVAdd;
+    vertex[1].v = vertex[0].v;
+    vertex[0].y = (geFloat)ClipRect.Top;
+    vertex[1].y = vertex[0].y;
+    }
+
+  if(vertex[1].x > ClipRect.Right )
+    {
+    if( vertex[0].x >= ClipRect.Right )
+      {
+			geErrorLog_AddString(-1, "Clipping Rect has negative dimension",
+				NULL);
+      return GE_FALSE;
+      }
+    fUVAdd = ( vertex[1].x - ClipRect.Right ) / fWidthBmp;
+    vertex[1].u -= fUVAdd;
+    vertex[2].u = vertex[1].u;
+    vertex[1].x = (geFloat)ClipRect.Right - 1;
+    vertex[2].x = vertex[1].x;
+    }
+
+  if( vertex[2].y > ClipRect.Bottom )
+    {
+    if( vertex[0].y >= ClipRect.Bottom )
+      {
+			geErrorLog_AddString(-1, "Clipping Rect has negative dimension",
+				NULL);
+			return GE_FALSE;
+      }
+    fUVAdd = ( vertex[2].y - ClipRect.Bottom ) / fHeightBmp;
+    vertex[2].v -= fUVAdd;
+    vertex[3].v = vertex[2].v;
+    vertex[2].y = (geFloat)ClipRect.Bottom - 1;
+    vertex[3].y = vertex[2].y;
+    }
+
+  geEngine_RenderPoly( Engine, 
+                         vertex, 
+                         4, 
+                         pBitmap,
+                         ( Alpha != 255 ? DRV_RENDER_ALPHA : 0 ) | 
+			DRV_RENDER_CLAMP_UV | DRV_RENDER_FLUSH | 
+			DRV_RENDER_NO_ZMASK | DRV_RENDER_NO_ZWRITE );
+
 	return GE_TRUE;
 }
 
@@ -1587,7 +1796,7 @@ extern int32	NumGetContents;
 GENESISAPI geBoolean geEngine_EndFrame(geEngine *Engine)
 {
 	LARGE_INTEGER		NowTic, DeltaTic;
-	float				Fps;
+	geFloat				Fps;
 	//DRV_Debug			*Debug;
 
 	assert(Engine != NULL);
@@ -1616,12 +1825,12 @@ GENESISAPI geBoolean geEngine_EndFrame(geEngine *Engine)
 	}
 
 	QueryPerformanceCounter(&NowTic);
-	//CurrentFrequency = ((float)PR_EntireFrame.ElapsedCycles/200.0f)
+	//CurrentFrequency = ((geFloat)PR_EntireFrame.ElapsedCycles/200.0f)
 
 	SubLarge(&Engine->CurrentTic, &NowTic, &DeltaTic);
 
 	if (DeltaTic.LowPart > 0)
-		Fps =  (float)Engine->CPUInfo.Freq / (float)DeltaTic.LowPart;
+		Fps =  (geFloat)Engine->CPUInfo.Freq / (geFloat)DeltaTic.LowPart;
 	else 
 		Fps = 100.0f;
 
@@ -1629,9 +1838,9 @@ GENESISAPI geBoolean geEngine_EndFrame(geEngine *Engine)
 	{
 		#define				MAX_FPS_ARRAY		20
 
-		float				AverageFps;
+		geFloat				AverageFps;
 		DRV_CacheInfo		*pCacheInfo;
-		static float		FpsArray[MAX_FPS_ARRAY];
+		static geFloat		FpsArray[MAX_FPS_ARRAY];
 		static int32		NumFps = 0, i;
 
 		// Changed Average Fps to go accross last n frames, JP...
@@ -1640,7 +1849,7 @@ GENESISAPI geBoolean geEngine_EndFrame(geEngine *Engine)
 		for (AverageFps = 0.0f, i=0; i<MAX_FPS_ARRAY; i++)
 			AverageFps += FpsArray[i];
 
-		AverageFps *= (1.0f/(float)MAX_FPS_ARRAY);
+		AverageFps *= (1.0f/(geFloat)MAX_FPS_ARRAY);
 
 		// Grab some driver debug info
 		Engine->DebugInfo.RenderedPolys = Engine->DriverInfo.RDriver->NumRenderedPolys;

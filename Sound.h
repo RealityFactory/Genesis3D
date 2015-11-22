@@ -46,6 +46,8 @@ GENESISAPI	geSound_Def	   *geSound_LoadSoundDef(geSound_System *SoundS, geVFile 
 GENESISAPI	void			geSound_FreeSoundDef(geSound_System *SoundS, 
 									geSound_Def *SoundDef);
 
+GENESISAPI	void			geSound_FreeAllChannels(geSound_System *SoundS);
+
 GENESISAPI	geSound		   *geSound_PlaySoundDef(geSound_System *SoundS, 
 									geSound_Def *SoundDef, 
 									geFloat Volume, 
@@ -60,6 +62,9 @@ GENESISAPI	geBoolean		geSound_ModifySound(geSound_System *SoundS,
 									geFloat Frequency);
 GENESISAPI	geBoolean		geSound_SoundIsPlaying(geSound_System *SoundS, geSound *Sound);
 GENESISAPI	geBoolean		geSound_SetMasterVolume( geSound_System *SoundS, geFloat Volume );
+//	Added 11/08/1999 Ed Averill API call to return DSOUND object
+GENESISAPI void *geSound_GetDSound(void);
+//	End 11/08/1999 modification
 
 // GENESIS_PRIVATE_APIS
 

@@ -40,9 +40,9 @@ static RECT			OldWindow;
 GMain_BoardInfo		g_BoardInfo;			// Global board info for current hardware
 
 geBoolean			g_FogEnable = GE_TRUE;
-float				g_FogR;
-float				g_FogG;
-float				g_FogB;
+geFloat				g_FogR;
+geFloat				g_FogG;
+geFloat				g_FogB;
 
 //==============================================================================
 //==============================================================================
@@ -381,7 +381,7 @@ geBoolean DRIVERCC GMain_ScreenShot(const char *Name)
 //==================================================================================
 //	GMain_SetFogEnable
 //==================================================================================
-geBoolean DRIVERCC GMain_SetFogEnable(geBoolean Enable, float r, float g, float b, float Start, float End)
+geBoolean DRIVERCC GMain_SetFogEnable(geBoolean Enable, geFloat r, geFloat g, geFloat b, geFloat Start, geFloat End)
 {
 	g_FogEnable = Enable;
 	g_FogR = r;

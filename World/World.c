@@ -21,7 +21,7 @@
 /****************************************************************************************/
 #include <Assert.h>
 #include <Math.h>
-
+ 
 #include "World.h"
 #include "System.h"
 #include "Ram.h"
@@ -48,10 +48,13 @@
 #include "Bitmap.h"
 #include "Bitmap._h"
 
+#include "Puppet.h"
+#include "Body.h"
+#include "Motion.h"
+
 //#define BSP_BACK_TO_FRONT
 
 //#define DO_ADDREMOVE_MESSAGES
-
 #ifndef _DEBUG
 #undef DO_ADDREMOVE_MESSAGES
 #endif
@@ -69,6 +72,7 @@ void				geCamera_FillDriverInfo(geCamera *Camera);
 extern geVec3d		GlobalEyePos;
 
 Frustum_Info		g_HackFrustum;
+
 //============================================================================
 //	**END** HACK section
 //============================================================================
@@ -484,8 +488,12 @@ GENESISAPI geWorld *geWorld_Create(geVFile *File)
 //=====================================================================================
 GENESISAPI void geWorld_Free(geWorld *World)
 {
-	int				i;
-	geFog			*Fog, *Next;
+	int			i;
+	geFog		*Fog, *Next;
+	/*extern		geActor_Count;
+	extern		geActor_RefCount;
+	extern		geActor_DefCount;
+	extern		geActor_DefRefCount;*/
 
 	assert(World);
 	assert(World->RefCount > 0);
@@ -503,9 +511,16 @@ if (World->CurrentBSP)
 			assert( World->ActorArray != NULL );
 			for (i=0; i< World->ActorCount; i++)
 				{
-					geActor_Destroy( &( World->ActorArray[i].Actor ) );
+				if(!geActor_Destroy( &( World->ActorArray[i].Actor ) ))
+					geErrorLog_AddString(-1, "geWorld_Free:  geActor_Destroy failed.", NULL);
 				}
-			World->ActorCount = 0;
+
+			/*geActor_Count       = 0;geActor_DestroyDirect
+			geActor_RefCount    = 0;
+			geActor_DefCount    = 0;
+			geActor_DefRefCount = 0;*/
+			World->ActorCount	= 0;
+
 	}
 	if (World->ActorArray != NULL)
 		{
@@ -968,7 +983,7 @@ static geBoolean RenderScene(geEngine *Engine, geWorld *World, geCamera *Camera,
 //=====================================================================================
 static void RenderBSPFrontBack_r2(int32 Node, geCamera *Camera)
 {
-	float			Dist1;
+	geFloat			Dist1;
 	GFX_Node		*pNode;
 	int32			Side;
 
@@ -1022,7 +1037,7 @@ static void RenderBSPFrontBack_r2(int32 Node, geCamera *Camera)
 //=====================================================================================
 static void RenderBSPFrontBack_r(int32 Node, const geWorld_RenderInfo *RenderInfo, int32 ClipFlags)
 {
-	float			Dist1;
+	geFloat			Dist1;
 	int32			i;
 	int32			k, f, Side;
 	GFX_Node		*pNode;
@@ -1063,16 +1078,16 @@ static void RenderBSPFrontBack_r(int32 Node, const geWorld_RenderInfo *RenderInf
 	
 	if (ClipFlags)	
 	{
-		float			*MinMaxs;
+		geFloat			*MinMaxs;
 		int32			*Index;
-		float			Dist;
+		geFloat			Dist;
 		geVec3d			Pnt;
 		GFX_Plane		*Planes;
 		Frustum_Info	*Fi;
 
 		Fi = RenderInfo->Frustum;
 
-		MinMaxs = (float*)&pNode->Mins;
+		MinMaxs = (geFloat*)&pNode->Mins;
 		Planes = Fi->Planes;
 
 		for (k=0; k< Fi->NumPlanes; k++)
@@ -1273,6 +1288,7 @@ static void RenderFace(int32 Face, const geWorld_RenderInfo *RenderInfo, int32 C
 			pDest1->Z = pGFXVerts[*pIndex].Z;
 			pDest1++;
 			pIndex++;
+
 		}
 	}
 
@@ -1281,6 +1297,7 @@ static void RenderFace(int32 Face, const geWorld_RenderInfo *RenderInfo, int32 C
 	pTex1 = &CBSP->TexVerts[pFace->FirstVert];
 	pTex2 = Tex2;
 	Length1 = NumVerts;
+
 
 	FPlanes = Fi->Planes;
 
@@ -1402,7 +1419,7 @@ static void RenderFace(int32 Face, const geWorld_RenderInfo *RenderInfo, int32 C
 		geXForm3d		MirrorXForm, OldXForm;
 		GFX_Plane		*pPlane;
 		geVec3d			FaceNormal;
-		float			FaceDist;
+		geFloat			FaceDist;
 		
 		//
 		// Create the mirror frustum, for the mirrored scene.
@@ -1940,6 +1957,7 @@ GENESISAPI geBoolean geWorld_SetModelXForm(geWorld *World, geWorld_Model *Model,
 		VectorToSUB(Model->TMaxs, i)	+=1.0f;
 		VectorToSUB(Model->TMins, i)	-=1.0f;
 	}
+
 	Model->ChangedFlags |= MODEL_CHANGED_XFORM;
 
 	return GE_TRUE;
@@ -2111,7 +2129,7 @@ GENESISAPI geBoolean geWorld_ModelGetBBox(const geWorld *World, const geWorld_Mo
 	{
 		VectorToSUB(*Mins, i) -= VectorToSUB(Model->Pivot, i);
 		VectorToSUB(*Maxs, i) -= VectorToSUB(Model->Pivot, i);
-	}
+	} 
 
 	return GE_TRUE;
 }
@@ -2156,6 +2174,17 @@ GENESISAPI uint32 geWorld_ModelGetFlags(geWorld_Model *Model)
 	assert(Model);
 
 	return Model->Flags;
+}
+
+//	eaa3 07/28/2000 Gods, you'd think when you asked for the rotational
+//	..center you'd get the REAL center of the model.  Fine, this will
+//	..return the Actual True Center (feh).
+
+GENESISAPI void geWorld_ModelGetCenter(geWorld_Model *Model, geVec3d *Center)
+{
+  *Center = Model->RealCenter;
+
+  return;
 }
 
 //========================================================================================
@@ -2528,8 +2557,8 @@ typedef struct
 {
 	geVec3d		Origin;
 	GE_RGBA		Color;
-	float		Brightness;
-	float		Radius;
+	geFloat		Brightness;
+	geFloat		Radius;
 
 } MapFogData;
 
@@ -2607,7 +2636,7 @@ static geBoolean BuildSkyBox(World_SkyBox *SkyBox, const GFX_SkyData *SkyData)
 {
 	geVec3d			*Verts;
 	int32			i;
-	float			TexWidth, TexHeight;
+	geFloat			TexWidth, TexHeight;
 	geVec3d			Zero;
 
 	// Copy data over so it is more convenient
@@ -2771,6 +2800,7 @@ static void RenderSkyThroughFrustum(World_SkyBox *SkyBox, geWorld_SkyBoxTData *S
 	int32			TexNum;
 	GFX_Plane		*Planes;
 	uint32			SkyFlags;
+	int nFoo;
 
 	assert(SkyTData->NumTransformed >= 0);		// Now that we have a far clip plane, it is possible to have no sky...
 
@@ -2809,7 +2839,18 @@ static void RenderSkyThroughFrustum(World_SkyBox *SkyBox, geWorld_SkyBoxTData *S
 						
 
 		// NumVerts is the number of clip planes from the sky poly...
-		for (p=0; p< Fi->NumPlanes; p++)
+
+//	eaa3 01/30/2001 EVIL HACK
+//	..for some reason, it is possible to get your skybox culled even if you
+//	..don't want it to be.  Since I like my skybox to draw no matter what my
+//	..far clip plane is, this little EVIL HACK makes sure the skybox doesn't
+//	..fall prey to the far clip plane, if active.
+
+    nFoo = Fi->NumPlanes;			// EVIL HACK
+	  if(nFoo == 5)							// EVIL HACK - 5 planes means far clip enabled
+	    nFoo = 4;								// EVIL HACK - leave my skybox alone!
+
+		for (p=0; p< nFoo; p++)
 		{
 			if (!Frustum_ClipToPlaneUV(&Planes[p], pDest1, pDest2, pTex1, pTex2, Length1, &Length2))
 				break;
@@ -2831,8 +2872,8 @@ static void RenderSkyThroughFrustum(World_SkyBox *SkyBox, geWorld_SkyBoxTData *S
 			Length1 = Length2;
 		}
 
-		if (p != Fi->NumPlanes)
-			continue;
+		if (p != nFoo)
+			continue;						// eaa3 01/30/2001 more EVIL HACK work
 
 		if (Length1 < 3)
 			continue;
@@ -2868,6 +2909,7 @@ static void RenderSkyThroughFrustum(World_SkyBox *SkyBox, geWorld_SkyBoxTData *S
 	#endif
 
 	}
+
 }
 
 //=====================================================================================
@@ -2881,9 +2923,10 @@ static void SetupSkyBoxFaceForScene(World_SkyBox *SkyBox, int32 Face, const geXF
 	int32			Length1, Length2;
 	int32			p;
 	GFX_Plane		*pFPlane;
-	float			Width, Height;
+	geFloat			Width, Height;
 	int32			TexNum;
 	GFX_Texture		*pTexture;
+  int nFoo;
 
 	TexNum = CWorld->CurrentBSP->BSPData.GFXSkyData.Textures[Face];
 
@@ -2898,7 +2941,17 @@ static void SetupSkyBoxFaceForScene(World_SkyBox *SkyBox, int32 Face, const geXF
 
 	pFPlane = Fi->Planes;
 
-	for (p=0; p< Fi->NumPlanes; p++, pFPlane++)
+//	eaa3 01/30/2001 EVIL HACK
+//	..for some reason, it is possible to get your skybox culled even if you
+//	..don't want it to be.  Since I like my skybox to draw no matter what my
+//	..far clip plane is, this little EVIL HACK makes sure the skybox doesn't
+//	..fall prey to the far clip plane, if active.
+
+  nFoo = Fi->NumPlanes;			// EVIL HACK
+	if(nFoo == 5)							// EVIL HACK - 5 planes means far clip enabled
+	  nFoo = 4;								// EVIL HACK - leave my skybox alone!
+
+	for (p=0; p< nFoo; p++, pFPlane++)
 	{
 		if (!Frustum_ClipToPlaneUV(pFPlane, pDest1, pDest2, pTex1, pTex2, Length1, &Length2))
 			return;
@@ -2930,8 +2983,8 @@ static void SetupSkyBoxFaceForScene(World_SkyBox *SkyBox, int32 Face, const geXF
 
 	pTexture = &CWorld->CurrentBSP->BSPData.GFXTextures[TexNum];
 
-	Width = (float)pTexture->Width;
-	Height = (float)pTexture->Height;
+	Width = (geFloat)pTexture->Width;
+	Height = (geFloat)pTexture->Height;
 	
 	//geXForm3d_RotateArray(CXForm, pDest1, pDest2, Length1);
 	for (p=0; p<Length1; p++)
@@ -3071,7 +3124,6 @@ geBoolean geWorld_BitmapListShutdown(geWorld *World)
 	if (World->AttachedBitmaps )
 	{
 		//BitmapList_DetachAll(World->AttachedBitmaps);
-		// destroy detached for you!
 		BitmapList_Destroy(World->AttachedBitmaps);
 		World->AttachedBitmaps = NULL;
 	}

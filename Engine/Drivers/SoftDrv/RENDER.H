@@ -61,13 +61,13 @@ extern uint8			*GLightData;
 extern int32			DeltaX, Remaining, N_Runs, PixelCount;
 extern uint16			*Source, *Dest;
 extern int32			U2, V2, StepU, StepV;
-extern float			UDivZ, VDivZ, Zi, Z, Dx, Dy, PixelEnd;
+extern geFloat			UDivZ, VDivZ, Zi, Z, Dx, Dy, PixelEnd;
 extern int32			TxWhole, TyWhole, TxFract, TyFract;
-extern float			UDivZnStepX, VDivZnStepX, ZinStepX;
+extern geFloat			UDivZnStepX, VDivZnStepX, ZinStepX;
 extern int32			Junk[2];
 
-extern float			Real16 ;	
-extern float			Real65536;
+extern geFloat			Real16 ;	
+extern geFloat			Real65536;
 
 extern int32			U, V;
 
@@ -79,19 +79,19 @@ extern uint16				*GBitPtr16;
 // 16bit zbuffer
 extern uint16				*ZBuffer;
 
-extern float			UDivZStepX;
-extern float			UDivZStepY;
-extern float			VDivZStepX;
-extern float			VDivZStepY;
+extern geFloat			UDivZStepX;
+extern geFloat			UDivZStepY;
+extern geFloat			VDivZStepX;
+extern geFloat			VDivZStepY;
 
-extern float			UDivZOrigin;
-extern float			VDivZOrigin;
-extern float			UDivZ16StepX, VDivZ16StepX, Zi16StepX;
-extern float			UDivZ32StepX, VDivZ32StepX, Zi32StepX;
+extern geFloat			UDivZOrigin;
+extern geFloat			VDivZOrigin;
+extern geFloat			UDivZ16StepX, VDivZ16StepX, Zi16StepX;
+extern geFloat			UDivZ32StepX, VDivZ32StepX, Zi32StepX;
 
-extern float			ZiStepX;
-extern float			ZiStepY;
-extern float			ZiOrigin;
+extern geFloat			ZiStepX;
+extern geFloat			ZiStepY;
+extern geFloat			ZiOrigin;
 
 extern Fixed16			UAdjust;
 extern Fixed16			VAdjust;

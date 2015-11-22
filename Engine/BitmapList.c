@@ -23,8 +23,11 @@
 
 #ifdef _DEBUG
 #include <windows.h>
-#include <stdio.h>
 #endif
+
+#include <stdio.h>
+#include <memory.h>
+
 
 #include "BitmapList.h"
 #include "DCommon.h"
