@@ -137,7 +137,7 @@ GENESISAPI geBoolean GENESISCC geActor_CreateTangentSpace(const geActor *A);
 
 /*	02/21/2004 Wendell Buckner
     DOT3 BUMPMAPPING */
-GENESISAPI GENESISCC geActor_DestroyTangentSpace(const geActor *A);
+GENESISAPI void GENESISCC geActor_DestroyTangentSpace(const geActor *A);
 
 	// Create an 'empty' Actor Definition.
 GENESISAPI geActor_Def *GENESISCC geActor_DefCreate(void);

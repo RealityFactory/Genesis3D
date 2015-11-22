@@ -100,7 +100,7 @@ extern TPage_Mgr			*TPageMgr;
 
 extern THandle_MipData		SystemToVideo[];
 
-extern CacheNeedsUpdate;
+extern geBoolean CacheNeedsUpdate;
 
 //============================================================================================
 //============================================================================================

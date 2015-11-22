@@ -3634,7 +3634,7 @@ BOOL DRIVERCC EnumSubDrivers2(DRV_ENUM_DRV_CB *Cb, void *Context)
 /*   07/16/2000 Wendell Buckner                                                         
       Convert to Directx7...                                                            
 	hr = DirectDrawEnumerate(EnumDriversCB2, &Info);                                   */
-    hr = DirectDrawEnumerateEx((LPDDENUMCALLBACKEX) EnumDriversCB2, &Info, NULL);
+    hr = DirectDrawEnumerateEx((LPDDENUMCALLBACKEX) EnumDriversCB2, &Info, 0);
 	
 
     if (hr != DD_OK) 
