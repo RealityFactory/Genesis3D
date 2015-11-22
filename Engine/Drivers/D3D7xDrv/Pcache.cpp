@@ -1,11 +1,52 @@
 /****************************************************************************************/
 /*  PCache.cpp                                                                          */
 /*                                                                                      */
-/*  Author: John Pollard                                                                */
+/*  Author: John Pollard                                                                  */
 /*  Description: D3D poly cache                                                         */
 /*                                                                                      */
-/*   01/10/2003 Wendell Buckner
-/*    Allow 32-bit color depth lightmaps...                                              */
+/*  Edit History:                                                                       */           
+/*   08/24/2004 Wendell Buckner                                                         */
+/*    No reason to clear the textures... just disable the texture stages your not using */
+/*    (D3DTOP_DISABLE)...                                                               */
+/*    Make sure you render regular polys properly...                                    */
+/*   03/02/2004 Wendell Buckner                                                         */
+/*    DOT3BUMPMAPPING                                                                   */   
+/*	  The bump thandles have to be manipulated because base map has to come be assigned */
+/*	  to the second texture unit! argh! this is getting messy!                          */
+/*   01/11/2004 Wendell Buckner                                                         */
+/*    FULLBRIGHT BUG - Fix lightmap being displayed when rendering non-lightmap poly's  */
+/*    like full bright polys                                                            */
+/*   01/03/2004 Wendell Buckner                                                         */ 
+/*    CONFIG DRIVER - Make the driver configurable by "ini" file settings               */
+/*   11/11/2003 Wendell Buckner                                                         */
+/*    Bumpmapping for the World                                                         */
+/*   10/15/2003 Wendell Buckner                                                         */
+/*    Bumpmapping for the World                                                         */
+/*   08/23/2003 Wendell Buckner                                                         */
+/*    BUMPMAPPING                                                                       */
+/*	   Don't allow bleeding of bumpmap effect onto actors that shouldn't receive the    */
+/*     effect                                                                           */
+/*   08/18/2003 Wendell Buckner                                                         */
+/*    TODO: Allow mip map levels greater than 0                                         */
+/*	 04/23/2003 Wendell Buckner                                                         */
+/*	  Send Misc Poly's as triangle lists instead of fans...                             */
+/*	 04/21/2003 Wendell Buckner                                                         */
+/*	  Send Misc Poly's as triangle lists instead of fans...                             */
+/*   04/08/2003 Wendell Buckner                                                         */
+/*    BUMPMAPPING                                                                       */
+/*   01/28/2003 Wendell Buckner                                                         */
+/*	  Send World Poly's as triangle lists instead of fans...                            */
+/*    Cache decals so that they can be drawn after all the 3d stuff...                  */
+/*   01/18/2003 Wendell Buckner                                                         */
+/*    Don't call fog api if it's no set in the global fog flag...                       */
+/*    To continually turn this off and on really is ineffecient... turn it on when you  */
+/*    need it turn if off when you don'tOptimization from GeForce_Optimization2.doc     */
+/*    Basically when you leave the above loop, make sure fog is on                      */
+/*    Optimization from GeForce_Optimization2.doc                                       */
+/*    9. Do not duplicate render state commands.  Worse is useless renderstates. Do not */
+/*       set a renderstate unless it is needed.                                         */
+/*   01/10/2003 Wendell Buckner                                                         */
+/*    Allow 32-bit color depth lightmaps...                                             */
 /*   03/10/2002 Wendell Buckner                                                         */
 /*    Procedural Textures                                                               */
 /*    if you must lock a texture specify the flags WRITEONLY and DISCARDCONTENTS when   */
@@ -50,6 +91,9 @@
 #include "THandle.h"
 #include "D3D_Err.h"
 
+/*   01/28/2003 Wendell Buckner                                                         */
+/*    Cache decals so that they can be drawn after all the 3d stuff...                  */
+#include "Render.h"
 
 //#define D3D_MANAGE_TEXTURES
 #define SUPER_FLUSH
@@ -72,6 +116,10 @@ DRV_CacheInfo						CacheInfo;
 #define MAX_MISC_POLYS				256
 #define MAX_MISC_POLY_VERTS			1024
 
+// changed QD Shadows
+#define MAX_STENCIL_POLYS			2048
+#define MAX_STENCIL_POLY_VERTS		8192
+// end change
 #else
 
 #define MAX_WORLD_POLYS				256
@@ -80,7 +128,35 @@ DRV_CacheInfo						CacheInfo;
 #define MAX_MISC_POLYS				256
 #define MAX_MISC_POLY_VERTS			4096
 
+// changed QD Shadows
+#define MAX_STENCIL_POLYS			256
+#define MAX_STENCIL_POLY_VERTS		4096
+// end change
 #endif
+
+
+
+/*  01/28/2003 Wendell Buckner                                                          */
+/*   Cache decals so that they can be drawn after all the 3d stuff...                   */
+#define MAX_DECAL_RECTS             256
+
+typedef struct
+{
+ geRDriver_THandle *THandle;
+ RECT  SRect;
+ int32 x;
+ int32 y;
+} Decal_Rect;
+
+typedef struct
+{
+	Decal_Rect		Decals[MAX_DECAL_RECTS];
+	int32			NumDecals;
+} Decal_Cache;
+
+static Decal_Cache		DecalCache;
+
+
 
 typedef struct
 {
@@ -129,12 +205,22 @@ typedef struct
 	World_Poly		Polys[MAX_WORLD_POLYS];
 	World_Poly		*SortedPolys[MAX_WORLD_POLYS];
 	World_Poly		*SortedPolys2[MAX_WORLD_POLYS];
+
+/* 04/21/2003 Wendell Buckner
+	Send World Poly's as triangle lists instead of fans... */
+	World_Poly		*SortedPolys3[MAX_WORLD_POLYS];
+
 	PCache_Vert		Verts[MAX_WORLD_POLY_VERTS];
 
 	PCache_TVert	TVerts[MAX_WORLD_POLY_VERTS];		// Original uv
 
 	int32			NumPolys;
 	int32			NumPolys2;
+
+/* 04/21/2003 Wendell Buckner
+	Send World Poly's as triangle lists instead of fans... */
+	int32			NumPolys3;
+
 	int32			NumVerts;
 } World_Cache;
 
@@ -176,6 +262,29 @@ typedef struct
 
 static Misc_Cache		MiscCache;
 
+// changed QD Shadows
+//
+//	Stencil cache
+//
+
+typedef struct
+{
+	uint32		Flags;						// Flags for this poly
+	int32		FirstVert;
+	int32		NumVerts;
+} Stencil_Poly;
+
+typedef struct
+{
+	Stencil_Poly	Polys[MAX_STENCIL_POLYS];
+	D3DXYZRHWVERTEX	Verts[MAX_STENCIL_POLY_VERTS];
+
+	int32			NumPolys;
+	int32			NumVerts;
+} Stencil_Cache;
+
+static Stencil_Cache		StencilCache;
+// end change
 //====================================================================================
 //	Local static functions prototypes
 //====================================================================================
@@ -186,6 +295,88 @@ static BOOL ClearWorldCache(void);
 static int32 GetMipLevel(DRV_TLVertex *Verts, int32 NumVerts, float ScaleU, float ScaleV, int32 MaxMipLevel);
 
 #include <Math.h>
+
+/* 01/03/2004 Wendell Buckner
+    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
+extern DWORD BltSurfFlags;
+
+/*  01/28/2003 Wendell Buckner                                                          */
+/*   Cache decals so that they can be drawn after all the 3d stuff...                   */
+BOOL DCache_FlushDecalRects(void)
+{
+	int32				i;
+	Decal_Rect			*pRect;
+
+	if (!DecalCache.NumDecals)
+		return TRUE;
+
+	if (!THandle_CheckCache())
+		return GE_FALSE;
+
+	for (i=0; i< DecalCache.NumDecals; i++)
+	{
+	  pRect = &DecalCache.Decals[i];
+
+	  if ( pRect->SRect.bottom == -1 )
+	  {
+       if ( !DrawDecal(pRect->THandle, NULL, pRect->x, pRect->y) )
+	   {
+	      D3DMain_Log("DCache_FlushDecalRects: Failed\n");
+		  return FALSE;
+	   }
+	  }
+	  else
+	  {
+	   if ( !DrawDecal(pRect->THandle, &pRect->SRect, pRect->x, pRect->y) )
+	   {
+	      D3DMain_Log("DCache_FlushDecalRects: Failed\n");
+		  return FALSE;
+	   }
+	  }
+
+    }
+
+	DecalCache.NumDecals = 0;
+
+	return TRUE;
+}
+
+BOOL DCache_InsertDecalRect(geRDriver_THandle *THandle, RECT *SRect, int32 x, int32 y)
+{
+	Decal_Rect		*pDecalCacheRect;
+
+	if ( DecalCache.NumDecals == MAX_DECAL_RECTS)
+	{
+		// If the cache is full, we must flush it before going on...
+		DCache_FlushDecalRects();
+	}
+
+	// Store info about this poly in the cache
+	pDecalCacheRect = &DecalCache.Decals[DecalCache.NumDecals];
+
+    pDecalCacheRect->THandle      = THandle;
+
+    pDecalCacheRect->SRect.bottom = -1;
+	pDecalCacheRect->SRect.left   = -1;
+	pDecalCacheRect->SRect.right  = -1;
+	pDecalCacheRect->SRect.top    = -1;
+
+    if( SRect != NULL )
+	{
+      pDecalCacheRect->SRect.bottom = SRect->bottom;
+	  pDecalCacheRect->SRect.left   = SRect->left;
+	  pDecalCacheRect->SRect.right  = SRect->right;
+	  pDecalCacheRect->SRect.top    = SRect->top;
+	}
+
+    pDecalCacheRect->x            = x;
+    pDecalCacheRect->y            = y;
+
+	// Update globals about the misc poly cache
+	DecalCache.NumDecals++;
+
+	return TRUE;
+}
 
 //====================================================================================
 //	PCache_InsertWorldPoly
@@ -829,10 +1020,13 @@ geBoolean SetupLMap(int32 Stage, DRV_LInfo *LInfo, int32 LNum, geBoolean Dynamic
      Also, Load is even faster than BLT under Dx7.
 	 Error = AppInfo.lpD3DDevice->Load ( Surface, NULL, SystemToVideo[THandle->Log].Surface, NULL, NULL );  */
 
+/* 01/03/2004 Wendell Buckner
+    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
 /*	01/24/2002 Wendell Buckner
-    Change flags for speed...
-		Error = Surface->BltFast(0, 0, SystemToVideo[THandle->Log].Surface, NULL, DDBLTFAST_WAIT); */
-		Error = Surface->BltFast(0, 0, SystemToVideo[THandle->Log].Surface, NULL, DDBLTFAST_DONOTWAIT );
+    Change flags for speed... (DDBLT_ASYNC) is not a valid parameter
+		Error = Surface->BltFast(0, 0, SystemToVideo[THandle->Log].Surface, NULL, DDBLTFAST_WAIT); *
+		Error = Surface->BltFast(0, 0, SystemToVideo[THandle->Log].Surface, NULL, DDBLTFAST_DONOTWAIT);*/
+        Error = Surface->BltFast(0, 0, SystemToVideo[THandle->Log].Surface, NULL, BltSurfFlags);
         
 		
 		//Error = Surface->BltFast(0, 0, SystemToVideo[THandle->Log].Surface, NULL, 0);
@@ -903,10 +1097,13 @@ geBoolean SetupTexture(int32 Stage, geRDriver_THandle *THandle, int32 MipLevel)
      Also, Load is even faster than BLT under Dx7.
      Error = AppInfo.lpD3DDevice->Load ( Surface, NULL, MipData->Surface, NULL, NULL );*/
 
+/* 01/03/2004 Wendell Buckner
+    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
 /*	01/24/2002 Wendell Buckner
-    Change flags for speed...
-		Error = Surface->BltFast(0, 0, MipData->Surface, NULL, DDBLTFAST_WAIT);*/
-		Error = Surface->BltFast(0, 0, MipData->Surface, NULL, DDBLTFAST_DONOTWAIT );
+    Change flags for speed... (DDBLT_ASYNC) is not a valid parameter
+		Error = Surface->BltFast(0, 0, MipData->Surface, NULL, DDBLTFAST_WAIT);*
+		Error = Surface->BltFast(0, 0, MipData->Surface, NULL, DDBLTFAST_DONOTWAIT);*/
+		Error = Surface->BltFast(0, 0, MipData->Surface, NULL, BltSurfFlags);
 
 
 		if (Error != DD_OK)
@@ -936,10 +1133,35 @@ geBoolean SetupTexture(int32 Stage, geRDriver_THandle *THandle, int32 MipLevel)
 //====================================================================================
 //	PCache_FlushMiscPolys
 //====================================================================================
+
+/*	04/23/2003 Wendell Buckner
+	Send World Poly's as triangle lists instead of fans... */
+static PCache_Vert		Verts2[MAX_MISC_POLY_VERTS];
+
+inline DWORD F2DW( FLOAT f ) { return *((DWORD*)&f); }
+
+
 BOOL PCache_FlushMiscPolys(void)
 {
 	int32				i;
 	Misc_Poly			*pPoly;
+
+/*	04/23/2003 Wendell Buckner
+	Send Misc Poly's as triangle lists instead of fans... */
+	Misc_Poly			*pPoly2   = NULL;
+    int32				vi        = 0;
+    int32               VertCount = 0;
+	int32               MaxVerts  = 0; 
+	int32			    MatchPolyCount = 0;
+	int32				MatchVertCount =  0;
+	int32				PolyCount = 0;
+	BOOL				LastPoly  = FALSE;
+	BOOL				MatchPoly = FALSE;
+	BOOL				PendPoly  = FALSE;
+	BOOL				AddPoly   = FALSE;
+    BOOL				FlushPoly = FALSE;
+    BOOL				OnlyPoly = FALSE;
+	BOOL				FullPoly = FALSE;
 
 	if (!MiscCache.NumPolys)
 		return TRUE;
@@ -950,19 +1172,27 @@ BOOL PCache_FlushMiscPolys(void)
 	// Set the render states
 	if (AppInfo.CanDoMultiTexture)
 	{
-		AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_COLOROP,   D3DTOP_DISABLE );
-		AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_ALPHAOP,   D3DTOP_DISABLE );
-		D3DSetTexture(1, NULL);		// Reset texture stage 1
-	}
-	
-	AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_TEXCOORDINDEX, 0);
 
-	AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
-	AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
-	AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );
-	AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
-	AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );
-	AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP,   D3DTOP_MODULATE);
+/* 04/08/2003 Wendell Buckner
+    BUMPMAPPING
+/* 01/18/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc  
+9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. */
+        D3DSetTextureStageState1(D3DTA_TEXTURE,D3DTA_CURRENT,D3DTOP_DISABLE,D3DTA_DIFFUSE,D3DTA_CURRENT,D3DTOP_DISABLE,1);
+
+/* 08/24/2004 Wendell Buckner 
+    No reason to clear the textures... just disable the texture stages your not using (D3DTOP_DISABLE)...
+		D3DSetTexture(1, NULL);		// Reset texture stage 1
+		D3DSetTexture(2, NULL);		// Reset texture stage 1*/
+	}
+
+
+/* 04/08/2003 Wendell Buckner
+    BUMPMAPPING
+/* 01/18/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc  
+9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. 	*/
+    D3DSetTextureStageState0(D3DTA_TEXTURE,D3DTA_DIFFUSE,D3DTOP_MODULATE,D3DTA_TEXTURE,D3DTA_DIFFUSE,D3DTOP_MODULATE,0);
 
 	D3DBlendFunc (D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA);
 	D3DBlendEnable(TRUE);
@@ -989,25 +1219,228 @@ BOOL PCache_FlushMiscPolys(void)
 		else
 			D3DTexWrap(0, TRUE);
 
-		if (!SetupTexture(0, pPoly->THandle, pPoly->MipLevel))
-			return GE_FALSE;
+/* 04/08/2003 Wendell Buckner
+    BUMPMAPPING */
+		if (pPoly->Flags & DRV_RENDER_CLAMP_UV)
+			D3DTexWrap(1, FALSE);
+		else
+			D3DTexWrap(1, TRUE);
 
-		if ( (pPoly->Flags & DRV_RENDER_POLY_NO_FOG) && AppInfo.FogEnable) // poly fog
+		if (pPoly->Flags & DRV_RENDER_CLAMP_UV)
+			D3DTexWrap(2, FALSE);
+		else
+			D3DTexWrap(2, TRUE);
+
+/* 03/02/2004 Wendell Buckner
+    DOT3BUMPMAPPING
+	The bump thandles have to be manipulated because base map has to come be assigned
+	to the second texture unit! argh! this is getting messy!
+		 if (!SetupTexture(0, pPoly->THandle, pPoly->MipLevel))
+			return GE_FALSE;		*/		
+		{         
+			int j = 0;
+
+			do
+			{
+				if ( !(pPoly->Flags & DRV_RENDER_DOT3BUMPMAP) ) break;
+
+				geRDriver_THandle	*pBumpTHandle = pPoly->THandle->NextTHandle;
+
+				if ( !pBumpTHandle ) break;
+
+				if ( !SetupTexture(j, pBumpTHandle, 0) ) return GE_FALSE;
+
+				j++;
+			} while(GE_FALSE);
+
+			if (!SetupTexture(j, pPoly->THandle, pPoly->MipLevel))	return GE_FALSE;
+		}
+
+/*  01/18/2003 Wendell Buckner                                                         
+     To continually turn this off and on really is ineffecient... turn it on when you  
+     need it turn if off when you don't   *
 /*	01/13/2003 Wendell Buckner
     Optimization from GeForce_Optimization2.doc
-    9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. 
-			AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , FALSE); */
-		    D3DFogEnable ( FALSE, 0  );
+    9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. */
+        if ( AppInfo.FogEnable ) // poly fog
+		{
+			if ( pPoly->Flags & DRV_RENDER_POLY_NO_FOG ) 
+			 D3DFogEnable ( FALSE, 0  );
+			else
+			 D3DFogEnable ( TRUE, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<<8)|(DWORD)AppInfo.FogB ); 
+		}
 
-		D3DTexturedPoly(&MiscCache.Verts[pPoly->FirstVert], pPoly->NumVerts);
+/* 08/23/2003 Wendell Buckner
+    BUMPMAPPING 
+	 Don't allow bleeding of bumpmap effect onto actors that shouldn't receive the effect */
 
-		if ( (pPoly->Flags & DRV_RENDER_POLY_NO_FOG) && AppInfo.FogEnable) // poly fog
+//BEGIN *******************************************************************************************
+
+/*	01/01/2004 Wendell Buckner
+    DOT3 BUMPMAPPING 
+		if(pPoly->Flags & DRV_RENDER_BUMPMAP )			*/
+		int32 MultiTextureFlags = (DRV_RENDER_BUMPMAP | DRV_RENDER_DOT3BUMPMAP);
+
+		if ( pPoly->Flags & MultiTextureFlags )
+		{
+			geRDriver_THandle	*pTHandle;
+			int32 j; 
+			for(j=1, pTHandle = pPoly->THandle->NextTHandle; pTHandle ; pTHandle = pTHandle->NextTHandle,j++)
+			{
+
+/*	01/01/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+				if ((pPoly->Flags & DRV_RENDER_DOT3BUMPMAP) && (j >= 3)) break;
+
+				if ((pPoly->Flags & DRV_RENDER_BUMPMAP) && (j >= 3)) break;
+
+/* 03/02/2004 Wendell Buckner
+    DOT3BUMPMAPPING
+	The bump thandles have to be manipulated because base map has to come be assigned
+	to the second texture unit! argh! this is getting messy! */
+				if ( (pPoly->Flags & DRV_RENDER_DOT3BUMPMAP) && (j < 2) ) continue;
+
+/* 08/18/2003 Wendell Buckner
+    BUMPMAPPING 
+    TODO: Allow mip map levels greater than 0 */
+				if (!SetupTexture(j, pTHandle, 0)) 
+					return GE_FALSE;
+
+				if(!(pPoly->Flags & DRV_RENDER_BUMPMAP)) break;
+			}
+        }
+/* 08/24/2004 Wendell Buckner 
+    No reason to clear the textures... just disable the texture stages your not using (D3DTOP_DISABLE)...
+        else
+		{
+         D3DSetTexture(1, NULL);		// Reset texture stage 1
+	     D3DSetTexture(2, NULL);		// Reset texture stage 2
+		}*/
+
+/*	01/01/2004 Wendell Buckner
+    DOT3 BUMPMAPPING  
+		if (pPoly->Flags & DRV_RENDER_BUMPMAP)*/
+		if (pPoly->Flags & DRV_RENDER_DOT3BUMPMAP)
+		{
+			D3DBlendEnable(FALSE);
+			D3DSetTextureStageState0(D3DTA_TEXTURE, D3DTA_DIFFUSE, D3DTOP_DOTPRODUCT3, D3DTA_TEXTURE, D3DTA_CURRENT, D3DTOP_DISABLE, 0);
+			D3DSetTextureStageState1(D3DTA_TEXTURE, D3DTA_CURRENT, D3DTOP_MODULATE, D3DTA_TEXTURE, D3DTA_CURRENT, D3DTOP_DISABLE, 0);
+/* 08/24/2004 Wendell Buckner 
+    No reason to clear the textures... just disable the texture stages your not using (D3DTOP_DISABLE)...*/
+			D3DSetTextureStageState2(D3DTA_TEXTURE,D3DTA_CURRENT,D3DTOP_DISABLE,D3DTA_DIFFUSE,D3DTA_CURRENT,D3DTOP_DISABLE,0);
+        } 
+		else if (pPoly->Flags & DRV_RENDER_BUMPMAP)
+		{
+// Set the color operations and arguments to prepare for bump mapping.
+
+// Stage 0: the base texture
+			D3DSetTextureStageState0(D3DTA_TEXTURE, D3DTA_DIFFUSE, D3DTOP_MODULATE, D3DTA_TEXTURE, D3DTA_CURRENT, D3DTOP_SELECTARG1, 0);
+
+// Stage 1: the bump map 
+			D3DSetTextureStageState1(D3DTA_TEXTURE, D3DTA_CURRENT, D3DTOP_BUMPENVMAPLUMINANCE, D3DTA_TEXTURE, D3DTA_CURRENT, D3DTOP_DISABLE, 0);
+
+// Use luminance for this example.
+			D3DSetTextureStageState2(D3DTA_TEXTURE, D3DTA_CURRENT, D3DTOP_ADD, D3DTA_TEXTURE, D3DTA_CURRENT, D3DTOP_DISABLE , 0);
+
+    // Once the blending operations and arguments are set, the following code sets the 2×2 bump mapping matrix to the identity matrix, by setting the D3DTSS_BUMPENVMAT00 and D3DTSS_BUMPENVMAT11 texture stage states to 1.0. Setting the matrix to the identity causes the system to use the delta-values in the bump map unmodified, but this is not a requirement. 
+    // Set the bump mapping matrix. 
+    // If you set the bump mapping operation to include luminance (D3DTOP_BUMPENVMAPLUMINANCE), you must set the luminance controls. The luminance controls configure how the system computes luminance before modulating the color from the texture in the next stage. (For details, see Bump Mapping Formulas.)
+    // Set luminance controls. This is only needed when using a bump map 
+    // that contains luminance, and when the D3DTOP_BUMPENVMAPLUMINANCE 
+    // texture blending operation is being used.
+
+			D3DSetTextureStageState1BM (0.5f, 0.0f, 0.0f, 0.5f, 1.0f, 0.0f );		
+        } 
+/* 08/24/2004 Wendell Buckner 
+    Make sure you render regular polys properly... */
+		else
+		{
+			D3DBlendEnable(TRUE);
+
+			D3DSetTextureStageState0(D3DTA_TEXTURE,D3DTA_DIFFUSE,D3DTOP_MODULATE,D3DTA_TEXTURE,D3DTA_DIFFUSE,D3DTOP_MODULATE,0);
+			D3DSetTextureStageState1(D3DTA_TEXTURE,D3DTA_CURRENT,D3DTOP_DISABLE,D3DTA_DIFFUSE,D3DTA_CURRENT,D3DTOP_DISABLE,0);
+		}
+
+//END ********************************************************************************************/
+
+/*	04/23/2003 Wendell Buckner
+	Send Misc Poly's as triangle lists instead of fans... 	*/
+
+//* BEGIN**********************************************************************************************
+
+		LastPoly  = ( (i + 1) == MiscCache.NumPolys );
+        OnlyPoly  = ( MiscCache.NumPolys == 1 );
+
+		if ( !LastPoly )
+			pPoly2 = MiscCache.SortedPolys[i+1];
+		else 
+		{
+			if( !OnlyPoly )
+				pPoly2 = MiscCache.SortedPolys[i-1];				 
+			else
+			pPoly2 = MiscCache.SortedPolys[i];				 
+		}
+
+		MatchPoly = ( ( pPoly->THandle == pPoly2->THandle ) && (pPoly->Flags == pPoly2->Flags ) && (pPoly->MipLevel == pPoly2->MipLevel) && (!OnlyPoly) );
+		PendPoly  = ( VertCount > 0 );
+		AddPoly   = ( MatchPoly || PendPoly );
+
+		while ( AddPoly )
+		{
+			memcpy( &Verts2[VertCount], &MiscCache.Verts[pPoly->FirstVert], sizeof(PCache_Vert) * 3 );
+			VertCount += 3;
+
+			if ( pPoly->NumVerts == 3 ) break;
+
+			MaxVerts = pPoly->NumVerts - 1; 
+
+			for ( vi = 2; vi < MaxVerts; vi++, VertCount +=3 )
+			{	
+				memcpy( &Verts2[VertCount], &MiscCache.Verts[pPoly->FirstVert], sizeof(PCache_Vert) );
+				memcpy( &Verts2[VertCount+1], &MiscCache.Verts[pPoly->FirstVert+vi], sizeof(PCache_Vert) * 2 );
+			}
+
+			break;
+		}
+
+		if ( MatchPoly )
+		{
+			MatchPolyCount = pPoly2->NumVerts - 2;
+			MatchVertCount =  MatchPolyCount * 3;				
+			PolyCount = VertCount/3;
+			FullPoly = ( ((VertCount + MatchVertCount) > MAX_MISC_POLY_VERTS - 1) || ((PolyCount + MatchPolyCount) > MAX_MISC_POLYS) );
+		}
+        else FullPoly = FALSE;
+
+		FlushPoly = ( (!MatchPoly) || LastPoly || FullPoly);
+
+		if ( FlushPoly )
+		{
+			if ( PendPoly )
+			{					 
+				D3DTexturedPoly3( Verts2, VertCount );
+				VertCount = 0;
+			}
+			else
+			{
+				D3DTexturedPoly(&MiscCache.Verts[pPoly->FirstVert], pPoly->NumVerts);  
+			}
+		}
+
+//* END **********************************************************************************************
+
+/*  01/18/2003 Wendell Buckner                                                         
+     To continually turn this off and on really is ineffecient... turn it on when you  
+     need it turn if off when you don't   *
 /*	01/13/2003 Wendell Buckner
     Optimization from GeForce_Optimization2.doc
-    9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. 
-			AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , TRUE); */
-		    D3DFogEnable ( TRUE, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<<8)|(DWORD)AppInfo.FogB );
+    9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. */
+
 	}
+
+/*  01/18/2003 Wendell Buckner                                                         
+     Basically when you leave the above loop, make sure fog is on  */
+	if ( AppInfo.FogEnable ) D3DFogEnable ( TRUE, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<<8)|(DWORD)AppInfo.FogB ); 
 
 	// Turn z stuff back on...
 	D3DZWriteEnable (TRUE);
@@ -1018,11 +1451,23 @@ BOOL PCache_FlushMiscPolys(void)
 
 #ifdef SUPER_FLUSH
 /* 02/28/2001 Wendell Buckner
-   These render states are unsupported d3d 7.0
-	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FLUSHBATCH, 0);*/
+   These render states are unsupported d3d 7.0 */
 	AppInfo.lpD3DDevice->EndScene();
 	AppInfo.lpD3DDevice->BeginScene();
 #endif
+
+/* 04/08/2003 Wendell Buckner
+    BUMPMAPPING 
+	Get all kinds of weird blending on the walls if I don't do this... */
+	if (AppInfo.CanDoMultiTexture)
+	{
+     D3DSetTextureStageState1(D3DTA_TEXTURE,D3DTA_CURRENT,D3DTOP_DISABLE,D3DTA_DIFFUSE,D3DTA_CURRENT,D3DTOP_DISABLE,0);
+
+/* 08/24/2004 Wendell Buckner 
+    No reason to clear the textures... just disable the texture stages your not using (D3DTOP_DISABLE)... *
+     D3DSetTexture(1, NULL);		// Reset texture stage 1
+	 D3DSetTexture(2, NULL);		// Reset texture stage 1 */
+	}
 
 	return TRUE;
 }
@@ -1115,7 +1560,7 @@ BOOL PCache_InsertMiscPoly(DRV_TLVertex *Verts, int32 NumVerts, geRDriver_THandl
 		
 			pD3DVerts->specular = (FogVal<<24);		// Alpha component in specular is the fog value (0...255)
 		}
-		else
+		else 
 			pD3DVerts->specular = 0;
 
 		pVerts++;
@@ -1129,6 +1574,191 @@ BOOL PCache_InsertMiscPoly(DRV_TLVertex *Verts, int32 NumVerts, geRDriver_THandl
 	return TRUE;
 }
 
+// changed QD Shadows
+
+//====================================================================================
+//	PCache_FlushShadowPolys
+//====================================================================================
+BOOL PCache_FlushStencilPolys(void)
+{
+	int32				i;
+	Stencil_Poly		*pPoly;
+
+	if (!StencilCache.NumPolys)
+		return TRUE;
+
+	// Set the render states
+	// Turn depth buffer off, and stencil buffer on
+    D3DZWriteEnable (FALSE);
+	D3DStencilEnable(TRUE);
+
+    // Dont bother with interpolating color
+    AppInfo.lpD3DDevice->SetRenderState( D3DRENDERSTATE_SHADEMODE,     D3DSHADE_FLAT );
+
+    // Set up stencil compare fuction, reference value, and masks
+    // Stencil test passes if ((ref & mask) cmpfn (stencil & mask)) is true
+    D3DStencilFunc(D3DCMP_ALWAYS);
+	AppInfo.lpD3DDevice->SetRenderState( D3DRENDERSTATE_STENCILFAIL, D3DSTENCILOP_KEEP );
+	
+	switch(D3DDRV.StencilTestMode)
+	{
+	case 0:
+		// zfail method
+		AppInfo.lpD3DDevice->SetRenderState( D3DRENDERSTATE_STENCILPASS, D3DSTENCILOP_KEEP);
+
+		{
+	        // If ztest passes/failes, increment stencil buffer value
+			AppInfo.lpD3DDevice->SetRenderState( D3DRENDERSTATE_STENCILREF,       0x1 );
+			AppInfo.lpD3DDevice->SetRenderState( D3DRENDERSTATE_STENCILMASK,      0xffffffff );
+			AppInfo.lpD3DDevice->SetRenderState( D3DRENDERSTATE_STENCILWRITEMASK, 0xffffffff );
+			// zfail method:
+			AppInfo.lpD3DDevice->SetRenderState( D3DRENDERSTATE_STENCILZFAIL, D3DSTENCILOP_INCR);
+		}
+
+		D3DBlendEnable(TRUE);
+		D3DBlendFunc (D3DBLEND_ZERO, D3DBLEND_ONE);
+
+		// zfail:(with z-fail algo, back faces must be rendered first) (for actors CCW renders backfaces)
+		AppInfo.lpD3DDevice->SetRenderState( D3DRENDERSTATE_CULLMODE,   D3DCULL_CCW);
+		// draw front/back-side of shadow volume in stencil/z only
+		for (i=0; i< StencilCache.NumPolys; i++)
+		{
+			pPoly = &StencilCache.Polys[i];
+			AppInfo.lpD3DDevice->DrawPrimitive(	D3DPT_TRIANGLEFAN, 
+											D3DFVF_XYZRHW | D3DFVF_DIFFUSE, 
+											&(StencilCache.Verts[pPoly->FirstVert]), 
+											pPoly->NumVerts, NULL);
+		}
+
+		{
+			// decrement stencil buffer value
+			// zfail method:
+			AppInfo.lpD3DDevice->SetRenderState( D3DRENDERSTATE_STENCILZFAIL, D3DSTENCILOP_DECR);
+		}
+
+		// Now reverse cull order so back/front sides of shadow volume are written.
+		// zfail method
+		AppInfo.lpD3DDevice->SetRenderState( D3DRENDERSTATE_CULLMODE,   D3DCULL_CW );
+		break;
+
+	case 1:
+		// zpass method
+		AppInfo.lpD3DDevice->SetRenderState( D3DRENDERSTATE_STENCILZFAIL, D3DSTENCILOP_KEEP );
+		
+		{
+	        // If ztest passes/failes, increment stencil buffer value
+			AppInfo.lpD3DDevice->SetRenderState( D3DRENDERSTATE_STENCILREF,       0x1 );
+			AppInfo.lpD3DDevice->SetRenderState( D3DRENDERSTATE_STENCILMASK,      0xffffffff );
+			AppInfo.lpD3DDevice->SetRenderState( D3DRENDERSTATE_STENCILWRITEMASK, 0xffffffff );
+			// for zpass method
+			AppInfo.lpD3DDevice->SetRenderState( D3DRENDERSTATE_STENCILPASS, D3DSTENCILOP_INCR );
+		}
+
+		D3DBlendEnable(TRUE);
+		D3DBlendFunc (D3DBLEND_ZERO, D3DBLEND_ONE);
+
+		// zpass method (with zpass algo, front faces must be rendered first) (for actors CW renders frontfaces)
+		AppInfo.lpD3DDevice->SetRenderState( D3DRENDERSTATE_CULLMODE,   D3DCULL_CW );
+		// draw front/back-side of shadow volume in stencil/z only
+		for (i=0; i< StencilCache.NumPolys; i++)
+		{
+			pPoly = &StencilCache.Polys[i];
+			AppInfo.lpD3DDevice->DrawPrimitive(	D3DPT_TRIANGLEFAN, 
+											D3DFVF_XYZRHW | D3DFVF_DIFFUSE, 
+											&(StencilCache.Verts[pPoly->FirstVert]), 
+											pPoly->NumVerts, NULL);
+		}
+
+		{
+			// decrement stencil buffer value
+			// zpass method
+			AppInfo.lpD3DDevice->SetRenderState( D3DRENDERSTATE_STENCILPASS, D3DSTENCILOP_DECR);
+		}
+
+		// Now reverse cull order so back sides of shadow volume are written.
+		// zpass method
+		AppInfo.lpD3DDevice->SetRenderState( D3DRENDERSTATE_CULLMODE,   D3DCULL_CCW );
+		break;
+	}
+	
+	// Draw back/front-side (zpass/zfail) of shadow volume in stencil/z only
+	for (i=0; i< StencilCache.NumPolys; i++)
+	{
+		pPoly = &StencilCache.Polys[i];
+		AppInfo.lpD3DDevice->DrawPrimitive(	D3DPT_TRIANGLEFAN, 
+											D3DFVF_XYZRHW | D3DFVF_DIFFUSE, 
+											&(StencilCache.Verts[pPoly->FirstVert]), 
+											pPoly->NumVerts, NULL);
+	}
+
+    // Restore render states
+    AppInfo.lpD3DDevice->SetRenderState( D3DRENDERSTATE_CULLMODE, D3DCULL_NONE );
+	D3DZWriteEnable (TRUE);
+	D3DStencilEnable(FALSE);
+	D3DBlendEnable(FALSE);
+    AppInfo.lpD3DDevice->SetRenderState( D3DRENDERSTATE_SHADEMODE, D3DSHADE_GOURAUD );
+
+
+	StencilCache.NumPolys = 0;
+	StencilCache.NumVerts = 0;
+
+	return TRUE;
+}
+
+//====================================================================================
+//	PCache_InsertShadowPoly
+//====================================================================================
+BOOL PCache_InsertStencilPoly(DRV_XYZVertex *Verts, int32 NumVerts, uint32 Flags)
+{
+	int32			i;
+	float			ZRecip;
+	Stencil_Poly	*pCachePoly;
+	DRV_XYZVertex	*pVerts;
+	D3DXYZRHWVERTEX	*pD3DVerts;
+	//D3DTLVERTEX		*pD3DVerts;
+
+
+	if ((StencilCache.NumVerts + NumVerts) >= MAX_STENCIL_POLY_VERTS)
+	{
+		// If the cache is full, we must flush it before going on...
+		PCache_FlushStencilPolys();
+	}
+	else if (StencilCache.NumPolys+1 >= MAX_STENCIL_POLYS)
+	{
+		// If the cache is full, we must flush it before going on...
+		PCache_FlushStencilPolys();
+	}
+
+	// Store info about this poly in the cache
+	pCachePoly = &StencilCache.Polys[StencilCache.NumPolys];
+	pCachePoly->Flags = Flags;
+	pCachePoly->FirstVert = StencilCache.NumVerts;
+	pCachePoly->NumVerts = NumVerts;
+	
+	pVerts = Verts;
+	pD3DVerts = &StencilCache.Verts[StencilCache.NumVerts];
+	for (i=0; i< NumVerts; i++)
+	{
+		ZRecip = 1/pVerts->z;
+
+
+		pD3DVerts->sx = pVerts->x;
+		pD3DVerts->sy = pVerts->y;
+		pD3DVerts->sz = (1.0f - ZRecip);		// ZBUFFER
+		pD3DVerts->rhw = ZRecip;
+		pD3DVerts->color = 0xff111111;
+
+		pVerts++;
+		pD3DVerts++;
+	}	 
+	
+	// Update globals about the misc poly cache
+	StencilCache.NumVerts += NumVerts;
+	StencilCache.NumPolys++;
+
+	return TRUE;
+}
+// end change
 //====================================================================================
 //	**** LOCAL STATIC FUNCTIONS *****
 //====================================================================================
@@ -1301,6 +1931,10 @@ static void SortWorldPolysByHandle(void)
 #define TSTAGE_0			0
 #define TSTAGE_1			1
 
+/* 10/15/2003 Wendell Buckner
+    Bumpmapping for the World */
+#define TSTAGE_2			2
+
 D3DTEXTUREHANDLE		OldId;
 
 /*   07/16/2000 Wendell Buckner
@@ -1308,6 +1942,9 @@ D3DTEXTUREHANDLE		OldId;
 LPDIRECT3DTEXTURE2		OldTexture[8];*/
 LPDIRECTDRAWSURFACE7    OldTexture[8];
 
+/*	01/28/2003 Wendell Buckner
+	Send World Poly's as triangle lists instead of fans... */
+PCache_Vert		Verts[MAX_WORLD_POLY_VERTS];
 
 //====================================================================================
 //	RenderWorldPolys
@@ -1317,14 +1954,42 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 	World_Poly			*pPoly;
 	int32				i;
 
+/*	01/28/2003 Wendell Buckner
+	Send World Poly's as triangle lists instead of fans... */
+	World_Poly			*pPoly2   = NULL;
+    int32				vi        = 0;
+    int32               VertCount = 0;
+	int32               MaxVerts  = 0; 
+	int32			    MatchPolyCount = 0;
+	int32				MatchVertCount =  0;
+	int32				PolyCount = 0;
+	BOOL				LastPoly  = FALSE;
+	BOOL				MatchPoly = FALSE;
+	BOOL				PendPoly  = FALSE;
+	BOOL				AddPoly   = FALSE;
+    BOOL				FlushPoly = FALSE;
+    BOOL				OnlyPoly = FALSE;
+	BOOL				FullPoly = FALSE;
+
+/*	04/21/2003 Wendell Buckner
+	Send fog World Poly's as triangle lists instead of fans... */
+    int32               fVertCount = 0;
+
 	if(!AppInfo.RenderingIsOK)
 	{
 		return	TRUE;
 	}
+
+// changed QD Shadows
+	D3DZWriteEnable (TRUE);
+	D3DZEnable(TRUE);
+// end change
+
 	switch (RenderMode)
 	{	
 		case RENDER_WORLD_POLYS_NORMAL:
 		{
+
 			AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_TEXCOORDINDEX, 0 );
 
 			// Set the default state for the normal poly render mode for the world
@@ -1356,6 +2021,7 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 		
 		case RENDER_WORLD_POLYS_LMAP:
 		{
+
 			AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_TEXCOORDINDEX, 0);
 
 			D3DTexWrap(0, FALSE);
@@ -1384,11 +2050,17 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 				
 				if (pPoly->LInfo->RGBLight[1])
 				{
+
+/*  01/18/2003 Wendell Buckner                                                         
+     Don't call fog api if it's no set in the global fog flag...*
 /*	01/13/2003 Wendell Buckner
     Optimization from GeForce_Optimization2.doc
     9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. 
-					AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, FALSE); */
-					D3DFogEnable ( FALSE, 0 );
+					AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, FALSE); *
+					D3DFogEnable ( FALSE, 0 );                                            */
+  					if (AppInfo.FogEnable)
+                       D3DFogEnable ( FALSE, 0 );  
+
 
 					D3DBlendFunc (D3DBLEND_ONE, D3DBLEND_ONE);				// Change to a fog state
 
@@ -1417,22 +2089,16 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 		case RENDER_WORLD_POLYS_SINGLE_PASS:
 		{
 			// Setup texture stage states
-			AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_TEXCOORDINDEX, 0 );
-			AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
-			AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
-			AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );
-			AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
-			AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );
-			AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP,   D3DTOP_MODULATE);
-									 
-			AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_TEXCOORDINDEX, 1 );
-			AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_COLORARG1, D3DTA_TEXTURE );
-			AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_COLORARG2, D3DTA_CURRENT ); 
-			AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_COLOROP,   D3DTOP_MODULATE );
-			AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE );
-			AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_ALPHAARG2, D3DTA_CURRENT );
-			//AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_ALPHAOP,   D3DTOP_SELECTARG2 );
-			AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_ALPHAOP,   D3DTOP_MODULATE );
+
+/* 01/18/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc  
+9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. */
+            D3DSetTextureStageState0(D3DTA_TEXTURE,D3DTA_DIFFUSE,D3DTOP_MODULATE,D3DTA_TEXTURE,D3DTA_DIFFUSE,D3DTOP_MODULATE,0); 
+
+/* 01/18/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc  
+9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. */
+            D3DSetTextureStageState1(D3DTA_TEXTURE,D3DTA_CURRENT,D3DTOP_MODULATE,D3DTA_DIFFUSE,D3DTA_CURRENT,D3DTOP_MODULATE,1);
 
 			// Setup frame buffer blend modes
 			D3DBlendEnable(TRUE);
@@ -1448,18 +2114,35 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 			// Reset non lightmaps faces to 0
 			WorldCache.NumPolys2 = 0;
 
+/* 04/21/2003 Wendell Buckner
+	Send World Poly's as triangle lists instead of fans... */
+            WorldCache.NumPolys3 = 0;
+
 			for (i=0; i< WorldCache.NumPolys; i++)
 			{
-				BOOL	Dynamic = 0;
-
 				pPoly = WorldCache.SortedPolys[i];
 
 				if (!pPoly->LInfo)
 				{
 					// Put gouraud only polys in a seperate list, and render last
 					WorldCache.SortedPolys2[WorldCache.NumPolys2++] = pPoly;
-					continue;
 				}
+				else
+				{
+					// Put lightmap only polys in a seperate list, and render last
+				    WorldCache.SortedPolys3[WorldCache.NumPolys3++] = pPoly;
+				}
+            }
+			
+/* 04/21/2003 Wendell Buckner
+	Send World Poly's as triangle lists instead of fans... */
+			for (i=0; i< WorldCache.NumPolys3; i++)
+			{
+				BOOL	Dynamic = 0;
+
+/* 04/21/2003 Wendell Buckner
+	Send World Poly's as triangle lists instead of fans... */
+				pPoly = WorldCache.SortedPolys3[i];
 
 				if (pPoly->Flags & DRV_RENDER_CLAMP_UV)
 					D3DTexWrap(TSTAGE_0, FALSE);
@@ -1472,40 +2155,188 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 				// Call the engine to set this sucker up, because it's visible...
 				D3DDRV.SetupLightmap(pPoly->LInfo, &Dynamic);
 
-				if (!SetupLMap(TSTAGE_1, pPoly->LInfo, 0, Dynamic))
+/* 10/15/2003 Wendell Buckner
+    Bumpmapping for the World */
+		        if(pPoly->Flags & DRV_RENDER_BUMPMAP)
+				{
+	             geRDriver_THandle	*pTHandle;                 
+//ts1 = bumpmap
+				 if (pPoly->Flags & DRV_RENDER_CLAMP_UV)
+				  D3DTexWrap(TSTAGE_1, FALSE);
+				 else
+			      D3DTexWrap(TSTAGE_1, TRUE);
+
+                 pTHandle = pPoly->THandle->NextTHandle;
+
+//TODO: Allow mip map levels greater than 0 */
+                 if (!SetupTexture(TSTAGE_1, pTHandle, 0)) 
+		          return GE_FALSE;
+
+//ts2 = lightmap
+                 D3DTexWrap(TSTAGE_2, FALSE);
+
+				 if (!SetupLMap(TSTAGE_2, pPoly->LInfo, 0, Dynamic))
 					return GE_FALSE;
-					
-				// Prep the verts for a lightmap and texture map
+				}
+		        else
+				{
+ 				 D3DTexWrap(TSTAGE_1, FALSE);
+
+				 if (!SetupLMap(TSTAGE_1, pPoly->LInfo, 0, Dynamic))
+					return GE_FALSE;
+
+/* 08/24/2004 Wendell Buckner 
+    No reason to clear the textures... just disable the texture stages your not using (D3DTOP_DISABLE)...*
+//make sure texture stage 2 is clear for regular lightmaps...
+ 				 D3DSetTexture(2, NULL);		// Reset texture stage 2 */
+				}
+    
+// Prep the verts for a lightmap and texture map
 				World_PolyPrepVerts(pPoly, PREP_WORLD_VERTS_SINGLE_PASS, TSTAGE_0, TSTAGE_1);
 
-				if ( (pPoly->Flags & DRV_RENDER_POLY_NO_FOG) && AppInfo.FogEnable) // poly fog
+/*  01/18/2003 Wendell Buckner                                                         
+     To continually turn this off and on really is ineffecient... turn it on when you  
+     need it turn if off when you don't *
 /*	01/13/2003 Wendell Buckner
     Optimization from GeForce_Optimization2.doc
-    9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. 
-						AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , FALSE); */
-						D3DFogEnable ( FALSE, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<<8)|(DWORD)AppInfo.FogB );
+    9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. */
+  				if ( AppInfo.FogEnable ) // poly fog
+				{
+				 if ( pPoly->Flags & DRV_RENDER_POLY_NO_FOG )
+				  D3DFogEnable ( FALSE, 0 );
+				 else
+				  D3DFogEnable ( TRUE, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<<8)|(DWORD)AppInfo.FogB );
+				}    
+
+/* 10/15/2003 Wendell Buckner
+    Bumpmapping for the World */
+				if (pPoly->Flags & DRV_RENDER_BUMPMAP)
+				{
+// Set the color operations and arguments to prepare for bump mapping.
+
+// Stage 0: the base texture
+				 D3DSetTextureStageState0(D3DTA_TEXTURE, D3DTA_DIFFUSE, D3DTOP_MODULATE, D3DTA_TEXTURE, D3DTA_CURRENT, D3DTOP_SELECTARG1, 0);
+
+// Stage 1: the bump map 
+				 D3DSetTextureStageState1(D3DTA_TEXTURE, D3DTA_CURRENT, D3DTOP_BUMPENVMAPLUMINANCE, D3DTA_TEXTURE, D3DTA_CURRENT, D3DTOP_DISABLE, 0);
+
+// Use lightmap/luminance for this example.
+				 D3DSetTextureStageState2(D3DTA_TEXTURE, D3DTA_CURRENT, D3DTOP_MODULATE, D3DTA_TEXTURE, D3DTA_CURRENT, D3DTOP_DISABLE , 1);
+
+		         D3DSetTextureStageState1BM (1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f );		
+				} 
+                else
+				{
+                 D3DSetTextureStageState0(D3DTA_TEXTURE,D3DTA_DIFFUSE,D3DTOP_MODULATE,D3DTA_TEXTURE,D3DTA_DIFFUSE,D3DTOP_MODULATE,0); 
+                 D3DSetTextureStageState1(D3DTA_TEXTURE,D3DTA_CURRENT,D3DTOP_MODULATE,D3DTA_DIFFUSE,D3DTA_CURRENT,D3DTOP_MODULATE,1);
+
+/* 08/24/2004 Wendell Buckner 
+    No reason to clear the textures... just disable the texture stages your not using (D3DTOP_DISABLE)...*/
+                 D3DSetTextureStageState2(D3DTA_TEXTURE,D3DTA_CURRENT,D3DTOP_DISABLE,D3DTA_DIFFUSE,D3DTA_CURRENT,D3DTOP_DISABLE,0);
+
+				}
 
 				// Draw the texture
-				D3DTexturedPoly(&WorldCache.Verts[pPoly->FirstVert], pPoly->NumVerts);
 
-				if ( (pPoly->Flags & DRV_RENDER_POLY_NO_FOG) && AppInfo.FogEnable) // poly fog
+//				D3DMain_Log("BEGIN - Draw Lightmap Polys\n");
+
+/*	01/28/2003 Wendell Buckner
+	Send World Poly's as triangle lists instead of fans... */
+
+/*  BEGIN**********************************************************************************************/
+				
+				LastPoly  = ( (i + 1) == WorldCache.NumPolys3 );
+                OnlyPoly  = ( WorldCache.NumPolys3 == 1 );
+
+				if ( !LastPoly )
+				  pPoly2 = WorldCache.SortedPolys3[i+1];
+				else 
+				{
+				 if( !OnlyPoly )
+				  pPoly2 = WorldCache.SortedPolys3[i-1];				 
+				 else
+				  pPoly2 = WorldCache.SortedPolys3[i];				 
+				}
+
+				MatchPoly = ( (pPoly->THandle == pPoly2->THandle) && (pPoly->Flags == pPoly2->Flags) && ( pPoly->LInfo->THandle  == pPoly2->LInfo->THandle) && (pPoly->MipLevel == pPoly2->MipLevel) && (pPoly->LInfo->RGBLight[1] == pPoly2->LInfo->RGBLight[1]) && (!OnlyPoly) );
+				PendPoly  = ( VertCount > 0 );
+				AddPoly   = ( MatchPoly || PendPoly );
+
+				while ( AddPoly )
+				{
+				 memcpy( &Verts[VertCount], &WorldCache.Verts[pPoly->FirstVert], sizeof(PCache_Vert) * 3 );
+				 VertCount += 3;
+
+				 if ( pPoly->NumVerts == 3 ) break;
+
+				 MaxVerts = pPoly->NumVerts - 1; 
+
+                 for ( vi = 2; vi < MaxVerts; vi++, VertCount +=3 )
+				 {	
+				  memcpy( &Verts[VertCount], &WorldCache.Verts[pPoly->FirstVert], sizeof(PCache_Vert) );
+                  memcpy( &Verts[VertCount+1], &WorldCache.Verts[pPoly->FirstVert+vi], sizeof(PCache_Vert) * 2 );
+				 }
+
+				 break;
+				}
+
+				if ( MatchPoly )
+				{
+				 MatchPolyCount = pPoly2->NumVerts - 2;
+                 MatchVertCount =  MatchPolyCount * 3;				
+				 PolyCount = VertCount/3;
+                 FullPoly = ( ((VertCount + MatchVertCount) > MAX_WORLD_POLY_VERTS - 1) || ((PolyCount + MatchPolyCount) > MAX_WORLD_POLYS) );
+				}
+                else FullPoly = FALSE;
+
+				FlushPoly = ( (!MatchPoly) || LastPoly || FullPoly);
+
+				if ( FlushPoly )
+				{
+				 if ( PendPoly )
+				 {					 
+				  D3DTexturedPoly3( Verts, VertCount );
+				  fVertCount = VertCount;
+	              VertCount = 0;
+				 }
+				 else
+				 {
+				  D3DTexturedPoly(&WorldCache.Verts[pPoly->FirstVert], pPoly->NumVerts);  
+				 }
+				}
+                else continue;
+
+/* END **********************************************************************************************/
+
+/*  01/18/2003 Wendell Buckner                                                         
+     To continually turn this off and on really is ineffecient... turn it on when you  
+     need it turn if off when you don't *
 /*	01/13/2003 Wendell Buckner
     Optimization from GeForce_Optimization2.doc
-    9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. 
-						AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , TRUE); */
-                        D3DFogEnable ( TRUE, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<<8)|(DWORD)AppInfo.FogB );
-
+    9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. */
 
 				// Render any fog maps
 				if (pPoly->LInfo->RGBLight[1])
 				{
+
+/*  01/18/2003 Wendell Buckner                                                         
+     Basically when you leave the above loop, make sure fog is on  */
+				    if ( AppInfo.FogEnable ) D3DFogEnable ( TRUE, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<<8)|(DWORD)AppInfo.FogB );
+
 					D3DBlendFunc (D3DBLEND_ONE, D3DBLEND_ONE);				// Change to a fog state
 
 				#if (TSTAGE_0 == 0)
-					AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_SELECTARG2);
-					AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
-					AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+/* 01/18/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc  
+9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. */
+                    D3DSetTextureStageState0(D3DTA_TEXTURE,D3DTA_DIFFUSE,D3DTOP_SELECTARG2,D3DTA_TEXTURE,D3DTA_DIFFUSE,D3DTOP_DISABLE,0); 
+
+/* 01/18/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc  
+9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. */
+  					D3DSetTextureStageState1(D3DTA_TEXTURE,D3DTA_CURRENT,D3DTOP_SELECTARG1,D3DTA_DIFFUSE,D3DTA_CURRENT,D3DTOP_MODULATE,1); 
+
 				#else
 					AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_COLOROP, D3DTOP_DISABLE );
 					AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_ALPHAOP, D3DTOP_DISABLE );
@@ -1518,14 +2349,32 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 					if (!SetupLMap(TSTAGE_1, pPoly->LInfo, 1, 1))	// Dynamic is 1, because fog is always dynamic
 						return GE_FALSE;
 
-					D3DTexturedPoly(&WorldCache.Verts[pPoly->FirstVert], pPoly->NumVerts);
-	
+/*	01/28/2003 Wendell Buckner
+	Send World Poly's as triangle lists instead of fans... */
+				    if ( FlushPoly )
+					{
+					 if ( PendPoly )
+					 {					 
+					  D3DTexturedPoly3( Verts, fVertCount );
+					  fVertCount = 0;
+					 }
+					 else
+					  D3DTexturedPoly(&WorldCache.Verts[pPoly->FirstVert], pPoly->NumVerts);  
+					}
+					
 					// Restore states to the last state before fag map
 				#if (TSTAGE_0 == 0)
-					AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );
-					AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP,   D3DTOP_MODULATE);
-	
-					AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_COLOROP,   D3DTOP_MODULATE );
+
+/* 01/18/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc  
+9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. */
+   	                D3DSetTextureStageState0(D3DTA_TEXTURE,D3DTA_DIFFUSE,D3DTOP_MODULATE,D3DTA_TEXTURE,D3DTA_DIFFUSE,D3DTOP_MODULATE,0); 
+
+/* 01/18/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc  
+9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. */
+  					D3DSetTextureStageState1(D3DTA_TEXTURE,D3DTA_CURRENT,D3DTOP_MODULATE,D3DTA_DIFFUSE,D3DTA_CURRENT,D3DTOP_MODULATE,1); 
+
 				#else
 					AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_COLOROP,   D3DTOP_MODULATE );
 					AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_ALPHAOP,   D3DTOP_SELECTARG2 );
@@ -1539,12 +2388,33 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 			
 			// Setup for any non-lightmaped faces faces, turn tmu1 off
 		#if (TSTAGE_0 == 0)
-			AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_COLOROP, D3DTOP_DISABLE);
-			AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+
+/* 01/18/2003 Wendell Buckner
+    Optimization from GeForce_Optimization2.doc  
+9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. */
+            D3DSetTextureStageState1(D3DTA_TEXTURE,D3DTA_CURRENT,D3DTOP_DISABLE,D3DTA_DIFFUSE,D3DTA_CURRENT,D3DTOP_DISABLE,1); 
+
 		#else
 			AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_SELECTARG2);
 			AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG2);
 		#endif
+
+/*	01/28/2003 Wendell Buckner
+	Send World Poly's as triangle lists instead of fans...*/
+			pPoly2    = NULL;
+    		vi        = 0;
+			VertCount = 0;
+			MaxVerts  = 0; 
+			MatchPolyCount = 0;
+			MatchVertCount =  0;
+			PolyCount = 0;
+			LastPoly  = FALSE;
+			MatchPoly = FALSE;
+			PendPoly  = FALSE;
+			AddPoly   = FALSE;
+    		FlushPoly = FALSE;
+    		OnlyPoly = FALSE;
+			FullPoly = FALSE;
 
 			// Render all the faces without lightmaps
 			for (i=0; i< WorldCache.NumPolys2; i++)
@@ -1561,27 +2431,188 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 				if (!SetupTexture(TSTAGE_0, pPoly->THandle, pPoly->MipLevel))
 					return GE_FALSE;				
 
+/* 01/11/2004 Wendell Buckner
+    FULLBRIGHT BUG - Fix lightmap being displayed when rendering non-lightmap poly's like full bright polys */
+				if( pPoly->Flags & DRV_RENDER_BUMPMAP ) 
+				{
+
+/* 11/11/2003 Wendell Buckner
+    Bumpmapping for the World */
+		        do
+				{
+	             geRDriver_THandle	*pTHandle;                 
+
+/* 01/11/2004 Wendell Buckner
+    FULLBRIGHT BUG - Fix lightmap being displayed when rendering non-lightmap poly's like full bright polys 
+				 if(!(pPoly->Flags & DRV_RENDER_BUMPMAP)) break; */
+
+
+//ts1 = bumpmap
+				 if (pPoly->Flags & DRV_RENDER_CLAMP_UV)
+				  D3DTexWrap(TSTAGE_1, FALSE);
+				 else
+			      D3DTexWrap(TSTAGE_1, TRUE);
+
+                 pTHandle = pPoly->THandle->NextTHandle;
+
+				 if( !pTHandle ) break;
+
+//TODO: Allow mip map levels greater than 0 */
+                 if (!SetupTexture(TSTAGE_1, pTHandle, 0)) 
+		          return GE_FALSE;
+
+//ts2 = specular
+				 if (pPoly->Flags & DRV_RENDER_CLAMP_UV)
+				  D3DTexWrap(TSTAGE_2, FALSE);
+				 else
+			      D3DTexWrap(TSTAGE_2, TRUE);
+
+                 pTHandle = pTHandle->NextTHandle;
+
+				 if( !pTHandle ) break;
+
+				 if (!SetupTexture(TSTAGE_2, pTHandle, 0))
+					return GE_FALSE;
+				}
+				while (FALSE);
+
+/* 01/11/2004 Wendell Buckner
+    FULLBRIGHT BUG - Fix lightmap being displayed when rendering non-lightmap poly's like full bright polys */
+				}
+
+/* 08/24/2004 Wendell Buckner 
+    No reason to clear the textures... just disable the texture stages your not using (D3DTOP_DISABLE)...*
+				else
+				{
+				 D3DSetTexture(TSTAGE_1,NULL);
+				 D3DSetTexture(TSTAGE_2,NULL);
+				} */
+
 				// Prep verts as if there was no lightmap
 				World_PolyPrepVerts(pPoly, PREP_WORLD_VERTS_NORMAL, TSTAGE_0, TSTAGE_1);
 
-				if ( (pPoly->Flags & DRV_RENDER_POLY_NO_FOG) && AppInfo.FogEnable) // poly fog
+
+/*  01/18/2003 Wendell Buckner                                                         
+     To continually turn this off and on really is ineffecient... turn it on when you  
+     need it turn if off when you don't *
 /*	01/13/2003 Wendell Buckner
     Optimization from GeForce_Optimization2.doc
-    9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. 
-						AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , FALSE); */
-                        D3DFogEnable ( FALSE, 0 );
+    9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. */ 
+				if ( AppInfo.FogEnable ) // poly fog
+				{
+				  if ( pPoly->Flags & DRV_RENDER_POLY_NO_FOG )
+				   D3DFogEnable ( FALSE, 0 );
+				  else
+                   D3DFogEnable ( TRUE, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<<8)|(DWORD)AppInfo.FogB );
+				} 
+
+/* 11/11/2003 Wendell Buckner
+    Bumpmapping for the World */
+				if (pPoly->Flags & DRV_RENDER_BUMPMAP)
+				{
+// Set the color operations and arguments to prepare for bump mapping.
+
+// Stage 0: the base texture
+				 D3DSetTextureStageState0(D3DTA_TEXTURE, D3DTA_DIFFUSE, D3DTOP_MODULATE, D3DTA_TEXTURE, D3DTA_CURRENT, D3DTOP_SELECTARG1, 0);
+
+// Stage 1: the bump map 
+				 D3DSetTextureStageState1(D3DTA_TEXTURE, D3DTA_CURRENT, D3DTOP_BUMPENVMAPLUMINANCE, D3DTA_TEXTURE, D3DTA_CURRENT, D3DTOP_DISABLE, 0);
+
+// Use specular/luminance for this example.
+                 D3DSetTextureStageState2(D3DTA_TEXTURE, D3DTA_CURRENT, D3DTOP_ADD, D3DTA_TEXTURE, D3DTA_CURRENT, D3DTOP_DISABLE , 0);
+
+		         D3DSetTextureStageState1BM (1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f );		
+				} 
+                else
+				{
+                 D3DSetTextureStageState0(D3DTA_TEXTURE,D3DTA_DIFFUSE,D3DTOP_MODULATE,D3DTA_TEXTURE,D3DTA_DIFFUSE,D3DTOP_MODULATE,0); 
+
+/* 08/24/2004 Wendell Buckner 
+    No reason to clear the textures... just disable the texture stages your not using (D3DTOP_DISABLE)...*
+                 D3DSetTextureStageState1(D3DTA_TEXTURE,D3DTA_CURRENT,D3DTOP_MODULATE,D3DTA_DIFFUSE,D3DTA_CURRENT,D3DTOP_MODULATE,1); */
+                 D3DSetTextureStageState1(D3DTA_TEXTURE,D3DTA_CURRENT,D3DTOP_DISABLE,D3DTA_DIFFUSE,D3DTA_CURRENT,D3DTOP_DISABLE,1);
+				}
 
 				// Draw the texture
-				D3DTexturedPoly(&WorldCache.Verts[pPoly->FirstVert], pPoly->NumVerts);
 
-				if ( (pPoly->Flags & DRV_RENDER_POLY_NO_FOG) && AppInfo.FogEnable) // poly fog
+/*	01/28/2003 Wendell Buckner
+	Send World Poly's as triangle lists instead of fans...*/
+
+//* BEGIN**********************************************************************************************
+				
+				LastPoly  = ( (i + 1) == WorldCache.NumPolys2 );
+                OnlyPoly  = ( WorldCache.NumPolys2 == 1 );
+
+				if ( !LastPoly )
+				  pPoly2 = WorldCache.SortedPolys2[i+1];
+				else 
+				{
+				 if( !OnlyPoly )
+				  pPoly2 = WorldCache.SortedPolys2[i-1];				 
+				 else
+				  pPoly2 = WorldCache.SortedPolys2[i];				 
+				}
+
+				MatchPoly = ( ( pPoly->THandle == pPoly2->THandle ) && (pPoly->Flags == pPoly2->Flags ) && (pPoly->MipLevel == pPoly2->MipLevel) && (!OnlyPoly) );
+				PendPoly  = ( VertCount > 0 );
+				AddPoly   = ( MatchPoly || PendPoly );
+
+				while ( AddPoly )
+				{
+				 memcpy( &Verts[VertCount], &WorldCache.Verts[pPoly->FirstVert], sizeof(PCache_Vert) * 3 );
+				 VertCount += 3;
+
+				 if ( pPoly->NumVerts == 3 ) break;
+
+				 MaxVerts = pPoly->NumVerts - 1; 
+
+                 for ( vi = 2; vi < MaxVerts; vi++, VertCount +=3 )
+				 {	
+				  memcpy( &Verts[VertCount], &WorldCache.Verts[pPoly->FirstVert], sizeof(PCache_Vert) );
+                  memcpy( &Verts[VertCount+1], &WorldCache.Verts[pPoly->FirstVert+vi], sizeof(PCache_Vert) * 2 );
+				 }
+
+				 break;
+				}
+
+				if ( MatchPoly )
+				{
+				 MatchPolyCount = pPoly2->NumVerts - 2;
+                 MatchVertCount =  MatchPolyCount * 3;				
+				 PolyCount = VertCount/3;
+                 FullPoly = ( ((VertCount + MatchVertCount) > MAX_WORLD_POLY_VERTS - 1) || ((PolyCount + MatchPolyCount) > MAX_WORLD_POLYS) );
+				}
+                else FullPoly = FALSE;
+
+
+				FlushPoly = ( (!MatchPoly) || LastPoly || FullPoly);
+
+				if ( FlushPoly )
+				{
+				 if ( PendPoly )
+				 {					 
+				  D3DTexturedPoly3( Verts, VertCount );
+	              VertCount = 0;
+				 }
+				 else
+				 {
+				  D3DTexturedPoly(&WorldCache.Verts[pPoly->FirstVert], pPoly->NumVerts);  
+				 }
+				}
+
+//* END **********************************************************************************************/
+
+/*  01/18/2003 Wendell Buckner                                                         
+     To continually turn this off and on really is ineffecient... turn it on when you  
+     need it turn if off when you don't*
 /*	01/13/2003 Wendell Buckner
     Optimization from GeForce_Optimization2.doc
-    9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. 
-					AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , TRUE); */
-				    D3DFogEnable ( TRUE, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<<8)|(DWORD)AppInfo.FogB );
+    9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. */
 			}
 
+/*  01/18/2003 Wendell Buckner                                                         
+     Basically when you leave the above loop, make sure fog is on  */
+            if ( AppInfo.FogEnable ) D3DFogEnable ( TRUE, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<<8)|(DWORD)AppInfo.FogB );
 			break;						 
 		}
 
@@ -1614,6 +2645,9 @@ BOOL PCache_Reset(void)
 	MiscCache.NumPolys = 0;
 	MiscCache.NumVerts = 0;
 
+/*  01/28/2003 Wendell Buckner                                                          */
+/*   Cache decals so that they can be drawn after all the 3d stuff...                   */
+	DecalCache.NumDecals = 0;
 	return TRUE;
 }
 

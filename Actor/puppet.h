@@ -4,6 +4,10 @@
 /*  Author: Mike Sandige	                                                            */
 /*  Description: Puppet interface.										.				*/
 /*                                                                                      */
+/*  Edit History:                                                                       */
+/*  03/24/2004 Wendell Buckner                                                          */
+/*   BUG FIX: Rendering Transparent Polys properly (2)                                  */
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -15,8 +19,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_PUPPET_H
@@ -27,10 +31,10 @@
 #include "Body.h"
 #include "Pose.h"
 #include "ExtBox.h"			// geExtBox for gePuppet_RenderThroughFrustum
-
+// added 08.13.2004 by gekido, linking the rf exe was complaining about unresolved externals... 
+//#include "bitmap.h" //nonsense check your setup (QD)
 #include "Frustum.h"
 #include "vfile.h"
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,12 +55,39 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 					const geCamera *Camera, 
 					Frustum_Info *FInfo);
 
+// changed QD Clipping
 geBoolean GENESISCC gePuppet_Render(const gePuppet *P,
 					const gePose *Joints,
 					geEngine *Engine, 
 					geWorld *World,
 					const geCamera *Camera, 
-					geExtBox *Box);
+					geExtBox *Box,
+					Frustum_Info *FInfo);
+
+// changed QD Shadows
+geBoolean GENESISCC gePuppet_RenderShadowVolume(gePuppet *P,
+					const gePose *Joints,
+					geEngine *Engine, 
+					geWorld *World,
+					const geCamera *Camera,
+					GFX_Plane* FPlanes,//Frustum_Info *FrustumInfo,
+					geVec3d *LightPos,
+					geFloat Radius,
+					int LightType, 
+					geVec3d* Dir, 
+					geFloat Arc,
+					geBoolean ZPass);
+
+void GENESISCC gePuppet_BodyGeometryNeedsUpdate(gePuppet *P);
+
+void GENESISCC gePuppet_SetStencilShadow(gePuppet *P, geBoolean DoStencilShadow);
+
+// end change QD Shadows
+
+/* 03/24/2004 Wendell Buckner
+    BUG FIX: Rendering Transparent Polys properly (2) */
+geBoolean GENESISCC gePuppet_AddToGList ( const GE_TLVertex *Points, int NumPoints, const geBitmap *Bitmap, uint32 Flags, geBoolean Flush );
+geBoolean GENESISCC gePuppet_IsTransparent ( const geFloat OverallAlpha, const geBitmap **Bitmap, geBoolean *IsTransparent, uint32 Count );
 
 int GENESISCC gePuppet_GetMaterialCount( gePuppet *P );
 geBoolean GENESISCC gePuppet_GetMaterial( gePuppet *P, int MaterialIndex,

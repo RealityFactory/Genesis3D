@@ -4,6 +4,14 @@
 /*  Author: Eli Boling                                                                  */
 /*  Description: The Genesis3D Logo implementation                                      */
 /*                                                                                      */
+/*  Edit History:                                                                       */    
+/*  1/20/2004 Wendell Buckner                                                           */
+/*   LOGO CRASH BUG - On some machines with fast proccessors (2.0ghz or better,         */  
+/*   typically intel) the value return                                                  */
+/*   value return by Sys_GetCPUFreq is to large for the following variable make it a    */
+/*   large_integer.                                                                     */
+/*   Fix provide by Latex and IronDragon from the genesis3d forum                       */
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -15,8 +23,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #define WIN32_LEAN_AND_MEAN
@@ -458,7 +466,14 @@ static	geBoolean		DisplayedOnceAlready = GE_FALSE;
 
 //		CurrentTime += ((geFloat)DeltaTic.LowPart / (geFloat)Engine->CPUInfo.Freq) / 10.0f;
 //		CurrentTime += ((geFloat)DeltaTic.LowPart / (geFloat)Engine->CPUInfo.Freq) / 45.0f;
-		CurrentTime += ((geFloat)DeltaTic.LowPart / (geFloat)Engine->CPUInfo.Freq) / 75.0f;
+
+/* 01/20/2004 Wendell Buckner
+    LOGO CRASH BUG - On some machines with fast proccessors (2.0ghz or better, typically intel) the value return
+	by Sys_GetCPUFreq is to large for the following variable make it a large_integer
+	Fix provided by Latex and IronDragon from the genesis3d forum 
+		CurrentTime += ((geFloat)DeltaTic.LowPart / (geFloat)Engine->CPUInfo.Freq) / 75.0f;*/
+		CurrentTime += ((geFloat)DeltaTic.LowPart / (geFloat)Engine->CPUInfo.Freq.QuadPart) / 75.0f;
+
 	}
 
 	Sleep(500);

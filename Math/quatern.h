@@ -109,27 +109,27 @@ typedef struct
 
 #define	QUATERNION_PI	(GE_PI)
 
-geBoolean GENESISCC geQuaternion_IsValid( const geQuaternion *Q );
+GENESISAPI geBoolean GENESISCC geQuaternion_IsValid( const geQuaternion *Q );
 	// return GE_TRUE if Q is non null and for has no NAN's in its components
 
-void GENESISCC geQuaternion_Set( geQuaternion *Q, geFloat W, geFloat X, geFloat Y, geFloat Z);
+GENESISAPI void GENESISCC geQuaternion_Set( geQuaternion *Q, geFloat W, geFloat X, geFloat Y, geFloat Z);
 	// set quaternion components.  Doesn't normalize
-void GENESISCC geQuaternion_SetVec3d( geQuaternion *Q, geFloat W, const geVec3d *V);
+GENESISAPI void GENESISCC geQuaternion_SetVec3d( geQuaternion *Q, geFloat W, const geVec3d *V);
 	// set quaternion components.  Doesn't normalize
 GENESISAPI void GENESISCC geQuaternion_SetFromAxisAngle(geQuaternion *Q, const geVec3d *Axis, geFloat Theta);
 	// set a quaternion from an axis and a rotation around the axis
-geBoolean GENESISCC geQuaternion_GetAxisAngle(const geQuaternion *Q, geVec3d *Axis, geFloat *Theta);
+GENESISAPI geBoolean GENESISCC geQuaternion_GetAxisAngle(const geQuaternion *Q, geVec3d *Axis, geFloat *Theta);
 	// gets an axis and angle of rotation around the axis from a quaternion
 	// returns GE_TRUE if there is an axis.  
 	// returns GE_FALSE if there is no axis (and Axis is set to 0,0,0, and Theta is 0)
 
-void GENESISCC geQuaternion_Get( const geQuaternion *Q, 
+GENESISAPI void GENESISCC geQuaternion_Get( const geQuaternion *Q, 
 					geFloat *W, geFloat *X, geFloat *Y, geFloat *Z);
 	// get quaternion components into W,X,Y,Z
-void GENESISCC geQuaternion_GetVec3d( const geQuaternion *Q, geFloat *W, geVec3d *V);
+GENESISAPI void GENESISCC geQuaternion_GetVec3d( const geQuaternion *Q, geFloat *W, geVec3d *V);
 	// get quaternion components into W and V
 
-void GENESISCC geQuaternion_FromMatrix(
+GENESISAPI void GENESISCC geQuaternion_FromMatrix(
 	const geXForm3d		*RotationMatrix,
 	      geQuaternion	*QDest);
 	// takes upper 3 by 3 portion of matrix (rotation sub matrix) 
@@ -141,7 +141,7 @@ GENESISAPI void GENESISCC geQuaternion_ToMatrix(
 	// takes a unit quaternion and makes RotationMatrixDest an equivelant rotation xform.
 	// (any translation in RotationMatrixDest will be list)
 
-void GENESISCC geQuaternion_Slerp(
+GENESISAPI void GENESISCC geQuaternion_Slerp(
 	const geQuaternion		*Q0, 
 	const geQuaternion		*Q1, 
 	geFloat					T,		
@@ -152,7 +152,7 @@ void GENESISCC geQuaternion_Slerp(
 	// returns a quaternion with a positive W - always takes shortest route
 	// through the positive W domain.
 
-void GENESISCC geQuaternion_SlerpNotShortest(
+GENESISAPI void GENESISCC geQuaternion_SlerpNotShortest(
 	const geQuaternion		*Q0, 
 	const geQuaternion		*Q1, 
 	geFloat					T,		
@@ -162,20 +162,20 @@ void GENESISCC geQuaternion_SlerpNotShortest(
 	// with t==0 being all q0, and t==1 being all q1.
 
 
-void GENESISCC geQuaternion_Multiply(
+GENESISAPI void GENESISCC geQuaternion_Multiply(
 	const geQuaternion	*Q1, 
 	const geQuaternion	*Q2, 
 	geQuaternion			*QProduct);
 	// multiplies q1 * q2, and places the result in q.
 	// no failure. 	renormalization not automatic
 
-void GENESISCC geQuaternion_Rotate(
+GENESISAPI void GENESISCC geQuaternion_Rotate(
 	const geQuaternion	*Q, 
 	const geVec3d       *V, 
 	geVec3d				*VRotated);
 	// Rotates V by the quaternion Q, places the result in VRotated.
 
-geBoolean GENESISCC geQuaternion_IsUnit(const geQuaternion *Q);
+GENESISAPI geBoolean GENESISCC geQuaternion_IsUnit(const geQuaternion *Q);
 	// returns GE_TRUE if q is a unit quaternion.  GE_FALSE otherwise.
 
 GENESISAPI geFloat GENESISCC geQuaternion_Normalize(geQuaternion *Q);
@@ -184,49 +184,49 @@ GENESISAPI geFloat GENESISCC geQuaternion_Normalize(geQuaternion *Q);
 GENESISAPI void GENESISCC geQuaternion_Copy(const geQuaternion *QSrc, geQuaternion *QDst);
 	// copies quaternion QSrc into QDst
 
-void GENESISCC geQuaternion_SetNoRotation(geQuaternion *Q);
+GENESISAPI void GENESISCC geQuaternion_SetNoRotation(geQuaternion *Q);
 	// sets Q to be a quaternion with no rotation (like an identity matrix)
 
-void GENESISCC geQuaternion_Ln(
+GENESISAPI void GENESISCC geQuaternion_Ln(
 	const geQuaternion *Q, 
 	geQuaternion *LnQ);
 	// ln(Q) for unit quaternion only!
 
-void GENESISCC geQuaternion_Exp(
+GENESISAPI void GENESISCC geQuaternion_Exp(
 	const geQuaternion *Q,
 	geQuaternion *ExpQ);
 	// exp(Q) for pure quaternion only!  (zero scalar part (W))
 
-void GENESISCC geQuaternion_Scale(
+GENESISAPI void GENESISCC geQuaternion_Scale(
 	const geQuaternion *Q,
 	geFloat Scale,
 	geQuaternion *QScaled);
 	// Q = Q * Scale  (result is not generally a unit quaternion!)
 
-void GENESISCC geQuaternion_Add(
+GENESISAPI void GENESISCC geQuaternion_Add(
 	const geQuaternion *Q1,
 	const geQuaternion *Q2,
 	geQuaternion *QSum);
 	// QSum = Q1 + Q2  (result is not generally a unit quaternion!)
 
-void GENESISCC geQuaternion_Subtract(
+GENESISAPI void GENESISCC geQuaternion_Subtract(
 	const geQuaternion *Q1, 
 	const geQuaternion *Q2, 
 	geQuaternion *QSum);
 	// QSum = Q1 - Q2  (result is not generally a unit quaternion!)
 
-void GENESISCC geQuaternion_Inverse(const geQuaternion *Q, geQuaternion *QInv);
+GENESISAPI void GENESISCC geQuaternion_Inverse(const geQuaternion *Q, geQuaternion *QInv);
 	// sets QInv to the inverse of Q.  
 
-geFloat GENESISCC geQuaternion_Magnitude(const geQuaternion *Q);
+GENESISAPI geFloat GENESISCC geQuaternion_Magnitude(const geQuaternion *Q);
 	// returns Magnitude of Q.  
 
-geBoolean GENESISCC geQuaternion_Compare( geQuaternion *Q1, geQuaternion *Q2, geFloat Tolerance );
+GENESISAPI geBoolean GENESISCC geQuaternion_Compare( geQuaternion *Q1, geQuaternion *Q2, geFloat Tolerance );
 	// return GE_TRUE if quaternions differ elementwise by less than Tolerance.
 
 
 #ifndef NDEBUG
-void GENESISCC geQuaternion_SetMaximalAssertionMode( geBoolean Enable );
+GENESISAPI void GENESISCC geQuaternion_SetMaximalAssertionMode( geBoolean Enable );
 #endif
 
 #ifdef __cplusplus

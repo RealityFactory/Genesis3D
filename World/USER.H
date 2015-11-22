@@ -4,6 +4,10 @@
 /*  Author: John Pollard                                                                */
 /*  Description: User poly's                                                            */
 /*                                                                                      */
+/*  Edit History                                                                        */
+/*   03/24/2004 Wendell Buckner                                                         */
+/*    BUG FIX: Rendering Transparent Polys properly (2)                                 */
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -91,6 +95,11 @@ geBoolean	User_WorldInit(geWorld *World);
 void		User_WorldShutdown(geWorld *World);
 
 geBoolean User_RenderPolyList(gePoly *PolyList);
+
+/* 03/24/2004 Wendell Buckner
+    BUG FIX: Rendering Transparent Polys properly (2) */
+geBoolean User_RenderTLPoly (gePoly *Poly);
+geBoolean User_RenderPoly (gePoly *Poly);
 
 GENESISAPI	gePoly *geWorld_AddPolyOnce(	geWorld *World, 
 										GE_LVertex *Verts, 

@@ -159,6 +159,10 @@ typedef enum
 	ERR_SPRITE_ENOMEM,					// failure to create. (memory allocation failure)
 	ERR_SPRITE_INVALIDBITMAP,		// failure to use bitmap because bitmap was invalid
 //MRB END
+// changed QD Shadows
+	GE_ERR_BEGIN_SHADOWVOLUMES_FAILED,
+	GE_ERR_END_SHADOWVOLUMES_FAILED,
+// end change
 } geErrorLog_ErrorIDEnumType;
 
 

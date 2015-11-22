@@ -48,6 +48,8 @@ void Frustum_SetFromCamera(Frustum_Info *Info, geCamera *Camera)
 	geBoolean	ZFarEnable;
     geVec3d		Normal;
 	int32		i;
+// changed QD Clipping
+	geFloat		ZScale; 
 
     geCamera_GetViewAngleXSinCos(Camera,&s,&c);
 
@@ -77,7 +79,9 @@ void Frustum_SetFromCamera(Frustum_Info *Info, geCamera *Camera)
 	geVec3d_Normalize(&Normal);
 	Info->Planes[3].Normal = Normal;
 
-	Info->NumPlanes = 4;
+// changed QD Clipping
+	
+/*	Info->NumPlanes = 4;
 
 	// Clear all distances
 	for (i=0; i<Info->NumPlanes; i++)
@@ -107,6 +111,43 @@ void Frustum_SetFromCamera(Frustum_Info *Info, geCamera *Camera)
 
 		Info->NumPlanes = 5;
 	}
+/**/
+	Normal.X = 0.0f;
+	Normal.Y = 0.0f;
+	Normal.Z = -1.0f;
+	Info->Planes[4].Normal = Normal;
+
+	Info->NumPlanes = 5;
+
+	// Clear all distances
+	for (i=0; i<Info->NumPlanes; i++)
+	{
+		Info->Planes[i].Dist = 0.0f;
+		Info->Planes[i].Type = PLANE_ANY;
+	}
+
+	ZScale = geCamera_GetZScale(Camera);
+	Info->Planes[4].Dist = (2.0f/ZScale);
+
+    // Check to see if we need to use a far clip plane
+	geCamera_GetFarClipPlane(Camera, &ZFarEnable, &ZFar);
+
+	if(ZFarEnable)
+	{
+		// Far clip plane
+		Normal.X = 0.0f;
+		Normal.Y = 0.0f;
+		Normal.Z = 1.0f;
+		geVec3d_Normalize(&Normal);
+		Info->Planes[5].Normal = Normal;
+
+		Info->Planes[5].Dist = -(ZFar/ZScale);
+		Info->Planes[5].Type = PLANE_ANY;
+
+		Info->NumPlanes = 6;
+	}
+
+// end change
 
 	// Get BBox info for fast BBox rejection against frustum...
 	SetUpFrustumBBox(Info);

@@ -5,6 +5,26 @@
 /*  Description: Maintains the driver interface, as well as the bitmaps attached		*/
 /*					to the driver.														*/
 /*                                                                                      */
+/* Edit History:                                                                        */
+/*  11/02/2004 Wendell Buckner                                                          */
+/*   DOT3 BUG FIX - Crashes the 16-bit because not getting the right driver flags       */  
+/*  08/08/2004 Wendell Buckner                                                          */
+/*   BUG FIX: Allways call geBitmap_SetRenderFlags() before calling a textured rendering*/ 
+/*   function(for embm, dot3, & etc...).                                                */
+/*  08/06/2004 Wendell Buckner                                                          */   
+/*   DOT3 BUMPMAPPING   (Missing from original source)                                  */
+/*  01/20/2004 Wendell Buckner                                                          */
+/*   On some machines with fast proccessors (2.0ghz or better, typically intel) the     */
+/*   typically intel) the value return                                                  */
+/*   value return by Sys_GetCPUFreq is to large for the following variable make it a    */
+/*   large_integer                                                                      */
+/*   Fix provided by Latex and IronDragon from the genesis3d forum                      */
+/*  Edit History:                                                                       */
+/*  05/26/2003 Wendell Buckner                                                          */   
+/*   BUMPMAPPING                                                                        */
+/*  05/05/2003 Wendell Buckner                                                          */   
+/*   BUMPMAPPING                                                                       	*/
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -16,8 +36,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*Genesis3D Version 1.1 released November 15, 1999                                      */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 
@@ -516,7 +536,7 @@ GENESISAPI geBoolean GENESISCC geEngine_DrawAlphaBitmap(
                          pBitmap,
                          ( Alpha != 255 ? DRV_RENDER_ALPHA : 0 ) | 
 			DRV_RENDER_CLAMP_UV | DRV_RENDER_FLUSH | 
-			DRV_RENDER_NO_ZMASK | DRV_RENDER_NO_ZWRITE );
+			DRV_RENDER_NO_ZMASK | DRV_RENDER_NO_ZWRITE ); 
 
 	return GE_TRUE;
 }
@@ -554,6 +574,30 @@ GENESISAPI geBoolean geEngine_SetDriverAndMode(	geEngine *Engine,
 	if	(DoSplashScreen(Engine, DriverMode) == GE_FALSE)
 		return GE_FALSE;
 #endif
+
+	return GE_TRUE;
+}
+
+GENESISAPI geBoolean geEngine_SetDriverAndModeNoSplash(	geEngine *Engine, 
+												geDriver *Driver, 
+												geDriver_Mode *DriverMode)
+{
+	assert(Engine);
+	assert(Driver);
+	assert(DriverMode);
+
+	// init calls _Reset and eventually it gets down and Detaches all
+
+	//	Set up the Render Driver
+	if (!Engine_InitDriver(Engine, Driver, DriverMode))
+		return GE_FALSE;
+
+	// Force a Driver update
+	geEngine_SetAllWorldChangedFlag(Engine, GE_TRUE);
+	Engine->Changed = GE_TRUE;
+
+	geEngine_UpdateGamma(Engine);
+	geEngine_UpdateFogEnable(Engine);
 
 	return GE_TRUE;
 }
@@ -679,6 +723,10 @@ GENESISAPI void GENESISCC geEngine_RenderPoly(const geEngine *Engine,
 		TH = geBitmap_GetTHandle(Texture);
 		assert(TH);
 
+/*  05/05/2003 Wendell Buckner                                                          
+     BUMPMAPPING                                                                       	*/
+        geBitmap_SetRenderFlags(Texture, &Flags);
+
 		Ret = Engine->DriverInfo.RDriver->RenderMiscTexturePoly((DRV_TLVertex *)Points,
 			NumPoints,TH,Flags);
 	}
@@ -713,6 +761,11 @@ DRV_Driver * Driver;
 		for(pn=0;pn<NumPolys;pn++)
 		{
 			assert(pPoints[pn]);
+
+/* 08/08/2004 Wendell Buckner
+     BUG FIX: Allways call geBitmap_SetRenderFlags() before calling a textured rendering function(for embm, dot3, & etc...). */
+			geBitmap_SetRenderFlags(Texture, &Flags);
+
 			Ret = Driver->RenderMiscTexturePoly((DRV_TLVertex *)pPoints[pn],
 				pNumPoints[pn],TH,Flags);
 			assert(Ret);
@@ -730,6 +783,48 @@ DRV_Driver * Driver;
 	}
 
 }
+
+// changed QD Shadows
+GENESISAPI geBoolean geEngine_SetStencilShadowsEnable(geEngine *Engine, geBoolean Enable, int NumLights, geFloat r, geFloat g, geFloat b, geFloat a)
+{
+	Engine->StencilShadowsEnable = Enable;
+
+	if(Engine->DriverInfo.RDriver && !(Engine->DriverInfo.RDriver->EngineSettings->CanSupportFlags & DRV_SUPPORT_STENCIL))
+		Engine->StencilShadowsEnable = GE_FALSE;
+
+	Engine->NumStencilShadowLights = NumLights;
+
+	Engine->ShadowR = r;
+	Engine->ShadowG = g;
+	Engine->ShadowB = b;
+	Engine->ShadowA = a;
+
+	return GE_TRUE;
+}
+
+GENESISAPI void GENESISCC geEngine_RenderPolyStencil(const geEngine *Engine, const geVec3d *Points, 
+						int NumPoints, uint32 Flags)
+{
+	geBoolean	Ret;
+
+	assert(Engine && Points);
+
+	Ret = Engine->DriverInfo.RDriver->RenderStencilPoly((DRV_XYZVertex *)Points, NumPoints, Flags);
+
+	assert(Ret == GE_TRUE);
+}
+
+GENESISAPI void GENESISCC geEngine_DrawShadowPoly(geEngine *Engine, GE_RGBA ShadowColor)
+{
+	geBoolean	Ret;
+
+	assert(Engine);
+
+	Ret = Engine->DriverInfo.RDriver->DrawShadowPoly(ShadowColor.r, ShadowColor.g, ShadowColor.b, ShadowColor.a);
+
+	assert(Ret == GE_TRUE);
+}
+// end change
 
 //================================================================================
 //	geEngine_DrawBitmap
@@ -1778,7 +1873,8 @@ GENESISAPI geBoolean geEngine_BeginFrame(geEngine *Engine, geCamera *Camera, geB
 	else
 		pDrvRect = NULL;
 
-	if (!Engine->DriverInfo.RDriver->BeginScene( ClearScreen , TRUE, pDrvRect))
+//	if (!Engine->DriverInfo.RDriver->BeginScene( ClearScreen , TRUE, pDrvRect))
+	if (!Engine->DriverInfo.RDriver->BeginScene( ClearScreen , TRUE, TRUE, pDrvRect))
 	{
 		geErrorLog_Add(GE_ERR_DRIVER_BEGIN_SCENE_FAILED, NULL);
 		return GE_FALSE;
@@ -1831,7 +1927,14 @@ GENESISAPI geBoolean geEngine_EndFrame(geEngine *Engine)
 	SubLarge(&Engine->CurrentTic, &NowTic, &DeltaTic);
 
 	if (DeltaTic.LowPart > 0)
-		Fps =  (geFloat)Engine->CPUInfo.Freq / (geFloat)DeltaTic.LowPart;
+
+/* 01/20/2004 Wendell Buckner
+    LOGO CRASH BUG - On some machines with fast proccessors (2.0ghz or better, typically intel) the value return
+	by Sys_GetCPUFreq is to large for the following variable make it a large_integer
+	Fix provided by Latex and IronDragon from the genesis3d forum 
+		Fps =  (geFloat)Engine->CPUInfo.Freq / (geFloat)DeltaTic.LowPart; */
+        Fps =  (geFloat)Engine->CPUInfo.Freq.QuadPart / (geFloat)DeltaTic.LowPart;
+
 	else 
 		Fps = 100.0f;
 
@@ -2113,6 +2216,24 @@ geBoolean Engine_SetupPixelFormats(geEngine *Engine)
 
 	PixelFormatsLen = ((uint32)PixelArrayPtr - (uint32)PixelFormatsArray)/sizeof(geRDriver_PixelFormat);
 	assert(PixelFormatsLen > 0);
+
+/*  11/02/2004 Wendell Buckner                                                          
+     DOT3 BUG FIX - Crashes the 16-bit because not getting the right driver flags */  
+/*  08/06/2004 Wendell Buckner                                                           
+     DOT3 BUMPMAPPING   (Missing from original source)  
+    geBitmap_GetEngineSupport(&Engine->DriverInfo.RDriver->EngineSettings, 0);*/
+    geBitmap_GetEngineSupport(Engine->DriverInfo.RDriver->EngineSettings, 0);
+
+/* 05/26/2003 Wendell Buckner
+    BUMPMAPPING */
+	{
+     gePixelFormat PixelFormats[100];
+	 int i;
+	 for(i=0; i < PixelFormatsLen; i++)
+      PixelFormats[i] = PixelFormatsArray[i].PixelFormat; 
+
+     geBitmap_GetBumpMapPixelFormats ( PixelFormats, NULL, &PixelFormatsLen );
+	}
 
 	#define SetupPF( type, flag, alpha )	\
 		if ( PixelArrayPtr = Hack_FindPixelFormat(PixelFormatsArray,PixelFormatsLen,flag,alpha) )	\

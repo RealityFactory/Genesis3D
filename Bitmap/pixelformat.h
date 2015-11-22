@@ -7,6 +7,10 @@
 /*  Author: Charles Bloom                                                               */
 /*  Description:  The abstract Pixel primitives                                         */
 /*                                                                                      */
+/*  Edit History:                                                                       */
+/*  03/30/2003 Wendell Buckner                                                          */
+/*   BUMPMAPPING                                                                        */
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -53,6 +57,12 @@ typedef enum		// all supported formats (including shifts)
 	GE_PIXELFORMAT_32BIT_ABGR,
 	
 	GE_PIXELFORMAT_WAVELET,			// #20 , Wavelet Compression
+
+/* 03/30/2003 Wendell Buckner
+    BUMPMAPPING */
+	GE_PIXELFORMAT_16BIT_88_UV,
+	GE_PIXELFORMAT_16BIT_556_UVL,
+	GE_PIXELFORMAT_24BIT_888_UVL,
 
 	GE_PIXELFORMAT_COUNT
 } gePixelFormat;

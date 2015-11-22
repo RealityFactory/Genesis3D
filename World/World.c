@@ -4,6 +4,22 @@
 /*  Author: John Pollard                                                                */
 /*  Description: Code to render the world, and distribute work to other modules         */
 /*                                                                                      */
+/*  Edit History:                                                                       */
+/*  03/24/2004 Wendell Buckner                                                          */
+/*   BUG FIX: Rendering Transparent Polys properly (2)                                  */
+/*  02/21/2004 Wendell Buckner                                                          */
+/*   DOT3 BUMPMAPPING                                                                   */
+/*  02/18/2004 Wendell Buckner                                                          */
+/*   DOT3 BUMPMAPPING                                                                   */
+/*  11/12/2003 Wendell Buckner                                                          */  
+/*   Bumpmapping for the World                                                          */
+/*  11/11/2003 Wendell Buckner                                                          */
+/*   Bumpmapping for the World                                                          */
+/*  10/15/2003 Wendell Buckner                                                          */  
+/*   Bumpmapping for the World                                                          */
+/*  01/30/2003 Wendell Buckner                                                          */    
+/*   Driver render flush is probably causing a slow down!                               */
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -15,8 +31,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <Assert.h>
@@ -143,6 +159,87 @@ GList_Operation		GListOperations[GLIST_MAX_OPERATIONS];
 int32				FirstGListOperations[MAX_MIRROR_RECURSION+1];
 int32				NumGListOperations[MAX_MIRROR_RECURSION+1];
 
+/* 02/18/2004 Wendell Buckner
+    DOT BUMPMAPPING */
+GENESISAPI geBoolean geWorld_CreateBumpmapByNameDot3(geWorld *World, const char *BumpmapName)
+{ 
+	geBitmap *BaseBmp        = NULL;
+	geBitmap *BumpBmp        = NULL;
+	geBitmap *SpecularBmp    = NULL;
+	char FindMaterialName[1024];
+	geBoolean BumpmapCreated = GE_FALSE;
+	
+	do
+	{
+		if(!World) break;
+		if(!BumpmapName) break;
+		if(!geBitmap_IsBumpmapNameDot3(BumpmapName)) break;
+
+		BaseBmp = geWorld_GetBitmapByName(World, BumpmapName);
+		if (!BaseBmp) break;
+
+		strcpy(FindMaterialName,BumpmapName);
+		memcpy(FindMaterialName,"BDB",3);
+
+		BumpBmp = geWorld_GetBitmapByName(World, FindMaterialName);
+		if (!BumpBmp) break;
+
+/* 11/11/2003 Wendell Buckner 
+    Bumpmapping for the World */
+		strcpy(FindMaterialName,BumpmapName);
+		memcpy(FindMaterialName,"BNS",3);
+
+		SpecularBmp = geWorld_GetBitmapByName(World, FindMaterialName);
+
+//we don't need the specular since we expect to blend with a lightmap...
+		BumpmapCreated = geBitmap_CreateBumpmapDot3 ( BaseBmp, BumpBmp, SpecularBmp );
+	}
+	while(GE_FALSE);
+
+	return BumpmapCreated;
+}
+
+/* 10/15/2003 Wendell Buckner
+    Bumpmapping for the World */
+GENESISAPI geBitmap * geWorld_CreateBumpmapByName(geWorld *World, const char *BumpmapName, gePixelFormat BumpFormat)
+{ 
+	geBitmap *BaseBmp        = NULL;
+	geBitmap *BumpBmp        = NULL;
+	geBitmap *SpecularBmp    = NULL;
+	char FindMaterialName[1024];
+	geBitmap * BumpmapCreated = NULL;
+
+	
+	do
+	{
+		if(!World) break;
+		if(!BumpmapName) break;
+		if(!geBitmap_IsBumpmapName(BumpmapName)) break;
+
+		BaseBmp = geWorld_GetBitmapByName(World, BumpmapName);
+		if (!BaseBmp) break;
+
+		strcpy(FindMaterialName,BumpmapName);
+		memcpy(FindMaterialName,"BMB",3);
+
+		BumpBmp = geWorld_GetBitmapByName(World, FindMaterialName);
+		if (!BumpBmp) break;
+
+/* 11/11/2003 Wendell Buckner 
+    Bumpmapping for the World */
+		strcpy(FindMaterialName,BumpmapName);
+		memcpy(FindMaterialName,"BMS",3);
+
+		SpecularBmp = geWorld_GetBitmapByName(World, FindMaterialName);
+
+//we don't need the specular since we expect to blend with a lightmap...
+		BumpmapCreated = geBitmap_CreateBumpmap ( BaseBmp, BumpBmp, SpecularBmp, BumpFormat );
+	}
+	while(GE_FALSE);
+
+	return BumpmapCreated;
+} 
+
 //=====================================================================================
 //=====================================================================================
 GList *GList_Create(geEngine *Engine, geWorld *World)
@@ -175,9 +272,9 @@ void GList_AddOperation(uint8 Type, uint32 Data)
 	NumGListOperations[MirrorRecursion]++;
 }
 
-//========================================================================================
-// GList_RenderOperations
-//========================================================================================
+/* 03/24/2004 Wendell Buckner
+    BUG FIX: Rendering Transparent Polys properly (2) *
+
 geBoolean GList_RenderOperations(geCamera *Camera)
 {
 	int32			i;
@@ -206,7 +303,391 @@ geBoolean GList_RenderOperations(geCamera *Camera)
 	NumGListOperations[MirrorRecursion] = 0;
 
 	return GE_TRUE;
+} */
+typedef struct
+{
+	uint32	Type;
+	uint32	Data;
+	geFloat	ZOrder;
+} GList_OperationSorted;
+
+uint32 NumGListOperationsSorted = 0;
+GList_OperationSorted *GListOperationsSorted = NULL;
+uint32  NumGlistOperationsSortedAllocated = 0;
+
+//========================================================================================
+// GListPolyComp
+//========================================================================================
+
+static int GListPolyComp(const void *a, const void *b)
+{
+	geFloat	z1, z2;
+
+	z1 = ((GList_OperationSorted *) a)->ZOrder;
+	z2 = ((GList_OperationSorted *) b)->ZOrder;
+
+	if ( z1 == z2)
+		return 0;
+
+	if (z1 < z2)
+		return 1;
+
+	return -1;
 }
+
+//========================================================================================
+// GList_FindOperationsSorted
+//========================================================================================
+          
+geBoolean GList_FindOperationsSorted (void)
+{
+	int32			i;
+	geBoolean FoundUserSortedPoly = GE_FALSE;
+
+	// Render the list from back to front
+	for (i=NumGListOperations[MirrorRecursion]-1; i>= 0; i--)
+	{
+		int32		Op;
+
+		Op = FirstGListOperations[MirrorRecursion] + i;
+
+		if ( ( GListOperations[Op].Type != 1 ) && ( GListOperations[Op].Type != 2 ) ) continue;
+
+		{				
+			gePoly *PolyList = (gePoly*) GListOperations[Op].Data;
+			gePoly *Poly;
+
+			for (Poly = PolyList; Poly; Poly = Poly->Next)
+			{
+				FoundUserSortedPoly =  ( Poly->RenderFlags & GE_RENDER_DEPTH_SORT_BF );
+				if ( FoundUserSortedPoly ) break;
+			}
+		}
+
+		if ( FoundUserSortedPoly ) break;
+	}
+
+
+	return FoundUserSortedPoly;
+}
+
+//========================================================================================
+// GList_RenderOperationsUnsorted
+//========================================================================================
+
+void GList_RenderOperationsUnsorted(void)
+{
+		int32			i;
+
+		// Render the list from back to front
+// changed QD bug fix
+		//for (i=0; i < NumGListOperations[MirrorRecursion]-1; i++)
+		for (i=NumGListOperations[MirrorRecursion]-1; i>= 0; i--)
+		{
+			int32		Op;
+	
+			Op = FirstGListOperations[MirrorRecursion] + i;
+
+			if ( GListOperations[Op].Type != 1) continue;
+
+			{				
+				gePoly *pUPolyList = (gePoly*) GListOperations[Op].Data;
+				gePoly *pUPoly = NULL;
+
+				for (pUPoly = pUPolyList; pUPoly; pUPoly = pUPoly->Next)
+				{
+					if ( pUPoly->RenderFlags & GE_RENDER_DEPTH_SORT_BF ) continue;
+
+					User_RenderPoly( pUPoly );
+				}
+
+			}
+
+
+		}
+
+}
+
+//==========================================================================================
+// GList_AllocateOperationsSorted
+//======================================================================================
+
+GList_OperationSorted *GList_AllocateOperationsSorted(void)
+{
+
+  	if ( NumGListOperationsSorted == NumGlistOperationsSortedAllocated )
+	{
+		NumGlistOperationsSortedAllocated += 1024;
+
+/* 03/24/2004 Wendell Buckner
+    BUG FIX: Rendering Transparent Polys properly (2) *
+	 Dumb error! Must use preserve the data that's already in the array!
+		GListOperationsSorted = GE_RAM_ALLOCATE_ARRAY ( GList_OperationSorted,NumGlistOperationsSortedAllocated);*/
+		GListOperationsSorted = GE_RAM_REALLOC_ARRAY ( GListOperationsSorted, GList_OperationSorted,NumGlistOperationsSortedAllocated);
+
+		if ( !GListOperationsSorted )
+		{
+			NumGListOperationsSorted = 0;
+			NumGlistOperationsSortedAllocated = 0;
+		}
+	}
+
+	return GListOperationsSorted;
+}
+
+//========================================================================================
+// GList_AddOperationsSorted
+//========================================================================================
+
+void GList_AddOperationsSorted(geCamera *Camera)
+{
+	int32			i;
+    
+	NumGListOperationsSorted = 0;
+     
+	// Render the list from back to front
+	for (i=NumGListOperations[MirrorRecursion]-1; i>= 0; i--)
+	{
+		int32		Op;
+        int32		j;
+
+  		if ( NumGListOperationsSorted == NumGlistOperationsSortedAllocated )
+			GList_AllocateOperationsSorted();
+      
+		if ( !GListOperationsSorted ) break;
+
+		Op = FirstGListOperations[MirrorRecursion] + i;
+		
+		switch(GListOperations[Op].Type)
+		{
+			case 0:
+			{
+				World_TransPoly *pWTPoly  =  (World_TransPoly*) GListOperations[Op].Data;
+				DRV_TLVertex	*pTLVerts =  pWTPoly->TLVerts;
+
+				GListOperationsSorted[NumGListOperationsSorted].ZOrder = 0.0f;
+
+				for(j=0;j < pWTPoly->NumVerts;j++)
+				{
+					GListOperationsSorted[NumGListOperationsSorted].ZOrder += pTLVerts[j].z;
+				}
+
+				GListOperationsSorted[NumGListOperationsSorted].ZOrder /= pWTPoly->NumVerts;
+				
+				GListOperationsSorted[NumGListOperationsSorted].Type  = GListOperations[Op].Type;
+				GListOperationsSorted[NumGListOperationsSorted].Data = (uint32) pWTPoly;
+				NumGListOperationsSorted++;
+			}
+			break;
+
+			case 1:
+			{				
+				gePoly *pUPolyList = (gePoly*) GListOperations[Op].Data;
+				gePoly *pUPoly = NULL;
+
+				for (pUPoly = pUPolyList; pUPoly; pUPoly = pUPoly->Next)
+				{
+					if ( pUPoly->RenderFlags & GE_RENDER_DEPTH_SORT_BF )
+					{
+						GListOperationsSorted[NumGListOperationsSorted].ZOrder = 0.0f;
+
+						for(j=0; j < pUPoly->NumVerts; j++)
+						{
+							// Sorted polys (within this list) go in the SortedPoly list, and are sorted and drawn below
+							geVec3d		Src;
+							geVec3d		Dest;
+							geVec3d		DestP;
+
+							Src.X = pUPoly->Verts[j].X;
+							Src.Y = pUPoly->Verts[j].Y;
+							Src.Z = pUPoly->Verts[j].Z;
+
+							geCamera_Transform(Camera, &Src, &Dest);
+							
+							geCamera_Project(Camera,&Dest,&DestP);
+
+							GListOperationsSorted[NumGListOperationsSorted].ZOrder += DestP.Z;
+						}
+
+						GListOperationsSorted[NumGListOperationsSorted].ZOrder /= pUPoly->NumVerts;
+
+						GListOperationsSorted[NumGListOperationsSorted].Data = (uint32) pUPoly;
+						GListOperationsSorted[NumGListOperationsSorted].Type  = GListOperations[Op].Type;
+						NumGListOperationsSorted++;
+
+  						if ( NumGListOperationsSorted == NumGlistOperationsSortedAllocated )
+							GList_AllocateOperationsSorted();
+      
+						if ( !GListOperationsSorted ) break;
+
+					}
+				}
+
+			}
+			break;
+
+			case 2:
+			{				
+				gePoly *pUPolyList = (gePoly*) GListOperations[Op].Data;
+				gePoly *pUPoly = NULL;
+
+				for (pUPoly = pUPolyList; pUPoly; pUPoly = pUPoly->Next)
+				{
+					GListOperationsSorted[NumGListOperationsSorted].ZOrder = 0.0f;
+
+					for(j=0; j < pUPoly->NumVerts; j++)
+					{
+						GListOperationsSorted[NumGListOperationsSorted].ZOrder += pUPoly->Verts[j].Z;
+					}
+
+					GListOperationsSorted[NumGListOperationsSorted].ZOrder /= pUPoly->NumVerts;
+
+					GListOperationsSorted[NumGListOperationsSorted].Data = (uint32) pUPoly;
+					GListOperationsSorted[NumGListOperationsSorted].Type  = GListOperations[Op].Type;
+					NumGListOperationsSorted++;
+
+  					if ( NumGListOperationsSorted == NumGlistOperationsSortedAllocated )
+						GList_AllocateOperationsSorted();
+      
+					if ( !GListOperationsSorted ) break;
+
+				}
+
+			}
+			break;
+
+		}
+		
+	}
+
+  if ( GListOperationsSorted ) 
+	qsort(GListOperationsSorted, NumGListOperationsSorted, sizeof(GListOperationsSorted[0]), GListPolyComp);
+}
+
+//========================================================================================
+// GList_RenderOperationsSorted
+//========================================================================================
+
+geBoolean GList_RenderOperationsSorted(geCamera *Camera)
+{
+	uint32			i;
+
+	for (i=0; i < NumGListOperationsSorted; i++)
+	{
+		switch(GListOperationsSorted[i].Type)
+		{
+			case 0:
+				RenderTransPoly(Camera, (World_TransPoly*)GListOperationsSorted[i].Data);
+				break;
+
+			case 1:
+				User_RenderPoly ((gePoly*)GListOperationsSorted[i].Data);
+				break;
+
+			case 2:
+				User_RenderTLPoly ((gePoly*)GListOperationsSorted[i].Data);
+				break;
+
+			default:
+				assert(0);
+		}
+	}
+
+	return GE_TRUE;
+}
+
+//========================================================================================
+// GList_CleanUpOperationsSorted
+//========================================================================================
+
+void GList_CleanUpOperationsSorted(void)
+{
+	int32			i;
+    
+	if ( GListOperationsSorted) 
+		geRam_Free(GListOperationsSorted);
+
+	NumGListOperationsSorted = 0;
+	NumGlistOperationsSortedAllocated = 0;
+
+	for (i=NumGListOperations[MirrorRecursion]-1; i>= 0; i--)
+	{
+		int32		Op;
+
+		Op = FirstGListOperations[MirrorRecursion] + i;
+
+		if ( GListOperations[Op].Type == 2 )
+		{
+			gePoly *pUPolyList = (gePoly*) GListOperations[Op].Data;
+			gePoly *pUPoly = NULL;
+			gePoly *pUPolyPrev = NULL;
+
+			if ( pUPolyList ) 
+			{
+				pUPolyPrev = pUPolyList;
+
+				if ( pUPolyPrev->Prev )
+					pUPolyPrev = pUPolyPrev->Prev; 
+
+				pUPolyList->Prev = NULL; 
+			}
+
+			for (pUPoly = pUPolyPrev; pUPoly; pUPoly = pUPolyPrev )
+			{
+				pUPolyPrev = pUPoly->Prev;					 
+				geRam_Free ( pUPoly );
+
+			}
+		}
+	}	
+}
+
+//========================================================================================
+// GList_RenderOperations
+//========================================================================================
+
+geBoolean GList_RenderOperations(geCamera *Camera)
+{
+	int32			i;
+
+	if ( GList_FindOperationsSorted() )
+	{
+		GList_RenderOperationsUnsorted();
+		GList_AddOperationsSorted(Camera);	
+		GList_RenderOperationsSorted(Camera);
+		GList_CleanUpOperationsSorted();
+	}
+	else
+	{
+
+		// Render the list from back to front
+		for (i=NumGListOperations[MirrorRecursion]-1; i>= 0; i--)
+		{
+			int32		Op;
+	
+			Op = FirstGListOperations[MirrorRecursion] + i;
+
+			switch(GListOperations[Op].Type)
+			{
+				case 0:
+					RenderTransPoly(Camera, (World_TransPoly*)GListOperations[Op].Data);
+					break;
+				case 1:
+					User_RenderPolyList((gePoly*)GListOperations[Op].Data);
+					break;
+
+				default:
+					assert(0);
+			}
+		}
+
+	}
+
+	NumGListOperations[MirrorRecursion] = 0;
+
+	return GE_TRUE;
+
+} 
 
 //=====================================================================================
 //	Local Static Functions
@@ -220,7 +701,9 @@ static geBoolean RenderWorldModel(geCamera *Camera, Frustum_Info *FrustumInfo, g
 static geBoolean RenderSubModels(geCamera *Camera, Frustum_Info *FrustumInfo, geWorld_SkyBoxTData *SkyTData);
 static geBoolean WorldSetGBSP(geWorld *World, World_BSP *BSP);
 static World_BSP *CreateGBSP(geVFile *File);
-
+// changed QD Shadows
+static geBoolean RenderShadowVolumes(geEngine *Engine, geWorld *World, geCamera *Camera, Frustum_Info *FrustumInfo);
+// end change
 static geBoolean CreateStaticFogList(geWorld *World);
 
 // SkyBox functions
@@ -778,6 +1261,11 @@ geBoolean World_WorldRenderQ(geEngine *Engine, geWorld *World, geCamera *Camera)
 	if (!User_DestroyOncePolys(World))
 		return GE_FALSE;
 
+// changed QD Shadows
+	if(Engine->StencilShadowsEnable==GE_TRUE && Engine->NumStencilShadowLights>0)
+		RenderShadowVolumes(Engine, World, Camera, &FrustumInfo);
+// end change
+
 #if 1
 	// <> CB remember the last camera we rendered with,
 	//	so we can avoiding redoing view-dependent calculation
@@ -848,17 +1336,17 @@ GENESISAPI geBoolean GENESISCC geWorld_IsActorPotentiallyVisible(const geWorld *
 		geVec3d_Set(&Maxs,-BIG_NUMBER,-BIG_NUMBER,-BIG_NUMBER);
 		geVec3d_Set(&Mins, BIG_NUMBER, BIG_NUMBER, BIG_NUMBER);
 		for (i=0; i<8; i++)
-			{
-				geVec3d V;
-				geXForm3d_Transform(  ObjectToCamera,&(BoxCorners[i]),&(BoxCorners[i]));
-				geCamera_Project(  Camera,&(BoxCorners[i]),&V);
-				if (V.X > Maxs.X ) Maxs.X = V.X;
-				if (V.X < Mins.X ) Mins.X = V.X;
-				if (V.Y > Maxs.Y ) Maxs.Y = V.Y;
-				if (V.Y < Mins.Y ) Mins.Y = V.Y;
-				if (V.Z > Maxs.Z ) Maxs.Z = V.Z;
-				if (V.Z < Mins.Z ) Mins.Z = V.Z;
-			}
+		{
+			geVec3d V;
+			geXForm3d_Transform(  ObjectToCamera,&(BoxCorners[i]),&(BoxCorners[i]));
+			geCamera_Project(  Camera,&(BoxCorners[i]),&V);
+			if (V.X > Maxs.X ) Maxs.X = V.X;
+			if (V.X < Mins.X ) Mins.X = V.X;
+			if (V.Y > Maxs.Y ) Maxs.Y = V.Y;
+			if (V.Y < Mins.Y ) Mins.Y = V.Y;
+			if (V.Z > Maxs.Z ) Maxs.Z = V.Z;
+			if (V.Z < Mins.Z ) Mins.Z = V.Z;
+		}
 
 		if (   (Maxs.X < ClippingRect.Left) 
 			|| (Mins.X > ClippingRect.Right)
@@ -965,7 +1453,9 @@ static geBoolean RenderScene(geEngine *Engine, geWorld *World, geCamera *Camera,
 		Frustum_Info	ActorFrustum;
 
 		// Make the frustum go to world space for actors
-		Frustum_TransformToWorldSpace(FrustumInfo, Camera, &ActorFrustum);
+		// changed QD Clipping
+		// do clipping in camera space
+		//Frustum_TransformToWorldSpace(FrustumInfo, Camera, &ActorFrustum);
 
 		// Tell the driver we want to render meshes
 		if (!Engine->DriverInfo.RDriver->BeginMeshes())
@@ -979,44 +1469,55 @@ static geBoolean RenderScene(geEngine *Engine, geWorld *World, geCamera *Camera,
 		WActor = World->ActorArray;
 
 		for (i=0; i< World->ActorCount; i++, WActor++)
+		{
+			if (MirrorRecursion == 0 && !(WActor->Flags & (GE_ACTOR_RENDER_NORMAL | GE_ACTOR_RENDER_ALWAYS)))
+				continue;		// Not visible in normal views, skip it
+			if (MirrorRecursion > 0 && !(WActor->Flags & (GE_ACTOR_RENDER_MIRRORS | GE_ACTOR_RENDER_ALWAYS)))
+				continue;		// Not visible in mirros, skip it
+
 			{
-				if (MirrorRecursion == 0 && !(WActor->Flags & (GE_ACTOR_RENDER_NORMAL | GE_ACTOR_RENDER_ALWAYS)))
-					continue;		// Not visible in normal views, skip it
-				if (MirrorRecursion > 0 && !(WActor->Flags & (GE_ACTOR_RENDER_MIRRORS | GE_ACTOR_RENDER_ALWAYS)))
-					continue;		// Not visible in mirros, skip it
-
+				geExtBox Box;
+				geBoolean Enabled;
+				geActor_GetRenderHintExtBox(WActor->Actor,&Box,&Enabled);
+				if (Enabled == GE_TRUE)
 				{
-					geExtBox Box;
-					geBoolean Enabled;
-					geActor_GetRenderHintExtBox(WActor->Actor,&Box,&Enabled);
-					if (Enabled == GE_TRUE)
-						{
-							geExtBox_GetTranslation ( &Box, &Center );
-							if	(!(WActor->Flags & GE_ACTOR_RENDER_ALWAYS))
-								{
-									// NOTE - We are not taking into acount that a actor may live in more than one leaf...
-									geWorld_GetLeaf(World, &Center, &Leaf);
+					geExtBox_GetTranslation ( &Box, &Center );
+					if	(!(WActor->Flags & GE_ACTOR_RENDER_ALWAYS))
+					{
+						// NOTE - We are not taking into acount that a actor may live in more than one leaf...
+						geWorld_GetLeaf(World, &Center, &Leaf);
 					
-									if (World->CurrentBSP->LeafData[Leaf].VisFrame != World->CurFrameStatic)
-										continue;		// Not in PVS, skip it
-								}
+						if (World->CurrentBSP->LeafData[Leaf].VisFrame != World->CurFrameStatic)
+						{
+							// changed QD Shadows
+							// actor not visible but may cast a visible shadow
+							geActor_BodyGeometryNeedsUpdate(WActor->Actor);
+							// end change
+							continue;		// Not in PVS, skip it
 						}
+					}
 				}
-
-				if (MirrorRecursion == 0)
-				{
-					geActor_Render( WActor->Actor, Engine, World, Camera);
-					// For debugging...
-					//  This is set inside Actor/Puppet.  Engine->DebugInfo.NumActors++;
-				}
-				else
-				{
-					geActor_RenderThroughFrustum( WActor->Actor, Engine, World, Camera, &ActorFrustum);
-					// For debugging...
-					Engine->DebugInfo.NumActors++;
-				}
-
 			}
+
+			if (MirrorRecursion == 0)
+			{
+				// changed QD Clipping
+				//geActor_Render( WActor->Actor, Engine, World, Camera);
+				geActor_Render( WActor->Actor, Engine, World, Camera, FrustumInfo);
+				// For debugging...
+				//  This is set inside Actor/Puppet.  Engine->DebugInfo.NumActors++;
+			}
+			else
+			{
+				// changed QD Clipping
+				//geActor_RenderThroughFrustum( WActor->Actor, Engine, World, Camera, &ActorFrustum);
+				geActor_RenderThroughFrustum( WActor->Actor, Engine, World, Camera, FrustumInfo);
+				
+				// For debugging...
+				Engine->DebugInfo.NumActors++;
+			}
+
+		}
 
 //MRB BEGIN
 //geSprite
@@ -1071,6 +1572,426 @@ static geBoolean RenderScene(geEngine *Engine, geWorld *World, geCamera *Camera,
 
 	return GE_TRUE;
 }
+
+//================================================================================
+//	BackRotateVector
+//	Rotate a vector from viewspace to worldspace.
+//================================================================================
+static void BackRotateVector(const geVec3d *In, geVec3d *Out, const geXForm3d *XForm)
+{
+    geVec3d	VRight, VUp, VIn;
+	
+	//	Get the 3 vectors that make up the Xform axis 
+	VRight.X = XForm->AX; VRight.Y = XForm->AY; VRight.Z = XForm->AZ;
+	VUp.X    = XForm->BX; VUp.Y    = XForm->BY; VUp.Z    = XForm->BZ;
+	VIn.X    = XForm->CX; VIn.Y    = XForm->CY; VIn.Z    = XForm->CZ;
+
+    Out->X = (In->X * VRight.X) + (In->Y * VUp.X) + (In->Z * VIn.X);
+    Out->Y = (In->X * VRight.Y) + (In->Y * VUp.Y) + (In->Z * VIn.Y);
+    Out->Z = (In->X * VRight.Z) + (In->Y * VUp.Z) + (In->Z * VIn.Z);
+}
+//====================================
+// changed QD Shadows
+#define MAX_LIGHTS 8
+
+static geBoolean RenderShadowVolumes(geEngine *Engine, geWorld *World, geCamera *Camera, Frustum_Info *FrustumInfo)
+{
+	int i, j, p;	
+	World_Actor		*WActor;
+	Light_LightInfo *L;
+	GFX_Plane		FPlanes[6]; //for near clip plane and far clip plane if not set
+	Frustum_Info	ActorFrustum;
+	const geVec3d	*Pov;
+	geFloat			DistToCamSquared[MAX_LIGHTS];
+	geVec3d			Light[MAX_LIGHTS]; // position 
+	geVec3d			LNormal[MAX_LIGHTS]; // direction
+	geFloat			Arc[MAX_LIGHTS];
+	geFloat			Radius[MAX_LIGHTS];
+	int				LightType[MAX_LIGHTS];
+	geBoolean		ZPass[MAX_LIGHTS];
+	int				NumLights;
+	int				MaxNumLights;
+	
+
+	// no shadows in mirrors for now...
+	if(MirrorRecursion > 0)
+		return GE_TRUE;
+
+	// Make the frustum go to world space for lights
+	// NOTE: plane normals are pointing into the frustum
+	Frustum_TransformToWorldSpace(FrustumInfo, Camera, &ActorFrustum);
+	Pov = geCamera_GetPov(Camera);
+	MaxNumLights = (Engine->NumStencilShadowLights<MAX_LIGHTS)?Engine->NumStencilShadowLights:MAX_LIGHTS;
+
+	for(i=0;i<ActorFrustum.NumPlanes; i++)
+	{
+		FPlanes[i].Dist = ActorFrustum.Planes[i].Dist;
+		FPlanes[i].Type = ActorFrustum.Planes[i].Type;
+		geVec3d_Copy(&(ActorFrustum.Planes[i].Normal), &(FPlanes[i].Normal));
+	}
+
+
+	// far clip plane for lights
+	if(ActorFrustum.NumPlanes<6)
+	{
+		geVec3d Normal;
+		geFloat	ZScale;
+		geFloat Dist;
+		geFloat	ZFar = 1000.0f;	
+
+		ZScale = geCamera_GetZScale(Camera);
+
+		Normal.X = 0.0f;
+		Normal.Y = 0.0f;
+		Normal.Z = 1.0f;
+
+		Dist = -(ZFar/ZScale);
+		FPlanes[5].Type = PLANE_ANY;
+
+		BackRotateVector(&Normal, &(FPlanes[5].Normal), geCamera_GetCameraSpaceXForm(Camera));
+		FPlanes[5].Dist = geVec3d_DotProduct(Pov, &(FPlanes[5].Normal)) - CLIP_PLANE_EPSILON;
+
+		// Add the original dist back in
+		{
+			geVec3d	Vect;
+
+			geVec3d_Clear(&Vect);
+			geVec3d_AddScaled(&Vect, &Normal, Dist, &Vect);
+
+			BackRotateVector(&Vect, &Vect, geCamera_GetCameraSpaceXForm(Camera));
+
+			FPlanes[5].Dist += geVec3d_DotProduct(&(FPlanes[5].Normal), &Vect);
+		}
+	}
+
+
+	// Tell the driver we want to render shadowvolumes
+	if (!Engine->DriverInfo.RDriver->BeginShadowVolumes())
+	{
+		geErrorLog_Add(GE_ERR_BEGIN_SHADOWVOLUMES_FAILED, NULL);
+		return GE_FALSE;
+	}	
+
+	L = (World->LightInfo);
+	
+	NumLights=0;
+
+	// dynamic lights
+	for (i=0; i<MAX_DYNAMIC_LIGHTS; i++)
+	{
+		int32 Leaf;
+		geFloat PDist;
+		geBoolean ZPassTemp;
+		ZPassTemp = GE_TRUE;
+
+		if(!L->DynamicLights[i].Active)
+			continue;
+
+		geWorld_GetLeaf(World, &(L->DynamicLights[i].Pos), &Leaf);
+		if(!geWorld_MightSeeLeaf(World, Leaf))
+			continue;
+
+		for(p=0; p<4; p++)
+		{			
+			if(Plane_PlaneDistance(&FPlanes[p], &(L->DynamicLights[i].Pos)) < -(L->DynamicLights[i].Radius))
+				break;			
+		}
+
+		if(p!=4)
+			continue;
+
+		if(Plane_PlaneDistance(&FPlanes[5], &(L->DynamicLights[i].Pos)) < -(L->DynamicLights[i].Radius))
+			continue;
+
+		PDist = Plane_PlaneDistance(&FPlanes[4], &(L->DynamicLights[i].Pos));
+		if(PDist < -(L->DynamicLights[i].Radius))
+			continue;
+		if(PDist < (L->DynamicLights[i].Radius))
+			ZPassTemp = GE_FALSE;
+
+
+		if(NumLights<MaxNumLights)
+		{
+			geVec3d Temp;
+			geVec3d_Copy(&(L->DynamicLights[i].Pos), &Light[NumLights]);
+			
+			geVec3d_Subtract(&(L->DynamicLights[i].Pos), Pov, &Temp);
+			DistToCamSquared[NumLights] = geVec3d_LengthSquared(&Temp);
+			
+			Radius[NumLights] = L->DynamicLights[i].Radius;
+
+			ZPass[NumLights] = ZPassTemp;
+
+			if(L->DynamicLights[i].Spot)
+			{
+				LightType[NumLights] = 1;
+
+				geVec3d_Copy(&(L->DynamicLights[i].Normal), &LNormal[NumLights]);
+				Arc[NumLights] = L->DynamicLights[i].Angle;
+			}
+			else
+				LightType[NumLights] = 0;
+			
+			NumLights++;
+		}
+		else
+		{
+			geVec3d Temp;
+			geFloat DistSquared;
+			geVec3d_Subtract(&(L->DynamicLights[i].Pos), Pov, &Temp);
+			DistSquared = geVec3d_LengthSquared(&Temp);
+			for(j=0;j<MaxNumLights;j++)
+			{				
+				if(DistToCamSquared[j] > DistSquared)
+				{
+					geVec3d_Copy(&(L->DynamicLights[i].Pos), &Light[j]);
+							
+					DistToCamSquared[j] = DistSquared;
+			
+					Radius[j] = L->DynamicLights[i].Radius;
+
+					ZPass[j] = ZPassTemp;
+
+					if(L->DynamicLights[i].Spot)
+					{
+						LightType[NumLights] = 1;
+						geVec3d_Copy(&(L->DynamicLights[i].Normal), &LNormal[i]);
+						Arc[i] = L->DynamicLights[i].Angle;
+					}
+					else
+						LightType[j] = 0;
+					
+					break;
+				}
+			}
+		}
+	}
+
+	// static lights
+	{
+		geEntity_EntitySet * entitySet = NULL;
+		geEntity * entity = NULL;
+		light * aLight;
+		spotlight * sLight;
+		
+		// static lights
+		entitySet = geWorld_GetEntitySet((geWorld*)World, "light");
+		if (entitySet != NULL)
+			entity = geEntity_EntitySetGetNextEntity(entitySet, entity);
+	
+		//loop through all static lights and select the ones that are inside the view frustum
+		for(i=0; entity != NULL ;i++, entity = geEntity_EntitySetGetNextEntity(entitySet, entity))
+		{
+			int32 Leaf;
+			geFloat PDist;
+			geBoolean ZPassTemp;
+			ZPassTemp = GE_TRUE;
+
+			aLight = (light*)geEntity_GetUserData(entity);
+			
+			geWorld_GetLeaf(World, &(aLight->origin), &Leaf);
+			if(!geWorld_MightSeeLeaf(World, Leaf))
+				continue;
+
+			for(p=0; p<4; p++)
+			{			
+				if(Plane_PlaneDistance(&FPlanes[p], &(aLight->origin)) < -(aLight->light))
+					break;			
+			}
+			if(p!=4)
+				continue;
+
+			if(Plane_PlaneDistance(&FPlanes[5], &(aLight->origin)) < -(aLight->light))
+				continue;
+
+			PDist = Plane_PlaneDistance(&FPlanes[4], &(aLight->origin));
+			if(PDist < -(aLight->light))
+				continue;
+			if(PDist < (aLight->light))
+				ZPassTemp = GE_FALSE;
+			
+			
+			if(NumLights<MaxNumLights)
+			{
+				geVec3d Temp;
+				geVec3d_Copy(&(aLight->origin), &Light[NumLights]);
+			
+				geVec3d_Subtract(&(aLight->origin), Pov, &Temp);
+				DistToCamSquared[NumLights] = geVec3d_LengthSquared(&Temp);
+			
+				Radius[NumLights] = (geFloat)aLight->light;
+
+				ZPass[NumLights] = ZPassTemp;
+	
+				LightType[NumLights] = 0;
+			
+				NumLights++;
+			}
+			else
+			{
+				geVec3d Temp;
+				geFloat DistSquared;
+				geVec3d_Subtract(&(aLight->origin), Pov, &Temp);
+				DistSquared = geVec3d_LengthSquared(&Temp);
+				for(j=0;j<MaxNumLights;j++)
+				{				
+					if(DistToCamSquared[j] > DistSquared)
+					{
+						geVec3d_Copy(&(aLight->origin), &Light[j]);
+							
+						DistToCamSquared[j] = DistSquared;
+			
+						Radius[j] = (geFloat)aLight->light;
+
+						ZPass[j] = ZPassTemp;
+
+						LightType[j] = 0;
+						break;
+					}
+				}
+			}	
+		}
+
+		// static spotlights
+		entitySet = NULL;
+		entity = NULL;
+		
+		entitySet = geWorld_GetEntitySet((geWorld*)World, "spotlight");
+		if (entitySet != NULL)
+			entity = geEntity_EntitySetGetNextEntity(entitySet, entity);
+	
+		//loop through all static lights and select the ones that are inside the view frustum
+		for(i=0; entity != NULL ;i++, entity = geEntity_EntitySetGetNextEntity(entitySet, entity))
+		{
+			int32 Leaf;
+			geFloat PDist;
+			geBoolean ZPassTemp;
+			ZPassTemp = GE_TRUE;
+
+			sLight = (spotlight*)geEntity_GetUserData(entity);
+			
+			geWorld_GetLeaf(World, &(sLight->origin), &Leaf);
+			if(!geWorld_MightSeeLeaf(World, Leaf))
+				continue;
+
+			for(p=0; p<4; p++)
+			{			
+				if(Plane_PlaneDistance(&FPlanes[p], &(sLight->origin)) < -(sLight->light))
+					break;			
+			}
+			if(p!=4)
+				continue;
+
+			if(Plane_PlaneDistance(&FPlanes[5], &(sLight->origin)) < -(sLight->light))
+				continue;
+
+			PDist = Plane_PlaneDistance(&FPlanes[4], &(sLight->origin));
+			if(PDist < -(sLight->light))
+				continue;
+			if(PDist < (sLight->light))
+				ZPassTemp = GE_FALSE;
+
+			
+			if(NumLights<MaxNumLights)
+			{
+				geVec3d Temp;
+				geXForm3d	XForm;
+				
+				geVec3d_Copy(&(sLight->origin), &Light[NumLights]);
+			
+				geVec3d_Subtract(&(sLight->origin), Pov, &Temp);
+				DistToCamSquared[NumLights] = geVec3d_LengthSquared(&Temp);
+			
+				Radius[NumLights] = (geFloat)sLight->light;
+
+				ZPass[NumLights] = ZPassTemp;
+	
+				LightType[NumLights] = 1;
+
+				LNormal[NumLights].X = (sLight->angles.X / 180.0f) * GE_PI;
+				LNormal[NumLights].Y = (sLight->angles.Y / 180.0f) * GE_PI;
+				LNormal[NumLights].Z = (sLight->angles.Z / 180.0f) * GE_PI;
+				
+				geXForm3d_SetEulerAngles(&XForm, &LNormal[NumLights]);
+				geXForm3d_GetLeft(&XForm, &LNormal[NumLights]);
+				
+				LNormal[NumLights].X = -LNormal[NumLights].X;
+				LNormal[NumLights].Y = -LNormal[NumLights].Y;
+				LNormal[NumLights].Z = -LNormal[NumLights].Z;
+
+				Arc[NumLights] = (geFloat)cos((sLight->arc/360.0f)*GE_PI);
+			
+				NumLights++;
+			}
+			else
+			{
+				geVec3d Temp;
+				geFloat DistSquared;
+				geVec3d_Subtract(&(sLight->origin), Pov, &Temp);
+				DistSquared = geVec3d_LengthSquared(&Temp);
+				for(j=0;j<MaxNumLights;j++)
+				{				
+					if(DistToCamSquared[j] > DistSquared)
+					{
+						geXForm3d	XForm;
+						geVec3d_Copy(&(sLight->origin), &Light[j]);
+							
+						DistToCamSquared[j] = DistSquared;
+			
+						Radius[j] = (geFloat)sLight->light;
+
+						ZPass[j] = ZPassTemp;
+
+						LightType[j] = 1;
+						
+						LNormal[j].X = (sLight->angles.X / 180.0f) * GE_PI;
+						LNormal[j].Y = (sLight->angles.Y / 180.0f) * GE_PI;
+						LNormal[j].Z = (sLight->angles.Z / 180.0f) * GE_PI;
+				
+						geXForm3d_SetEulerAngles(&XForm, &LNormal[i]);
+						geXForm3d_GetLeft(&XForm, &LNormal[i]);
+				
+						LNormal[j].X = -LNormal[j].X;
+						LNormal[j].Y = -LNormal[j].Y;
+						LNormal[j].Z = -LNormal[j].Z;
+
+						Arc[j] = (geFloat)cos((sLight->arc/360.0f)*GE_PI);
+
+						break;
+					}
+				}
+			}	
+		}
+	}
+		
+	for(i=0; i<NumLights; i++)
+	{
+		Engine->DriverInfo.RDriver->StencilTestMode = ZPass[i];
+
+		WActor = World->ActorArray;
+
+		for(j=0; j< World->ActorCount; j++, WActor++)
+		{
+			if(MirrorRecursion == 0 && !(WActor->Flags & (GE_ACTOR_RENDER_NORMAL | GE_ACTOR_RENDER_ALWAYS)))
+				continue;		// Not visible in normal views, skip it
+	
+			geActor_RenderShadowVolume(WActor->Actor, Engine, World, Camera, FrustumInfo->Planes,
+					&Light[i], Radius[i], LightType[i], &LNormal[i], Arc[i], ZPass[i]);
+			
+		}
+
+		Engine->DriverInfo.RDriver->DrawShadowPoly(Engine->ShadowR, Engine->ShadowG, Engine->ShadowB, Engine->ShadowA);
+	}
+
+	if (!Engine->DriverInfo.RDriver->EndShadowVolumes())//EndShadows())
+	{
+		geErrorLog_Add(GE_ERR_END_SHADOWVOLUMES_FAILED, NULL);
+		return GE_FALSE;
+	}
+
+	return GE_TRUE;
+}
+// end change
 
 //=====================================================================================
 //	RenderBSPFrontBack_r2
@@ -1290,23 +2211,6 @@ void GENESISCC geXForm3d_SetIn(geXForm3d *M,const geVec3d *In)
 	M->CZ = -In->Z;
 }
 
-//================================================================================
-//	BackRotateVector
-//	Rotate a vector from viewspace to worldspace.
-//================================================================================
-static void BackRotateVector(const geVec3d *In, geVec3d *Out, const geXForm3d *XForm)
-{
-    geVec3d	VRight, VUp, VIn;
-	
-	//	Get the 3 vectors that make up the Xform axis 
-	VRight.X = XForm->AX; VRight.Y = XForm->AY; VRight.Z = XForm->AZ;
-	VUp.X    = XForm->BX; VUp.Y    = XForm->BY; VUp.Z    = XForm->BZ;
-	VIn.X    = XForm->CX; VIn.Y    = XForm->CY; VIn.Z    = XForm->CZ;
-
-    Out->X = (In->X * VRight.X) + (In->Y * VUp.X) + (In->Z * VIn.X);
-    Out->Y = (In->X * VRight.Y) + (In->Y * VUp.Y) + (In->Z * VIn.Y);
-    Out->Z = (In->X * VRight.Z) + (In->Y * VUp.Z) + (In->Z * VIn.Z);
-}
 
 #define GOURAUD_SHADING
 
@@ -1617,7 +2521,12 @@ static void RenderFace(int32 Face, const geWorld_RenderInfo *RenderInfo, int32 C
 	// If this surface is a mirror, and we can do mirrors, then render it with some alpha
 	if ((pTexInfo->Flags & TEXINFO_MIRROR) && CanDoMirrors)
 	{
+
+/* 01/30/2003 Wendell Buckner 
+     Driver render flush is probably causing a slow down! */
 		RenderFlags |= DRV_RENDER_ALPHA | DRV_RENDER_FLUSH;
+//		RenderFlags |= DRV_RENDER_ALPHA; 
+
 		Clipped1[0].a = pTexInfo->Alpha;
 	}
 	else
@@ -1644,6 +2553,10 @@ static void RenderFace(int32 Face, const geWorld_RenderInfo *RenderInfo, int32 C
 
 	if (pTexInfo->Flags & TEXINFO_NO_LIGHTMAP)
 	{
+/* 11/12/2003 Wendell Buckner
+     Bumpmapping for the World */
+		geBitmap_SetRenderFlags(pBitmap, &RenderFlags);
+
 		RDriver->RenderWorldPoly(Clipped1, Length1, THandle, &DrvTexInfo, NULL, RenderFlags);
 	}
 	else
@@ -1655,6 +2568,10 @@ static void RenderFace(int32 Face, const geWorld_RenderInfo *RenderInfo, int32 C
 		GlobalInfo.TexMinsY = pLInfo->MinV;
 		GlobalInfo.TexWidth = pLInfo->Width<<4;
 		GlobalInfo.TexHeight = pLInfo->Height<<4;
+
+/* 10/17/2003 Wendell Buckner
+    Bumpmapping for the World */
+        geBitmap_SetRenderFlags(pBitmap, &RenderFlags);
 
 		RDriver->RenderWorldPoly(Clipped1, Length1, THandle, &DrvTexInfo, &pSurfInfo[Face].LInfo, RenderFlags);
 	}
@@ -1912,16 +2829,29 @@ static void RenderTransPoly(geCamera *Camera, World_TransPoly *pPoly)
 	if (pTexInfo->Flags & TEXINFO_NO_LIGHTMAP)
 	{
 		geRDriver_THandle	*THandle;
+/* 11/12/2003 Wendell Buckner
+     Bumpmapping for the World */
+		uint32               RenderFlags = DRV_RENDER_ALPHA | DRV_RENDER_FLUSH;
 
 		THandle = geBitmap_GetTHandle(pBitmap);
 
 		assert(THandle);
 
-		RDriver->RenderWorldPoly(pTLVerts, NumVerts, THandle, &DrvTexInfo, NULL, DRV_RENDER_ALPHA | DRV_RENDER_FLUSH);
+/* 11/12/2003 Wendell Buckner
+     Bumpmapping for the World *
+		RDriver->RenderWorldPoly(pTLVerts, NumVerts, THandle, &DrvTexInfo, NULL, DRV_RENDER_ALPHA | DRV_RENDER_FLUSH);*/
+		geBitmap_SetRenderFlags(pBitmap, &RenderFlags);
+
+		RDriver->RenderWorldPoly(pTLVerts, NumVerts, THandle, &DrvTexInfo, NULL, RenderFlags);
+
 	}
 	else
 	{
 		geRDriver_THandle	*THandle;
+
+/* 11/12/2003 Wendell Buckner
+     Bumpmapping for the World */
+		uint32               RenderFlags = DRV_RENDER_ALPHA | DRV_RENDER_FLUSH;
 
 		// This global info only needs to be set up for faces that have lightmaps...
 		GlobalInfo.TexMinsX = pLInfo->MinU;
@@ -1933,7 +2863,14 @@ static void RenderTransPoly(geCamera *Camera, World_TransPoly *pPoly)
 
 		assert(THandle);
 
-		RDriver->RenderWorldPoly(pTLVerts, NumVerts, THandle, &DrvTexInfo, pLInfo, DRV_RENDER_ALPHA | DRV_RENDER_FLUSH);
+/* 11/12/2003 Wendell Buckner
+     Bumpmapping for the World *
+		RDriver->RenderWorldPoly(pTLVerts, NumVerts, THandle, &DrvTexInfo, pLInfo, DRV_RENDER_ALPHA | DRV_RENDER_FLUSH);*/
+		geBitmap_SetRenderFlags(pBitmap, &RenderFlags);
+
+		RDriver->RenderWorldPoly(pTLVerts, NumVerts, THandle, &DrvTexInfo, pLInfo, RenderFlags);
+
+
 	}
 }
 
@@ -2246,8 +3183,8 @@ GENESISAPI void * geWorld_ModelGetUserData(const geWorld_Model *Model)
 	return Model->UserData;
 }
 
-//========================================================================================
-//========================================================================================
+//==========================================================================================
+//======================================================================================
 GENESISAPI void geWorld_ModelSetUserData(geWorld_Model *Model, void *UserData)
 {
 	assert(Model);
@@ -2470,7 +3407,7 @@ GENESISAPI geBoolean geWorld_RemoveSprite(geWorld *World, geSprite *Sprite)
 }
 
 //========================================================================================
-//========================================================================================
+//==========================================================================================
 GENESISAPI geBoolean geWorld_SetSpriteFlags(geWorld *World, geSprite *Sprite, uint32 Flags)
 {
 	int i, Count;
@@ -2497,7 +3434,7 @@ GENESISAPI geBoolean geWorld_SetSpriteFlags(geWorld *World, geSprite *Sprite, ui
 
 //========================================================================================
 //	geWorld_GetLeaf
-//========================================================================================
+//======================================================================================
 GENESISAPI geBoolean geWorld_GetLeaf(const geWorld *World, const geVec3d *Pos, int32 *Leaf)
 {
 	assert(World);
@@ -3018,7 +3955,10 @@ static void RenderSkyThroughFrustum(World_SkyBox *SkyBox, geWorld_SkyBoxTData *S
 	if (!SkyTData->NumTransformed)
 		return;
 
-	SkyFlags = DRV_RENDER_FLUSH | DRV_RENDER_POLY_NO_FOG; // skybox fog
+/* 01/30/2003 Wendell Buckner 
+     Driver render flush is probably causing a slow down! */
+	SkyFlags = DRV_RENDER_FLUSH | DRV_RENDER_POLY_NO_FOG; 
+//	SkyFlags = DRV_RENDER_POLY_NO_FOG; // skybox fog
 
 	if (SkyBox->DrawScale <= 1.0f)
 		SkyFlags |= DRV_RENDER_CLAMP_UV;
@@ -3114,9 +4054,17 @@ static void RenderSkyThroughFrustum(World_SkyBox *SkyBox, geWorld_SkyBoxTData *S
 			TexInfo.DrawScaleU = 1.0f;
 			TexInfo.DrawScaleV = 1.0f;
 
+/* 10/17/2003 Wendell Buckner
+     Bumpmapping for the World */
+		    geBitmap_SetRenderFlags(pBitmap, &SkyFlags);
+
 			RDriver->RenderWorldPoly(Clipped1, Length1, THandle, &TexInfo, NULL, SkyFlags);
 		}
 	#else
+/* 10/17/2003 Wendell Buckner
+     Bumpmapping for the World */
+		geBitmap_SetRenderFlags(pBitmap, &SkyFlags);
+
 		RDriver->RenderMiscTexturePoly(Clipped1, Length1, THandle, SkyFlags);
 	#endif
 
@@ -3322,6 +4270,68 @@ geBoolean geWorld_BitmapListInit(geWorld *World)
 
 			World->Changed = GE_TRUE;
 		}
+
+/* 10/15/2003 Wendell Buckner
+    Bumpmapping for the World */
+		do //Create Bump-map Loop...
+		{ 
+		 int BumpMapPixelFormatCount = 0;
+		 gePixelFormat BumpMapPixelFormats[10];
+         gePixelFormat BumpFormat;
+
+/* 02/21/2004 Wendell Buckner
+    DOT3 BUMPMAPPING  */
+         geBoolean HasBumpDot3 = GE_FALSE;
+         HasBumpDot3 = geBitmap_GetEngineSupport(NULL, DRV_SUPPORT_DOT3 );
+
+	     geBitmap_GetBumpMapPixelFormats( NULL, &BumpMapPixelFormats[0],&BumpMapPixelFormatCount);
+
+ /* 02/21/2004 Wendell Buckner
+    DOT3 BUMPMAPPING 
+         if (BumpMapPixelFormatCount == 0 ) break; */
+         if ((BumpMapPixelFormatCount == 0) && (!HasBumpDot3) ) break;
+	 
+	     for (i=0; i<Count; i++) //Find all bump-maps by name...
+		 {
+	      const char *Name;
+//	      geBitmap   *Bitmap;
+		  geWBitmap	 *pWBitmap;
+
+		  pWBitmap = geWBitmap_Pool_GetWBitmapByIndex(World->CurrentBSP->WBitmapPool, i);
+
+	      Name = geWBitmap_GetName(pWBitmap);	  
+
+/* 02/18/2004 Wendell Buckner
+    DOT3 BUMPMAPPING  
+	      if ( !geBitmap_IsBumpmapName(Name) ) continue; */
+          if ( geBitmap_IsBumpmapNameDot3(Name) && HasBumpDot3 )
+		  { 
+ 	       geBitmap *BumpBmpAlt = NULL;
+ 	       geBoolean BumpmapCreated = GE_FALSE;
+
+	       BumpmapCreated = geWorld_CreateBumpmapByNameDot3(World, Name);
+		  }
+          else if ( geBitmap_IsBumpmapName(Name) && BumpMapPixelFormatCount )  
+		  {
+ 	       geBitmap *BumpBmpAlt = NULL;
+ 	       geBitmap *BumpmapCreated = NULL;
+
+//Get the best format...	  
+           BumpFormat = BumpMapPixelFormats[BumpMapPixelFormatCount-1];
+
+	       BumpmapCreated = geWorld_CreateBumpmapByName(World, Name, BumpFormat); 
+
+	       if(!BumpmapCreated) continue;
+
+           BumpBmpAlt = BumpmapCreated;
+	       if (BumpBmpAlt) geWorld_AddBitmap (World,BumpBmpAlt);
+		  } //Find all bump-maps by name...
+
+		 }// Check if good pixel formats
+
+		}
+	    while(GE_FALSE); //Create Bump-map Loop...
+
 	}
 
 	return GE_TRUE;

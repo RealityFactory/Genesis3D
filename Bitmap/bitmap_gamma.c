@@ -5,6 +5,13 @@
 /*  Description:  The Bitmap_Gamma_Apply function                                       */
 /*					Fast Gamma correction routines for various pixel formats			*/
 /*                                                                                      */
+/*  Edit History:                                                                       */
+/*   02/20/2004 Wendell Buckner                                                         */
+/*    DOT3 BUMPMAPPING                                                                   */
+/*   08/27/2003 Wendell Buckner                                                         */  
+/*    BUMPMAPPING                                                                       */    
+/*	   Don't gamma correct the true bump-map bitmap                                     */
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -16,8 +23,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                             */
 /*                                                                                      */
 /****************************************************************************************/
 
@@ -172,7 +179,23 @@ gePixelFormat_Composer		Compose;
 gePixelFormat_ColorGetter	GetColor;
 gePixelFormat_ColorPutter	PutColor;
 
+/* 02/20/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+    if ( pInfo->IsNormalMap ) return GE_TRUE;
+
 	Format = pInfo->Format;
+
+/* 08/27/2003 Wendell Buckner
+    BUMPMAPPING 
+	Don't gamma correct the true bump-map bitmap */
+	switch (Format)
+	{
+     case GE_PIXELFORMAT_16BIT_88_UV:
+     case GE_PIXELFORMAT_16BIT_556_UVL:
+     case GE_PIXELFORMAT_24BIT_888_UVL:
+	  return GE_TRUE;
+    }	
+
 	ops = gePixelFormat_GetOperations(Format);
 	if ( ! ops )
 		return GE_FALSE;

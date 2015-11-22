@@ -3,6 +3,10 @@
 /*                                                                                      */
 /*  Description: The master header for Genesis                                          */
 /*                                                                                      */
+/*  Edit History:                                                                       */ 
+/*   03/24/2004 Wendell Buckner                                                         */
+/*    BUG FIX: Rendering Transparent Polys properly (2)                                 */
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -14,8 +18,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GENESIS_H
@@ -255,6 +259,10 @@ GENESISAPI geBoolean	geEngine_SetDriverAndMode(	geEngine *Engine,
 													geDriver *Driver, 
 													geDriver_Mode *DriverMode);
 
+GENESISAPI geBoolean	geEngine_SetDriverAndModeNoSplash(	geEngine *Engine, 
+													geDriver *Driver, 
+													geDriver_Mode *DriverMode);
+
 GENESISAPI geBoolean	geEngine_ShutdownDriver(geEngine *Engine);
 
 GENESISAPI geBoolean	geEngine_BeginFrame(geEngine *Engine, geCamera *Camera, geBoolean ClearScreen);
@@ -268,6 +276,14 @@ GENESISAPI void			GENESISCC geEngine_RenderPoly(const geEngine *Engine, const GE
 
 GENESISAPI void			GENESISCC geEngine_RenderPolyArray(const geEngine *Engine, const GE_TLVertex ** pPoints, int * pNumPoints, int NumPolys, 
 								const geBitmap *Texture, uint32 Flags);
+
+// changed QD Shadows
+GENESISAPI geBoolean	geEngine_SetStencilShadowsEnable(geEngine *Engine, geBoolean Enable, int NumLights, geFloat r, geFloat g, geFloat b, geFloat a);
+
+GENESISAPI void			GENESISCC geEngine_RenderPolyStencil(const geEngine *Engine, const geVec3d *Points, 
+								int NumPoints, uint32 Flags);
+GENESISAPI void			GENESISCC geEngine_DrawShadowPoly(geEngine *Engine, GE_RGBA ShadowColor);
+// end change
 
 GENESISAPI geBoolean GENESISCC geEngine_DrawAlphaBitmap(	
 		geEngine * Engine,
@@ -444,6 +460,18 @@ GENESISAPI geBoolean	geWorld_SetLightAttributes(	geWorld *World,
 										geBoolean	CastShadow);
 GENESISAPI geBoolean	geWorld_SetLTypeTable(geWorld *World, int32 LType, const char *Table);
 
+// added QuestOfDreams DSpotLight
+GENESISAPI geBoolean	geWorld_SetSpotLightAttributes(	geWorld *World,
+										geLight		*Light, 
+										const		geVec3d *Pos, 
+										const		GE_RGBA *RGBA, 
+										geFloat		Radius,
+										geFloat		Arc,
+										const		geVec3d *Angles,
+										int		Style,
+										geBoolean	CastShadow);
+// end change QuestOfDreams
+
 // World fog
 GENESISAPI geFog		*geWorld_AddFog(geWorld *World);
 GENESISAPI geBoolean	geWorld_RemoveFog(geWorld *World, geFog *Fog);
@@ -602,6 +630,9 @@ GENESISAPI void		GENESISCC geTClip_Triangle(const GE_LVertex TriVertex[3]);
 GENESISAPI void		GENESISCC geTClip_SetRenderFlags(uint32 newflags);	// LA
 GENESISAPI void		GENESISCC geTClip_UnclippedTriangle(const GE_LVertex TriVertex[3]);	// LA
 
+/* 03/24/2004 Wendell Buckner
+    BUG FIX: Rendering Transparent Polys properly (2) */
+geBoolean GENESISCC geTClip_SetOverallAlpha ( const geFloat OverallAlpha );
 
 //================================================================================
 // NetPlay Management functions
@@ -655,6 +686,8 @@ GENESISAPI geBoolean		GENESISCC geCSNetMgr_StartSession(geCSNetMgr *M, const cha
 GENESISAPI geBoolean		GENESISCC geCSNetMgr_StopSession(geCSNetMgr *M);
 GENESISAPI geBoolean		GENESISCC geCSNetMgr_SendToServer(geCSNetMgr *M, geBoolean Guaranteed, uint8 *Data, int32 DataSize);
 GENESISAPI geBoolean		GENESISCC geCSNetMgr_SendToClient(geCSNetMgr *M, geCSNetMgr_NetID To, geBoolean Guaranteed, uint8 *Data, int32 DataSize);
+
+#include "xtra_g3d.h"
 
 #ifdef __cplusplus
 }

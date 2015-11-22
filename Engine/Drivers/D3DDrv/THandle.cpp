@@ -36,7 +36,7 @@
 
 //#define D3D_MANAGE_TEXTURES
 
-#define USE_ONE_CACHE
+//#define USE_ONE_CACHE
 
 #define MAX_TEXTURE_HANDLES					132000
 
@@ -814,12 +814,12 @@ geBoolean THandle_CheckCache(void)
 		MaxTable2[7] = 256;			//128x128
 		MaxTable2[8] = 256;			//256x256
 /* 11/25/2002 Wendell Buckner */
-		MaxTable1[9]  = 64;			//  512x512
-		MaxTable1[10] = 64;			// 1024x1024
-		MaxTable1[11] = 64;			// 2048x2048
-		MaxTable1[12] = 64;			// 4096x4096
-        MaxTable1[13] = 64;			// 8192x8192
-        MaxTable1[14] = 64;			//16384x16384
+		MaxTable2[9]  = 64;			//  512x512
+		MaxTable2[10] = 64;			// 1024x1024
+		MaxTable2[11] = 64;			// 2048x2048
+		MaxTable2[12] = 64;			// 4096x4096
+        MaxTable2[13] = 64;			// 8192x8192
+        MaxTable2[14] = 64;			//16384x16384
 	}
 #endif
 

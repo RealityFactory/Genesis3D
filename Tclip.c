@@ -4,6 +4,17 @@
 /*  Author: Mike Sandige & Charles Bloom                                                */
 /*  Description: Triangle Clipping to the screen rectangle                              */
 /*                                                                                      */
+/*  Edit History:                                                                       */
+/*                                                                                      */
+/*  Edit History:                                                                       */
+/*  08/08/2004 Wendell Buckner                                                          */ 
+/*   BUG FIX: Allways call geBitmap_SetRenderFlags() before calling a textured          */ 
+/*	 rendering function(for embm, dot3, & etc...).                                      */
+/*   03/24/2004 Wendell Buckner                                                         */
+/*    BUG FIX: Rendering Transparent Polys properly (2)                                 */
+/*  05/05/2003 Wendell Buckner                                                          */
+/*   BUMPMAPPING                                                                        */
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -67,8 +78,12 @@ TClip_Rasterize      : 0.006183 : 1.$ %
 #include <assert.h>
 #include <string.h>
 
+/* 03/24/2004 Wendell Buckner
+    BUG FIX: Rendering Transparent Polys properly (2) */
+#include "puppet.h"
+
 #include "TClip.h"
-#include "engine.h"
+//#include "engine.h" //already in tclip.h QD
 #include "bitmap._h"
 
 #include "list.h"
@@ -119,6 +134,10 @@ typedef struct geTClip_StaticsType
 
 	uint32 RenderFlags;		// LA
 
+	/* 03/24/2004 Wendell Buckner
+    BUG FIX: Rendering Transparent Polys properly (2) */
+    geFloat OverallAlpha;
+
 } geTClip_StaticsType;
 
 /*}{************ Protos ***********/
@@ -148,6 +167,8 @@ void GENESISCC geTClip_SetRenderFlags(uint32 newflags)
 geBoolean GENESISCC geTClip_Push(void)
 {
 geTClip_StaticsType * TCI;
+
+	memset(&geTClip_Statics, 0, sizeof(geTClip_StaticsType));
 
 	geTClip_Statics.RenderFlags = ActiveRenderFlags; // LA
 
@@ -191,6 +212,14 @@ geTClip_StaticsType * TCI;
 
 	ActiveRenderFlags = geTClip_Statics.RenderFlags; // LA, set ARF from newly pop'd statics
 	
+	return GE_TRUE;
+}
+
+/* 03/24/2004 Wendell Buckner
+    BUG FIX: Rendering Transparent Polys properly (2) */
+geBoolean GENESISCC geTClip_SetOverallAlpha ( const geFloat OverallAlpha )
+{
+	geTClip_Statics.OverallAlpha = OverallAlpha;
 	return GE_TRUE;
 }
 
@@ -242,7 +271,6 @@ void GENESISCC geTClip_Triangle(const GE_LVertex TriVertex[3])
 
 #if 1
 	geTClip_TrianglePlane(TriVertex,BACK_CLIPPING_PLANE);
-	//geTClip_TrianglePlane(TriVertex,LEFT_CLIPPING_PLANE);
 #else
 	geTClip_TrianglePlane_Old(TriVertex,BACK_CLIPPING_PLANE);
 #endif
@@ -254,6 +282,10 @@ void GENESISCC geTClip_Triangle(const GE_LVertex TriVertex[3])
 
 static void RASTERIZECC geTClip_Rasterize_Tex(const GE_LVertex * TriVtx)
 {
+/* 08/08/2004 Wendell Buckner
+     BUG FIX: Allways call geBitmap_SetRenderFlags() before calling a textured rendering function(for embm, dot3, & etc...). */
+	geBitmap_SetRenderFlags(geTClip_Statics.Bitmap, &ActiveRenderFlags);
+
 	geTClip_Statics.Driver->RenderMiscTexturePoly((DRV_TLVertex *)TriVtx,
 		3,geTClip_Statics.THandle, ActiveRenderFlags); // LA
 }
@@ -271,10 +303,14 @@ static void GENESISCC geTClip_Rasterize(const GE_LVertex * TriVtx)
 
 	if ( geTClip_Statics.THandle )
 	{
+/* 08/08/2004 Wendell Buckner
+     BUG FIX: Allways call geBitmap_SetRenderFlags() before calling a textured rendering function(for embm, dot3, & etc...). */
+	    geBitmap_SetRenderFlags(geTClip_Statics.Bitmap, &ActiveRenderFlags);
+
 		geTClip_Statics.Driver->RenderMiscTexturePoly((DRV_TLVertex *)TriVtx,
 			3,geTClip_Statics.THandle,ActiveRenderFlags);	// LA
 	}
-	else
+	else 
 	{
 		geTClip_Statics.Driver->RenderGouraudPoly((DRV_TLVertex *)TriVtx,
 			3,ActiveRenderFlags); // LA
@@ -288,6 +324,10 @@ static void GENESISCC geTClip_Split(GE_LVertex *NewVertex,const GE_LVertex *V1,c
 	geFloat Ratio=0.0f;
 	geFloat OneOverZ1,OneOverZ2;
 	
+	Ratio=0.0f;
+
+	memset(NewVertex, 0, sizeof(GE_LVertex));
+
 	#ifdef ONE_OVER_Z_PIPELINE
 		// in here ->Z is really (one over z)
 	OneOverZ1 = V1->Z;
@@ -400,6 +440,13 @@ static void GENESISCC geTClip_TrianglePlane(const GE_LVertex * TriVertex,
 											geTClip_ClippingPlane ClippingPlane)
 {
 uint32 OutBits = 0;
+/*int8 szBug[128];*/
+
+/* 03/24/2004 Wendell Buckner
+    BUG FIX: Rendering Transparent Polys properly (2) */
+	geBoolean IsTransparent = GE_FALSE;
+
+	OutBits = 0;
 
 	switch(ClippingPlane)
 	{
@@ -437,11 +484,11 @@ uint32 OutBits = 0;
 		break;
 	}
 
-	if ( OutBits )
+	if ( OutBits != 0)
 	{
-	GE_LVertex NewTriVertex[3];
+		GE_LVertex NewTriVertex[3];
 
-	memset(NewTriVertex, '\0',sizeof(GE_LVertex)*(3));
+		memset(NewTriVertex, 0,sizeof(GE_LVertex)*(3));
 
 		ClippingPlane = 0;
 		for(;;)
@@ -525,31 +572,52 @@ uint32 OutBits = 0;
 					return;
 
 				case (V2_OUT + V1_OUT + V0_OUT):
+				/*	if(TriVertex[0].X!=0 || TriVertex[0].Y!=0 || TriVertex[0].Z!=0)
+					{
+						sprintf(szBug,"Plane %d %f %f %f\n", ClippingPlane, TriVertex[0].X, TriVertex[0].Y, TriVertex[0].Z);
+						OutputDebugString(szBug);
+					}
+					if(TriVertex[1].X!=0 || TriVertex[1].Y!=0 || TriVertex[1].Z!=0)
+					{
+						sprintf(szBug,"Plane %d %f %f %f\n", ClippingPlane, TriVertex[1].X, TriVertex[1].Y, TriVertex[1].Z);
+						OutputDebugString(szBug);
+					}
+					if(TriVertex[2].X!=0 || TriVertex[2].Y!=0 || TriVertex[2].Z!=0)
+					{
+						sprintf(szBug,"Plane %d %f %f %f\n\n", ClippingPlane, TriVertex[2].X, TriVertex[2].Y, TriVertex[2].Z);
+						OutputDebugString(szBug);
+					} */
 					/* TOTALLY CLIPPED */
 					return;
 			}
 		}
 	}
 
-#if 0 // {
-
-	// this eliminates an 'if' , but doesn't seem to help :^(
-	// presumably because it's a predictable branch
-	geTClip_Statics.RasterizeFunc(TriVertex);
-
-#else //}{
-
-	if ( geTClip_Statics.THandle )
+/* 03/24/2004 Wendell Buckner
+    BUG FIX: Rendering Transparent Polys properly (2) 
+	if ( geTClip_Statics.THandle ) */
+	if ( gePuppet_IsTransparent ( geTClip_Statics.OverallAlpha, &geTClip_Statics.Bitmap,&IsTransparent,1) )
+		gePuppet_AddToGList ( (GE_TLVertex *)TriVertex, 3, geTClip_Statics.Bitmap, 0, GE_TRUE );
+	else if ( geTClip_Statics.THandle ) 
 	{
+/*  05/05/2003 Wendell Buckner                                                          
+     BUMPMAPPING                                                                        	 
 		geTClip_Statics.Driver->RenderMiscTexturePoly((DRV_TLVertex *)TriVertex,
-			3,geTClip_Statics.THandle,ActiveRenderFlags); // LA
+			3,geTClip_Statics.THandle,ActiveRenderFlags); // LA */
+	    uint32 Flags = 0;
+
+	    geBitmap_SetRenderFlags(geTClip_Statics.Bitmap, &Flags);
+
+		Flags |= ActiveRenderFlags;
+
+		geTClip_Statics.Driver->RenderMiscTexturePoly((DRV_TLVertex *)TriVertex,
+			3,geTClip_Statics.THandle,Flags);
+
 	}
-	else
+	else 
 	{
 		geTClip_Statics.Driver->RenderGouraudPoly((DRV_TLVertex *)TriVertex,3,ActiveRenderFlags); // LA
 	}
-
-#endif //}
 
 }
 
@@ -558,8 +626,18 @@ void GENESISCC geTClip_UnclippedTriangle(const GE_LVertex TriVertex[3])
 {
 	if ( geTClip_Statics.THandle )
 	{
+/*  05/05/2003 Wendell Buckner                                                          
+     BUMPMAPPING    
 		geTClip_Statics.Driver->RenderMiscTexturePoly((DRV_TLVertex *)TriVertex,
-			3,geTClip_Statics.THandle,ActiveRenderFlags);
+			3,geTClip_Statics.THandle,ActiveRenderFlags);*/
+	    uint32 Flags = 0;
+
+	    geBitmap_SetRenderFlags(geTClip_Statics.Bitmap, &Flags);
+
+		Flags |= ActiveRenderFlags;
+
+		geTClip_Statics.Driver->RenderMiscTexturePoly((DRV_TLVertex *)TriVertex,
+			3,geTClip_Statics.THandle,Flags);
 	}
 	else
 	{

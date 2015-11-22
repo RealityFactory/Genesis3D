@@ -4,6 +4,12 @@
 /*  Author: Mike Sandige	                                                            */
 /*  Description:  Actor implementation                                                  */
 /*                                                                                      */
+/*  Edit History:                                                                       */  
+/*	02/21/2004 Wendell Buckner                                                          */  
+/*   DOT3 BUMPMAPPING                                                                   */
+/*	01/13/2004 Wendell Buckner                                                          */
+/*   DOT3 BUMPMAPPING                                                                   */
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -15,8 +21,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 /*
@@ -94,6 +100,20 @@ int geActor_Count       = 0;
 int geActor_RefCount    = 0;
 int geActor_DefCount    = 0;
 int geActor_DefRefCount = 0;
+
+/*	01/13/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+GENESISAPI geBoolean GENESISCC geActor_CreateTangentSpace(const geActor *A)
+{	
+	return geBody_CreateTangentSpace( A->ActorDefinition->Body );
+}
+
+/*	02/21/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+GENESISAPI GENESISCC geActor_DestroyTangentSpace(const geActor *A)
+{	
+	geBody_DestroyTangentSpace( A->ActorDefinition->Body );
+}
 
 	// returns number of actors that are currently created.
 GENESISAPI int GENESISCC geActor_GetCount(void)
@@ -338,6 +358,11 @@ GENESISAPI geBoolean GENESISCC geActor_DefDestroy(geActor_Def **pActorDefinition
 
 	if (Ad->Body != NULL)
 		{
+
+/*	02/21/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+		    geBody_DestroyTangentSpace( Ad->Body );
+
 			geBody_Destroy( &(Ad->Body) );
 			Ad->Body = NULL;
 		}
@@ -424,6 +449,11 @@ GENESISAPI geBoolean GENESISCC geActor_DestroyDirect(geActor **pA)
 		// destroy the definition
 		if (CurrentActor->ActorDefinition->Body != NULL)
 			{
+
+/*	02/21/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+			geBody_DestroyTangentSpace( CurrentActor->ActorDefinition->Body );
+
 			geBody_Destroy( &(CurrentActor->ActorDefinition->Body) );
 			CurrentActor->ActorDefinition->Body = NULL;
 			}
@@ -468,6 +498,10 @@ GENESISAPI geBoolean GENESISCC geActor_SetBody( geActor_Def *ActorDefinition, ge
 
 	if (ActorDefinition->Body != NULL)
 		{
+/*	02/21/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+		    geBody_DestroyTangentSpace( ActorDefinition->Body );
+
 			geBody_Destroy( &(ActorDefinition->Body) );
 		}
 	
@@ -1270,11 +1304,12 @@ GENESISAPI geBoolean GENESISCC geActor_Attach( geActor *Slave,  const char *Slav
 			geErrorLog_AddString(-1,"Named bone for master not found", MasterBoneName);
 			return GE_FALSE;
 		}
+
 	
 	return gePose_Attach(   Slave->Pose,   SlaveBoneIndex,
 							Master->Pose, MasterBoneIndex, 
 							Attachment);
-}
+} 							
 
 
 GENESISAPI void GENESISCC geActor_Detach(geActor *A)
@@ -1282,6 +1317,7 @@ GENESISAPI void GENESISCC geActor_Detach(geActor *A)
 	assert( geActor_IsValid(A) != GE_FALSE);
 
 	gePose_Detach( A->Pose );
+
 }
 
 
@@ -1323,6 +1359,7 @@ GENESISAPI geBoolean GENESISCC geActor_SetBoneAttachment(geActor *A,
 		}
 	
 	gePose_SetJointAttachment(A->Pose,BoneIndex, Attachment);
+
 	return GE_TRUE;
 }
 
@@ -1850,6 +1887,25 @@ GENESISAPI geBoolean GENESISCC geActor_SetShadow(geActor *A,
 	return GE_TRUE;
 }
 
+// changed QD Shadows
+GENESISAPI geBoolean GENESISCC geActor_SetStencilShadow(geActor *A, 
+						geBoolean DoStencilShadow)
+{
+	assert( geActor_IsValid(A)!=GE_FALSE );
+	assert( (DoStencilShadow==GE_FALSE) || (DoStencilShadow==GE_TRUE));
+	
+	if(A->Puppet == GE_FALSE)
+	{
+		geErrorLog_AddString(-1,"Can't set shadow options until actor is prepared for rendering", NULL);
+		return GE_FALSE;
+	}
+	
+	gePuppet_SetStencilShadow(A->Puppet,DoStencilShadow);
+
+	return GE_TRUE;
+}
+// end change
+
 
 geBoolean GENESISCC geActor_RenderPrep( geActor *A, geWorld *World)
 {
@@ -1909,36 +1965,63 @@ geBoolean GENESISCC geActor_RenderThroughFrustum(const geActor *A, geEngine *Eng
 	return GE_TRUE;
 }
 
-geBoolean GENESISCC geActor_Render(const geActor *A, geEngine *Engine, geWorld *World,geCamera *Camera)
+// changed QD Clipping
+geBoolean GENESISCC geActor_Render(const geActor *A, geEngine *Engine, geWorld *World,geCamera *Camera, Frustum_Info *FInfo)
 {
 	assert( geActor_IsValid(A) != GE_FALSE );
 	assert( A->Puppet != NULL );
 
 	if (A->RenderHintExtBoxEnabled)
+	{
+		geBoolean Enabled;
+		geExtBox Box;
+		if (geActor_GetRenderHintExtBox(A, &Box, &Enabled)==GE_FALSE)
 		{
-			geBoolean Enabled;
-			geExtBox Box;
-			if (geActor_GetRenderHintExtBox(A, &Box, &Enabled)==GE_FALSE)
-				{
-					geErrorLog_Add( -1 , NULL);	//?
-					return GE_FALSE;
-				}
-			if (gePuppet_Render( A->Puppet, A->Pose, Engine,World, Camera, &Box )==GE_FALSE)
-				{
-					geErrorLog_Add( ERR_ACTOR_RENDER_FAILED , NULL);
-					return GE_FALSE;
-				}
+			geErrorLog_Add( -1 , NULL);	//?
+			return GE_FALSE;
 		}
+		if (gePuppet_Render( A->Puppet, A->Pose, Engine,World, Camera, &Box, FInfo )==GE_FALSE)
+		{
+			geErrorLog_Add( ERR_ACTOR_RENDER_FAILED , NULL);
+			return GE_FALSE;
+		}
+	}
 	else
+	{
+		if (gePuppet_Render( A->Puppet, A->Pose, Engine,World, Camera, NULL, FInfo )==GE_FALSE)
 		{
-			if (gePuppet_Render( A->Puppet, A->Pose, Engine,World, Camera, NULL )==GE_FALSE)
-				{
-					geErrorLog_Add( ERR_ACTOR_RENDER_FAILED , NULL);
-					return GE_FALSE;
-				}
+			geErrorLog_Add( ERR_ACTOR_RENDER_FAILED , NULL);
+			return GE_FALSE;
 		}
+	}
 	return GE_TRUE;
 }
+// end change
+
+// changed QD Shadows
+geBoolean GENESISCC geActor_RenderShadowVolume(const geActor *A, geEngine *Engine, geWorld *World, geCamera *Camera, 
+											   GFX_Plane *FPlanes, geVec3d *Light, geFloat Radius, 
+											   int LightType, geVec3d* Dir, geFloat Arc, geBoolean ZPass)
+{
+	assert( geActor_IsValid(A) != GE_FALSE );
+	assert( A->Puppet != NULL );
+
+	{
+		if (gePuppet_RenderShadowVolume( A->Puppet, A->Pose, Engine,World, Camera, 
+			FPlanes, Light, Radius, LightType, Dir, Arc, ZPass)==GE_FALSE)
+		{
+			geErrorLog_Add( ERR_ACTOR_RENDER_FAILED , NULL);
+			return GE_FALSE;
+		}
+	}
+	return GE_TRUE;
+}
+
+void GENESISCC geActor_BodyGeometryNeedsUpdate(geActor *A)
+{
+	gePuppet_BodyGeometryNeedsUpdate(A->Puppet);
+}
+// end change
 
 GENESISAPI int GENESISCC geActor_GetMaterialCount(const geActor *A)
 {
@@ -1974,11 +2057,18 @@ GENESISAPI geBoolean GENESISCC geActor_SetStaticLightingOptions(geActor *A,	geBo
 			geErrorLog_AddString(-1,"Can't set lighting options until actor is prepared for rendering", NULL);
 			return GE_FALSE;		
 		}
-		gePuppet_SetStaticLightingOptions( A->Puppet,
+// changed QD bug fix
+/*		gePuppet_SetStaticLightingOptions( A->Puppet,
 								  AmbientLightFromStaticLights,
 								  MaxStaticLightsToUse,
 								  TestRayCollision
+								  );*/
+		gePuppet_SetStaticLightingOptions( A->Puppet,
+								  AmbientLightFromStaticLights,
+								  TestRayCollision,
+								  MaxStaticLightsToUse
 								  );
+// end change
 		return GE_TRUE;
 }
 

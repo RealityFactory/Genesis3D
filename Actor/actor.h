@@ -4,6 +4,12 @@
 /*  Author: Mike Sandige	                                                            */
 /*  Description:  Actor interface		                                                */
 /*                                                                                      */
+/*  Edit History:                                                                       */  
+/*	02/21/2004 Wendell Buckner                                                          */
+/*   DOT3 BUMPMAPPING                                                                   */
+/*	01/13/2004 Wendell Buckner                                                          */
+/*   DOT3 BUMPMAPPING                                                                   */
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -15,8 +21,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 /*   Actor
@@ -124,6 +130,15 @@ typedef struct geActor_Def geActor_Def;		// the deinition of an actor's geometry
 //---------------------------------------------------------------------------------
 //   Creation/Destruction functions
 //---------------------------------------------------------------------------------
+
+/*	01/13/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+GENESISAPI geBoolean GENESISCC geActor_CreateTangentSpace(const geActor *A);
+
+/*	02/21/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+GENESISAPI GENESISCC geActor_DestroyTangentSpace(const geActor *A);
+
 	// Create an 'empty' Actor Definition.
 GENESISAPI geActor_Def *GENESISCC geActor_DefCreate(void);
 
@@ -293,7 +308,16 @@ geBoolean GENESISCC geActor_RenderPrep( geActor *A, geWorld *World);
 
 	// Draws the geActor.  (RenderPrep must be called first)
 geBoolean GENESISCC geActor_RenderThroughFrustum(const geActor *A, geEngine *Engine, geWorld *World, geCamera *Camera, Frustum_Info *FInfo);
-geBoolean GENESISCC geActor_Render(const geActor *A, geEngine *Engine, geWorld *World, geCamera *Camera);
+// changed QD Clipping
+geBoolean GENESISCC geActor_Render(const geActor *A, geEngine *Engine, geWorld *World, geCamera *Camera, Frustum_Info *FInfo);
+// end change
+
+// changed QD Shadows
+geBoolean GENESISCC geActor_RenderShadowVolume(const geActor *A, geEngine *Engine, geWorld *World, geCamera *Camera, GFX_Plane *FPlanes, 
+											   geVec3d *Light, geFloat Radius, int LightType, geVec3d* Dir, geFloat Arc, geBoolean ZPass);
+
+void GENESISCC geActor_BodyGeometryNeedsUpdate(geActor *A);
+// end change
 #endif
 
 // GENESIS_PUBLIC_APIS
@@ -387,6 +411,11 @@ GENESISAPI geBoolean GENESISCC geActor_SetShadow(geActor *A,
 						geFloat Radius,
 						const geBitmap *ShadowMap,
 						const char * BoneName);
+
+// changed QD Shadows
+GENESISAPI geBoolean GENESISCC geActor_SetStencilShadow(geActor *A, 
+						geBoolean DoStencilShadow);
+// end change
 
 //  Animation Cuing API:
 // high level Actor animation:  The principle is that motions can be applied to an actor

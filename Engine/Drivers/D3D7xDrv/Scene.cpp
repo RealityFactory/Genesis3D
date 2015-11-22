@@ -4,6 +4,9 @@
 /*  Author: John Pollard                                                                */
 /*  Description: Begin/EndScene code, etc                                               */
 /*                                                                                      */
+/*  Edit History:                                                                       */
+/*  01/28/2003 Wendell Buckner                                                          */
+/*   Cache decals so that they can be drawn after all the 3d stuff...                   */
 /*  02/28/2001 Wendell Buckner
 /*   These render states are unsupported d3d 7.0
 /*  07/16/2000 Wendell Buckner
@@ -50,7 +53,14 @@ int32 RenderMode;
 
 uint32 CurrentLRU;
 
-BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, RECT *WorldRect)
+/*  01/28/2003 Wendell Buckner                                                          */
+/*   Cache decals so that they can be drawn after all the 3d stuff...                   */
+BOOL InScene = FALSE;
+
+// changed QD Shadows
+//BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, RECT *WorldRect)
+BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, BOOL ClearStencil, RECT *WorldRect)
+// end change
 {
 	HRESULT	Result;
 
@@ -71,15 +81,21 @@ BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, RECT *WorldRect)
 	//	Watch for inactive app or minimize
 	if(AppInfo.RenderingIsOK)
 	{
-		if (!Main_ClearBackBuffer(Clear, ClearZ))
+// changed QD Shadows
+//		if (!Main_ClearBackBuffer(Clear, ClearZ))
+		if (!Main_ClearBackBuffer(Clear, ClearZ, ClearStencil))
+
 		{
 			D3DMain_Log("D3DClearBuffers failed.");
 			return FALSE;
 		}
-		
+
+		D3DDRV.StencilTestMode = 1; // zpass=1, zfail=0
+// end change		
 		D3DDRV.NumRenderedPolys = 0;
 		
 		Result = AppInfo.lpD3DDevice->BeginScene();
+//      D3DMain_Log("Begin Scene\n");
 
 		if (Result != D3D_OK)
 		{
@@ -93,6 +109,10 @@ BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, RECT *WorldRect)
 		D3DZWriteEnable (TRUE);
 		D3DZEnable(TRUE);
 		D3DZFunc(D3DCMP_LESSEQUAL);
+//	changed QD shadows
+		D3DStencilEnable(FALSE);
+		D3DStencilFunc(D3DCMP_ALWAYS);
+// end change
 
 		D3DBlendFunc (D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA);
 		D3DBlendEnable(TRUE);
@@ -121,6 +141,9 @@ BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, RECT *WorldRect)
         
 	}
 
+/*  01/28/2003 Wendell Buckner                                                          */
+/*   Cache decals so that they can be drawn after all the 3d stuff...                   */
+    InScene = TRUE;
 	return TRUE;
 }
 
@@ -138,6 +161,7 @@ BOOL DRIVERCC EndScene(void)
 		PCache_FlushMiscPolys();
 
 		Result = AppInfo.lpD3DDevice->EndScene();
+//      D3DMain_Log("End Scene\n");
 
 		if (Result != D3D_OK)
 		{
@@ -145,9 +169,17 @@ BOOL DRIVERCC EndScene(void)
 			return FALSE;
 		}
 
+/* 01/28/2003 Wendell Buckner
+     Cache decals so that they can be drawn after all the 3d stuff... */
+		DCache_FlushDecalRects();
+
 		if (!Main_ShowBackBuffer())
 			return FALSE;
 	}
+
+/*  01/28/2003 Wendell Buckner                                                          */
+/*   Cache decals so that they can be drawn after all the 3d stuff...                   */
+    InScene = FALSE;
 	return TRUE;
 }
 
@@ -243,3 +275,32 @@ BOOL DRIVERCC EndModels(void)
 	}
 	return TRUE;
 }
+
+// changed QD Shadows
+BOOL DRIVERCC BeginShadowVolumes(void)
+{
+	RenderMode = RENDER_SHADOWVOLUMES;
+	D3DSetTexture(0, NULL);
+	D3DFogEnable (FALSE, 0 );
+	return TRUE;
+}
+
+BOOL DRIVERCC EndShadowVolumes(void)
+{
+	RenderMode = RENDER_NONE;
+
+	if(AppInfo.RenderingIsOK)
+	{
+		//PCache_FlushWorldPolys();
+		//PCache_FlushMiscPolys();
+		//PCache_FlushStencilPolys();
+		//D3DDrawShadow(0.0f, 0.0f, 0.0f, 94.0f);
+	#ifdef SUPER_FLUSH
+		AppInfo.lpD3DDevice->EndScene();
+		AppInfo.lpD3DDevice->BeginScene();
+	#endif
+
+	}
+	return TRUE;
+}
+// end change

@@ -8,8 +8,34 @@
 /*   TODO: Understand lightmap generation a little better                               */
 /*   TODO: a lot of createthandle calls were made for a level with 1 texture... why?    */
 /*         check and make sure textures are only sent once...                           */
-/*   01/13/2003 Wendell Buckner
-/*     Use the geneis d3d api functions else there be problems
+/*   TODO: For the those wonderful people who are are having refresh rate problems...   */
+/*         wait for vertical blank...                                                   */
+/*   TODO: These are obsolete, I need to find out how to get the mipmaps working....    */
+/*   TODO: It looks like newer cards will support 32-bit bumpmapping support... right   */
+/*         now stick with 16-bit and 24-bit since dx7 examples only these formats       */
+/*   02/21/2004 Wendell Buckner                                                         */
+/*    DOT3 BUMPMAPPING                                                                  */
+/*   01/05/2004 Wendell Buckner                                                         */   
+/*    CONFIG DRIVER - Display the drivers capibilities in the the driver log            */
+/*   01/03/2004 Wendell Buckner                                                         */   
+/*    CONFIG DRIVER - Display the drivers capibilities in the the driver log            */
+/*   12/27/2003 Wendell Buckner                                                         */
+/*    CONFIG DRIVER - Make the driver configurable by "ini" file settings               */
+/*   12/20/2003 Wendell Buckner                                                         */  
+/*    CONFIG DRIVER - Informational: Display the zbuffer depth                          */
+/*   12/20/2003 Wendell Buckner                                                         */   
+/*    COMPRESSED TEXTURES - Display the four CC codes                                   */          
+/*   04/28/2003 Wendell Buckner                                                         */
+/*    BUMPMAPPING                                                                       */
+/*   03/25/2003 Wendell Buckner                                                         */
+/*    BUMPMAPPING                                                                       */
+/*   03/17/2003 Wendell Buckner                                                         */
+/*    Fog under dx6 would clear use the viewport interface which would automatically    */
+/*    use the material color to clear the target                                        */
+/*    dx7 doesn't support this... you must now clear the target using clear and passing */
+/*    the color you want to clear it to.                                                */
+/*   01/13/2003 Wendell Buckner                                                         */
+/*     Use the geneis d3d api functions else there be problems                          */ 
 /*   01/11/2003 Wendell Buckner                                                         */
 /*    Force to bpp to desktop bpp...                                                    */
 /*   01/11/2003 Wendell Buckner                                                         */
@@ -41,7 +67,7 @@
 /*   02/28/2001 Wendell Buckner                                                         */  
 /*	  Lighting is on by default so turn it off...                                       */
 /*    Optimization from GeForce_Optimization2.doc                                       */
-/*     9. Do not duplicate render state commands.  Worse is useless renderstates.  Do   */
+/*     9. Do not du  plicate render state commands.  Worse is useless renderstates.  Do   */
 /*        not set a renderstate unless it is needed.                                    */
 /*    Optimization from GeForce_Optimization2.doc                                       */ 
 /*     Lights                                                                           */
@@ -53,7 +79,7 @@
 /*    specular highlights are not necessary.                                            */
 /*   07/16/2000 Wendell Buckner                                                         */
 /*    Convert to Directx7...                                                            */
-/*                                                                                      */
+/*                                                                                    */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -110,6 +136,20 @@ int ZbufferD = 16; // our Z buffer depths
 FILE *stream; // The variable we open our config file to
 int gWidth, gHeight; // Global variables for our width and height
 // end 32 bit changes
+
+/* 12/27/2003 Wendell Buckner
+    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
+int BBufferCount = 2;
+int FSAntiAliasing = 0;
+int NoVsync = 1;
+int Async = 1;
+int DoNotWait = 1;
+int ExtraTextures = 1;
+int CompressTextures = 0;
+
+DWORD FlipFlags = DDFLIP_DONOTWAIT | DDFLIP_NOVSYNC;
+DWORD BltRtFlags  = DDBLT_DONOTWAIT | DDBLT_ASYNC;
+DWORD BltSurfFlags  = DDBLTFAST_DONOTWAIT;
 
 #define MAX_DRIVERS		64
 
@@ -261,6 +301,57 @@ BOOL D3DMain_InitD3D(HWND hWnd, const char *DriverName, int32 Width, int32 Heigh
 		fscanf(stream,"%d",&BPP32);
 		fscanf(stream,"%d",&ZbufferD);
 		fclose(stream);
+
+/* 12/27/2003 Wendell Buckner
+    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
+		{
+		 char lpRetStr[25];
+		 DWORD dwRetCount;
+
+		 dwRetCount = GetPrivateProfileString("D3D24", "BPP","16", (LPTSTR) &lpRetStr,sizeof(lpRetStr), ".\\D3D24.INI");
+		 if ( dwRetCount ) BPP32 = atoi(lpRetStr);
+
+		 dwRetCount = GetPrivateProfileString("D3D24", "ZBufferD","16", (LPTSTR) &lpRetStr,sizeof(lpRetStr), ".\\D3D24.INI");
+		 if ( dwRetCount ) ZbufferD = atoi(lpRetStr);
+
+         dwRetCount = GetPrivateProfileString("D3D24", "BBufferCount","2", (LPTSTR) &lpRetStr,sizeof(lpRetStr), ".\\D3D24.INI");
+		 BBufferCount = atoi(lpRetStr);
+         if (BBufferCount < 1) BBufferCount = 1;
+
+		 dwRetCount = GetPrivateProfileString("D3D24", "CompressTextures","0", (LPTSTR) &lpRetStr,sizeof(lpRetStr), ".\\D3D24.INI");
+		 CompressTextures = atoi(lpRetStr);
+
+		 dwRetCount = GetPrivateProfileString("D3D24", "FSAntiAliasing","0", (LPTSTR) &lpRetStr,sizeof(lpRetStr), ".\\D3D24.INI");
+		 FSAntiAliasing = atoi(lpRetStr);
+
+		 dwRetCount = GetPrivateProfileString("D3D24", "ExtraTextures","1", (LPTSTR) &lpRetStr,sizeof(lpRetStr), ".\\D3D24.INI");
+		 ExtraTextures = atoi(lpRetStr);
+
+		 dwRetCount = GetPrivateProfileString("D3D24", "NoVsync","1", (LPTSTR) &lpRetStr,sizeof(lpRetStr), ".\\D3D24.INI");
+		 NoVsync = atoi(lpRetStr);
+
+		 dwRetCount = GetPrivateProfileString("D3D24", "Async","1", (LPTSTR) &lpRetStr,sizeof(lpRetStr), ".\\D3D24.INI");
+		 Async = atoi(lpRetStr);
+
+		 dwRetCount = GetPrivateProfileString("D3D24", "DoNotWait","1", (LPTSTR) &lpRetStr,sizeof(lpRetStr), ".\\D3D24.INI");
+		 DoNotWait = atoi(lpRetStr);
+
+         if (!NoVsync) FlipFlags &= ~DDFLIP_NOVSYNC;
+		 if (!Async) BltRtFlags  &= ~DDBLT_ASYNC;
+
+		 if (!DoNotWait)
+		 {
+          FlipFlags &= ~DDFLIP_DONOTWAIT;
+		  BltRtFlags  &= ~DDBLT_DONOTWAIT;
+          BltSurfFlags  &= ~DDBLTFAST_DONOTWAIT;
+
+          FlipFlags |= DDFLIP_WAIT;
+          BltRtFlags |= DDBLT_WAIT;
+		  BltSurfFlags  |= DDBLTFAST_WAIT; 
+		 }
+
+		}
+
 	}
 	else
 	{
@@ -372,18 +463,24 @@ BOOL D3DMain_InitD3D(HWND hWnd, const char *DriverName, int32 Width, int32 Heigh
     D3DZFunc (D3DCMP_LESSEQUAL);
     D3DZFunc (D3DCMP_GREATEREQUAL);
 
+// changed QD Shadows
+	D3DStencilFunc (D3DCMP_LESSEQUAL);
+	D3DStencilFunc (D3DCMP_GREATEREQUAL);
+// end change 
+
 	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, TRUE);
     AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_SPECULARENABLE, FALSE);
 
 	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_DITHERENABLE, TRUE);
 
+/* 12/27/2003 Wendell Buckner
+    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
 /* 12/06/2001 Wendell Buckner
-    ENHANCEMENT - Allow full-scene anti-aliasing  
-    if ( AppInfo.Drivers[AppInfo.CurrentDriver].Desc.dpcLineCaps.dwRasterCaps & D3DPRASTERCAPS_ANTIALIASSORTINDEPENDENT )
-	{
- 	 D3DMain_Log("Sort independent anti-aliasing available\n");
-     AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_ANTIALIAS,D3DANTIALIAS_SORTINDEPENDENT );
-	}*/
+    ENHANCEMENT - Allow full-scene anti-aliasing *
+    if ( AppInfo.Drivers[AppInfo.CurrentDriver].Desc.dpcLineCaps.dwRasterCaps & D3DPRASTERCAPS_ANTIALIASSORTINDEPENDENT ) 
+     AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_ANTIALIAS,D3DANTIALIAS_SORTINDEPENDENT ); */
+    if ( (AppInfo.Drivers[AppInfo.CurrentDriver].Desc.dpcLineCaps.dwRasterCaps & D3DPRASTERCAPS_ANTIALIASSORTINDEPENDENT) &&  FSAntiAliasing )      
+     D3DFullSceneAntiAliasing ( TRUE );
 
 #if 0
 	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_ANTIALIAS, D3DANTIALIAS_SORTINDEPENDENT);
@@ -394,8 +491,10 @@ BOOL D3DMain_InitD3D(HWND hWnd, const char *DriverName, int32 Width, int32 Heigh
     AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_CULLMODE, D3DCULL_NONE);
 	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, TRUE);
 
+/* 01/30/2003 Wendell Buckner
+    TODO: These are obsolete, I need to find out how to get the mipmaps working....*/
 	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_TEXTUREMIN, D3DFILTER_LINEARMIPNEAREST);
-	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_TEXTUREMAG, D3DFILTER_LINEAR);
+	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_TEXTUREMAG, D3DFILTER_LINEAR); 
 
 	LastError = AppInfo.lpD3DDevice->EndScene();
 
@@ -802,6 +901,30 @@ static HRESULT WINAPI EnumDeviceFunc(LPSTR lpDeviceDescription,
 	else
 		AppInfo.Drivers[AppInfo.NumDrivers].CanDoWindow = FALSE;
 
+/* 03/25/2003 Wendell Buckner
+    BUMPMAPPING */
+	if ( (Desc->dwTextureOpCaps & (D3DTEXOPCAPS_BUMPENVMAP | D3DTEXOPCAPS_BUMPENVMAPLUMINANCE)) && (Desc->wMaxTextureBlendStages > 2) )
+	{
+		AppInfo.Drivers[AppInfo.NumDrivers].CanDoBumpMapping = TRUE;
+		AppInfo.CanDoBumpMapping = TRUE;
+	}
+	else
+	{
+		AppInfo.Drivers[AppInfo.NumDrivers].CanDoBumpMapping = FALSE;	
+		AppInfo.CanDoBumpMapping = FALSE;
+	}
+
+/* 02/21/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+	if ( Desc->dwTextureOpCaps & D3DTEXOPCAPS_DOTPRODUCT3 )
+	{
+		AppInfo.Drivers[AppInfo.NumDrivers].CanDoDot3 = TRUE;
+	}
+	else
+	{
+		AppInfo.Drivers[AppInfo.NumDrivers].CanDoDot3 = FALSE;	
+	}
+
 	// Store if we can use this driver
 	AppInfo.Drivers[AppInfo.NumDrivers].CanUse = Good;
 
@@ -1029,11 +1152,43 @@ static HRESULT CALLBACK EnumTextureFormatsCallback(LPDDPIXELFORMAT lpddpfPixelFo
 	if(!lpddpfPixelFormat)
 		return DDENUMRET_OK;
 
+/* TODO: It looks like newer cards will support 32-bit bumpmapping support... right now stick with 16-bit and 24-bit since dx7
+         examples only these formats */
+
+/* 12/20/2003 Wendell Buckner
+    COMPRESSED TEXTURES - Display the four CC codes
+/* 04/28/2003 Wendell Buckner
+    BUMPMAPPING
 	D3DMain_Log("EnumTextureFormatsCallback: %i, A:%x, R:%x, G:%x, B:%x Texture Support Found\n",	lpddpfPixelFormat->dwRGBBitCount, 
 																									lpddpfPixelFormat->dwRGBAlphaBitMask, 
 																									lpddpfPixelFormat->dwRBitMask, 
 																									lpddpfPixelFormat->dwGBitMask, 
-																									lpddpfPixelFormat->dwBBitMask);
+																									lpddpfPixelFormat->dwBBitMask); */
+/*	D3DMain_Log("EnumTextureFormatsCallback: %i, A:%x, R:%x, G:%x, B:%x / %i, U:%x, V:%x, L:%x / 4CC:%x Texture Support Found\n",	
+		                                                                                            lpddpfPixelFormat->dwRGBBitCount, 
+																									lpddpfPixelFormat->dwRGBAlphaBitMask, 
+																									lpddpfPixelFormat->dwRBitMask, 
+																									lpddpfPixelFormat->dwGBitMask, 
+																									lpddpfPixelFormat->dwBBitMask,
+
+                                                                                                    lpddpfPixelFormat->dwBumpBitCount,
+                                                                                                    lpddpfPixelFormat->dwBumpDuBitMask,
+																									lpddpfPixelFormat->dwBumpDvBitMask,
+			                                                                                        lpddpfPixelFormat->dwBumpLuminanceBitMask);*/
+	D3DMain_Log("EnumTextureFormatsCallback: %i, A:%x, R:%x, G:%x, B:%x / %i, U:%x, V:%x, L:%x / 4CC:%x Texture Support Found\n",	
+		                                                                                            lpddpfPixelFormat->dwRGBBitCount, 
+																									lpddpfPixelFormat->dwRGBAlphaBitMask, 
+																									lpddpfPixelFormat->dwRBitMask, 
+																									lpddpfPixelFormat->dwGBitMask, 
+																									lpddpfPixelFormat->dwBBitMask,
+
+                                                                                                    lpddpfPixelFormat->dwBumpBitCount,
+                                                                                                    lpddpfPixelFormat->dwBumpDuBitMask,
+																									lpddpfPixelFormat->dwBumpDvBitMask,
+			                                                                                        lpddpfPixelFormat->dwBumpLuminanceBitMask,
+
+																									lpddpfPixelFormat->dwFourCC);
+
 
 
 	if (AppInfo.NumTextureFormats+1 >= DDMAIN_MAX_TEXTURE_FORMATS )
@@ -1047,10 +1202,96 @@ static HRESULT CALLBACK EnumTextureFormatsCallback(LPDDPIXELFORMAT lpddpfPixelFo
 	// Clear out this texture format slot
 	memset(pTexFormat, 0, sizeof(DDMain_SurfFormat));
 
-	if(lpddpfPixelFormat->dwFlags & DDPF_ALPHAPIXELS) 
+/* 12/20/2003 Wendell Buckner
+    COMPRESSED TEXTURES - Display the four CC codes
+    if( lpddpfPixelFormat->dwFlags & DDPF_BUMPDUDV ) 
+/* 03/25/2003 Wendell Buckner
+    BUMPMAPPING *
+	if(lpddpfPixelFormat->dwFlags & DDPF_ALPHAPIXELS) */
+	if( lpddpfPixelFormat->dwRGBBitCount == 0 ) 
+	{
+		switch( lpddpfPixelFormat->dwFourCC )
+		{
+		 case 0:
+			return DDENUMRET_OK;
+			break;
+
+		 case FOURCC_DXT1:
+			pTexFormat->HasOneBitAlpha = TRUE;
+			pTexFormat->HasFourBitAlpha = FALSE;
+			pTexFormat->HasEightBitAlpha = FALSE;
+			break;
+
+		 case FOURCC_DXT2:
+			pTexFormat->HasOneBitAlpha = FALSE;
+			pTexFormat->HasFourBitAlpha = TRUE;
+			pTexFormat->HasEightBitAlpha = FALSE;
+			break;
+
+		 case FOURCC_DXT3:
+			pTexFormat->HasOneBitAlpha = FALSE;
+			pTexFormat->HasFourBitAlpha = TRUE;
+			pTexFormat->HasEightBitAlpha = FALSE;
+			break;
+
+		 case FOURCC_DXT4:
+			pTexFormat->HasOneBitAlpha = FALSE;
+			pTexFormat->HasFourBitAlpha = FALSE;
+			pTexFormat->HasEightBitAlpha = TRUE;
+            break;
+
+		 case FOURCC_DXT5:
+			pTexFormat->HasOneBitAlpha = FALSE;
+			pTexFormat->HasFourBitAlpha = FALSE;
+			pTexFormat->HasEightBitAlpha = TRUE;
+			break;
+
+         default:
+            return DDENUMRET_OK; 
+			break;
+		}
+	}
+    else if( lpddpfPixelFormat->dwFlags & DDPF_BUMPDUDV ) 
+    {
+
+	 if(lpddpfPixelFormat->dwBumpBitCount == 16)
+	 {
+        if ( (lpddpfPixelFormat->dwBumpDuBitMask        == 0x000000ff) && 
+             (lpddpfPixelFormat->dwBumpDvBitMask        == 0x0000ff00) &&
+			 (lpddpfPixelFormat->dwBumpLuminanceBitMask == 0x00000000) )
+			 {
+			  pTexFormat->HasBumpMapSupportNoLuminance = TRUE;
+	          pTexFormat->HasBumpMapSupportSixBitLuminance = FALSE;
+	          pTexFormat->HasBumpMapSupportEightBitLuminance = FALSE;
+			 }
+        else if ( (lpddpfPixelFormat->dwBumpDuBitMask        == 0x0000001f) && 
+                  (lpddpfPixelFormat->dwBumpDvBitMask        == 0x000003e0) &&
+			      (lpddpfPixelFormat->dwBumpLuminanceBitMask == 0x0000fc00) )
+             {
+              pTexFormat->HasBumpMapSupportNoLuminance = FALSE;
+	          pTexFormat->HasBumpMapSupportSixBitLuminance = TRUE;
+	          pTexFormat->HasBumpMapSupportEightBitLuminance = FALSE;
+		     }
+        else return DDENUMRET_OK;
+	 }
+	 else if(lpddpfPixelFormat->dwBumpBitCount == 24) 
+	 {
+      if ( (lpddpfPixelFormat->dwBumpDuBitMask        == 0x000000ff) && 
+           (lpddpfPixelFormat->dwBumpDvBitMask        == 0x0000ff00) &&
+	       (lpddpfPixelFormat->dwBumpLuminanceBitMask == 0x00ff0000) )
+           {
+	        pTexFormat->HasBumpMapSupportSixBitLuminance = FALSE;
+	        pTexFormat->HasBumpMapSupportEightBitLuminance = FALSE;
+	        pTexFormat->HasBumpMapSupportEightBitLuminance = TRUE;
+		   }
+      else return DDENUMRET_OK;
+	 }
+     else return DDENUMRET_OK;
+	}
+    else if(lpddpfPixelFormat->dwFlags & DDPF_ALPHAPIXELS) 
 	{
 
-/* 12/28/2002 Wendell Buckner
+/*  04/28/2003 Wendell Buckner
     Allow/make 32-bit (ARGB) mode the default mode... 
 		if(lpddpfPixelFormat->dwRGBAlphaBitMask == 0x8000)     */
 		if(lpddpfPixelFormat->dwRGBAlphaBitMask == 0xff000000) 
@@ -1339,8 +1580,24 @@ static HRESULT WINAPI EnumZBufferFormatsCallback( DDPIXELFORMAT* pddpf,
 		if( pddpf->dwZBufferBitDepth == 16 )
 			return D3DENUMRET_CANCEL;        */
 
+// changed QD Shadows
+		if(pddpf->dwStencilBitDepth>=8)
+		{
+			AppInfo.Drivers[AppInfo.CurrentDriver].CanDoStencil = TRUE;
+			D3DMain_Log("EnumZBufferFormats:  StencilBitDepth>=8... can do 8bit stencil buffer\n");
+		}
+		else
+		{
+			AppInfo.Drivers[AppInfo.CurrentDriver].CanDoStencil = FALSE;
+			D3DMain_Log("EnumZBufferFormats:  StencilBitDepth<8... not enough stencil bits\n");
+		}
+// end change
+
 		if( pddpf->dwZBufferBitDepth == UserZBufferD )
+		{
+
 			return D3DENUMRET_CANCEL;
+		}
     }
 
     return D3DENUMRET_OK;
@@ -1373,11 +1630,15 @@ static BOOL D3DMain_ClearBuffers(void)
 		ddbltfx.dwSize = sizeof(DDBLTFX);
 		SetRect(&dst, 0, 0, ddsd.dwWidth, ddsd.dwHeight);
 
+/* 01/03/2004 Wendell Buckner
+    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
 /*	01/24/2002 Wendell Buckner
     Change flags for speed...		
 		LastError = AppInfo.lpFrontBuffer->Blt(&dst, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, 
-							&ddbltfx);*/
+							&ddbltfx);*
 		LastError = AppInfo.lpFrontBuffer->Blt(&dst, NULL, NULL, DDBLT_COLORFILL | DDBLT_DONOTWAIT | DDBLT_ASYNC, 
+							&ddbltfx);		*/
+		LastError = AppInfo.lpFrontBuffer->Blt(&dst, NULL, NULL, DDBLT_COLORFILL | BltRtFlags, 
 							&ddbltfx);		
     
 		if (LastError != DD_OK) 
@@ -1418,13 +1679,16 @@ static BOOL D3DMain_ClearBuffers(void)
 		ddbltfx.dwSize = sizeof(DDBLTFX);
 		SetRect(&dst, 0, 0, ddsd.dwWidth, ddsd.dwHeight);
 
+/* 01/03/2004 Wendell Buckner
+    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
 /*	01/24/2002 Wendell Buckner
     Change flags for speed...
 		LastError = AppInfo.lpBackBuffer->Blt(&dst, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT,
-					&ddbltfx);                                                                */
+					&ddbltfx);                                                                *
 		LastError = AppInfo.lpBackBuffer->Blt(&dst, NULL, NULL, DDBLT_COLORFILL | DDBLT_DONOTWAIT | DDBLT_ASYNC,
+					&ddbltfx); */
+		LastError = AppInfo.lpBackBuffer->Blt(&dst, NULL, NULL, DDBLT_COLORFILL | BltRtFlags,
 					&ddbltfx);
-
 
 		if (LastError != DD_OK) 
 		{
@@ -1463,16 +1727,24 @@ BOOL Main_ShowBackBuffer(void)
 		// Flip the back and front buffers
 		#if 1
 
+/* 01/03/2004 Wendell Buckner
+    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
 /*	01/24/2002 Wendell Buckner
     Change flags for speed...		
-			LastError = AppInfo.lpFrontBuffer->Flip(AppInfo.lpBackBuffer, DDFLIP_WAIT);*/
-			LastError = AppInfo.lpFrontBuffer->Flip(AppInfo.lpBackBuffer, DDFLIP_DONOTWAIT | DDFLIP_NOVSYNC );
+			LastError = AppInfo.lpFrontBuffer->Flip(AppInfo.lpBackBuffer, DDFLIP_WAIT);*
+			LastError = AppInfo.lpFrontBuffer->Flip(AppInfo.lpBackBuffer, DDFLIP_DONOTWAIT | DDFLIP_NOVSYNC );*/
+            LastError = AppInfo.lpFrontBuffer->Flip(AppInfo.lpBackBuffer, FlipFlags );
 
 		#else
+
+/* 01/03/2004 Wendell Buckner
+    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
 /*	01/24/2002 Wendell Buckner
     Change flags for speed...		
-			LastError = AppInfo.lpFrontBuffer->Flip(AppInfo.lpBackBuffer, DDFLIP_NOVSYNC);*/
-			LastError = AppInfo.lpFrontBuffer->Flip(AppInfo.lpBackBuffer, DDFLIP_DONOTWAIT | DDFLIP_NOVSYNC );
+			LastError = AppInfo.lpFrontBuffer->Flip(AppInfo.lpBackBuffer, DDFLIP_NOVSYNC);*
+			LastError = AppInfo.lpFrontBuffer->Flip(AppInfo.lpBackBuffer, DDFLIP_DONOTWAIT | DDFLIP_NOVSYNC ); */
+			LastError = AppInfo.lpFrontBuffer->Flip(AppInfo.lpBackBuffer, FlipFlags );
+
 		#endif
 		
 		if (LastError == DDERR_SURFACELOST) 
@@ -1507,6 +1779,8 @@ BOOL Main_ShowBackBuffer(void)
 		BRect.top = 0;
 		BRect.bottom = AppInfo.CurrentHeight;
 
+/* 01/03/2004 Wendell Buckner
+    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
 /*  03/10/2002 Wendell Buckner
      Optimization from GeForce_Optimization2.doc                                        
      Procedural Textures
@@ -1514,9 +1788,11 @@ BOOL Main_ShowBackBuffer(void)
  *	01/24/2002 Wendell Buckner
      Change flags for speed...
 		LastError = AppInfo.lpFrontBuffer->Blt(&FRect, AppInfo.lpBackBuffer,
-				&BRect, DDBLT_WAIT, NULL);                                   */
+				&BRect, DDBLT_WAIT, NULL);                                   *
 		LastError = AppInfo.lpFrontBuffer->Blt(&FRect, AppInfo.lpBackBuffer,
-				&BRect, DDBLT_DONOTWAIT | DDBLT_ASYNC, NULL);                
+				&BRect, DDBLT_DONOTWAIT | DDBLT_ASYNC, NULL);                */
+		LastError = AppInfo.lpFrontBuffer->Blt(&FRect, AppInfo.lpBackBuffer,
+				&BRect, BltRtFlags, NULL);                
   
 		if (LastError != DD_OK) 
 		{
@@ -1542,7 +1818,9 @@ BOOL Main_ShowBackBuffer(void)
 //================================================================================
 //	Main_ClearBackBuffer
 //================================================================================
-BOOL Main_ClearBackBuffer(BOOL Clear, BOOL ClearZ)
+// changed QD Shadows
+//BOOL Main_ClearBackBuffer(BOOL Clear, BOOL ClearZ)
+BOOL Main_ClearBackBuffer(BOOL Clear, BOOL ClearZ, BOOL ClearStencil)
 {
     int			ClearFlags;
     D3DRECT		Dummy;
@@ -1561,19 +1839,32 @@ BOOL Main_ClearBackBuffer(BOOL Clear, BOOL ClearZ)
 	if (ClearZ)
 		ClearFlags |= D3DCLEAR_ZBUFFER;
 
+// changed QD Shadows
+	if (ClearStencil)
+		ClearFlags |= D3DCLEAR_STENCIL;
+// end change
+
     Dummy.x1 = Dummy.y1 = 0;
     Dummy.x2 = AppInfo.CurrentWidth;
     Dummy.y2 = AppInfo.CurrentHeight;
  
+/* 03/17/2003 Wendell Buckner
+	Fog under dx6 would clear use the viewport interface which would automatically use the material color to clear the target
+	dx7 doesn't support this... you must now clear the target using clear and passing the color you want to clear it to. 
 /* 07/16/2000 Wendell Buckner
-    Convert to Directx7...    /
-    LastError = AppInfo.lpD3DViewport->Clear(1, &Dummy, ClearFlags);
+	Convert to Directx7... /
+	LastError = AppInfo.lpD3DViewport->Clear(1, &Dummy, ClearFlags);
 
-    POTENTIAL GOTCHA 
-    Need to understand this value => 1.0f better, the original code above has it set to 0 but my
-    sample code won't work with this value set to 0	*/
-	LastError = AppInfo.lpD3DDevice->Clear( 1, &Dummy, ClearFlags,  0,  1.0f, 0L );	
-	
+	POTENTIAL GOTCHA 
+	Need to understand this value => 1.0f better, the original code above has it set to 0 but my
+	sample code won't work with this value set to 0 *
+	LastError = AppInfo.lpD3DDevice->Clear( 1, &Dummy, ClearFlags, 0, 1.0f, 0L ); */
+	if (AppInfo.FogEnable) 
+		LastError = AppInfo.lpD3DDevice->Clear( 1, &Dummy, ClearFlags, ((DWORD)AppInfo.FogR<<16)|((DWORD)AppInfo.FogG<< 8)|(DWORD)AppInfo.FogB, 1.0f, 0L );
+	else
+		LastError = AppInfo.lpD3DDevice->Clear( 1, &Dummy, ClearFlags, 0, 1.0f, 0L ); 
+
+
 	if (LastError != D3D_OK) 
 	{
 		D3DMain_Log("Viewport clear failed.\n  %s\n",
@@ -2023,6 +2314,100 @@ BOOL D3DMain_GetSurfaceFormats(void)
     }
 
 /* 12/28/2002 Wendell Buckner
+    BUMPMAPPING */
+    memset(&AppInfo.ddBumpMapNoLuminance , 0, sizeof(DDSURFACEDESC2));
+	memset(&AppInfo.ddBumpMapSixBitLuminance, 0, sizeof(DDSURFACEDESC2));
+	memset(&AppInfo.ddBumpMapEightBitLuminance, 0, sizeof(DDSURFACEDESC2));
+
+	// Get all bump map surfaces: 88, 556, & 888 surfaces.
+
+	// Get bump map surface: 88
+	for(i = 0; i < AppInfo.NumTextureFormats; i++)
+	{
+		LPDDPIXELFORMAT lpddpfPixelFormat;
+
+        lpddpfPixelFormat = &AppInfo.TextureFormats[i].ddsd.ddpfPixelFormat;
+
+		if( (lpddpfPixelFormat->dwBumpBitCount != 16)) 
+			continue;
+
+		if ( (AppInfo.TextureFormats[i].HasBumpMapSupportNoLuminance == FALSE))
+			continue;
+
+        if ( (lpddpfPixelFormat->dwBumpDuBitMask        == 0x000000ff) && 
+             (lpddpfPixelFormat->dwBumpDvBitMask        == 0x0000ff00) &&
+			 (lpddpfPixelFormat->dwBumpLuminanceBitMask == 0x00000000) )
+		{
+         AppInfo.ddBumpMapNoLuminance = AppInfo.TextureFormats[i].ddsd;    
+		 break;
+		} 
+	}
+
+    if(i == AppInfo.NumTextureFormats) 
+	{
+		D3DMain_Log("D3DMain_GetSurfaceFormats:  Unable to find 88 (16-bit) bump map support.\n");
+    } 
+
+
+	// Get bump map surface: 556
+	for(i = 0; i < AppInfo.NumTextureFormats; i++)
+	{
+		LPDDPIXELFORMAT lpddpfPixelFormat;
+
+        lpddpfPixelFormat = &AppInfo.TextureFormats[i].ddsd.ddpfPixelFormat;
+
+		if( (lpddpfPixelFormat->dwBumpBitCount != 16)) 
+			continue;
+
+		if ( (AppInfo.TextureFormats[i].HasBumpMapSupportSixBitLuminance == FALSE) )
+			continue;
+
+        if ( (lpddpfPixelFormat->dwBumpDuBitMask        == 0x0000001f) && 
+             (lpddpfPixelFormat->dwBumpDvBitMask        == 0x000003e0) &&
+			 (lpddpfPixelFormat->dwBumpLuminanceBitMask == 0x0000fc00) )               
+		{
+         AppInfo.ddBumpMapSixBitLuminance = AppInfo.TextureFormats[i].ddsd;    
+		 break;
+		} 
+	}
+
+    if(i == AppInfo.NumTextureFormats) 
+	{
+		D3DMain_Log("D3DMain_GetSurfaceFormats:  Unable to find 556 (16-bit) bump map support.\n");
+    } 
+
+
+	// Get bump map surface: 888
+	for(i = 0; i < AppInfo.NumTextureFormats; i++)
+	{
+		LPDDPIXELFORMAT lpddpfPixelFormat;
+
+        lpddpfPixelFormat = &AppInfo.TextureFormats[i].ddsd.ddpfPixelFormat;
+
+		if( (lpddpfPixelFormat->dwBumpBitCount != 24)) 
+			continue;
+
+		if ( (AppInfo.TextureFormats[i].HasBumpMapSupportEightBitLuminance == FALSE) )
+			continue;
+
+        if ( (lpddpfPixelFormat->dwBumpDuBitMask        == 0x000000ff) && 
+             (lpddpfPixelFormat->dwBumpDvBitMask        == 0x0000ff00) &&
+			 (lpddpfPixelFormat->dwBumpLuminanceBitMask == 0x00ff0000) )
+		{
+         AppInfo.ddBumpMapEightBitLuminance = AppInfo.TextureFormats[i].ddsd;    
+		 break;
+		} 
+	}
+
+    if(i == AppInfo.NumTextureFormats) 
+	{
+		D3DMain_Log("D3DMain_GetSurfaceFormats:  Unable to find 888 (24-bit) bump map support.\n");
+    } 
+
+/*   TODO: It looks like newer cards will support 32-bit bumpmapping support... right   
+           now stick with 16-bit and 24-bit since dx7 examples only these formats       */
+
+/* 12/28/2002 Wendell Buckner
     A 2-d surface is different than a 3d-surface, some cards don't support the same surfaces in 3-d as in 2-d, so don't force the 2-d
     surface to be like the 3-d one*/
 
@@ -2030,6 +2415,121 @@ BOOL D3DMain_GetSurfaceFormats(void)
     Allow/make 32-bit (ARGB) mode the default mode...  */
 	if ( HasEightBitAlpha && (BPP32 == 32) ) AppInfo.ddTexFormat =  AppInfo.ddEightBitAlphaSurfFormat;
 
+/* 12/21/2003 Wendell Buckner
+    COMPRESSED TEXTURES - Get the compressed surface formats */
+    memset(&AppInfo.ddCompressedOneBitAlphaSurfFormat, 0, sizeof(DDSURFACEDESC2));
+	memset(&AppInfo.ddCompressedFourBitAlphaSurfFormat, 0, sizeof(DDSURFACEDESC2));
+	memset(&AppInfo.ddCompressedEightBitAlphaSurfFormat, 0, sizeof(DDSURFACEDESC2));
+
+	// Get 1555 Compressed
+	for(i = 0; i < AppInfo.NumTextureFormats; i++)
+	{
+		LPDDPIXELFORMAT lpddpfPixelFormat;
+
+        lpddpfPixelFormat = &AppInfo.TextureFormats[i].ddsd.ddpfPixelFormat;
+
+        if (lpddpfPixelFormat->dwRGBBitCount != 0)
+			continue;
+
+        if(AppInfo.TextureFormats[i].HasOneBitAlpha == TRUE) 
+		{
+            AppInfo.ddCompressedOneBitAlphaSurfFormat = AppInfo.TextureFormats[i].ddsd;
+            break;
+        }
+	}
+
+    if(i == AppInfo.NumTextureFormats) 
+	{
+		D3DMain_Log("D3DMain_GetSurfaceFormats:  Unable to find 1555 (16-bit) compressed texture support.\n");
+    }
+    
+    // Get 4444 Compressed
+	for(i = 0; i < AppInfo.NumTextureFormats; i++)
+	{
+		LPDDPIXELFORMAT lpddpfPixelFormat;
+
+        lpddpfPixelFormat = &AppInfo.TextureFormats[i].ddsd.ddpfPixelFormat;
+
+        if (lpddpfPixelFormat->dwRGBBitCount != 0)
+			continue;
+
+        if(AppInfo.TextureFormats[i].HasFourBitAlpha == TRUE) 
+		{
+            AppInfo.ddCompressedFourBitAlphaSurfFormat = AppInfo.TextureFormats[i].ddsd;
+            break;
+        }
+	}
+
+    if(i == AppInfo.NumTextureFormats) 
+	{
+		D3DMain_Log("D3DMain_GetSurfaceFormats:  Unable to find 4444 (16-bit) compressed texture support.\n");
+    }
+
+    // Get 4444 Compressed - favor DXT3
+	for(i = 0; i < AppInfo.NumTextureFormats; i++)
+	{
+		LPDDPIXELFORMAT lpddpfPixelFormat;
+
+        lpddpfPixelFormat = &AppInfo.TextureFormats[i].ddsd.ddpfPixelFormat;
+
+        if (lpddpfPixelFormat->dwRGBBitCount != 0)
+			continue;
+
+        if( (AppInfo.TextureFormats[i].HasFourBitAlpha == TRUE) && (lpddpfPixelFormat->dwFourCC == FOURCC_DXT3) ) 
+		{
+            AppInfo.ddCompressedFourBitAlphaSurfFormat = AppInfo.TextureFormats[i].ddsd;
+            break;
+        }
+	}
+
+    if(i == AppInfo.NumTextureFormats) 
+	{
+		D3DMain_Log("D3DMain_GetSurfaceFormats:  Unable to find 4444 (16-bit) compressed (DXT3) texture support.\n");
+    }
+
+	// Get 8888 Compressed
+	for(i = 0; i < AppInfo.NumTextureFormats; i++)
+	{
+		LPDDPIXELFORMAT lpddpfPixelFormat;
+
+        lpddpfPixelFormat = &AppInfo.TextureFormats[i].ddsd.ddpfPixelFormat;
+
+        if (lpddpfPixelFormat->dwRGBBitCount != 0)
+			continue;
+
+        if(AppInfo.TextureFormats[i].HasEightBitAlpha == TRUE) 
+		{
+            AppInfo.ddCompressedEightBitAlphaSurfFormat = AppInfo.TextureFormats[i].ddsd;
+            break;
+        }
+	}
+    
+    if(i == AppInfo.NumTextureFormats) 
+	{
+		D3DMain_Log("D3DMain_GetSurfaceFormats:  Unable to find 8888 (32-bit) compressed texture support.\n");
+    }
+	
+	// Get 8888 Compressed - Favor DXT5
+	for(i = 0; i < AppInfo.NumTextureFormats; i++)
+	{
+		LPDDPIXELFORMAT lpddpfPixelFormat;
+
+        lpddpfPixelFormat = &AppInfo.TextureFormats[i].ddsd.ddpfPixelFormat;
+
+        if (lpddpfPixelFormat->dwRGBBitCount != 0)
+			continue;
+
+        if( (AppInfo.TextureFormats[i].HasEightBitAlpha == TRUE) && (lpddpfPixelFormat->dwFourCC == FOURCC_DXT5) ) 
+		{
+            AppInfo.ddCompressedEightBitAlphaSurfFormat = AppInfo.TextureFormats[i].ddsd;
+            break;
+        }
+	}
+    
+    if(i == AppInfo.NumTextureFormats) 
+	{
+		D3DMain_Log("D3DMain_GetSurfaceFormats:  Unable to find 8888 (32-bit) compressed (DXT5) texture support.\n");
+    }
 	
 	Main_BuildRGBGammaTables(1.0f);
 	
@@ -2507,6 +3007,11 @@ static BOOL D3DMain_SetDisplayMode(HWND hWnd, int w, int h, int bpp, BOOL FullSc
 //================================================================================
 //	D3DMain_PickDevice
 //================================================================================
+
+/* 02/21/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+extern DRV_EngineSettings EngineSettings;
+
 static BOOL D3DMain_PickDevice(void)
 {
 	int32	i;
@@ -2569,7 +3074,6 @@ static BOOL D3DMain_PickDevice(void)
 			//continue;
 // end 32 bit changes
 
-
 /* 07/16/2000 Wendell Buckner
    POTENTIAL GOTCHA * DOCS SAY DCMCOLORMODEL IS SUPPORTED BUT IT IS NO LONGER AVAILABLE  
 		if (!(AppInfo.Drivers[i].Desc.dcmColorModel & D3DCOLOR_RGB)) 
@@ -2580,6 +3084,35 @@ static BOOL D3DMain_PickDevice(void)
 
 		// Remember the current driver
 		AppInfo.CurrentDriver = i;
+
+/*   01/05/2004 Wendell Buckner                                                         
+      CONFIG DRIVER - Display the drivers capibilities in the the driver log                            */
+		// Remember the current driver
+	    if ( AppInfo.Drivers[AppInfo.CurrentDriver].Desc.dwTextureOpCaps & D3DTEXOPCAPS_BUMPENVMAP )
+         D3DMain_Log("    D3DTEXOPCAPS_BUMPENVMAP      : YES\n");
+	    else
+         D3DMain_Log("    D3DTEXOPCAPS_BUMPENVMAP      : NO\n");
+
+	    if ( AppInfo.Drivers[AppInfo.CurrentDriver].Desc.dwTextureOpCaps & D3DTEXOPCAPS_BUMPENVMAPLUMINANCE  )
+         D3DMain_Log(" D3DTEXOPCAPS_BUMPENVMAPLUMINANCE: YES\n");
+	    else
+         D3DMain_Log(" D3DTEXOPCAPS_BUMPENVMAPLUMINANCE: NO\n");
+
+/*	01/04/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+	    if ( AppInfo.Drivers[AppInfo.CurrentDriver].Desc.dwTextureOpCaps & D3DTEXOPCAPS_DOTPRODUCT3  )
+         D3DMain_Log("   D3DTEXOPCAPS_DOTPRODUCT3     : YES\n");
+	    else
+         D3DMain_Log("   D3DTEXOPCAPS_DOTPRODUCT3     : NO\n"); 
+
+/* 02/21/2004 Wendell Buckner                                                         
+    DOT3 BUMPMAPPING                                                                  */
+		{
+		 EngineSettings.CanSupportFlags = (DRV_SUPPORT_ALPHA | DRV_SUPPORT_COLORKEY);
+
+         if ( AppInfo.Drivers[AppInfo.CurrentDriver].CanDoBumpMapping ) EngineSettings.CanSupportFlags |= DRV_SUPPORT_EMBM;
+         if ( AppInfo.Drivers[AppInfo.CurrentDriver].CanDoDot3 ) EngineSettings.CanSupportFlags |= DRV_SUPPORT_DOT3;
+        }
 
 		return TRUE;
 	}
@@ -2670,20 +3203,23 @@ static BOOL D3DMain_CreateBuffers(void)
 		ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE | DDSCAPS_FLIP |
 		DDSCAPS_3DDEVICE | DDSCAPS_COMPLEX;
 
-/* 12/06/2001 Wendell Buckner
+/* 12/27/2003 Wendell Buckner
+    CONFIG DRIVER - Make the driver configurable by "ini" file settings *
+/ * 12/06/2001 Wendell Buckner
     ENHANCEMENT - Allow triple buffering 
-		ddsd.dwBackBufferCount = 1;      */
-		ddsd.dwBackBufferCount = 2; 
+		ddsd.dwBackBufferCount = 1;      *
+		ddsd.dwBackBufferCount = 2; */
+		ddsd.dwBackBufferCount = BBufferCount;
 
 		ddsd.ddsCaps.dwCaps |= DDSCAPS_VIDEOMEMORY;
 
+/* 12/27/2003 Wendell Buckner
+   CONFIG DRIVER -  Make the driver configurable by "ini" file settings *
 /* 12/06/2001 Wendell Buckner
-    ENHANCEMENT - Allow full-scene anti-aliasing  
-        if ( AppInfo.Drivers[AppInfo.CurrentDriver].Desc.dpcLineCaps.dwRasterCaps & D3DPRASTERCAPS_ANTIALIASSORTINDEPENDENT )
-		{
-			D3DMain_Log("Sort independent anti-aliasing enabled\n");
+    ENHANCEMENT - Allow full-scene anti-aliasing  *
+        if ( AppInfo.Drivers[AppInfo.CurrentDriver].Desc.dpcLineCaps.dwRasterCaps & D3DPRASTERCAPS_ANTIALIASSORTINDEPENDENT )*/
+        if ( FSAntiAliasing && (AppInfo.Drivers[AppInfo.CurrentDriver].Desc.dpcLineCaps.dwRasterCaps & D3DPRASTERCAPS_ANTIALIASSORTINDEPENDENT) )
 			ddsd.ddsCaps.dwCaps2 = DDSCAPS2_HINTANTIALIASING; 
-		}*/
 
 		LastError = CreateSurface(&ddsd, &AppInfo.lpFrontBuffer);
 
@@ -2826,6 +3362,10 @@ static BOOL D3DMain_CreateBuffers(void)
   
 	D3DMain_ClearBuffers();
   
+/* 12/27/2003 Wendell Buckner
+    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
+    D3DMain_Log("    Back Buffer Count = %i \n",BBufferCount);
+
 	return TRUE;
   
 	exit_with_error:
@@ -2869,11 +3409,19 @@ static BOOL D3DMain_CreateZBuffer(void)
 	ddsd.dwWidth = AppInfo.CurrentWidth;
 	ddsd.dwHeight = AppInfo.CurrentHeight;
 	
-	ddsd.ddpfPixelFormat.dwFlags = DDPF_ZBUFFER;
+// changed QD Shadows	
+//	ddsd.ddpfPixelFormat.dwFlags = DDPF_ZBUFFER;
+	ddsd.ddpfPixelFormat.dwFlags = DDPF_ZBUFFER|DDPF_STENCILBUFFER;
+// end change
 
     // Find a valid zbuffer, from the current device
     AppInfo.lpD3D->EnumZBufferFormats(AppInfo.Drivers[AppInfo.CurrentDriver].Guid, EnumZBufferFormatsCallback,
 										(VOID*)&ddsd.ddpfPixelFormat);
+
+// changed QD
+	if(AppInfo.Drivers[AppInfo.CurrentDriver].CanDoStencil) EngineSettings.CanSupportFlags |= DRV_SUPPORT_STENCIL;
+//end change
+
 
     
 	if( sizeof(DDPIXELFORMAT) != ddsd.ddpfPixelFormat.dwSize )
@@ -2928,6 +3476,32 @@ static BOOL D3DMain_CreateZBuffer(void)
 	
 	AppInfo.ZBufferInVideo = (ddsd.ddsCaps.dwCaps & DDSCAPS_VIDEOMEMORY) ? TRUE : FALSE;
   
+/* 12/20/2003 Wendell Buckner 
+    CONFIG DRIVER - Display the zbuffer depth*/
+    {
+	 char	YN[2][32];
+
+	 strcpy(YN[0], "NO");
+	 strcpy(YN[1], "YES");
+
+	 D3DMain_Log("   ZBuffer Depth Available:");
+     D3DMain_Log(" 16-bit (%s),", YN[ (AppInfo.Drivers[AppInfo.CurrentDriver].Desc.dwDeviceZBufferBitDepth & DDBD_16) ? 1 : 0] );
+	 D3DMain_Log(" 24-bit (%s),", YN[ (AppInfo.Drivers[AppInfo.CurrentDriver].Desc.dwDeviceZBufferBitDepth & DDBD_24) ? 1 : 0] );
+     D3DMain_Log(" 32-bit (%s),", YN[ (AppInfo.Drivers[AppInfo.CurrentDriver].Desc.dwDeviceZBufferBitDepth & DDBD_32) ? 1 : 0] );
+     D3DMain_Log("\n");
+
+//***
+
+	 if ( (ZbufferD == 16) && (AppInfo.Drivers[AppInfo.CurrentDriver].Desc.dwDeviceZBufferBitDepth & DDBD_16))
+      D3DMain_Log("   ZBuffer Depth: 16, ZBuffer in Video: %s\n",YN[AppInfo.ZBufferInVideo]);
+
+	 if ( (ZbufferD == 24) && (AppInfo.Drivers[AppInfo.CurrentDriver].Desc.dwDeviceZBufferBitDepth & DDBD_24))
+      D3DMain_Log("   ZBuffer Depth: 24, ZBuffer in Video: %s\n",YN[AppInfo.ZBufferInVideo]);
+
+	 if ( (ZbufferD == 32) && (AppInfo.Drivers[AppInfo.CurrentDriver].Desc.dwDeviceZBufferBitDepth & DDBD_32))
+      D3DMain_Log("   ZBuffer Depth: 32, ZBuffer in Video: %s\n",YN[AppInfo.ZBufferInVideo]);
+    }
+
 	return TRUE;
   
 	exit_with_error:
@@ -3324,6 +3898,13 @@ static BOOL D3DMain_CreateDDFromName(const char *DriverName)
 		D3DMain_Log("   DDCAPS2_NO2DDURING3DSCENE    : YES\n");
 	else
 		D3DMain_Log("   DDCAPS2_NO2DDURING3DSCENE    : NO\n");
+
+/* 01/05/2004 Wendell Buckner
+    CONFIG DRIVER - Display the drivers capibilities in the the driver log */
+	if ( DriverCaps.dwCaps2 & DDCAPS2_FLIPNOVSYNC )
+        D3DMain_Log("   DDCAPS2_FLIPNOVSYNC          : YES\n");
+	else
+        D3DMain_Log("   DDCAPS2_FLIPNOVSYNC          : NO\n");
 
 	// Save the DD object
 	strcpy(AppInfo.DDName, DriverName);

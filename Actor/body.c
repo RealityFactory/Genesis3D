@@ -4,6 +4,18 @@
 /*  Author: Mike Sandige	                                                            */
 /*  Description: Actor body implementation.                                             */
 /*                                                                                      */
+/*  Edit History:                                                                       */
+/*	02/21/2004 Wendell Buckner                                                          */
+/*   DOT3 BUMPMAPPING                                                                   */
+/*	02/18/2004 Wendell Buckner                                                          */
+/*   DOT3 BUMPMAPPING                                                                   */
+/*	02/17/2004 Wendell Buckner                                                          */
+/*   DOT3 BUMPMAPPING                                                                   */
+/*	01/13/2004 Wendell Buckner                                                          */ 
+/*   DOT3 BUMPMAPPING                                                                   */
+/*  04/08/2003 Wendell Buckner 	                                                        */
+/*   BUMPMAPPING                                                                        */                                    
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -15,10 +27,11 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
+
 #include <assert.h>						//assert()
 #include <string.h>						//strlen(), strcpy()
 #include <math.h> 						//fabs()
@@ -33,7 +46,458 @@
 #define MAX(aa,bb)   ( (aa)>(bb)?(aa):(bb) )
 #define MIN(aa,bb)   ( (aa)<(bb)?(aa):(bb) )
 
+/*	02/18/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+geBoolean GENESISCC geBody_GetMaterialByName(const geBody *B, const char *FindMaterialName, int *MaterialIndex,
+										const char **MaterialName,
+										geBitmap **Bitmap, geFloat *Red, geFloat *Green, geFloat *Blue);
 
+/*	02/17/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+geBoolean GENESISCC geBody_CreateBumpmapByNameDot3(const geBody *B, const char *BumpmapName)
+{ 
+ int MaterialIndex = 0;
+ const char *MaterialName = NULL;
+ geBitmap *BaseBmp        = NULL;
+ geBitmap *BumpBmp        = NULL;
+ geBitmap *SpecularBmp    = NULL;
+ geFloat Red   = 0.0f;
+ geFloat Green = 0.0f;
+ geFloat Blue  = 0.0f;
+ char FindMaterialName[1024];
+ geBoolean BumpmapCreated = GE_FALSE;
+
+ do
+ {
+  if(!B) break;
+  if(!BumpmapName) break;
+  if(!geBitmap_IsBumpmapNameDot3(BumpmapName)) break;
+ 
+  strcpy(FindMaterialName,BumpmapName);
+
+  if(!geBody_GetMaterialByName(B, &FindMaterialName[0], &MaterialIndex, &MaterialName, &BaseBmp, &Red, &Green, &Blue)) break;
+
+  strcpy(FindMaterialName,BumpmapName);
+  memcpy(FindMaterialName,"BNB",3);
+
+  if(!geBody_GetMaterialByName(B, &FindMaterialName[0], &MaterialIndex, &MaterialName, &BumpBmp, &Red, &Green, &Blue)) break;
+
+  strcpy(FindMaterialName,BumpmapName);
+  memcpy(FindMaterialName,"BNS",3);
+
+  geBody_GetMaterialByName(B, &FindMaterialName[0], &MaterialIndex, &MaterialName, &SpecularBmp, &Red, &Green, &Blue);
+
+  BumpmapCreated = geBitmap_CreateBumpmapDot3 ( BaseBmp, BumpBmp, SpecularBmp );
+ }
+ while(GE_FALSE);
+
+ return BumpmapCreated;
+}
+
+/*	01/13/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+geBoolean GENESISCC geBody_CreateTangentSpace( const geBody *B )
+{
+ geBody_Index VertexCount = B->XSkinVertexCount; 
+
+ assert( B      != NULL );
+ assert( geBody_IsValid(B) != GE_FALSE );
+
+ if ( B->XSkinTangentSpace ) return GE_FALSE;
+
+ if ( !B->XSkinTangentSpace ) 
+ {
+  geBody_TangentSpace **tempTS;
+  tempTS = (geBody_TangentSpace **) &B->XSkinTangentSpace;  
+  *tempTS = GE_RAM_ALLOCATE_ARRAY ( geBody_TangentSpace, VertexCount );
+ }
+
+ if ( !B->XSkinTangentSpace ) return GE_FALSE;
+
+ {
+	geBody_Index FaceCount = B->SkinFaces[GE_BODY_HIGHEST_LOD].FaceCount; 
+	const geBody_Triangle     *SF = B->SkinFaces[GE_BODY_HIGHEST_LOD].FaceArray;
+	const geBody_XSkinVertex  *SV = B->XSkinVertexArray;
+	const geBody_Normal       *SN = B->SkinNormalArray;
+	
+	memset(B->XSkinTangentSpace,0,sizeof(geBody_TangentSpace) * VertexCount );
+
+	{
+		geBody_TangentSpace       *TS = B->XSkinTangentSpace;
+		geBody_Index i;
+		geBody_Index j;
+		geBody_Index k;
+
+#ifdef _DEBUG // changed QD bug fix
+		{
+			FILE *fp = fopen("c:\\cube.txt","at");
+
+			fprintf(fp,"Vertex List\n");  
+
+			for ( i= 0; i < VertexCount; i++ )  
+				fprintf(fp,"%i,  X = %f Y = %f Z= %f U = %f V = %f \n", i, SV[i].XPoint.X,SV[i].XPoint.Y,SV[i].XPoint.Z,SV[i].XU,SV[i].XV);  
+
+			fprintf(fp,"Normal List\n");  
+
+			for ( i= 0; i < B->SkinNormalCount; i++ )  
+				fprintf(fp,"%i,  X = %f Y = %f Z = %f\n", i, SN[i].Normal.X,SN[i].Normal.Y,SN[i].Normal.Z);  
+
+			for ( j = 0; j < FaceCount; j++ )
+				fprintf(fp,"%i,  V1 = %i V2 = %i V3 = %i N1 = %i N2 = %i N3 = %i\n",j, SF[j].VtxIndex[0],SF[j].VtxIndex[1],SF[j].VtxIndex[2],SF[j].NormalIndex[0],SF[j].NormalIndex[1],SF[j].NormalIndex[2]);
+
+			fclose(fp);
+		}
+#endif // end change 
+
+		for ( i= 0; i < VertexCount; i++ )  
+		{
+			geBoolean TangentSpaceCreated = GE_FALSE;
+
+			for ( j = 0; j < FaceCount; j++ )
+			{
+				for ( k = 0; k < 3; k++)
+				{
+					if ( i  != SF[j].VtxIndex[k] ) continue;
+
+//Compute tangent space for the vertex...
+
+					{
+						geBody_Index v1 = SF[j].VtxIndex[0];
+						geBody_Index v2 = SF[j].VtxIndex[1];
+						geBody_Index v3 = SF[j].VtxIndex[2];
+						const geBody_XSkinVertex *p1 = &SV[v1];
+						const geBody_XSkinVertex *p2 = &SV[v2];
+						const geBody_XSkinVertex *p3 = &SV[v3];
+						geFloat p1U = (geFloat) fabs(p1->XU) + 10.0f;
+						geFloat p1V = (geFloat) fabs(p1->XV) + 10.0f;
+						geFloat p2U = (geFloat) fabs(p2->XU) + 10.0f;
+						geFloat p2V = (geFloat) fabs(p2->XV) + 10.0f;
+						geFloat p3U = (geFloat) fabs(p3->XU) + 10.0f;
+						geFloat p3V = (geFloat) fabs(p3->XV) + 10.0f;
+						geBody_Index n1 = SF[j].NormalIndex[k];
+						const geBody_Normal *BodyNormal = &SN[n1];
+						const geVec3d *Normal = &BodyNormal->Normal;
+						geBody_Index vt = SF[j].VtxIndex[k];
+						geBody_TangentSpace *TSP1 = &TS[vt];
+						geVec3d AlignedVector;
+						geVec3d BaseVector1;
+						geVec3d BaseVector2;
+						geVec3d Tangent;
+						geVec3d Binormal;
+						geFloat UV[2];
+
+						geVec3d_Subtract(&p2->XPoint,&p1->XPoint,&BaseVector1);
+						geVec3d_Subtract(&p3->XPoint,&p1->XPoint,&BaseVector2);
+
+						if ( (p2U == p1U) || (p3U == p1U) )
+						{
+							if ( p2U == p1U )
+							{
+								UV[0] = ( p1V < p2V ) ?  1.0f : -1.0f;
+								UV[1] = 0.0f;
+							}
+							else if	( p3U == p1U )
+							{
+								UV[0] = 0.0f;
+								UV[1] = ( p1V < p3V ) ?  -1.0f : 1.0f;
+							}
+						}
+						else
+						{
+							UV[0] = -p1U/(p2U-p1U);
+							UV[1] = -p1U/(p3U-p1U);
+
+							if ( UV[0] * UV[1] < 0.0f )
+							{
+								UV[0] = -UV[0];
+								UV[1] = -UV[1];
+							}
+						}
+
+						geVec3d_Scale(&BaseVector2,UV[1],&BaseVector2);
+						geVec3d_Scale(&BaseVector1,UV[0],&BaseVector1);
+						geVec3d_Subtract(&BaseVector2,&BaseVector1,&AlignedVector);
+
+						geVec3d_CrossProduct(&AlignedVector,Normal,&Tangent);
+						geVec3d_CrossProduct(&Tangent,Normal,&Binormal);
+
+						if ( ( (p1U-p3U) * (p2V-p3V) ) > ( (p2U-p3U) *(p1V - p3V) ) )
+							geVec3d_Scale(&Binormal,-1.0f,&Binormal);
+
+						geVec3d_Normalize(&Tangent);
+						geVec3d_Normalize(&Binormal);
+
+						geVec3d_Set(&TSP1->T,Tangent.X,Tangent.Y,Tangent.Z);
+						geVec3d_Set(&TSP1->B,Binormal.X,Binormal.Y,Binormal.Z);
+						geVec3d_Set(&TSP1->N,Normal->X,Normal->Y,Normal->Z);
+
+						TangentSpaceCreated = GE_TRUE;
+					}
+
+//Compute tangent space for the vertex...
+
+					if ( TangentSpaceCreated ) break;
+				}
+
+				if ( TangentSpaceCreated ) break;
+			}
+
+		}
+	}
+ }
+
+ return GE_TRUE;
+} 
+
+/*	02/21/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+void GENESISCC geBody_DestroyTangentSpace( geBody *B )
+{
+ assert( B      != NULL );
+ assert( geBody_IsValid(B) != GE_FALSE );
+ 
+ if ( !B->XSkinTangentSpace ) return;
+
+ if ( B->XSkinTangentSpace ) geRam_Free (B->XSkinTangentSpace);
+}
+
+void GENESISCC geBody_SetVertexColorDot3( geVec3d LightPosition, const geXForm3d *Mdl2WldXFA, const geBody *B, int16 VertexIndex, geFloat *ColorDot3, int16 LightType, geBoolean *Reset )
+{
+	geBoolean NewLightPosition = GE_FALSE;
+	geBoolean NewMsLightPosition = GE_FALSE;
+	geBoolean NewMdl2Wld = GE_FALSE;
+	geBoolean NewV = GE_FALSE;
+	geBoolean NewTgt2Mdl = GE_FALSE;
+	geBoolean NewB = GE_FALSE;
+	geBoolean NewLT = GE_FALSE;
+    static geBody_Index BoneIndex;
+	static int16 OldVertexIndex;
+	static geVec3d Position;	
+	static geVec3d msLightPosition;
+	static geVec3d tsLightPosition;	
+	static geVec3d tempv;
+	static geVec3d v;
+    static geXForm3d Mdl2Wld;
+	static geXForm3d Mdl2Tgt;
+	static geXForm3d invWld2Mdl;
+	static const geBody *tempB;
+    const geBody_TangentSpace *Mdl2TgtTS;
+    const geBody_XSkinVertex *XVA;
+
+    if ( !B->XSkinTangentSpace ) return;
+
+    #define geDirectionalLightDot3 0
+    #define gePointLightDot3       1
+
+	if ( LightType < geDirectionalLightDot3 ) LightType = 0;
+	if ( LightType > gePointLightDot3)        LightType = 1;
+
+	Mdl2TgtTS = B->XSkinTangentSpace;
+
+    XVA = B->XSkinVertexArray;
+
+	NewB = ( B != tempB ) || *Reset;
+    
+	if ( NewB )
+	{
+	 BoneIndex = -1;	 
+	 OldVertexIndex = -1;
+	 geVec3d_Clear(&Position);
+	 geVec3d_Clear(&msLightPosition);
+	 geVec3d_Clear(&tsLightPosition);
+	 geVec3d_Clear(&tempv);
+	 geVec3d_Clear(&v);	
+	 geXForm3d_SetIdentity(&Mdl2Wld);
+	 geXForm3d_SetIdentity(&Mdl2Tgt);
+	 geXForm3d_SetIdentity(&invWld2Mdl);
+	 tempB = B;
+	}
+
+//1. Compute model space light vector
+
+//	a. Get light position
+    NewLightPosition = (!geVec3d_Compare(&Position,&LightPosition,0.05f));
+
+    if ( NewLightPosition ) 
+		geVec3d_Set(&Position,LightPosition.X, LightPosition.Y,LightPosition.Z);
+
+//	b. Compute model space
+	NewMdl2Wld = ( BoneIndex != XVA[VertexIndex].BoneIndex ) || NewB;
+	
+    if ( NewMdl2Wld  ) 
+	{
+		BoneIndex = XVA[VertexIndex].BoneIndex;
+		geXForm3d_Copy(&Mdl2WldXFA[BoneIndex],&Mdl2Wld);
+		geXForm3d_GetTranspose (&Mdl2Wld,&invWld2Mdl);
+    }
+
+	NewMsLightPosition = ( NewLightPosition || NewMdl2Wld );
+
+    if (NewMsLightPosition ) 
+	{
+		geXForm3d_Transform (&invWld2Mdl, &Position, &msLightPosition);
+	}
+
+//	c. multiply model space by the vertex
+//	NewV = ( !geVec3d_Compare(&tempv,&XVA[VertexIndex].XPoint,0.05f) );
+	NewV = ( OldVertexIndex != VertexIndex ) || NewMsLightPosition;
+
+	if ( NewV ) 
+	{
+	 OldVertexIndex = VertexIndex;
+	}
+
+	NewLT = NewV && ( LightType == gePointLightDot3 );
+
+	if ( NewLT ) 
+	{
+	 geVec3d_Set(&tempv,XVA[VertexIndex].XPoint.X, XVA[VertexIndex].XPoint.Y,XVA[VertexIndex].XPoint.Z);		
+	 geVec3d_Set(&v,tempv.X, tempv.Y,tempv.Z);
+//TODO: point light and directional light don't seem much different, but in powervr they are... hhmmm...
+	 geVec3d_Subtract(&msLightPosition,&v,&msLightPosition);
+	}
+
+	NewTgt2Mdl = ( NewV );
+
+	if ( NewTgt2Mdl )
+	{
+	 Mdl2Tgt.AX = Mdl2TgtTS[VertexIndex].T.X;
+	 Mdl2Tgt.AY = Mdl2TgtTS[VertexIndex].T.Y;
+	 Mdl2Tgt.AZ = Mdl2TgtTS[VertexIndex].T.Z;
+
+     Mdl2Tgt.BX = Mdl2TgtTS[VertexIndex].B.X;
+	 Mdl2Tgt.BY = Mdl2TgtTS[VertexIndex].B.Y;
+	 Mdl2Tgt.BZ = Mdl2TgtTS[VertexIndex].B.Z;
+
+     Mdl2Tgt.CX = Mdl2TgtTS[VertexIndex].N.X;
+	 Mdl2Tgt.CY = Mdl2TgtTS[VertexIndex].N.Y;
+	 Mdl2Tgt.CZ = Mdl2TgtTS[VertexIndex].N.Z;
+	}
+
+//2. Compute tangent space light vector
+	if ( NewTgt2Mdl || NewMsLightPosition)
+	{
+		geVec3d_Normalize(&msLightPosition);
+		geXForm3d_RotateNoOrthogonal (&Mdl2Tgt, &msLightPosition, &tsLightPosition);
+	}
+
+//3. Convert light vector to color
+	ColorDot3[0] = tsLightPosition.X * 127.5f + 127.5f;
+	ColorDot3[1] = tsLightPosition.Y * 127.5f + 127.5f;
+	ColorDot3[2] = tsLightPosition.Z * 127.5f + 127.5f;
+	ColorDot3[3] = 0;
+
+	*Reset = GE_FALSE;
+}
+
+/* 04/08/2003 Wendell Buckner
+    BUMPMAPPING */
+
+//****************************************************************************************
+
+geBoolean GENESISCC geBody_GetMaterialByName(const geBody *B, const char *FindMaterialName, int *MaterialIndex,
+										const char **MaterialName,
+										geBitmap **Bitmap, geFloat *Red, geFloat *Green, geFloat *Blue)
+{
+	geBoolean MaterialNameFound = GE_FALSE;
+
+	assert( B      != NULL );
+	assert( geBody_IsValid(B) != GE_FALSE );
+	assert( Red    != NULL );
+	assert( Green  != NULL );
+	assert( Blue   != NULL );
+	assert( Bitmap != NULL );
+	assert( MaterialIndex >= 0 );
+	assert( *MaterialIndex < B->MaterialCount );
+	assert( MaterialName != NULL );
+
+    for(*MaterialIndex=0; *MaterialIndex < B->MaterialCount; (*MaterialIndex)++)
+	{     
+	 *MaterialName = geStrBlock_GetString(B->MaterialNames,*MaterialIndex);
+     if(memcmp(*MaterialName,FindMaterialName,strlen(FindMaterialName)) == 0)
+	 {
+	  geBody_Material *M = &(B->MaterialArray[*MaterialIndex]);
+	  *Bitmap = M->Bitmap;
+	  *Red    = M->Red;
+	  *Green  = M->Green;
+	  *Blue   = M->Blue;
+	  MaterialNameFound = GE_TRUE;
+	  break;
+	 }
+    }
+
+	return MaterialNameFound;
+}
+
+geBitmap * GENESISCC geBody_CreateBumpmapByName(const geBody *B, const char *BumpmapName, gePixelFormat BumpFormat)
+{ 
+ int MaterialIndex = 0;
+ const char *MaterialName = NULL;
+ geBitmap *BaseBmp        = NULL;
+ geBitmap *BumpBmp        = NULL;
+ geBitmap *SpecularBmp    = NULL;
+ geFloat Red   = 0.0f;
+ geFloat Green = 0.0f;
+ geFloat Blue  = 0.0f;
+ char FindMaterialName[1024];
+ geBitmap * BumpmapCreated = NULL;
+
+ do
+ {
+  if(!B) break;
+  if(!BumpmapName) break;
+  if(!geBitmap_IsBumpmapName(BumpmapName)) break;
+ 
+  strcpy(FindMaterialName,BumpmapName);
+
+  if(!geBody_GetMaterialByName(B, &FindMaterialName[0], &MaterialIndex, &MaterialName, &BaseBmp, &Red, &Green, &Blue)) break;
+
+  strcpy(FindMaterialName,BumpmapName);
+  memcpy(FindMaterialName,"BMB",3);
+
+  if(!geBody_GetMaterialByName(B, &FindMaterialName[0], &MaterialIndex, &MaterialName, &BumpBmp, &Red, &Green, &Blue)) break;
+
+  strcpy(FindMaterialName,BumpmapName);
+  memcpy(FindMaterialName,"BMS",3);
+
+  geBody_GetMaterialByName(B, &FindMaterialName[0], &MaterialIndex, &MaterialName, &SpecularBmp, &Red, &Green, &Blue);
+
+  BumpmapCreated = geBitmap_CreateBumpmap ( BaseBmp, BumpBmp, SpecularBmp, BumpFormat );
+ }
+ while(GE_FALSE);
+
+ return BumpmapCreated;
+}
+
+geBitmap * GENESISCC geBody_GetBumpMapAltByName(const geBody *B, const char *BumpmapName)
+{ 
+ int MaterialIndex = 0;
+ const char *MaterialName = NULL;
+ geBitmap *BaseBmp        = NULL;
+ geBitmap *BumpBmpAlt     = NULL;
+ geFloat Red   = 0.0f;
+ geFloat Green = 0.0f;
+ geFloat Blue  = 0.0f;
+ char FindMaterialName[1024];
+
+ do
+ {
+  if(!B) break;
+  if(!BumpmapName) break;
+  if(!geBitmap_IsBumpmapName(BumpmapName)) break;
+ 
+  strcpy(FindMaterialName,BumpmapName);
+
+  if(!geBody_GetMaterialByName(B, &FindMaterialName[0], &MaterialIndex, &MaterialName, &BaseBmp, &Red, &Green, &Blue)) break;
+
+  BumpBmpAlt = geBitmap_GetBumpMapAlt ( BaseBmp );
+ }
+ while(GE_FALSE);
+
+ return BumpBmpAlt;
+}
+
+//****************************************************************************************
 
 
 #if defined(DEBUG) || !defined(NDEBUG)
@@ -160,6 +624,11 @@ static geBody *GENESISCC geBody_CreateNull(void)
 
 	geVec3d_Set(&(B->BoundingBoxMin),0.0f,0.0f,0.0f);
 	geVec3d_Set(&(B->BoundingBoxMax),0.0f,0.0f,0.0f);
+
+/*	01/13/2004 Wendell Buckner                                                          */ 
+/*   DOT3 BUMPMAPPING                                                                   */
+    B->XSkinTangentSpace = NULL;
+
 	return B;
 }
 

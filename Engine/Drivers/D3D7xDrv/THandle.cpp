@@ -4,7 +4,13 @@
 /*  Author: John Pollard                                                                */
 /*  Description: THandle manager for D3DDrv                                             */
 /*                                                                                      */
-/*  Edit History:                                                                       */
+/*  Edit History:                                                                       */ 
+/*  10/15/2003 Wendell Buckner                                                          */
+/*   Bumpmapping for the World                                                          */
+/*  05/19/2003 Wendell Buckner                                                          */  
+/*   BUMPMAPPING                                                                        */
+/*  03/25/2003 Wendell Buckner                                                          */
+/*   BUMPMAPPING                                                                        */
 /*  12/28/2002 Wendell Buckner                                                          */
 /*    Allow/make 32-bit (ARGB) mode the default mode...                                 */
 /*  12/28/2002 Wendell Buckner                                                          */
@@ -25,8 +31,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <Windows.h>
@@ -63,6 +69,10 @@
 
 #define TSTAGE_0			0
 #define TSTAGE_1			1
+
+/* 10/15/2003 Wendell Buckner
+    Bumpmapping for the World */
+#define TSTAGE_2			2
 
 //============================================================================================
 //============================================================================================
@@ -471,6 +481,48 @@ geBoolean SetupCurrent3dDesc(gePixelFormat PixelFormat)
 			break;
 		}
 
+/* 03/25/2003 Wendell Buckner
+    BUMPMAPPING */
+
+        case GE_PIXELFORMAT_16BIT_88_UV:
+		{
+			memcpy(&CurrentSurfDesc, &AppInfo.ddBumpMapNoLuminance, sizeof(DDSURFACEDESC2));
+
+			if ( CurrentSurfDesc.ddpfPixelFormat.dwBumpBitCount != 16 )
+			{
+             D3DMain_Log("SetupCurrent3dDesc:  Invalid pixel format (BUMPMAP 88) (%i).\n",PixelFormat);
+			 return FALSE;
+			}
+
+			break;
+		}
+
+        case GE_PIXELFORMAT_16BIT_556_UVL:
+		{
+			memcpy(&CurrentSurfDesc, &AppInfo.ddBumpMapSixBitLuminance, sizeof(DDSURFACEDESC2));
+
+			if ( CurrentSurfDesc.ddpfPixelFormat.dwBumpBitCount != 16 )
+			{
+             D3DMain_Log("SetupCurrent3dDesc:  Invalid pixel format (BUMPMAP 556) (%i).\n",PixelFormat);
+			 return FALSE;
+			}
+
+			break;
+		}
+
+        case GE_PIXELFORMAT_24BIT_888_UVL:
+		{
+			memcpy(&CurrentSurfDesc, &AppInfo.ddBumpMapEightBitLuminance, sizeof(DDSURFACEDESC2));
+
+			if ( CurrentSurfDesc.ddpfPixelFormat.dwBumpBitCount != 16 )
+			{
+             D3DMain_Log("SetupCurrent3dDesc:  Invalid pixel format (BUMPMAP 888) (%i).\n",PixelFormat);
+			 return FALSE;
+			}
+
+			break;
+		}
+
 		default:
 		{
 			D3DMain_Log("SetupCurrent3dDesc:  Invalid pixel format (%i).\n",PixelFormat);
@@ -742,6 +794,8 @@ geBoolean THandle_CreateSurfaces(THandle_MipData *Surf, int32 Width, int32 Heigh
 		return FALSE;
 	}
 
+//	Hr = Surface->GetSurfaceDesc( &ddsd );
+
 	Surf->Surface = Surface;
 	
 /* 02/25/2001 Wendell Buckner
@@ -899,12 +953,12 @@ geBoolean THandle_CheckCache(void)
 		MaxTable2[7] = 256;			//128x128
 		MaxTable2[8] = 256;			//256x256
 
-        MaxTable1[9]  = 64;			//  512x512
-		MaxTable1[10] = 64;			// 1024x1024
-		MaxTable1[11] = 64;			// 2048x2048
-		MaxTable1[12] = 64;			// 4096x4096
-        MaxTable1[13] = 64;			// 8192x8192
-        MaxTable1[14] = 64;			//16384x16384
+        MaxTable2[9]  = 64;			//  512x512
+		MaxTable2[10] = 64;			// 1024x1024
+		MaxTable2[11] = 64;			// 2048x2048
+		MaxTable2[12] = 64;			// 4096x4096
+        MaxTable2[13] = 64;			// 8192x8192
+        MaxTable2[14] = 64;			//16384x16384
 	}
 #endif
 
@@ -952,4 +1006,66 @@ geBoolean THandle_CheckCache(void)
 	CacheNeedsUpdate = GE_FALSE;
 
 	return GE_TRUE;
+}
+
+/* 05/19/2003 Wendell Buckner 
+    BUMPMAPPING */
+geBoolean DRIVERCC THandle_Combine ( geRDriver_THandle **THandle, int32 THandleCount)
+{
+ geRDriver_THandle *DriverHandle = NULL;
+ geRDriver_THandle *DriverHandleLink = NULL;
+ int32 DriverHandleIndex = 0;
+ geBoolean THandleCombined = GE_FALSE;
+
+ do
+ {
+  if ( THandleCount < 2 ) break;
+  if ( !THandle ) break;
+
+  for( ; DriverHandleIndex < THandleCount; DriverHandleIndex++ )
+  {
+   DriverHandle = THandle[DriverHandleIndex];
+   if ( !DriverHandle ) break;
+
+   if(DriverHandleIndex < 2)
+    DriverHandleLink = THandle[DriverHandleIndex+1];
+   else
+    DriverHandleLink = NULL;
+   
+   DriverHandle->NextTHandle = DriverHandleLink;
+  }
+
+  THandleCombined = GE_TRUE;
+
+ }while(GE_FALSE);
+
+ return THandleCombined;
+}
+
+/* 05/19/2003 Wendell Buckner 
+    BUMPMAPPING */
+geBoolean DRIVERCC THandle_UnCombine ( geRDriver_THandle **THandle, int32 THandleCount)
+{
+ geRDriver_THandle *DriverHandle = NULL;
+ int32 DriverHandleIndex = 0;
+ geBoolean THandleUnCombined = GE_FALSE;
+
+ do
+ {
+  if ( THandleCount < 2 ) break;
+  if ( !THandle ) break;
+  
+  for( ; DriverHandleIndex < THandleCount; DriverHandleIndex++ )
+  {
+   DriverHandle = THandle[DriverHandleIndex];
+   if ( !DriverHandle ) break;
+
+   DriverHandle->NextTHandle = NULL;
+  }
+
+  THandleUnCombined = GE_TRUE;
+
+ }while(GE_FALSE);
+
+ return THandleUnCombined;
 }

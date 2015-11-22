@@ -88,6 +88,10 @@ GENESISAPI geBoolean geEngine_SetDriverAndMode(	geEngine *Engine,
 												geDriver *Driver, 
 												geDriver_Mode *DriverMode);
 
+GENESISAPI geBoolean geEngine_SetDriverAndModeNoSplash(	geEngine *Engine, 
+												geDriver *Driver, 
+												geDriver_Mode *DriverMode);
+
 //-------- drawing with the engine (Decals & Misc Polys)
 
 GENESISAPI geBoolean GENESISCC geEngine_DrawBitmap(const geEngine *Engine,
@@ -111,6 +115,14 @@ GENESISAPI void GENESISCC geEngine_RenderPoly(const geEngine *Engine, const GE_T
 GENESISAPI void GENESISCC geEngine_RenderPolyArray(const geEngine *Engine, const GE_TLVertex ** pPoints, int * pNumPoints, int NumPolys, 
 								const geBitmap *Texture, uint32 Flags);
 
+// changed QD Shadows
+GENESISAPI geBoolean geEngine_SetStencilShadowsEnable(geEngine *Engine, geBoolean Enable, int NumLights, geFloat r, geFloat g, geFloat b, geFloat a);
+
+GENESISAPI void GENESISCC geEngine_RenderPolyStencil(const geEngine *Engine, const geVec3d *Points, 
+						int NumPoints, uint32 Flags);
+
+GENESISAPI void GENESISCC geEngine_DrawShadowPoly(geEngine *Engine, GE_RGBA ShadowColor);
+// end change
 //-------- temporary pre-geBitmap hacks
 geBoolean Engine_UploadBitmap(geEngine *Engine, DRV_Bitmap *Bitmap, DRV_Bitmap *ABitmap, geFloat Gamma);
 geBoolean Engine_SetupPixelFormats(geEngine *Engine);

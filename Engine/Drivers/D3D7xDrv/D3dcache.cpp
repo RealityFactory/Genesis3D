@@ -4,11 +4,16 @@
 /*  Author: John Pollard                                                                */
 /*  Description: D3D cache manager                                                      */
 /*                                                                                      */
-/*  02/25/2001 Wendell Buckner
-/*   This texture pointer is no longer valid under directx 7.  Set it to TRUE so there is
-/*   something there when  the code does assert checks.
-/*  07/16/2000 Wendell Buckner
-/*   Convert to Directx7...    
+/*  Edit History:                                                                       */
+/*  12/27/2003 Wendell Buckner                                                          */ 
+/*   CONFIG DRIVER - Make the driver configurable by "ini" file settings                */
+/*  12/23/2003 Wendell Buckner                                                          */ 
+/*   COMPRESSED TEXTURES - Select the best compressed texture format...                 */
+/*  02/25/2001 Wendell Buckner                                                          */
+/*   This texture pointer is no longer valid under directx 7.  Set it to TRUE so there  */
+/*   is  something there when  the code does assert checks.                             */
+/*  07/16/2000 Wendell Buckner                                                          */
+/*   Convert to Directx7...                                                             */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -21,8 +26,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <Windows.h>
@@ -37,6 +42,10 @@
 // Texutres may vary from width/height/num miplevels/etc...
 // Cache types is just a way to combine them to similar types...
 #define	D3DCACHE_MAX_CACHE_TYPES		128		
+
+/* 12/27/2003 Wendell Buckner
+   CONFIG DRIVER - Make the driver configurable by "ini" file settings */
+extern int CompressTextures;
 
 //========================================================================================================
 //========================================================================================================
@@ -591,6 +600,11 @@ geBoolean D3DCache_SlotIsValid(D3DCache_Slot *Slot)
 //	Returns 0 on out of memory
 //	Returns 1 on success
 //=====================================================================================
+
+/* 12/23/2003 Wendell Buckner
+    COMPRESSED TEXTURES - Select the best compressed texture format... */
+#include <d3d_main.h>
+
 int32 D3DCache_SetupSlot(D3DCache *Cache, D3DCache_Slot *Slot, int32 Width, int32 Height, const DDSURFACEDESC2 *SurfDesc, geBoolean UseStage, int32 Stage)
 {
 /* 07/16/2000 Wendell Buckner
@@ -604,8 +618,9 @@ int32 D3DCache_SetupSlot(D3DCache *Cache, D3DCache_Slot *Slot, int32 Width, int3
 	assert(D3DCache_IsValid(Cache));
 	assert(D3DCache_SlotIsValid(Slot));
 
-	memcpy(&ddsd, SurfDesc, sizeof(DDSURFACEDESC2));
+    memcpy(&ddsd, SurfDesc, sizeof(DDSURFACEDESC2));
 
+    
 	ddsd.dwSize = sizeof(DDSURFACEDESC2);
 	ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
 
@@ -620,7 +635,66 @@ int32 D3DCache_SetupSlot(D3DCache *Cache, D3DCache_Slot *Slot, int32 Width, int3
 	ddsd.dwWidth = Height;
 	
 	ddsd.dwTextureStage = Stage;
-	
+
+/* 12/23/2003 Wendell Buckner
+    COMPRESSED TEXTURES - Select the best compressed texture format... */
+
+//***************************************
+
+    do
+	{
+     DWORD dwOldFourCC = ddsd.ddpfPixelFormat.dwFourCC;
+     DWORD dwOldFlags  = ddsd.ddpfPixelFormat.dwFlags;
+     DWORD dwOldHeight = ddsd.dwHeight;
+     DWORD dwOldWidth  = ddsd.dwWidth;
+     long NoAlpha = !(ddsd.ddpfPixelFormat.dwFlags & DDPF_ALPHAPIXELS);
+
+	 if (!CompressTextures) break;
+
+	 if( ddsd.ddpfPixelFormat.dwFlags & DDPF_BUMPDUDV ) break;
+
+//d3d requries divisible by 4
+	 if ( ddsd.dwWidth % 4) 
+	 {
+	  ddsd.dwWidth /= 4;
+      ddsd.dwWidth++;
+	  ddsd.dwWidth *= 4;
+     }
+
+	 if ( ddsd.dwHeight % 4) 
+	 {
+	  ddsd.dwHeight /= 4;
+      ddsd.dwHeight++;
+	  ddsd.dwHeight *= 4;
+     }
+
+	 ddsd.ddpfPixelFormat.dwFlags &= ~DDPF_RGB;
+	 ddsd.ddpfPixelFormat.dwFlags &= ~DDPF_ALPHAPIXELS;
+     ddsd.ddpfPixelFormat.dwFlags |=  DDPF_FOURCC;
+	 
+     ddsd.ddpfPixelFormat.dwFourCC = AppInfo.ddCompressedOneBitAlphaSurfFormat.ddpfPixelFormat.dwFourCC;
+
+     if( ((ddsd.ddpfPixelFormat.dwRGBAlphaBitMask == 0x8000) || NoAlpha) && (ddsd.ddpfPixelFormat.dwFourCC) ) break;
+
+     if (AppInfo.ddCompressedFourBitAlphaSurfFormat.ddpfPixelFormat.dwFourCC ) ddsd.ddpfPixelFormat.dwFourCC = AppInfo.ddCompressedFourBitAlphaSurfFormat.ddpfPixelFormat.dwFourCC;
+
+
+	 if ( ((ddsd.ddpfPixelFormat.dwRGBAlphaBitMask == 0x8000) || NoAlpha) && (ddsd.ddpfPixelFormat.dwFourCC) ) break;
+     if ( ((ddsd.ddpfPixelFormat.dwRGBAlphaBitMask == 0xf000) || NoAlpha) && (ddsd.ddpfPixelFormat.dwFourCC) ) break;
+    
+     if ( AppInfo.ddCompressedEightBitAlphaSurfFormat.ddpfPixelFormat.dwFourCC ) ddsd.ddpfPixelFormat.dwFourCC = AppInfo.ddCompressedEightBitAlphaSurfFormat.ddpfPixelFormat.dwFourCC;
+
+     if (ddsd.ddpfPixelFormat.dwFourCC) break; 
+
+	 ddsd.ddpfPixelFormat.dwFourCC = dwOldFourCC;
+     ddsd.ddpfPixelFormat.dwFlags = dwOldFlags;
+	 ddsd.dwHeight = dwOldHeight;
+     ddsd.dwWidth = dwOldWidth;
+	}
+	while(FALSE);
+
+//***************************************
+
 	Hr = Cache->lpDD->CreateSurface(&ddsd, &Surface, NULL);
 
 	if(Hr != DD_OK) 

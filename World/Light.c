@@ -98,7 +98,11 @@ static BOOL CombineDLightWithRGBMap(int32 *LightData, Light_DLight *Light, GFX_F
 static BOOL CombineDLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo);
 static void BuildLightLUTS(geEngine *Engine);
 static void SetupDynamicLight_r(Light_DLight *pLight, geVec3d *Pos, int32 LNum, int32 Node);
+// added QuestOfDreams DSpotLight 
+static BOOL CombineDSpotLightWithRGBMap(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo);
 
+static BOOL CombineDSpotLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo);
+// end change QuestOfDreams
 static void AddLightType0(int32 *LightDest, uint8 *LightData, int32 lw, int32 lh);
 static void AddLightType(int32 *LightDest, uint8 *LightData, int32 lw, int32 lh, int32 Intensity);
 static void AddLightType1(int32 *LightDest, uint8 *LightData, int32 lw, int32 lh, int32 Intensity);
@@ -859,16 +863,34 @@ void Light_SetupLightmap(DRV_LInfo *LInfo, BOOL *Dynamic)
 
 			CEngine->DebugInfo.NumDLights++;
 
-			if (DLights->CastShadow)
+			// changed QuestOfDreams DSpotLight 
+			if(DLights->Spot == GE_FALSE)
 			{
-				if (CombineDLightWithRGBMapWithShadow(TempRGB32, DLights, Face, SInfo))
-					IsDyn = GE_TRUE;
+				if (DLights->CastShadow)
+				{
+					if (CombineDLightWithRGBMapWithShadow(TempRGB32, DLights, Face, SInfo))
+						IsDyn = GE_TRUE;
+				}
+				else
+				{
+					if (CombineDLightWithRGBMap(TempRGB32, DLights, Face, SInfo))
+						IsDyn = GE_TRUE;
+				}
 			}
 			else
 			{
-				if (CombineDLightWithRGBMap(TempRGB32, DLights, Face, SInfo))
-					IsDyn = GE_TRUE;
+				if (DLights->CastShadow)
+				{
+					if (CombineDSpotLightWithRGBMapWithShadow(TempRGB32, DLights, Face, SInfo))
+						IsDyn = GE_TRUE;
+				}
+				else
+				{
+					if (CombineDSpotLightWithRGBMap(TempRGB32, DLights, Face, SInfo))
+						IsDyn = GE_TRUE;
+				}
 			}
+			// end change QuestOfDreams
 		}
 	}
 
@@ -1251,6 +1273,192 @@ static BOOL CombineDLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Li
 	return Hit;
 }
 
+// added QuestOfDreams DSpotLight
+//=====================================================================================
+//	CombineDSpotLightWithRGBMap
+//=====================================================================================
+static BOOL CombineDSpotLightWithRGBMap(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo)
+{
+	BOOL		Hit;
+	geFloat		Angle, Angle2, Dist, Radius, Val;
+	GFX_Plane	*Plane;
+	geVec3d		LPos, PNormal, Vect, Start, Right, Down, LMapPos;
+	int32		u, v;
+	int32		ColorR, ColorG, ColorB;
+
+
+	assert(BSPData != NULL);
+	assert(BSPData->GFXPlanes != NULL);
+
+	Hit = FALSE;
+
+	Radius = Light->Radius;
+
+	Plane = &BSPData->GFXPlanes[Face->PlaneNum];
+
+	geVec3d_Copy(&Light->Pos, &LPos);
+	geVec3d_Copy(&Plane->Normal, &PNormal);
+	if(Face->PlaneSide)
+	{
+		geVec3d_Inverse(&PNormal);
+	}
+
+	ColorR = Light->FColorR; 
+	ColorG = Light->FColorG; 
+	ColorB = Light->FColorB; 
+
+	LMapPos = Start = SInfo->TexOrg;
+	Right = SInfo->T2WVecs[0];
+	Down = SInfo->T2WVecs[1];
+	
+	for (v=0; v< SInfo->LInfo.Height; v++)
+	{
+		
+		for (u=0; u< SInfo->LInfo.Width; u++)
+		{
+			geVec3d_Subtract(&Light->Pos, &LMapPos, &Vect);
+			Dist = geVec3d_Normalize(&Vect); 
+			Angle = geVec3d_DotProduct(&Vect, &PNormal);
+
+			if(Angle < 0.001f|| Dist>Radius)
+			{
+				LightData+=3;
+			}
+			else
+			{
+				Angle2 = -geVec3d_DotProduct(&Vect, &Light->Normal);
+				
+				if(Angle2<Light->Angle)
+				{
+					LightData+=3;
+				}
+				else
+				{
+					Hit = TRUE;
+				
+					// get a nice falloff ...
+					Val = (Angle2-Light->Angle)/(1.001f-Light->Angle);
+					// softer
+					if(Light->Style==1)
+						Val *= Val;
+					// harder
+					else if(Light->Style==2)
+						Val = (geFloat)FastSqrt(Val);
+
+					Val *= (Radius-Dist);
+
+					*LightData++ += (int32)(Val * ColorR);
+					*LightData++ += (int32)(Val * ColorG);
+					*LightData++ += (int32)(Val * ColorB);
+			
+				}
+			}
+
+			geVec3d_Add(&LMapPos, &Right, &LMapPos);
+		}
+
+		geVec3d_Add(&Start, &Down, &Start);
+		LMapPos = Start;
+	}
+
+	return Hit;
+}
+
+//=====================================================================================
+//	CombineDSpotLightWithRGBMapWithShadow
+//=====================================================================================
+static BOOL CombineDSpotLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo)
+{
+	BOOL		Hit;
+	geFloat		Angle, Angle2, Dist, Radius, Val;
+	GFX_Plane	*Plane;
+	geVec3d		LPos, PNormal, Vect, Start, Right, Down, LMapPos;
+	int32		u, v;
+	int32		ColorR, ColorG, ColorB;
+
+	assert(BSPData != NULL);
+	assert(BSPData->GFXPlanes != NULL);
+
+	Hit = FALSE;
+
+	Radius = Light->Radius;
+	Plane = &BSPData->GFXPlanes[Face->PlaneNum];
+
+	geVec3d_Copy(&Light->Pos, &LPos);
+	geVec3d_Copy(&Plane->Normal, &PNormal);
+
+	if(Face->PlaneSide)
+	{
+		geVec3d_Inverse(&PNormal);
+	}
+
+	ColorR = Light->FColorR; 
+	ColorG = Light->FColorG; 
+	ColorB = Light->FColorB; 
+
+	LMapPos = Start = SInfo->TexOrg;
+	Right = SInfo->T2WVecs[0];
+	Down = SInfo->T2WVecs[1];
+
+	// cast shadow
+	Trace_SetupIntersect(CWorld);
+	
+	for (v=0; v< SInfo->LInfo.Height; v++)
+	{
+		
+		for (u=0; u< SInfo->LInfo.Width; u++)
+		{
+			geVec3d_Subtract(&Light->Pos, &LMapPos, &Vect);
+			Dist = geVec3d_Normalize(&Vect); 
+			Angle = geVec3d_DotProduct(&Vect, &PNormal);
+
+			if(Angle < 0.001f || Dist>Radius)
+			{
+				LightData+=3;
+			}
+			else
+			{
+				Angle2 = -geVec3d_DotProduct(&Vect, &Light->Normal);
+				if(Angle2<Light->Angle)
+				{
+					LightData+=3;
+				}
+				// cast shadow
+				else if (Trace_IntersectWorldBSP(&Light->Pos, &LMapPos, 0))
+				{
+					LightData+=3;
+				}
+				else
+				{
+					Hit = TRUE;
+				
+					// get a nice falloff ...
+					Val = (Angle2-Light->Angle)/(1.001f-Light->Angle);
+					// softer				
+					if(Light->Style==1)
+						Val *= Val;
+					// harder
+					else if(Light->Style==2)
+						Val = (geFloat)FastSqrt(Val);
+					
+					Val *= (Radius-Dist);
+			
+					*LightData++ += (int32)(Val * ColorR);
+					*LightData++ += (int32)(Val * ColorG);
+					*LightData++ += (int32)(Val * ColorB);
+				}
+			}
+			geVec3d_Add(&LMapPos, &Right, &LMapPos);
+		}
+
+		geVec3d_Add(&Start, &Down, &Start);
+		LMapPos = Start;
+	}
+
+	return Hit;
+}
+// end change QuestOfDreams 
+
 //=====================================================================================
 //	Light_SetupLights
 //	Post processes the lights render q so the world can use them while rendering
@@ -1438,9 +1646,62 @@ geBoolean Light_SetAttributes(	Light_DLight *Light,
 	Light->FColorB = (int32)((Light->Color.b/195.0f) * (1<<LIGHT_FRACT));
 
 	Light->CastShadow = CastShadow;
-
+// changed QuestOfDreams DSpotLight 
+	Light->Spot = GE_FALSE;
+	// end change QuestOfDreams
 	return GE_TRUE;
 }
+
+// added QuestOfDreams DSpotLight
+
+//=====================================================================================
+//	Light_SetSpotAttributes
+//=====================================================================================
+geBoolean Light_SetSpotAttributes(	Light_DLight *Light, 
+								const geVec3d *Pos, 
+								const GE_RGBA *RGBA, 
+								geFloat Radius,
+								geFloat Arc,
+								const geVec3d *Angles, 
+								int Style,
+								geBoolean CastShadow)
+{
+	geVec3d				Angles2;
+	geXForm3d			XForm;
+	
+	assert(Light != NULL);
+	
+	Light->Pos = *Pos;
+	Light->Color = *RGBA;
+	Light->Radius = Radius;
+	Light->Style = Style;
+	Light->Angle = (float)cos((Arc/360.0f)*GE_PI); // we only need half the angle seen in the editor for our calculations
+
+
+	Angles2.X = (Angles->X / 180.0f) * GE_PI;
+	Angles2.Y = (Angles->Y / 180.0f) * GE_PI;
+	Angles2.Z = (Angles->Z / 180.0f) * GE_PI;
+
+	geXForm3d_SetEulerAngles(&XForm, &Angles2);
+
+	geXForm3d_GetLeft(&XForm, &Angles2);
+	Light->Normal.X = -Angles2.X;
+	Light->Normal.Y = -Angles2.Y;
+	Light->Normal.Z = -Angles2.Z;
+	
+	// Pre-compute fixed point light colors
+	Light->FColorR = (int32)((Light->Color.r/195.0f)* (1<<LIGHT_FRACT));
+	Light->FColorG = (int32)((Light->Color.g/195.0f)* (1<<LIGHT_FRACT));
+	Light->FColorB = (int32)((Light->Color.b/195.0f)* (1<<LIGHT_FRACT));
+
+	Light->CastShadow = CastShadow;
+
+	Light->Spot = GE_TRUE;
+	
+	return GE_TRUE;
+}
+
+// end change QuestOfDreams
 
 //=====================================================================================
 //	Light_SetLTypeTable

@@ -4,6 +4,10 @@
 /*  Author:                                                                             */
 /*  Description: 3D transform interface                                                 */
 /*                                                                                      */
+/*  Edit History:                                                                       */
+/*	01/08/2004 Wendell Buckner                                                          */
+/*    DOT3 BUMPMAPPING                                                                  */
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -51,6 +55,12 @@ typedef struct
 
 #define GEXFORM3D_MINIMUM_SCALE (0.00001f)
 
+/*	01/08/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+GENESISAPI void GENESISCC geXForm3d_RotateNoOrthogonal(
+	const geXForm3d *M,
+	const geVec3d *V, 
+	geVec3d *Result);
 
 GENESISAPI void GENESISCC geXForm3d_Copy(
 	const geXForm3d *Src, 

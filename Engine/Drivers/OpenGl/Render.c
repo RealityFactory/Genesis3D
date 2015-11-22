@@ -386,6 +386,18 @@ geBoolean DRIVERCC Render_MiscTexturePoly(DRV_TLVertex *Pnts, int32 NumPoints,
 	return GE_TRUE;
 }
 
+// changed QD Shadows
+geBoolean DRIVERCC Render_StencilPoly(DRV_XYZVertex *Pnts, int32 NumPoints, uint32 Flags) 
+{
+	return GE_TRUE;
+}
+
+geBoolean DRIVERCC DrawShadowPoly(geFloat r, geFloat g, geFloat b, geFloat a)
+{
+	return GE_TRUE;
+}
+// end change
+
 
 // Render a 2D decal graphic...
 // Notes: unfortunately traditional thru-the-API framebuffer access for OpenGL is 
@@ -570,8 +582,9 @@ geBoolean DRIVERCC DrawDecal(geRDriver_THandle *THandle, RECT *SRect, int32 x, i
 	return GE_TRUE; 
 }
 
-
-geBoolean DRIVERCC BeginScene(geBoolean Clear, geBoolean ClearZ, RECT *WorldRect)
+// changed QD Shadows
+//geBoolean DRIVERCC BeginScene(geBoolean Clear, geBoolean ClearZ, RECT *WorldRect)
+geBoolean DRIVERCC BeginScene(geBoolean Clear, geBoolean ClearZ, geBoolean ClearStencil, RECT *WorldRect)
 {
 
 	if(Clear)
@@ -649,3 +662,15 @@ geBoolean DRIVERCC EndModels(void)
 
 	return TRUE;
 }
+
+// changed QD Shadows
+geBoolean DRIVERCC BeginShadowVolumes(void)
+{
+	return TRUE;
+}
+
+geBoolean DRIVERCC EndShadowVolumes(void)
+{
+	return TRUE;
+}
+// end change

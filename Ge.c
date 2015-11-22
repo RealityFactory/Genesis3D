@@ -300,6 +300,30 @@ GENESISAPI geBoolean geWorld_SetLTypeTable(geWorld *World, int32 LType, const ch
 	return Light_WorldSetLTypeTable(World, LType, Table);
 }
 
+// added QuestOfDreams DSpotLight
+//========================================================================================
+//	geWorld_SetSpotLightAttributes
+//========================================================================================
+GENESISAPI geBoolean geWorld_SetSpotLightAttributes(		geWorld *World,
+										geLight		*Light, 
+										const		geVec3d *Pos, 
+										const		GE_RGBA *RGBA, 
+										geFloat		Radius,
+										geFloat		Arc,
+										const		geVec3d *Angles,
+										int		Style,
+										geBoolean	CastShadow)
+{
+	assert(World != NULL);
+	assert(Light != NULL);
+	assert(Pos != NULL);
+	assert(RGBA != NULL);
+	assert(Angles != NULL);
+
+	return Light_SetSpotAttributes((Light_DLight*)Light, Pos, RGBA, Radius, Arc, Angles, Style, CastShadow);
+}
+// end change QuestOfDreams
+
 //========================================================================================
 // geWorld_TestModelMove
 //========================================================================================

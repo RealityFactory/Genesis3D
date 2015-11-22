@@ -608,6 +608,14 @@ __inline static void geSprite_UpdateLighting(geSprite *S, geWorld *World)
 				// if the sprite is inside the active dynamic light's radius, then add it to the array
 				if (geSpriteDynamicLights[DLCount].Distance < (DynamicLights[i].Radius * DynamicLights[i].Radius))
 				{
+					// changed QuestOfDreams DSpotLight
+					if(DynamicLights[i].Spot)
+					{
+						geFloat Angle = -geVec3d_DotProduct(&Normal, &DynamicLights[i].Normal);
+						if(Angle < DynamicLights[i].Angle)
+							continue;
+					}
+					// end change QuestOfDreams	
 					geSpriteDynamicLights[DLCount].Color.r = DynamicLights[i].Color.r;
 					geSpriteDynamicLights[DLCount].Color.g = DynamicLights[i].Color.g;
 					geSpriteDynamicLights[DLCount].Color.b = DynamicLights[i].Color.b;

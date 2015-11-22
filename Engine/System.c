@@ -3,6 +3,13 @@
 /*                                                                                      */
 /*  Author: John Pollard                                                                */
 /*  Description: Friend of engine.c.  Takes care of some of the driver work.            */
+/*  Edit History:                                                                       */
+/*  01/20/2004 Wendell Buckner                                                          */
+/*   LOGO CRASH BUG - On some machines with fast proccessors (2.0ghz or better,         */  
+/*   typically intel) the value return                                                  */
+/*   value return by Sys_GetCPUFreq is to large for the following variable make it a    */
+/*   large_integer                                                                      */
+/*   Fix provided by Latex and IronDragon from the genesis3d forum                      */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -15,10 +22,11 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
+
 #include <Assert.h>
 
 #include "BaseType.h"
@@ -266,6 +274,10 @@ geEngine *Sys_EngineCreate(HWND hWnd, const char *AppName, const char *DriverDir
 	//geEngine_SetFogEnable(NewEngine, GE_TRUE, 255.0f, 0.0f, 0.0f, 250.0f, 1000.0f);
 	geEngine_SetFogEnable(NewEngine, GE_FALSE, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 
+// changed QD Shadows
+	geEngine_SetStencilShadowsEnable(NewEngine, GE_FALSE, 0, 0.0f, 0.0f, 0.0f, 96.0f);
+// end change QD Shadows
+
 	return NewEngine;
 
 	// Error cleanup
@@ -335,7 +347,12 @@ geBoolean Sys_GetCPUFreq(Sys_CPUInfo *Info)
 		return GE_FALSE;
 	}
 
-	Info->Freq = Freq.LowPart;
+/* 01/20/2004 Wendell Buckner
+    LOGO CRASH BUG - On some machines with fast proccessors (2.0ghz or better, typically intel) the value return
+	by Sys_GetCPUFreq is to large for the following variable make it a large_integer
+	Fix provided by Latex and IronDragon from the genesis3d forum 
+	Info->Freq = Freq.LowPart; */
+    Info->Freq.QuadPart = Freq.LowPart;
 
 	return GE_TRUE;
 }

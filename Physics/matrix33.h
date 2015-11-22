@@ -31,17 +31,17 @@ typedef struct
 	geFloat x[3][3];
 }	Matrix33;
 
-void Matrix33_Copy(const Matrix33* m, Matrix33* c);
-void Matrix33_SetIdentity(Matrix33* m);
-void Matrix33_Add(const Matrix33* m1, const Matrix33* m2, Matrix33* res);
-void Matrix33_Subtract(const Matrix33* m1, const Matrix33* m2, Matrix33* res);
-void Matrix33_MultiplyVec3d(const Matrix33* m, const geVec3d* v, geVec3d* res);
-void Matrix33_Multiply(const Matrix33* m1, const Matrix33* m2, Matrix33* res);
-void Matrix33_MultiplyScalar(geFloat s, const Matrix33* m, Matrix33* res);
-void Matrix33_GetTranspose(const Matrix33* m, Matrix33* t);
-void Matrix33_GetInverse(const Matrix33* m, Matrix33* inv);
-void Matrix33_MakeCrossProductMatrix33(const geVec3d* v, Matrix33* m);
-void Matrix33_ExtractFromXForm3d(const geXForm3d* xform, Matrix33* m);
+GENESISAPI void Matrix33_Copy(const Matrix33* m, Matrix33* c);
+GENESISAPI void Matrix33_SetIdentity(Matrix33* m);
+GENESISAPI void Matrix33_Add(const Matrix33* m1, const Matrix33* m2, Matrix33* res);
+GENESISAPI void Matrix33_Subtract(const Matrix33* m1, const Matrix33* m2, Matrix33* res);
+GENESISAPI void Matrix33_MultiplyVec3d(const Matrix33* m, const geVec3d* v, geVec3d* res);
+GENESISAPI void Matrix33_Multiply(const Matrix33* m1, const Matrix33* m2, Matrix33* res);
+GENESISAPI void Matrix33_MultiplyScalar(geFloat s, const Matrix33* m, Matrix33* res);
+GENESISAPI void Matrix33_GetTranspose(const Matrix33* m, Matrix33* t);
+GENESISAPI void Matrix33_GetInverse(const Matrix33* m, Matrix33* inv);
+GENESISAPI void Matrix33_MakeCrossProductMatrix33(const geVec3d* v, Matrix33* m);
+GENESISAPI void Matrix33_ExtractFromXForm3d(const geXForm3d* xform, Matrix33* m);
 
 #ifdef __cplusplus
 }

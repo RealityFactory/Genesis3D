@@ -4,6 +4,10 @@
 /*  Author: Mike Sandige	                                                            */
 /*  Description: Actor body instance interface.		                                    */
 /*                                                                                      */
+/*  Edit History:                                                                       */
+/*	01/08/2004 Wendell Buckner                                                          */ 
+/*   DOT3 BUMPMAPPING                                                                   */
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -15,8 +19,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_BODYINST_H
@@ -119,6 +123,9 @@ const geBodyInst_Geometry *GENESISCC geBodyInst_GetGeometry(
 								int LevelOfDetail,
 								const geCamera *Camera);
 
+/*	01/08/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+void GENESISCC geBodyInst_SetVertexColorDot3( geVec3d LightPosition, const geXForm3d *Mdl2WldXFA, const geBodyInst *BI, int16 VertexIndex, geFloat *ColorDot3, int16 LightType, geBoolean *Reset );
 
 #ifdef __cplusplus
 }

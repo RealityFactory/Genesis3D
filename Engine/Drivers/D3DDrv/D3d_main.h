@@ -212,6 +212,7 @@ BOOL				D3DMain_RestoreAllSurfaces(void);
 
 BOOL				Main_EnumTextureFormats(void);
 BOOL				D3DMain_EnumDisplayModes(void);
+
 BOOL				Main_ClearBackBuffer(BOOL Clear, BOOL ClearZ);
 BOOL				Main_ShowBackBuffer(void);
 

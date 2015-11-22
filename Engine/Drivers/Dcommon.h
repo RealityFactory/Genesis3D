@@ -4,6 +4,22 @@
 /*  Author: John Pollard                                                                */
 /*  Description: Header file for all driver modules.                                    */
 /*                                                                                      */
+/* Edit History:                                                                        */ 
+/*  05/04/2004 Wendell Buckner                                                          */
+/*   TODO: CUBEMAPPING                                                                  */
+/*  02/21/2004 Wendell Buckner                                                          */
+/*   DOT3 BUMPMAPPING                                                                   */
+/*  02/17/2004 Wendell Buckner                                                          */
+/*   DOT3 BUMPMAPPING                                                                   */
+/*  01/01/2004 Wendell Buckner                                                          */
+/*   DOT3 BUMPMAPPING                                                                   */
+/*  05/19/2003 Wendell Buckner                                                          */
+/*   BUMPMAPPING                                                                        */
+/*  04/09/2003 Wendell Buckner                                                          */ 
+/*   BUMPMAPPING                                                                        */
+/*  04/07/2003 Wendell Buckner                                                          */
+/*   BUMPMAPPING                                                                        */
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -15,8 +31,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef DCOMMON_H
@@ -122,6 +138,21 @@ typedef struct geRDriver_THandle	geRDriver_THandle;
 #define RDRIVER_PF_CAN_DO_COLORKEY_SHIFT	(RDRIVER_PF_OPTIONAL_SHIFT + 1)		// Surface supports colorkeying
 #define RDRIVER_PF_COMBINE_LIGHTMAP_SHIFT	(RDRIVER_PF_OPTIONAL_SHIFT + 2)			// Supports being rendered with a lightmap (3d will be set as well)
 
+/* 04/07/2003 Wendell Buckner
+    BUMPMAPPING */
+#define RDRIVER_PF_BUMPMAP_SHIFT             (RDRIVER_PF_OPTIONAL_SHIFT + 3)
+#define RDRIVER_PF_COMBINE_BUMPMAP_SHIFT     (RDRIVER_PF_OPTIONAL_SHIFT + 4)
+
+/* 02/17/2004 Wendell Buckner
+    DOT3 BUMPMAPPING  */
+#define RDRIVER_PF_COMBINE_EMBMBUMPMAP_SHIFT   (RDRIVER_PF_OPTIONAL_SHIFT + 4)
+#define RDRIVER_PF_COMBINE_DOT3BUMPMAP_SHIFT   (RDRIVER_PF_OPTIONAL_SHIFT + 5)
+#define RDRIVER_PF_COMBINE_EMBOSSBUMPMAP_SHIFT (RDRIVER_PF_OPTIONAL_SHIFT + 6)
+
+/* 05/04/2004 Wendell Buckner
+    TODO: CUBEMAPPING 
+#define RDRIVER_PF_COMBINE_CUBEMAP_SHIFT       (RDRIVER_PF_OPTIONAL_SHIFT + 7) */
+
 #define RDRIVER_PF_2D					(1<<RDRIVER_PF_2D_SHIFT)				
 #define RDRIVER_PF_3D					(1<<RDRIVER_PF_3D_SHIFT)				
 #define RDRIVER_PF_LIGHTMAP				(1<<RDRIVER_PF_LIGHTMAP_SHIFT)			
@@ -131,6 +162,21 @@ typedef struct geRDriver_THandle	geRDriver_THandle;
 #define RDRIVER_PF_CAN_DO_COLORKEY		(1<<RDRIVER_PF_CAN_DO_COLORKEY_SHIFT)
 #define RDRIVER_PF_HAS_ALPHA			(1<<RDRIVER_PF_HAS_ALPHA_SHIFT)		
 #define RDRIVER_PF_MAJOR_MASK			((1<<RDRIVER_PF_OPTIONAL_SHIFT)-1)
+
+/* 04/07/2003 Wendell Buckner
+    BUMPMAPPING */
+#define RDRIVER_PF_BUMPMAP				(1<<RDRIVER_PF_BUMPMAP_SHIFT)
+#define RDRIVER_PF_COMBINE_BUMPMAP		(1<<RDRIVER_PF_COMBINE_BUMPMAP_SHIFT)
+
+/* 02/17/2004 Wendell Buckner
+    DOT3 BUMPMAPPING  */
+#define RDRIVER_PF_COMBINE_EMBMBUMPMAP	 (1<<RDRIVER_PF_COMBINE_BUMPMAP_SHIFT)
+#define RDRIVER_PF_COMBINE_DOT3BUMPMAP	 (1<<RDRIVER_PF_COMBINE_DOT3BUMPMAP_SHIFT)
+#define RDRIVER_PF_COMBINE_EMBOSSBUMPMAP (1<<RDRIVER_PF_COMBINE_EMBOSSBUMPMAP_SHIFT)
+
+/* 05/04/2004 Wendell Buckner
+    TODO: CUBEMAPPING 
+#define RDRIVER_PF_CUBEMAP		(1<<RDRIVER_PF_COMBINE_CUBEMAP_SHIFT)	*/
 
 typedef struct
 {
@@ -249,7 +295,21 @@ typedef struct
 #define DRV_RENDER_NO_ZMASK		(1<<2)	// No zbuffering should be performed
 #define DRV_RENDER_NO_ZWRITE	(1<<3)	// No z writing will be performed
 #define DRV_RENDER_CLAMP_UV		(1<<4)	// Clamp UV in both directions
-#define DRV_RENDER_POLY_NO_FOG	(1<<5)  // Don't render this poly with fog 
+#define DRV_RENDER_POLY_NO_FOG	(1<<5)	// Don't render fog render state
+
+/* 04/09/2003 Wendell Buckner
+    BUMPMAPPING  */
+#define DRV_RENDER_BUMPMAP (1<<6)
+
+/* 01/01/2004 Wendell Buckner
+    DOT3 BUMPMAPPING  */
+#define DRV_RENDER_EMBMBUMPMAP     (1<<6)
+#define DRV_RENDER_DOT3BUMPMAP     (1<<7)
+#define DRV_RENDER_EMBOSSBUMPMAP   (1<<8)
+
+/* 05/04/2004 Wendell Buckner
+    TODO: CUBEMAPPING  
+#define DRV_RENDER_CUBEMAP   (1<<8) */
 
 //
 //  PolyMode flags	(A method to override how polys are drawn for debugging purposes...)
@@ -259,6 +319,12 @@ typedef struct
 #define DRV_POLYMODE_GOURAUD	2			// Gouraud only
 #define DRV_POLYMODE_LINES		3			// Outlines only
 
+// changed QD
+typedef struct
+{
+	geFloat	x,y,z;
+} DRV_XYZVertex;
+// end change
 
 typedef struct
 {
@@ -316,6 +382,13 @@ typedef struct
 #define DRV_SUPPORT_COLORKEY				(1<<1)		// Driver can do pixel masking
 #define DRV_SUPPORT_GAMMA					(1<<2)		// Gamma function works with the driver
 
+/* 02/21/2004 Wendell Buckner                                                         
+    DOT3 BUMPMAPPING                                                                  */
+#define DRV_SUPPORT_EMBM					(1<<3)		// Gamma function works with the driver
+#define DRV_SUPPORT_DOT3					(1<<4)		// Gamma function works with the driver
+// changed QD
+#define DRV_SUPPORT_STENCIL					(1<<5)		// supports 8bit stencil buffer
+
 // A hint to the engine as far as what to turn on and off...
 #define DRV_PREFERENCE_NO_MIRRORS			(1<<0)		// Engine should NOT render mirrors
 #define DRV_PREFERENCE_SORT_WORLD_FB		(1<<1)		// Sort world Front to Back
@@ -362,8 +435,16 @@ typedef geRDriver_THandle *DRIVERCC GET_ALPHA(geRDriver_THandle *THandle);
 
 typedef geBoolean DRIVERCC THANDLE_GET_INFO(geRDriver_THandle *THandle, int32 MipLevel, geRDriver_THandleInfo *Info);
 
+/* 05/19/2003 Wendell Buckner
+    BUMPMAPPING */
+typedef geBoolean DRIVERCC COMBINE_TEXTURE(geRDriver_THandle **THandle,int32 THandleCount);
+typedef geBoolean DRIVERCC UNCOMBINE_TEXTURE(geRDriver_THandle **THandle,int32 THandleCount);
+
 // Scene management functions
-typedef geBoolean DRIVERCC BEGIN_SCENE(geBoolean Clear, geBoolean ClearZ, RECT *WorldRect);
+// changed QD Shadows
+//typedef geBoolean DRIVERCC BEGIN_SCENE(geBoolean Clear, geBoolean ClearZ, RECT *WorldRect);
+typedef geBoolean DRIVERCC BEGIN_SCENE(geBoolean Clear, geBoolean ClearZ, geBoolean ClearStencil, RECT *WorldRect);
+// end change
 typedef geBoolean DRIVERCC END_SCENE(void);
 typedef geBoolean DRIVERCC BEGIN_WORLD(void);
 typedef geBoolean DRIVERCC END_WORLD(void);
@@ -371,11 +452,18 @@ typedef geBoolean DRIVERCC BEGIN_MESHES(void);
 typedef geBoolean DRIVERCC END_MESHES(void);
 typedef geBoolean DRIVERCC BEGIN_MODELS(void);
 typedef geBoolean DRIVERCC END_MODELS(void);
-
+// changed QD Shadows
+typedef geBoolean DRIVERCC BEGIN_SHADOWVOLUMES(void);
+typedef geBoolean DRIVERCC END_SHADOWVOLUMES(void);
+// end change
 // Render functions
 typedef geBoolean DRIVERCC RENDER_G_POLY(DRV_TLVertex *Pnts, S32 NumPoints, U32 Flags);
 typedef geBoolean DRIVERCC RENDER_W_POLY(DRV_TLVertex *Pnts, S32 NumPoints, geRDriver_THandle *THandle, DRV_TexInfo *TexInfo, DRV_LInfo *LInfo, U32 Flags);
 typedef geBoolean DRIVERCC RENDER_MT_POLY(DRV_TLVertex *Pnts, S32 NumPoints, geRDriver_THandle *THandle, U32 Flags);
+// changed QD Shadows
+typedef geBoolean DRIVERCC RENDER_S_POLY(DRV_XYZVertex *Pnts, S32 NumPoints, U32 Flags);
+typedef geBoolean DRIVERCC DRAW_SHADOWPOLY(geFloat r, geFloat g, geFloat b, geFloat a);
+// end change
 
 typedef geBoolean DRIVERCC DRAW_DECAL(geRDriver_THandle *THandle, RECT *SRect, int32 x, int32 y);
 
@@ -437,11 +525,20 @@ typedef struct
 	END_MESHES			*EndMeshes;
 	BEGIN_MODELS		*BeginModels;
 	END_MODELS			*EndModels;
+// changed QD Shadows
+	BEGIN_SHADOWVOLUMES	*BeginShadowVolumes;
+	END_SHADOWVOLUMES	*EndShadowVolumes;
+	S32					StencilTestMode; // zpass = 1 or zfail = 0?
+// end change
 	
 	// Render functions
 	RENDER_G_POLY		*RenderGouraudPoly;
 	RENDER_W_POLY		*RenderWorldPoly;
 	RENDER_MT_POLY		*RenderMiscTexturePoly;
+// changed QD Shadows
+	RENDER_S_POLY		*RenderStencilPoly;
+	DRAW_SHADOWPOLY		*DrawShadowPoly;
+// end change
 
 	//Decal functions
 	DRAW_DECAL			*DrawDecal;
@@ -466,6 +563,11 @@ typedef struct
 
 	// Temp hack global
 	GInfo				*GlobalInfo;
+
+/* 05/19/2003 Wendell Buckner 
+    BUMPMAPPING */
+	COMBINE_TEXTURE		*THandle_Combine;
+	UNCOMBINE_TEXTURE	*THandle_UnCombine;
 } DRV_Driver;
 
 typedef geBoolean DRV_Hook(DRV_Driver **Hook);
@@ -490,7 +592,10 @@ typedef enum
 	RENDER_NONE,
 	RENDER_WORLD,
 	RENDER_MESHES,
-	RENDER_MODELS
+	RENDER_MODELS,
+// changed QD Shadows
+	RENDER_SHADOWVOLUMES
+// end change
 } DRV_RENDER_MODE;
 
 #ifdef __cplusplus

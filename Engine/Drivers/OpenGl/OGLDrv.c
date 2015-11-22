@@ -91,10 +91,19 @@ DRV_Driver OGLDRV =
 	EndMeshes,
 	BeginModels,
 	EndModels,
+// changed QD Shadows
+	BeginShadowVolumes,
+	EndShadowVolumes,
+	1,
+// end change
 
 	Render_GouraudPoly,
 	Render_WorldPoly,
 	Render_MiscTexturePoly,
+// changed QD Shadows
+	Render_StencilPoly,
+	DrawShadowPoly,
+// end change
 
 	DrawDecal,
 
@@ -128,16 +137,26 @@ geBoolean DRIVERCC SetFogEnable(geBoolean Enable, float r, float g, float b, flo
 		fogColor[2] = (GLfloat)b/255.0f;
 		fogColor[3] = 1.0f;
 		glFogfv(GL_FOG_COLOR, fogColor);
-		glFogf(GL_FOG_DENSITY, 1.0f);
+		//glFogf(GL_FOG_DENSITY, 1.0f); // changed QD Fog: only used for exponential fogmode
 		glHint(GL_FOG_HINT, GL_FASTEST);
-		glFogf(GL_FOG_START, Start);
-		glFogf(GL_FOG_END, End);
+		
+		// changed QD Fog
+		if(Start < 1.0f)
+			Start = 1.0f;
+		if(End < 1.0f)
+			End = 1.0f;
+		glFogf(GL_FOG_START, 1.0f- 1.0f/Start); 
+		glFogf(GL_FOG_END, 1.0f - 1.0f/End);
 		FogEnabled = GE_TRUE;
+		glClearColor(fogColor[0], fogColor[1], fogColor[2], 1.0); /* fog color */
+		// end change
 	}
 	else
 	{
 		glDisable(GL_FOG);
 		FogEnabled = GE_FALSE;
+		// changed QD Fog
+		glClearColor(0.0, 0.0, 0.0, 1.0);
 	}
 	return GE_TRUE;
 }

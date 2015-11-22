@@ -36,18 +36,18 @@ typedef struct geExtBox
 } geExtBox;
 
 // Set the values in a box
-void GENESISCC geExtBox_Set (  geExtBox *B,
+GENESISAPI void GENESISCC geExtBox_Set (  geExtBox *B,
 				  geFloat X1,	  geFloat Y1,	  geFloat Z1,
 				  geFloat X2,	  geFloat Y2,	  geFloat Z2 );
 
 // Test a box for validity ( non NULL and max >= min )
-geBoolean GENESISCC geExtBox_IsValid(  const geExtBox *B );
+GENESISAPI geBoolean GENESISCC geExtBox_IsValid(  const geExtBox *B );
 
 // Set box Min and Max to the passed point
-void GENESISCC geExtBox_SetToPoint ( geExtBox *B, const geVec3d *Point );
+GENESISAPI void GENESISCC geExtBox_SetToPoint ( geExtBox *B, const geVec3d *Point );
 
 // Extend a box to encompass the passed point
-void GENESISCC geExtBox_ExtendToEnclose( geExtBox *B, const geVec3d *Point );
+GENESISAPI void GENESISCC geExtBox_ExtendToEnclose( geExtBox *B, const geVec3d *Point );
 
 // Return result of box intersection.
 // If no intersection, returns GE_FALSE and bResult is not modified.
@@ -55,23 +55,23 @@ void GENESISCC geExtBox_ExtendToEnclose( geExtBox *B, const geVec3d *Point );
 // with the intersected box,
 // bResult may be one of b1 or b2.
 // 
-geBoolean GENESISCC geExtBox_Intersection ( const geExtBox *B1, const geExtBox *B2, geExtBox *Result	);
+GENESISAPI geBoolean GENESISCC geExtBox_Intersection ( const geExtBox *B1, const geExtBox *B2, geExtBox *Result	);
 
 // computes union of b1 and b2 and returns in bResult.
-void GENESISCC geExtBox_Union ( const geExtBox *B1, const geExtBox *B2, geExtBox *Result );
+GENESISAPI void GENESISCC geExtBox_Union ( const geExtBox *B1, const geExtBox *B2, geExtBox *Result );
 
-geBoolean GENESISCC geExtBox_ContainsPoint ( const geExtBox *B, const geVec3d  *Point );
+GENESISAPI geBoolean GENESISCC geExtBox_ContainsPoint ( const geExtBox *B, const geVec3d  *Point );
 
-void GENESISCC geExtBox_GetTranslation ( const geExtBox *B,       geVec3d *pCenter );
-void GENESISCC geExtBox_SetTranslation (       geExtBox *B, const geVec3d *pCenter );
-void GENESISCC geExtBox_Translate      (       geExtBox *B, geFloat DX, geFloat DY, geFloat DZ );
+GENESISAPI void GENESISCC geExtBox_GetTranslation ( const geExtBox *B,       geVec3d *pCenter );
+GENESISAPI void GENESISCC geExtBox_SetTranslation (       geExtBox *B, const geVec3d *pCenter );
+GENESISAPI void GENESISCC geExtBox_Translate      (       geExtBox *B, geFloat DX, geFloat DY, geFloat DZ );
 
-void GENESISCC geExtBox_GetScaling     ( const geExtBox *B,       geVec3d *pScale );
-void GENESISCC geExtBox_SetScaling     (       geExtBox *B, const geVec3d *pScale );
-void GENESISCC geExtBox_Scale          (       geExtBox *B, geFloat DX, geFloat DY,geFloat DZ );
+GENESISAPI void GENESISCC geExtBox_GetScaling     ( const geExtBox *B,       geVec3d *pScale );
+GENESISAPI void GENESISCC geExtBox_SetScaling     (       geExtBox *B, const geVec3d *pScale );
+GENESISAPI void GENESISCC geExtBox_Scale          (       geExtBox *B, geFloat DX, geFloat DY,geFloat DZ );
 
 //  Creates a box that encloses the entire area of a box that moves along linear path
-void GENESISCC geExtBox_LinearSweep(	const geExtBox *BoxToSweep, 
+GENESISAPI void GENESISCC geExtBox_LinearSweep(	const geExtBox *BoxToSweep, 
 						const geVec3d *StartPoint, 
 						const geVec3d *EndPoint, 
 						geExtBox *EnclosingBox );
@@ -81,7 +81,7 @@ void GENESISCC geExtBox_LinearSweep(	const geExtBox *BoxToSweep,
 //     on success, GE_TRUE is returned, and 
 //       if T is non-NULL, T is returned as 0..1 where 0 is a collision at Start, and 1 is a collision at End
 //       if Normal is non-NULL, Normal is the surface normal of the box where the collision occured.
-geBoolean GENESISCC geExtBox_RayCollision( const geExtBox *B, const geVec3d *Start, const geVec3d *End, 
+GENESISAPI geBoolean GENESISCC geExtBox_RayCollision( const geExtBox *B, const geVec3d *Start, const geVec3d *End, 
 								geFloat *T, geVec3d *Normal );
 
 #ifdef __cplusplus

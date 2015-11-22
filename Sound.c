@@ -20,6 +20,7 @@
 /*                                                                                      */
 /****************************************************************************************/
 #include	<windows.h>
+//#include	<dplay.h>
 #include	<dsound.h>
 #include	<stdio.h>
 #include	<assert.h>

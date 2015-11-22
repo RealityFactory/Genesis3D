@@ -7,6 +7,26 @@
 /*  Author: Charles Bloom                                                               */
 /*  Description:  Abstract Bitmap system                                                */
 /*                                                                                      */
+/*  Edit History:                                                                       */ 
+/*                                                                                      */
+/*  Edit History:                                                                       */ 
+/*   03/24/2004 Wendell Buckner                                                         */
+/*    BUG FIX: Rendering Transparent Polys properly (2)                                 */
+/*	03/15/2004 Wendell Buckner                                                          */ 
+/*    SPHEREMAPPING                                                                     */
+/*  03/14/2004 Wendell Buckner                                                          */
+/*   BUMPMAPPING - Allow the height differential map to be changed by the height map    */
+/*  02/21/2004 Wendell Buckner                                                          */
+/*   DOT3 BUMPMAPPING                                                                   */
+/*  02/20/2004 Wendell Buckner                                                          */
+/*   DOT3 BUMPMAPPING                                                                   */
+/*  02/18/2004 Wendell Buckner                                                          */
+/*   DOT3 BUMPMAPPING                                                                   */
+/*  10/15/2003 Wendell Buckner                                                          */
+/*    Bumpmapping for the World                                                         */
+/*  03/28/2003 Wendell Buckner                                                          */   
+/*    BUMPMAPPING                                                                       */
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -18,8 +38,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 
@@ -47,6 +67,15 @@ typedef struct geBitmap_Info
 	geBoolean				HasColorKey;
 	uint32					ColorKey;	// meaningless unless HasColorKey ; the ColorKey is a Pixel in Format
 	geBitmap_Palette *		Palette;
+
+/* 02/20/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+    geBoolean IsNormalMap;
+
+/* 03/14/2004 Wendell Buckner 
+    BUMPMAPPING - Have a informational variable which tells us what kind of bitmap this is */
+    geBoolean IsHeightMap;
+
 } geBitmap_Info;
 
 /***********************************************************************************/		
@@ -277,7 +306,7 @@ GENESISAPI geBoolean		GENESISCC	geBitmap_Palette_SetFormat(geBitmap_Palette * Pa
 GENESISAPI geBoolean		GENESISCC	geBitmap_Palette_Copy(const geBitmap_Palette * Src,geBitmap_Palette * Target);
 
 GENESISAPI geBoolean		GENESISCC	geBitmap_Palette_GetInfo(const	geBitmap_Palette *P,geBitmap_Info *Into);
-												// get the info as if it were a bitmap; Into->Height == 1
+												// get the info as if it were a bitmap; Into->Heigtmht == 1
 
 GENESISAPI geBoolean		GENESISCC	geBitmap_Palette_Lock(geBitmap_Palette *Palette, void **pBits, gePixelFormat *pFormat,int *pSize);
 												// pFormat & pSize are optional
@@ -299,6 +328,49 @@ GENESISAPI geBoolean		GENESISCC	geBitmap_Palette_GetEntryColor(const geBitmap_Pa
 
 GENESISAPI geBoolean		GENESISCC	geBitmap_Palette_SetEntry(      geBitmap_Palette *P,int Color,uint32 Pixel);
 GENESISAPI geBoolean		GENESISCC	geBitmap_Palette_GetEntry(const geBitmap_Palette *P,int Color,uint32 *Pixel);
+
+/* 03/24/2004 Wendell Buckner
+    BUG FIX: Rendering Transparent Polys properly (2) */
+GENESISAPI geBoolean GENESISCC geBitmap_UsesColorKey(const geBitmap * Bmp); 
+
+/*	03/15/2004 Wendell Buckner
+    SPHEREMAPPING */
+GENESISAPI geBoolean GENESISCC geBitmap_IsSphereMapName(const char *BmpName);
+
+/* 03/14/2004 Wendell Buckner 
+    BUMPMAPPING - Allow the height differential map to be changed by the height map */
+GENESISAPI geBoolean GENESISCC geBitmap_UpdateBumpMapAlt ( geBitmap *BumpBmp );
+
+/* 02/21/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+GENESISAPI geBoolean GENESISCC geBitmap_GetEngineSupport(void * EngineSupport, uint32 DesiredEngineSupport );
+
+/* 02/18/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+GENESISAPI geBoolean GENESISCC geBitmap_CreateBumpmapDot3 (geBitmap *BaseBmp, geBitmap *BumpBmp, geBitmap *SpecularBmp);
+GENESISAPI geBoolean GENESISCC geBitmap_IsBumpmapNameDot3(const char *BmpName);
+GENESISAPI geBoolean GENESISCC geBitmap_DestroyBumpmapDot3 (geBitmap *BaseBmp);
+GENESISAPI void GENESISCC geBitmap_AttachBumpmapToDriverDot3( geBitmap *Bmp );
+GENESISAPI void GENESISCC geBitmap_DetachBumpmapFromDriverDot3( geBitmap *Bmp );
+
+/* 10/15/2003 Wendell Buckner
+    Bumpmapping for the World */
+GENESISAPI char * GENESISCC geBitmap_GetGreyBumpmapName(const char *BumpName);
+GENESISAPI char * GENESISCC geBitmap_GetSpecularBumpmapName(const char *BmpName);
+GENESISAPI geBoolean GENESISCC geBitmap_IsGreyBumpmapName(const char *BmpName);
+GENESISAPI geBoolean GENESISCC geBitmap_IsSpecularBumpmapName(const char *BmpName);
+
+/* 03/28/2003 Wendell Buckner
+    BUMPMAPPING */
+GENESISAPI geBoolean GENESISCC geBitmap_IsBumpmapName(const char *BmpName);
+GENESISAPI void GENESISCC geBitmap_GetBumpMapPixelFormats( gePixelFormat *DriverFormatsPtr, gePixelFormat *BumpMapPixelFormats, int *BumpMapPixelFormatCount);
+GENESISAPI geBitmap * GENESISCC geBitmap_CreateBumpmap (geBitmap *BaseBmp, geBitmap *BumpBmp, geBitmap *SpecularBmp, gePixelFormat BumpFormat );
+GENESISAPI geBitmap * GENESISCC geBitmap_DestroyBumpmap (geBitmap *BaseBmp);
+
+GENESISAPI void GENESISCC geBitmap_AttachBumpmapToDriver( geBitmap *Bmp );
+GENESISAPI void GENESISCC geBitmap_DetachBumpmapFromDriver( geBitmap *Bmp );
+GENESISAPI geBitmap * GENESISCC geBitmap_GetBumpMapAlt ( geBitmap *BaseBmp );
+GENESISAPI void GENESISCC geBitmap_SetRenderFlags(const geBitmap *Bmp, uint32 *Flags);
 
 /***********************************************************************************/
 

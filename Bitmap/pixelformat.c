@@ -4,6 +4,10 @@
 /*  Author: Charles Bloom                                                               */
 /*  Description:  The abstract Pixel primitives                                         */
 /*                                                                                      */
+/*  Edit History:                                                                       */
+/*  05/27/2003 Wendell Buckner                                                          */ 
+/*   BUMPMAPPING                                                                        */
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -824,6 +828,53 @@ void	Put_32abgr(uint8 **ppData,int  R,int  G,int  B,int  A)
 }
 
 
+
+/* 05/27/2003 Wendell Buckner
+    BUMPMAPPING */
+
+//********************************************************************
+
+uint32	Compose_16uv   (int U,int V,int L,int A)
+{
+	return	(V<<8) + (U);
+}
+
+void	Decompose_16uv (uint32 Pixel, int *U,int *V,int *L,int *A)
+{
+	*U = (Pixel     ) & 0xF;
+	*V = (Pixel >> 8) & 0xF;
+	*L = 0;
+	*A = 0;
+}
+
+uint32	Compose_16uvl   (int U,int V,int L,int A)
+{
+	return	((L<<10) + (V<<5) + (U));
+}
+
+void	Decompose_16uvl (uint32 Pixel, int *U,int *V,int *L,int *A)
+{
+	*U = (Pixel      ) & 0x1F;
+	*V = (Pixel >>  5) & 0x1F;
+	*L = (Pixel >> 10) & 0x3F;
+	*A = 0;
+}
+
+uint32	Compose_24uvl   (int U,int V,int L,int A)
+{
+	return	( (L<<16) + (V<<8) + (U));
+}
+
+void	Decompose_24uvl (uint32 Pixel, int *U,int *V,int *L,int *A)
+{
+	*U = (Pixel      ) & 0xFF;
+	*V = (Pixel >>  8) & 0xFF;
+	*L = (Pixel >> 16) & 0xFF;
+	*A = 0;
+}
+
+//*********************************************************************
+
 /*}{********* the giant format-ops definition ****************/
 
 static const gePixelFormat_Operations gePixelFormat_Operations_Array_Def[] = 
@@ -859,6 +910,12 @@ static const gePixelFormat_Operations gePixelFormat_Operations_Array_Def[] =
 	{0x000000FF,0x0000FF00,0x00FF0000,0xFF000000,	0 , 8,16,24,	0,0,0,0,4,0,"32 bit ABGR",	Compose_32abgr,Decompose_32abgr, Get_32abgr,Put_32abgr,	GetPixel_32bit,PutPixel_32bit},
 
 	{0,0,0,0, 			0,0,0,0,	0,0,0,0,	0 ,0,	"wavelet"},
+
+/* 05/27/2003 Wendell Buckner
+    BUMPMAPPING */
+	{0x00000000,0x00000000,0x00000000,0x00000000,	0 , 0, 0, 0,	0,0,0,0,2,0,"16 bit UV",	 Compose_16uv, Decompose_16uv,	0,	0,	GetPixel_16bit,PutPixel_16bit},
+	{0x00000000,0x00000000,0x00000000,0x00000000,	0 , 0, 0, 0,	0,0,0,0,2,0,"16 bit UVL",	Compose_16uvl,Decompose_16uvl,	0,	0,	GetPixel_16bit,PutPixel_16bit},
+	{0x00000000,0x00000000,0x00000000,0x00000000,	0 , 0, 0, 0,	0,0,0,0,3,0,"24 bit UVL",	Compose_24uvl,Decompose_24uvl,	0,	0,	GetPixel_24bit,PutPixel_24bit},
 
 	{0,0,0,0,			0,0,0,0,	0,0,0,0,	0 ,0,	"invalid"}
 };

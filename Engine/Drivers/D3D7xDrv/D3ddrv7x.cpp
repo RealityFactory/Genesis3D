@@ -5,6 +5,16 @@
 /*  Description: D3D driver                                                             */
 /*                                                                                      */
 /*  Edit History:                                                                       */
+/*  01/04/2004 Wendell Buckner                                                          */ 
+/*   CONFIG DRIVER - Make the driver configurable by "ini" file settings                */
+/*  05/19/2003 Wendell Buckner                                                          */
+/*   BUMPMAPPING                                                                        */
+/*  04/01/2003 Wendell Buckner                                                          */
+/*   BUMPMAPPING                                                                        */
+/*  03/31/2003 Wendell Buckner                                                          */
+/*   BUMPMAPPING                                                                        */
+/*  01/28/2003 Wendell Buckner                                                          */                  
+/*    Cache decals so that they can be drawn after all the 3d stuff...                  */                  
 /*  12/28/2002 Wendell Buckner                                                          */
 /*    Allow/make 32-bit (ARGB) mode the default mode...                                 */
 /*    Give out the true 24-bit surface as well...                                       */
@@ -53,6 +63,10 @@ char				LastErrorStr[200];
 geBoolean	DRIVERCC DrvShutdown(void);
 geBoolean	DRIVERCC ScreenShot(const char *Name);
 
+/* 01/04/2004 Wendell Buckner
+    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
+extern int ExtraTextures;
+
 BOOL DRIVERCC DrvInit(DRV_DriverHook *Hook)
 {
 	RECT	WRect;
@@ -96,7 +110,12 @@ geBoolean DRIVERCC DrvResetAll(void)
 	return D3DMain_Reset();
 }
 
-geRDriver_PixelFormat	PixelFormat[10]; 
+/* 04/01/2003 Wendell Buckner
+    BUMPMAPPING
+geRDriver_PixelFormat	PixelFormat[10]; */
+#define MAX_PIXEL_FORMATS 25             
+geRDriver_PixelFormat	PixelFormat[MAX_PIXEL_FORMATS];
+
 
 #define NUM_PIXEL_FORMATS (sizeof(PixelFormats)/sizeof(geRDriver_PixelFormat))
 
@@ -193,6 +212,38 @@ geBoolean DRIVERCC EnumPixelFormats(DRV_ENUM_PFORMAT_CB *Cb, void *Context)
 	 j++;
 	}
 
+/* 01/04/2004 Wendell Buckner
+    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
+	if( ExtraTextures )
+	{
+
+/* 03/31/2003 Wendell Buckner
+    BUMPMAPPING */
+    if ( (AppInfo.ddBumpMapNoLuminance.ddpfPixelFormat.dwBumpBitCount == 16)  )
+	{	 
+	 PixelFormat[j].PixelFormat = GE_PIXELFORMAT_16BIT_88_UV;	// 3d 88 bump surface
+	 PixelFormat[j].Flags = RDRIVER_PF_3D | RDRIVER_PF_BUMPMAP;
+	 j++;
+	}
+
+    if ( (AppInfo.ddBumpMapSixBitLuminance.ddpfPixelFormat.dwBumpBitCount == 16)  )
+	{	 
+	 PixelFormat[j].PixelFormat = GE_PIXELFORMAT_16BIT_556_UVL;	// 3d 556 bump surface
+	 PixelFormat[j].Flags = RDRIVER_PF_3D | RDRIVER_PF_BUMPMAP;
+	 j++;
+	}
+
+    if ( (AppInfo.ddBumpMapEightBitLuminance.ddpfPixelFormat.dwBumpBitCount == 24)  )
+	{	 
+	 PixelFormat[j].PixelFormat = GE_PIXELFORMAT_24BIT_888_UVL;	// 3d 888 bump surface
+	 PixelFormat[j].Flags = RDRIVER_PF_3D | RDRIVER_PF_BUMPMAP;
+	 j++;
+	}
+
+/* 01/04/2004 Wendell Buckner
+    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
+	}
+
 	// Then hand them off to the caller
 /* 12/28/2002 Wendell Buckner
     Give out the true 24-bit or 32-bit XRGB surface as well...  
@@ -263,12 +314,23 @@ DRV_Driver D3DDRV =
 	EndMeshes,
 	BeginModels,
 	EndModels,
+// changed QD Shadows
+	BeginShadowVolumes,
+	EndShadowVolumes,
+	1,
+// end change
 
 	RenderGouraudPoly,
 	RenderWorldPoly,
 	RenderMiscTexturePoly,
-
-	DrawDecal,
+// changed QD Shadows
+	RenderStencilPoly,
+	DrawShadowPoly,
+// end change
+/*  01/28/2003 Wendell Buckner                                                          
+     Cache decals so that they can be drawn after all the 3d stuff...                   
+  	DrawDecal,                                                                          */
+    DrawDecalRect,
 
 	0,0,0,
 	
@@ -283,7 +345,12 @@ DRV_Driver D3DDRV =
 
 	NULL,
 	NULL,								// Init to NULL, engine SHOULD set this (SetupLightmap)
-	NULL
+	NULL,
+
+/* 05/19/2003 Wendell Buckner 
+    BUMPMAPPING */
+	THandle_Combine,
+    THandle_UnCombine,
 };
 
 DRV_EngineSettings EngineSettings;

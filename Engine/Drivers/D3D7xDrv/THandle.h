@@ -4,8 +4,13 @@
 /*  Author: John Pollard                                                                */
 /*  Description: THandle manager for D3DDrv                                             */
 /*                                                                                      */
-/*   07/16/2000 Wendell Buckner
-/*    Convert to Directx7...    
+/*  Edit History:                                                                       */
+/*   05/19/2003 Wendell Buckner                                                         */  
+/*    BUMPMAPPING                                                                       */
+/*   03/28/2003 Wendell Buckner                                                         */
+/*    BumpMapping                                                                       */
+/*   07/16/2000 Wendell Buckner                                                         */
+/*    Convert to Directx7...                                                            */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -18,8 +23,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef THANDLE_H
@@ -80,6 +85,10 @@ typedef struct geRDriver_THandle
 	TPage_Block				*Block;
 #endif
 
+/*03/28/2003 Wendell Buckner
+   BumpMapping*/
+    geRDriver_THandle       *NextTHandle;
+
 } geRDriver_THandle;
 
 extern geRDriver_THandle	TextureHandles[];
@@ -114,4 +123,8 @@ geBoolean THandle_CreateSurfaces(THandle_MipData *MipData, int32 Width, int32 He
 void THandle_DestroySurfaces(THandle_MipData *MipData);
 geBoolean THandle_CheckCache(void);
 
+/* 05/19/2003 Wendell Buckner 
+    BUMPMAPPING */
+geBoolean DRIVERCC THandle_Combine ( geRDriver_THandle **THandle, int32 THandleCount);
+geBoolean DRIVERCC THandle_UnCombine ( geRDriver_THandle **THandle, int32 THandleCount);
 #endif

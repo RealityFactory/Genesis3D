@@ -4,6 +4,16 @@
 /*  Author: Charles Bloom                                                               */
 /*  Description: Maintains a pool of bitmap pointers.                                   */
 /*                                                                                      */
+/*  Edit History:                                                                       */
+/*  02/18/2004 Wendell Buckner                                                          */
+/*   DOT3 BUMPMAPPING                                                                   */
+/*  11/28/2003 Wendell Buckner 	                                                        */ 
+/*    Bumpmapping for the World                                                         */
+/*  04/07/2003 Wendell Buckner                                                          */
+/*   BUMPMAPPING                                                                        */
+/*   HAVE TO WAIT UNTIL ALL BUMPMAPS HAVE BEEN ATTACHED BEFORE LINKING DRIVERHANDLES    */
+/*   TOGETHER... THAT'S WHY WE HAVE TO GO THROUGH THE LIST AGAIN...                     */
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -15,8 +25,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <Assert.h>
@@ -95,6 +105,14 @@ geBoolean	Ret = GE_TRUE;
 
 			HashNode_GetData(pNode,(uint32 *)&Bmp,&TimesAdded);
 
+/* 02/18/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+            geBitmap_DetachBumpmapFromDriverDot3(Bmp );
+
+/* 04/07/2003 Wendell Buckner
+    BUMPMAPPING */
+            geBitmap_DetachBumpmapFromDriver(Bmp );
+
 			if (!geBitmap_DetachDriver(Bmp, GE_TRUE))
 				Ret = GE_FALSE;
 
@@ -103,6 +121,19 @@ geBoolean	Ret = GE_TRUE;
 			pList->Members --;
 
 			assert( TimesAdded >= 1 );
+
+/* 02/18/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+            geBitmap_DestroyBumpmapDot3 ( Bmp );
+
+/* 11/28/2003 Wendell Buckner 	
+    Bumpmapping for the World */
+			{
+             geBitmap *BumpBmpAlt = NULL;
+             BumpBmpAlt = geBitmap_DestroyBumpmap ( Bmp );
+
+             if ( BumpBmpAlt ) geBitmap_Destroy( &(BumpBmpAlt) );
+            }
 
 			while(TimesAdded --)
 			{
@@ -193,6 +224,24 @@ int MembersAttached;
 
 	assert( MembersAttached == pList->Members );
 
+/* 04/07/2003 Wendell Buckner
+    BUMPMAPPING 
+     HAVE TO WAIT UNTIL ALL BUMPMAPS HAVE BEEN ATTACHED BEFORE LINKING DRIVERHANDLES TOGETHER...
+     THAT'S WHY WE HAVE TO GO THROUGH THE LIST AGAIN... */
+	pNode = NULL;
+	while( (pNode = Hash_WalkNext(pList->Hash,pNode)) != NULL )
+	{
+	 geBitmap *Bmp;
+
+ 	 Bmp = (geBitmap *)HashNode_Key(pNode);
+
+/* 02/18/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+     geBitmap_AttachBumpmapToDriverDot3(Bmp);
+
+	 geBitmap_AttachBumpmapToDriver(Bmp);
+	}	
+
 	return GE_TRUE;
 }
 
@@ -214,6 +263,14 @@ int MembersAttached;
 	uint32 TimesAdded;
 
 		HashNode_GetData(pNode,(uint32 *)&Bmp,&TimesAdded);
+
+/* 02/18/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+        geBitmap_DetachBumpmapFromDriverDot3(Bmp );
+
+/* 04/07/2003 Wendell Buckner
+    BUMPMAPPING */
+        geBitmap_DetachBumpmapFromDriver(Bmp );
 
 		if (!geBitmap_DetachDriver(Bmp, GE_TRUE))
 			Ret = GE_FALSE;
@@ -339,12 +396,33 @@ uint32 Key;
 
 	if ( TimesAdded <= 0 )
 	{
+/* 02/18/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+		geBitmap_DetachBumpmapFromDriverDot3(Bitmap );
+
+/* 04/07/2003 Wendell Buckner
+    BUMPMAPPING*/
+        geBitmap_DetachBumpmapFromDriver(Bitmap );
+
 		if ( ! geBitmap_DetachDriver(Bitmap, GE_TRUE) )
 		{
 			geErrorLog_AddString(-1, "BitmapList_Remove:  geBitmap_DetachDriver failed.", NULL);
 			return GE_FALSE;
 		}
 	}
+
+	/* 02/18/2004 Wendell Buckner
+    DOT3 BUMPMAPPING*/
+    geBitmap_DestroyBumpmapDot3 ( Bitmap );
+
+/* 11/28/2003 Wendell Buckner 	
+    Bumpmapping for the World */
+	{
+     geBitmap *BumpBmpAlt = NULL;
+     BumpBmpAlt = geBitmap_DestroyBumpmap ( Bitmap );
+
+     if ( BumpBmpAlt ) geBitmap_Destroy( &(BumpBmpAlt) );
+    }
 
 	geBitmap_Destroy(&Bitmap);
 

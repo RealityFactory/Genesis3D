@@ -335,9 +335,9 @@ GENESISAPI void GENESISCC geCamera_Project(const geCamera *Camera,
 	Z = -PointInCameraSpace->Z;   
 
 	if (Z < CAMERA_MINIMUM_PROJECTION_DISTANCE)
-		{
-			Z = CAMERA_MINIMUM_PROJECTION_DISTANCE; 
-		}
+	{
+		Z = CAMERA_MINIMUM_PROJECTION_DISTANCE; 
+	}
 
 	ScaleOverZ = Camera->Scale / Z;
 

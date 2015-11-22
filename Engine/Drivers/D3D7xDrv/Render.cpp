@@ -4,6 +4,11 @@
 /*  Author: John Pollard                                                                */
 /*  Description: Code to render polys under D3D                                         */
 /*                                                                                      */
+/*  Edit History:                                                                       */
+/*  01/03/2004 Wendell Buckner                                                          */
+/*   CONFIG DRIVER - Make the driver configurable by "ini" file settings                */
+/*  01/28/2003 Wendell Buckner                                                          */
+/*   Cache decals so that they can be drawn after all the 3d stuff...                   */
 /*	01/24/2002 Wendell Buckner                                                          */
 /*   Change flags for speed...                                                          */
 /*  02/28/2001 Wendell Buckner                                                          */
@@ -44,6 +49,10 @@
 #include "PCache.h"
 
 #define SNAP_VERT(v)  ( ( v )  = ( float )( ( long )( ( v ) * 16 ) ) / 16.0f )
+
+/* 01/03/2004 Wendell Buckner
+    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
+extern DWORD BltRtFlags;
 
 geBoolean DRIVERCC RenderGouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint32 Flags)
 {
@@ -102,7 +111,7 @@ geBoolean DRIVERCC RenderGouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint32
 		
 			pD3DPnts->specular = (FogVal<<24);		// Alpha component in specular is the fog value (0...255)
 		}
-		else
+		else 
 			pD3DPnts->specular = 0;
 
 		pPnts++;
@@ -245,6 +254,38 @@ geBoolean DRIVERCC RenderMiscTexturePoly(DRV_TLVertex *Pnts, int32 NumPoints, ge
 	return TRUE;
 }
 
+// changed QD Shadows
+geBoolean DRIVERCC RenderStencilPoly(DRV_XYZVertex *Pnts, int32 NumPoints, uint32 Flags)
+{
+	if(!AppInfo.RenderingIsOK)
+	{
+		return	TRUE;
+	}
+	else if (Flags & DRV_RENDER_FLUSH)
+	{
+		PCache_FlushStencilPolys();
+	}
+				
+	PCache_InsertStencilPoly(Pnts, NumPoints, Flags);
+
+	if (Flags & DRV_RENDER_FLUSH)
+	{
+		PCache_FlushStencilPolys();
+	}
+
+	return TRUE;
+}
+
+geBoolean DRIVERCC DrawShadowPoly(geFloat r, geFloat g, geFloat b, geFloat a)
+{
+	PCache_FlushStencilPolys();
+	D3DDrawShadow(r, g, b, a);
+	Main_ClearBackBuffer(FALSE, FALSE, TRUE);
+
+	return TRUE;
+}
+// end change
+
 geBoolean DRIVERCC DrawDecal(geRDriver_THandle *THandle, RECT *SRect, int32 x, int32 y)
 {
 	RECT	SRect2, *pSRect;
@@ -300,10 +341,13 @@ geBoolean DRIVERCC DrawDecal(geRDriver_THandle *THandle, RECT *SRect, int32 x, i
 	
 #if 0
 
+/* 01/03/2004 Wendell Buckner
+    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
 /*	01/24/2002 Wendell Buckner
     Change flags for speed...
-	AppInfo.lpBackBuffer->BltFast(x, y, THandle->MipData[0].Surface, pSRect, DDBLTFAST_SRCCOLORKEY | DDBLTFAST_WAIT);*/
-    AppInfo.lpBackBuffer->BltFast(x, y, THandle->MipData[0].Surface, pSRect, DDBLTFAST_SRCCOLORKEY | DDBLTFAST_DONOTWAIT ); 
+	AppInfo.lpBackBuffer->BltFast(x, y, THandle->MipData[0].Surface, pSRect, DDBLTFAST_SRCCOLORKEY | DDBLTFAST_WAIT);*
+    AppInfo.lpBackBuffer->BltFast(x, y, THandle->MipData[0].Surface, pSRect, DDBLTFAST_SRCCOLORKEY | DDBLTFAST_DONOTWAIT ); */
+    AppInfo.lpBackBuffer->BltFast(x, y, THandle->MipData[0].Surface, pSRect, DDBLTFAST_SRCCOLORKEY | BltSurfFlags ); 
     
 #else
 	RECT	DRect;
@@ -316,12 +360,16 @@ geBoolean DRIVERCC DrawDecal(geRDriver_THandle *THandle, RECT *SRect, int32 x, i
 	DRect.top = y;
 	DRect.bottom = y+Height;
 
+/* 01/03/2004 Wendell Buckner
+    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
 /*	01/24/2002 Wendell Buckner
     Change flags for speed...
     ddrval= AppInfo.lpBackBuffer->Blt(&DRect, THandle->MipData[0].Surface, pSRect, 
-		             (DDBLT_KEYSRC | DDBLT_WAIT), NULL);*/
+		             (DDBLT_KEYSRC | DDBLT_WAIT), NULL);*
 	ddrval= AppInfo.lpBackBuffer->Blt(&DRect, THandle->MipData[0].Surface, pSRect, 
-		             (DDBLT_KEYSRC | DDBLT_DONOTWAIT | DDBLT_ASYNC ), NULL);	
+		             (DDBLT_KEYSRC | DDBLT_DONOTWAIT | DDBLT_ASYNC ), NULL);	*/
+	ddrval= AppInfo.lpBackBuffer->Blt(&DRect, THandle->MipData[0].Surface, pSRect, 
+		             (DDBLT_KEYSRC | BltRtFlags ), NULL);	
 
 	if(ddrval==DDERR_SURFACELOST)
 	{
@@ -334,3 +382,18 @@ geBoolean DRIVERCC DrawDecal(geRDriver_THandle *THandle, RECT *SRect, int32 x, i
 	return GE_TRUE;
 }
 
+/*  01/28/2003 Wendell Buckner                                                          */
+/*   Cache decals so that they can be drawn after all the 3d stuff...                   */
+extern BOOL InScene;
+
+geBoolean DRIVERCC DrawDecalRect(geRDriver_THandle *THandle, RECT *SRect, int32 x, int32 y)
+{
+	BOOL InsertDrawDecalOk = FALSE;
+
+	if ( InScene )
+	 InsertDrawDecalOk = DCache_InsertDecalRect(THandle, SRect, x, y);	 
+	else
+     InsertDrawDecalOk = DrawDecal(THandle, SRect, x, y);
+
+	return InsertDrawDecalOk;
+}

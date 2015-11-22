@@ -199,10 +199,19 @@ DRV_Driver D3DDRV =
 	EndMeshes,
 	BeginModels,
 	EndModels,
+// changed QD Shadows
+	BeginShadowVolumes,
+	EndShadowVolumes,
+	1,
+// end change
 
 	RenderGouraudPoly,
 	RenderWorldPoly,
 	RenderMiscTexturePoly,
+// changed QD Shadows
+	RenderStencilPoly,
+	DrawShadowPoly,
+// end change
 
 	DrawDecal,
 

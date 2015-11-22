@@ -4,6 +4,10 @@
 /*  Author:                                                                             */
 /*  Description: 3D transform implementation                                            */
 /*                                                                                      */
+/*  Edit History:                                                                       */
+/*	01/08/2004 Wendell Buckner                                                          */
+/*    DOT3 BUMPMAPPING                                                                  */
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -15,8 +19,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*Genesis3D Version 1.1 released November 15, 1999                                      */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <assert.h>
@@ -377,6 +381,28 @@ GENESISAPI void GENESISCC geXForm3d_Transform(
 
 }
 
+/*	01/08/2004 Wendell Buckner
+    DOT3 BUMPMAPPING */
+GENESISAPI void GENESISCC geXForm3d_RotateNoOrthogonal(
+	const geXForm3d *M,
+	const geVec3d *V, 
+	geVec3d *Result)
+	// Result is Matrix M * Vector V:  V Tranformed by M 
+{
+	geVec3d VL;
+	assert( M != NULL );
+	assert( geVec3d_IsValid(V)!=GE_FALSE);
+
+	assert( Result != NULL );
+
+	VL = *V;
+
+	Result->X = (VL.X * M->AX) + (VL.Y * M->AY) + (VL.Z * M->AZ);
+	Result->Y = (VL.X * M->BX) + (VL.Y * M->BY) + (VL.Z * M->BZ);
+	Result->Z = (VL.X * M->CX) + (VL.Y * M->CY) + (VL.Z * M->CZ);
+	geXForm3d_Assert( geVec3d_IsValid(Result)!=GE_FALSE);
+
+}
 
 //========================================================================================
 //	geXForm3d_TransformArray

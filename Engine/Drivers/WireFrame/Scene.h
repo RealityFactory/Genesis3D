@@ -33,7 +33,10 @@
 
 extern int32 RenderMode;
 
-BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, RECT *WorldRect);
+// changed QD Shadows
+//BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, RECT *WorldRect);
+BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, BOOL ClearStencil, RECT *WorldRect);
+// end change
 BOOL DRIVERCC EndScene(void);
 BOOL DRIVERCC BeginWorld(void);
 BOOL DRIVERCC EndWorld(void);
@@ -41,6 +44,10 @@ BOOL DRIVERCC BeginMeshes(void);
 BOOL DRIVERCC EndMeshes(void);
 BOOL DRIVERCC BeginModels(void);
 BOOL DRIVERCC EndModels(void);
+// changed QD Shadows
+BOOL DRIVERCC BeginShadowVolumes(void);// {return TRUE;}
+BOOL DRIVERCC EndShadowVolumes(void);// {return TRUE;}
+// end change
 
 #endif
 

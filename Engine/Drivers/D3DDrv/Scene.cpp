@@ -41,7 +41,10 @@ int32 RenderMode;
 
 uint32 CurrentLRU;
 
-BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, RECT *WorldRect)
+// changed QD Shadows
+//BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, RECT *WorldRect)
+BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, BOOL ClearStencil, RECT *WorldRect)
+// end change
 {
 	HRESULT	Result;
 
@@ -220,3 +223,17 @@ BOOL DRIVERCC EndModels(void)
 	}
 	return TRUE;
 }
+
+// changed QD Shadows
+BOOL DRIVERCC BeginShadowVolumes(void)
+{
+	return TRUE;
+}
+
+BOOL DRIVERCC EndShadowVolumes(void) 
+{
+	return TRUE;
+}
+// end change
+
+

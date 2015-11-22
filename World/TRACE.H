@@ -94,6 +94,17 @@ geBoolean Trace_WorldCollisionExact2(geWorld *World,
 									int32 *Plane,
 									int32 *Side);
 
+// changed QD Shadows
+// Internal only doesn't check meshes or actors, and ignores translucent contents (CLIP, WINDOW...)
+geBoolean Trace_WorldCollisionExact3(geWorld *World, 
+									const geVec3d *Front, 
+									const geVec3d *Back,
+									geVec3d *Impact,
+									int32 *Node,
+									int32 *Plane,
+									int32 *Side);
+// end change
+
 geBoolean Trace_MiscCollision(GFX_BNode *BNodes, GFX_Plane *Planes, const geVec3d *Mins, const geVec3d *Maxs, const geVec3d *Front, const geVec3d *Back, geXForm3d *XForm, geVec3d *I, GFX_Plane *P);
 geBoolean Trace_MiscCollision2(GFX_BNode *BNodes, GFX_Plane *Planes, const geVec3d *Front, const geVec3d *Back, geVec3d *I, int32 *P);
 

@@ -4,6 +4,10 @@
 /*  Author: John Pollard                                                                */
 /*  Description: Creates geBitmaps from the data in the BSP, that are used to render    */
 /*                                                                                      */
+/*  Edit History:                                                                       */   
+/*   10/15/2003 Wendell Buckner                                                         */  
+/*    Bumpmapping for the World                                                         */
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -78,6 +82,10 @@ geBoolean geWBitmap_SetVisFrame(geWBitmap *WBitmap, int32 VisFrame);
 // changed texture name
 char *geWBitmap_Pool_GetWNameByBitmap(geWBitmap_Pool *Pool, const geBitmap *Bitmap);
 // end change texture name
+
+/* 10/15/2003 Wendell Buckner
+    Bumpmapping for the World */
+char * geWBitmap_GetName(geWBitmap *WBitmap);
 
 #ifdef __cplusplus
 }

@@ -4,6 +4,14 @@
 /*  Author: John Pollard                                                                */
 /*  Description: Code to render the world, and distribute work to other modules         */
 /*                                                                                      */
+/*  Edit History:                                                                       */   
+/*   03/24/2004 Wendell Buckner                                                         */
+/*    BUG FIX: Rendering Transparent Polys properly (2)                                 */
+/*   02/18/2004 Wendell Buckner                                                         */
+/*    DOT BUMPMAPPING                                                                   */
+/*   10/15/2003 Wendell Buckner                                                         */  
+/*    Bumpmapping for the World                                                         */
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -15,8 +23,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_WORLD_H
@@ -231,7 +239,7 @@ typedef struct geWorld
 //MRB BEGIN
 //geSprite
 	int32				SpriteCount;							// Number of sprites in world
-	World_Sprite			*SpriteArray;						// Array of sprites
+	World_Sprite		*SpriteArray;						// Array of sprites
 //MRB END
 	
 	geWorld_EntClassSet	EntClassSets[MAX_WORLD_ENT_CLASS_SETS];
@@ -307,6 +315,18 @@ GENESISAPI geBitmap *geWorld_GetBitmapByName(geWorld *World, const char *BitmapN
 
 geBoolean geWorld_AttachAll(geWorld *World, DRV_Driver *Driver, geFloat Gamma);
 geBoolean geWorld_DetachAll(geWorld *World);
+
+/* 03/24/2004 Wendell Buckner
+    BUG FIX: Rendering Transparent Polys properly (2) */
+void GList_AddOperation(uint8 Type, uint32 Data);
+
+/* 02/18/2004 Wendell Buckner
+    DOT BUMPMAPPING */
+GENESISAPI geBoolean geWorld_CreateBumpmapByNameDot3(geWorld *World, const char *BumpmapName);
+
+/* 10/15/2003 Wendell Buckner
+    Bumpmapping for the World */
+GENESISAPI geBitmap * geWorld_CreateBumpmapByName(geWorld *World, const char *BumpmapName, gePixelFormat BumpFormat);
 
 #ifdef __cplusplus
 }

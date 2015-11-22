@@ -5,6 +5,50 @@
 /*  Author: Charles Bloom                                                               */
 /*  Description:  Abstract Bitmap system                                                */
 /*                                                                                      */
+/*  Edit History:                                                                       */
+/*                                                                                      */
+/*  Edit History:                                                                       */
+/*  11/02/2004 Wendell Buckner                                                          */
+/*   DOT3 BUG FIX - Crashes the 16-bit because not getting the right driver flags       */  
+/*  08/10/2004 Wendell Buckner                                                          */
+/*   BUG FIX EMBM: geBitmap_destroy can set the bitmap to NULL so clear the bitmaps     */
+/*   before the calling it                                                              */
+/*  03/24/2004 Wendell Buckner                                                          */
+/*   BUG FIX: Rendering Transparent Polys properly (2)                                  */
+/*	03/15/2004 Wendell Buckner                                                          */
+/*   SPHEREMAPPING                                                                      */
+/*  03/14/2004 Wendell Buckner                                                          */
+/*   BUMPMAPPING - Allow the height differential map to be changed by the height map    */
+/*   BUMPMAPPING - Have a informational variable which tells us what kind of bitmap this*/
+/*    is                                                                                */
+/*   BUMPMAPPING - It's useful to navigate through the textures to get to the head or   */
+/*   the tail                                                                           */
+/*  02/28/2004 Wendell Buckner                                                          */ 
+/*   DOT3 BUMPMAPPING                                                                   */
+/*  02/20/2004 Wendell Buckner                                                          */
+/*   DOT3 BUMPMAPPING                                                                   */
+/*  02/17/2004 Wendell Buckner                                                          */
+/*   DOT3 BUMPMAPPING                                                                   */
+/*  02/13/2004 Wendell Buckner                                                          */
+/*   2 EMBM METHODS - GAMASUTRA is less bumpy, MS is more bumpy                         */
+/*  10/15/2003 Wendell Buckner                                                          */
+/*   Bumpmapping for the World                                                          */
+/*  08/27/2003 Wendell Buckner                                                          */   
+/*   BUMPMAPPING                                                                        */   
+/*    When gamma correction is done globally this routine is called which changes the   */
+/*    bump map driver flags                                                             */
+/*  05/28/2003 Wendell Buckner                                                          */
+/*   BUMPMAPPING                                                                        */
+/*  05/27/2003 Wendell Buckner                                                          */
+/*   BUMPMAPPING                                                                        */
+/*  05/19/2003 Wendell Buckner                                                          */
+/*   BUMPMAPPING                                                                        */
+/*  05/05/2003 Wendell Buckner                                                          */
+/*   BUMPMAPPING                                                                        */
+/*	 geBitmap_ChooseDriverFormat() will Ignore the bump map pixel formats for now...    */
+/*  03/28/2003 Wendell Buckner                                                          */
+/*   BUMPMAPPING                                                                        */
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -16,8 +60,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 
@@ -127,6 +171,624 @@ void geBitmap_Stop(void)
 
 /*}{ ******** Creator Functions **********************/
 
+/*	03/15/2004 Wendell Buckner
+    SPHEREMAPPING */
+GENESISAPI geBoolean GENESISCC geBitmap_IsSphereMapName(const char *BmpName)
+{
+ long c = memcmp(BmpName,"SM0_",3);
+ geBoolean b = (c == 0);
+ return b;
+}
+
+/*  02/17/2004 Wendell Buckner                                                          
+     DOT3 BUMPMAPPING                                                                   */
+
+GENESISAPI geBoolean GENESISCC geBitmap_IsBumpmapNameDot3(const char *BmpName)
+{
+ long c = memcmp(BmpName,"BN0_",3);
+ geBoolean b = (c == 0);
+ return b;
+}
+
+GENESISAPI geBoolean GENESISCC geBitmap_CreateBumpmapDot3 (geBitmap *BaseBmp, geBitmap *BumpBmp, geBitmap *SpecularBmp)
+{
+ static	geBoolean BumpMapFormatsQueried = GE_FALSE;
+ static	geBoolean HasBumpMapDot3;
+ geBoolean BumpMapCreated = GE_FALSE;
+ 
+ do
+ {
+  if(!BaseBmp) break;
+  if(!BumpBmp) break;
+
+  if(BaseBmp->DriverFlags & RDRIVER_PF_COMBINE_DOT3BUMPMAP) break;
+  if( BaseBmp->NextBitmap || BumpBmp->NextBitmap ) break;
+
+  if (!BumpMapFormatsQueried) HasBumpMapDot3 = geBitmap_GetEngineSupport( NULL, DRV_SUPPORT_DOT3 );
+
+  BumpMapFormatsQueried = GE_TRUE;
+
+  if (!HasBumpMapDot3 ) break;
+
+  BaseBmp->NextBitmap = BumpBmp;
+
+  geBitmap_CreateRef(BaseBmp);
+  geBitmap_CreateRef(BumpBmp);
+
+  if ( SpecularBmp )
+  { 
+   BumpBmp->NextBitmap = SpecularBmp;
+   SpecularBmp->NextBitmap = NULL;
+
+   geBitmap_CreateRef(SpecularBmp);
+  }
+  else
+   BumpBmp->NextBitmap = NULL;
+
+  BaseBmp->DriverFlags |= RDRIVER_PF_COMBINE_DOT3BUMPMAP;
+
+/* 02/20/2004 Wendell Buckner 
+    DOT3 BUMPMAPPING */
+  BumpBmp->Info.IsNormalMap = GE_TRUE;
+
+  BumpMapCreated = GE_TRUE;
+  
+ }
+ while(GE_FALSE);
+
+ return BumpMapCreated;
+}
+
+GENESISAPI geBoolean GENESISCC geBitmap_DestroyBumpmapDot3 (geBitmap *BaseBmp)
+{
+ geBoolean BumpMapDestroyed = GE_FALSE;
+ geBitmap *BumpBmp = NULL;
+ geBitmap *SpecularBmp = NULL;
+
+ do
+ {
+  if(!BaseBmp) break;
+
+  if(!(BaseBmp->DriverFlags & RDRIVER_PF_COMBINE_DOT3BUMPMAP)) break;
+
+  if( (!BaseBmp->NextBitmap) ) break;
+
+// With embm bumpmapping since we add a new bitmap we force the textures to be reloaded to the driver.
+// which ensured that the textures are linked on the driver, but with dot3 we never add a new bitmap and
+// code is constantly adding/deleting (really incrementing/decrementing references) so when we call this
+// routine and remove flag which ensures that we never combine the textures on the driver!
+// So the sucker never gets to the driver.
+// WE NEED TO DO THIS WITH EMBM TO BE CONSISTENT!
+  if( BaseBmp->RefCount > 2) break;
+
+  BumpBmp = BaseBmp->NextBitmap;
+
+  SpecularBmp = BumpBmp->NextBitmap;
+
+  BaseBmp->NextBitmap = NULL;
+  BumpBmp->NextBitmap = NULL;
+
+  geBitmap_Destroy( &(BaseBmp) );
+  geBitmap_Destroy( &(BumpBmp) );
+
+  if( SpecularBmp ) 
+  {
+   SpecularBmp->NextBitmap = NULL;
+   geBitmap_Destroy( &(SpecularBmp) );
+  }
+
+  BaseBmp->DriverFlags &= ~RDRIVER_PF_COMBINE_DOT3BUMPMAP;
+
+/* 02/20/2004 Wendell Buckner 
+    DOT3 BUMPMAPPING */
+  BumpBmp->Info.IsNormalMap = GE_FALSE;
+
+  BumpMapDestroyed = GE_TRUE;
+ } while(GE_FALSE);
+
+ return BumpMapDestroyed;
+}
+
+GENESISAPI void GENESISCC geBitmap_AttachBumpmapToDriverDot3( geBitmap *Bmp )
+{
+ geBitmap *BumpBmp     = NULL;
+ geBitmap *BmpSpecular = NULL;
+ int32     BmpCount    = 0;
+
+ geRDriver_THandle *DriverHandle[3];
+ memset(&DriverHandle,0,sizeof(geRDriver_THandle *) * 3);
+
+ do
+ {
+  if ( !geBitmap_IsValid(Bmp) ) break;
+  if ( !(Bmp->DriverFlags & RDRIVER_PF_COMBINE_DOT3BUMPMAP) ) break;
+
+  BumpBmp = Bmp->NextBitmap;
+  if ( !geBitmap_IsValid(BumpBmp) ) break;
+
+  if(!Bmp->DriverHandle) break;
+  if(!BumpBmp->DriverHandle) break;;
+
+  DriverHandle[0] = Bmp->DriverHandle;
+  DriverHandle[1] = BumpBmp->DriverHandle;
+  BmpCount = 2;
+
+  BmpSpecular = BumpBmp->NextBitmap;
+
+  if (BmpSpecular) 
+  {
+   DriverHandle[2] = BmpSpecular->DriverHandle;
+   BmpCount++;
+  }
+  
+  Bmp->Driver->THandle_Combine(&DriverHandle[0],BmpCount);
+ }while(GE_FALSE);
+
+}
+
+GENESISAPI void GENESISCC geBitmap_DetachBumpmapFromDriverDot3( geBitmap *Bmp )
+{
+ geBitmap *BumpBmp     = NULL;
+ geBitmap *BmpSpecular = NULL;
+ int32     BmpCount    = 0;
+ geRDriver_THandle *DriverHandle[3];
+
+ memset(&DriverHandle,0,sizeof(geRDriver_THandle *) * 3);
+
+ do
+ {
+  if ( !geBitmap_IsValid(Bmp) ) break;
+  if ( !(Bmp->DriverFlags & RDRIVER_PF_COMBINE_DOT3BUMPMAP) ) break;
+  if ( !geBitmap_IsValid(Bmp->NextBitmap) ) break;
+
+  BumpBmp = Bmp->NextBitmap;
+  if ( !geBitmap_IsValid(BumpBmp) ) break;
+
+  BmpSpecular = BumpBmp->NextBitmap;
+
+  if(!Bmp->DriverHandle) break;
+  if(!BumpBmp->DriverHandle) break;
+
+  DriverHandle[0] = Bmp->DriverHandle;
+  DriverHandle[1] = BumpBmp->DriverHandle;
+  BmpCount = 2;  
+
+  if (BmpSpecular) 
+  {
+   DriverHandle[2] = BmpSpecular->DriverHandle;
+   BmpCount++;
+  }
+  
+  Bmp->Driver->THandle_UnCombine(&DriverHandle[0],BmpCount);
+ }while(GE_FALSE);
+
+}
+
+GENESISAPI geBoolean GENESISCC geBitmap_GetEngineSupport(void * EngineSupport, uint32 DesiredEngineSupport )
+{
+ static DRV_EngineSettings EngineSettings;
+ static geBoolean EngineSettingsInitialized = GE_FALSE;
+ geBoolean HasEngineSupport = GE_FALSE;
+
+ if (!EngineSettingsInitialized ) memset(&EngineSettings,0,sizeof(DRV_EngineSettings));
+
+ EngineSettingsInitialized = GE_TRUE;
+
+/* 11/02/2004 Wendell Buckner 
+    DOT3 BUG FIX - Crashes the 16-bit because not getting the right driver flags 
+ if ( EngineSupport ) memcpy (&EngineSettings, &EngineSupport, sizeof(DRV_EngineSettings)); */
+ if ( EngineSupport ) memcpy (&EngineSettings, EngineSupport, sizeof(DRV_EngineSettings));
+
+ if ( DesiredEngineSupport && (EngineSettings.CanSupportFlags & DesiredEngineSupport)) HasEngineSupport = GE_TRUE;
+
+ return HasEngineSupport;
+}
+
+/* 10/15/2003 Wendell Buckner
+    Bumpmapping for the World */
+GENESISAPI char * GENESISCC geBitmap_GetGreyBumpmapName(const char *BumpName)
+{
+ static char GreyBumpmapName[1024];
+ char * pGreyBumpmapName = NULL;
+
+ do
+ {
+  if(!BumpName) break;
+  
+  strcpy(GreyBumpmapName,BumpName);
+  memcpy((char*) &GreyBumpmapName,"BMB",3);
+
+  pGreyBumpmapName = (char *) &GreyBumpmapName;
+ }
+ while(GE_FALSE);
+
+ return pGreyBumpmapName;
+}
+
+GENESISAPI char * GENESISCC geBitmap_GetSpecularBumpmapName(const char *BumpName)
+{
+ static char SpecularBumpmapName[1024];
+ char * pSpecularBumpmapName = NULL;
+
+ do
+ {
+  if(!BumpName) break;
+  
+  strcpy(SpecularBumpmapName,BumpName);
+  memcpy((char *) &SpecularBumpmapName,"BMS",3);
+
+  pSpecularBumpmapName = (char *) &SpecularBumpmapName;
+ }
+ while(GE_FALSE);
+
+ return pSpecularBumpmapName;
+}
+
+/* 03/28/2003 Wendell Buckner
+    BUMPMAPPING */
+
+//*****************************************************************************************
+
+GENESISAPI geBoolean GENESISCC geBitmap_IsBumpmapName(const char *BmpName)
+{
+ long c = memcmp(BmpName,"BM0_",3);
+ geBoolean b = (c == 0);
+ return b;
+// return (strncmp(BmpName,"BM0_",sizeof("BM0_")) == 0) ? GE_TRUE : GE_FALSE;
+}
+
+/* 10/15/2003 Wendell Buckner
+    Bumpmapping for the World */
+GENESISAPI geBoolean GENESISCC geBitmap_IsGreyBumpmapName(const char *BmpName)
+{
+ long c = memcmp(BmpName,"BMB_",3);
+ geBoolean b = (c == 0);
+ return b;
+}
+
+GENESISAPI geBoolean GENESISCC geBitmap_IsSpecularBumpmapName(const char *BmpName)
+{
+ long c = memcmp(BmpName,"BMS_",3);
+ geBoolean b = (c == 0);
+ return b;
+}
+
+GENESISAPI geBitmap * GENESISCC geBitmap_GetBumpMapAlt ( geBitmap *BaseBmp )
+{
+ geBitmap *BumpBmp        = NULL;
+ geBitmap *BumpBmpAlt     = NULL;
+ unsigned long u = 0;
+ do
+ {
+  if(!BaseBmp) break;
+
+  if(!(BaseBmp->DriverFlags & RDRIVER_PF_COMBINE_BUMPMAP)) break;
+
+  BumpBmp = BaseBmp->NextBitmap;
+  if(!BumpBmp) break;
+  
+  BumpBmpAlt = BumpBmp->NextBitmap;
+ }
+ while(GE_FALSE);
+
+ return BumpBmpAlt;
+}
+
+/* 02/13/2004 Wendell Buckner
+   2 EMBM METHODS - GAMASUTRA is less bumpy, MS is more bumpy */
+
+/* method inspired by Gamastura Sample */
+
+void geBitmap_InitBumpMapAlt ( geBitmap *BumpBmp, geBitmap *BumpBmpAlt )
+{
+ geBitmap *sMips;
+ geBitmap *dMips;
+ int NumMips = 1;
+ int m;
+ long y;
+ long x;
+ WORD uL;
+ unsigned int sBytesPerPel;
+ unsigned int dBytesPerPel;
+
+ if ( !geBitmap_LockForRead ( BumpBmp, &sMips,0,0,BumpBmp->Info.Format,GE_FALSE,0) )
+ {
+  geErrorLog_AddString(-1, "geInitBumpMapAlt:  geBitmap_LockForRead failed.", NULL);
+// goto ExitWithError;
+ }
+
+// Lock all the miplevels
+ if (!geBitmap_LockForWrite ( BumpBmpAlt, &dMips, 0, NumMips-1 ) )
+ {
+  geErrorLog_AddString(-1, "geInitBumpMapAlt:  geBitmap_LockForWrite failed.", NULL);
+//goto ExitWithError;
+ }
+
+// Fill all the mip levels
+ for (m=0; m< NumMips; m++)
+ {
+  uint8			*pSrc;
+  geBitmap_Info	sInfo;
+  uint8			*pDst;
+  geBitmap_Info	dInfo;
+
+  if (!geBitmap_GetInfo(&sMips[m], &sInfo, NULL))
+  {
+   geErrorLog_AddString(-1, "geWBitmap_Pool_CreateAllWBitmaps:  geBitmap_GetInfo failed.", NULL);
+// goto ExitWithError;
+  }
+
+  assert(sInfo.Stride >= sInfo.Width);
+
+  pSrc = geBitmap_GetBits(&sMips[m]);
+  assert( pSrc );
+
+  if (!geBitmap_GetInfo(&dMips[m], &dInfo, NULL))
+  {
+   geErrorLog_AddString(-1, "geWBitmap_Pool_CreateAllWBitmaps:  geBitmap_GetInfo failed.", NULL);
+//   goto ExitWithError;
+  }
+
+  pDst = geBitmap_GetBits(&dMips[m]);
+  assert( pDst );
+
+  assert(dInfo.Stride >= dInfo.Width);
+
+  sBytesPerPel =  gePixelFormat_BytesPerPel( BumpBmp->Info.Format );
+  dBytesPerPel =  gePixelFormat_BytesPerPel( BumpBmpAlt->Info.Format );
+
+  for( y=0; y < sInfo.Height; y++ )
+  {
+   BYTE* pDstT = pDst;
+   BYTE* pSrcB0 = (BYTE*) pSrc;
+   BYTE* pSrcB1 = ( pSrcB0 + (sInfo.Stride * sBytesPerPel) );
+   BYTE* pSrcB2 = ( pSrcB0 - (sInfo.Stride * sBytesPerPel) );
+
+   if( y == sInfo.Height-1 )   // Don't go past the last line
+    pSrcB1 = pSrcB0;
+
+   if( y == 0 )                 // Don't go before first line
+    pSrcB2 = pSrcB0;
+
+   for( x=0; x < sInfo.Width; x++ )
+   {
+    LONG v00 = *(pSrcB0+0); // Get the current pixel
+    LONG v01 = *(pSrcB0+sBytesPerPel); // and the pixel to the right
+    LONG vM1 = *(pSrcB0-sBytesPerPel); // and the pixel to the left
+    LONG v10 = *(pSrcB1+0); // and the pixel one line below.
+    LONG v1M = *(pSrcB2+0); // and the pixel one line above.
+
+    LONG iDu = (v01-v00); // The delta-u bump value
+    LONG iDv = (v10-v00); // The delta-v bump value
+
+    uL  = 255;  // The luminance bump value
+    if( v00 > 120 )  // If above sea-level (specific to the earth bmp),
+     uL = 63;        // make the land masses less shiny.
+
+	
+    switch( BumpBmpAlt->Info.Format )
+    {
+     case GE_PIXELFORMAT_16BIT_88_UV:
+      *pDstT++ = (BYTE)iDu;
+      *pDstT++ = (BYTE)iDv;
+      break;
+
+     case GE_PIXELFORMAT_16BIT_556_UVL:
+      *(WORD*)pDstT  =  (iDu >> 3) & 0x1f;
+      *(WORD*)pDstT |= ((iDv >> 3) & 0x1f)<<5;
+      *(WORD*)pDstT |= ( (uL >> 2) & 0x3f)<<10;
+      pDstT += 2;
+      break;
+
+     case GE_PIXELFORMAT_24BIT_888_UVL:
+      *pDstT++ = (BYTE)iDu;
+      *pDstT++ = (BYTE)iDv;
+      *pDstT++ = (BYTE)uL;
+      break;
+    }
+
+    pSrcB0+=sBytesPerPel; 
+    pSrcB1+=sBytesPerPel;
+    pSrcB2+=sBytesPerPel;
+   }
+
+   pSrc += (sInfo.Stride * sBytesPerPel); // Move to the next line
+   pDst += (dInfo.Stride * dBytesPerPel);
+  }
+
+  geBitmap_UnLock(&sMips[m]); 
+  geBitmap_UnLock(&dMips[m]); 
+ }
+
+//ExitWithError:
+
+}
+
+/* 02/13/2004 Wendell Buckner
+   2 EMBM METHODS - GAMASUTRA is less bumpy, MS is more bumpy */
+
+/* method inspired by MS Bump World Sample 
+
+void geBitmap_InitBumpMapAlt ( geBitmap *BumpBmp, geBitmap *BumpBmpAlt )
+{
+ geBitmap *sMips;
+ geBitmap *dMips;
+ int NumMips = 1;
+ int m;
+ long y;
+ long x;
+ WORD uL;
+ unsigned int sBytesPerPel;
+ unsigned int dBytesPerPel;
+
+ if ( !geBitmap_LockForRead ( BumpBmp, &sMips,0,0,BumpBmp->Info.Format,GE_FALSE,0) )
+ {
+  geErrorLog_AddString(-1, "geInitBumpMapAlt:  geBitmap_LockForRead failed.", NULL);
+// goto ExitWithError;
+ }
+
+// Lock all the miplevels
+ if (!geBitmap_LockForWrite ( BumpBmpAlt, &dMips, 0, NumMips-1 ) )
+ {
+  geErrorLog_AddString(-1, "geInitBumpMapAlt:  geBitmap_LockForWrite failed.", NULL);
+//goto ExitWithError;
+ }
+
+// Fill all the mip levels
+ for (m=0; m< NumMips; m++)
+ {
+  uint8			*pSrc;
+  geBitmap_Info	sInfo;
+  uint8			*pDst;
+  geBitmap_Info	dInfo;
+
+  if (!geBitmap_GetInfo(&sMips[m], &sInfo, NULL))
+  {
+   geErrorLog_AddString(-1, "geWBitmap_Pool_CreateAllWBitmaps:  geBitmap_GetInfo failed.", NULL);
+// goto ExitWithError;
+  }
+
+  assert(sInfo.Stride >= sInfo.Width);
+
+  pSrc = geBitmap_GetBits(&sMips[m]);
+  assert( pSrc );
+
+  if (!geBitmap_GetInfo(&dMips[m], &dInfo, NULL))
+  {
+   geErrorLog_AddString(-1, "geWBitmap_Pool_CreateAllWBitmaps:  geBitmap_GetInfo failed.", NULL);
+//   goto ExitWithError;
+  }
+
+  pDst = geBitmap_GetBits(&dMips[m]);
+  assert( pDst );
+
+  assert(dInfo.Stride >= dInfo.Width);
+
+  sBytesPerPel =  gePixelFormat_BytesPerPel( BumpBmp->Info.Format );
+  dBytesPerPel =  gePixelFormat_BytesPerPel( BumpBmpAlt->Info.Format );
+
+  for( y=0; y < sInfo.Height; y++ )
+  {
+   BYTE* pDstT = pDst;
+   BYTE* pSrcB0 = (BYTE*) pSrc;
+   BYTE* pSrcB1 = ( pSrcB0 + (sInfo.Stride * sBytesPerPel) );
+   BYTE* pSrcB2 = ( pSrcB0 - (sInfo.Stride * sBytesPerPel) );
+
+   if( y == sInfo.Height-1 )   // Don't go past the last line
+    pSrcB1 = pSrcB0;
+
+   if( y == 0 )                 // Don't go before first line
+    pSrcB2 = pSrcB0;
+
+   for( x=0; x < sInfo.Width; x++ )
+   {
+    LONG v00 = *(pSrcB0+0); // Get the current pixel
+    LONG v01 = *(pSrcB0+sBytesPerPel); // and the pixel to the right
+    LONG vM1 = *(pSrcB0-sBytesPerPel); // and the pixel to the left
+    LONG v10 = *(pSrcB1+0); // and the pixel one line below.
+    LONG v1M = *(pSrcB2+0); // and the pixel one line above.
+
+    LONG iDu = (vM1-v01); // The delta-u bump value
+    LONG iDv = (v1M-v10); // The delta-v bump value
+
+    if ( (v00 < vM1) && (v00 < v01) )  // If we are at valley
+    {
+     iDu = vM1-v00;                 // Choose greater of 1st order diffs
+     if ( iDu < v00-v01 ) iDu = v00-v01;
+    }
+
+    uL  = 255;  // The luminance bump value
+    if( v00 > 120 )  // If above sea-level (specific to the earth bmp),
+     uL = 63;        // make the land masses less shiny.
+
+	
+    switch( BumpBmpAlt->Info.Format )
+    {
+     case GE_PIXELFORMAT_16BIT_88_UV:
+      *pDstT++ = (BYTE)iDu;
+      *pDstT++ = (BYTE)iDv;
+      break;
+
+     case GE_PIXELFORMAT_16BIT_556_UVL:
+      *(WORD*)pDstT  =  (iDu >> 3) & 0x1f;
+      *(WORD*)pDstT |= ((iDv >> 3) & 0x1f)<<5;
+      *(WORD*)pDstT |= ( (uL >> 2) & 0x3f)<<10;
+      pDstT += 2;
+      break;
+
+     case GE_PIXELFORMAT_24BIT_888_UVL:
+      *pDstT++ = (BYTE)iDu;
+      *pDstT++ = (BYTE)iDv;
+      *pDstT++ = (BYTE)uL;
+      break;
+    }
+
+    pSrcB0+=sBytesPerPel; 
+    pSrcB1+=sBytesPerPel;
+    pSrcB2+=sBytesPerPel;
+   }
+
+   pSrc += (sInfo.Stride * sBytesPerPel); // Move to the next line
+   pDst += (dInfo.Stride * dBytesPerPel);
+  }
+
+  geBitmap_UnLock(&sMips[m]); 
+  geBitmap_UnLock(&dMips[m]); 
+ }
+
+//ExitWithError:
+
+} */
+
+/* 03/14/2004 Wendell Buckner 
+    BUMPMAPPING - Allow the height differential map to be changed by the height map */
+GENESISAPI geBoolean GENESISCC geBitmap_UpdateBumpMapAlt ( geBitmap *BumpBmp )
+{
+	geBoolean BumpMapAltUpdated = GE_FALSE;
+	geBitmap *BaseBmp   = NULL;
+    geBitmap *BumpBmpAlt = NULL;
+
+	do
+	{
+		BaseBmp = BumpBmp->PrevBitmap;
+
+        if (!BaseBmp) break;
+
+		if (!(BaseBmp->DriverFlags & RDRIVER_PF_COMBINE_BUMPMAP)) break;
+
+		if (!BumpBmp->Info.IsHeightMap) break;
+
+		BumpBmpAlt = BumpBmp->NextBitmap;
+
+        if (!BumpBmpAlt) break;
+
+		geBitmap_InitBumpMapAlt(BumpBmp,BumpBmpAlt);
+		
+		BumpMapAltUpdated = GE_TRUE;
+	}
+	while (GE_FALSE);
+
+	return BumpMapAltUpdated;
+}
+
+GENESISAPI void GENESISCC geBitmap_SetRenderFlags(const geBitmap *Bmp, uint32 *Flags)
+{
+ /* 02/17/2004 Wendell Buckner
+    DOT3 BUMPMAPPING 
+	if(Bmp->DriverFlags & RDRIVER_PF_COMBINE_BUMPMAP) */
+	if(Bmp->DriverFlags & RDRIVER_PF_COMBINE_DOT3BUMPMAP)
+	{
+		*Flags |= DRV_RENDER_DOT3BUMPMAP;	
+	}
+	else if(Bmp->DriverFlags & RDRIVER_PF_COMBINE_BUMPMAP)
+	{ 
+		*Flags |= DRV_RENDER_BUMPMAP;	
+	}
+}
+
+//*****************************************************************************************
+
+
 geBitmap * geBitmap_Create_Base(void)
 {
 geBitmap * Bmp;
@@ -197,6 +859,19 @@ geBitmap * Bmp;
 		geErrorLog_AddString(-1,"Genesis3D 1.0 does not support Wavelet Images",NULL);
 		return NULL;
 	}
+
+/* 05/28/2003 Wendell Buckner
+    BUMPMAPPING */
+	switch (Bmp->Info.Format)
+	{
+     case GE_PIXELFORMAT_16BIT_88_UV:
+     case GE_PIXELFORMAT_16BIT_556_UVL:
+     case GE_PIXELFORMAT_24BIT_888_UVL:
+	 {
+	  Bmp->DriverGamma = Bmp->DriverGammaLast = 0.0f;
+	  Bmp->DriverGammaSet = GE_TRUE;
+	 }
+    }	
 
 return Bmp;
 }
@@ -466,7 +1141,7 @@ int mip;
 
 	assert( Bmp->LockCount == - (MaximumMip - MinimumMip + 1) );
 
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 GENESISAPI geBoolean	GENESISCC geBitmap_LockForWriteFormat(
@@ -476,7 +1151,7 @@ GENESISAPI geBoolean	GENESISCC geBitmap_LockForWriteFormat(
 	int					MaximumMip,
 	gePixelFormat 		Format)
 {
-int mip;
+	int mip;
 
 	assert( geBitmap_IsValid(Bmp) );
 	assert( Target);
@@ -564,8 +1239,8 @@ GENESISAPI geBoolean GENESISCC geBitmap_LockForReadNative(
 	int					MinimumMip,
 	int					MaximumMip)
 {
-int mip;
-geBitmap * Bmp = (geBitmap *)iBmp;
+	int mip;
+	geBitmap * Bmp = (geBitmap *)iBmp;
 
 	assert( geBitmap_IsValid(Bmp) );
 	assert( Target);
@@ -622,8 +1297,8 @@ GENESISAPI geBoolean	GENESISCC geBitmap_LockForRead(
 	geBoolean			HasColorKey,
 	uint32				ColorKey)
 {
-int mip;
-geBitmap * Bmp = (geBitmap *)iBmp;
+	int mip;
+	geBitmap * Bmp = (geBitmap *)iBmp;
 
 	assert( geBitmap_IsValid(Bmp) );
 	assert( Target);
@@ -660,38 +1335,38 @@ geBitmap * Bmp = (geBitmap *)iBmp;
 		}
 	}
 
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 geBoolean geBitmap_UnLockArray_NoChange(geBitmap **Locks,int Size)
 {
-int i;
-geBoolean Ret = GE_TRUE;
+	int i;
+	geBoolean Ret = GE_TRUE;
 	assert(Locks);
 	for(i=0;i<Size;i++)
 	{
 		if ( ! geBitmap_UnLock_NoChange(Locks[i]) )
 			Ret = GE_FALSE;
 	}
-return Ret;
+	return Ret;
 }
 
 GENESISAPI geBoolean	GENESISCC geBitmap_UnLockArray(geBitmap **Locks,int Size)
 {
-int i;
-geBoolean Ret = GE_TRUE;
+	int i;
+	geBoolean Ret = GE_TRUE;
 	assert(Locks);
 	for(i=0;i<Size;i++)
 	{
 		if ( ! geBitmap_UnLock(Locks[i]) )
 			Ret = GE_FALSE;
 	}
-return Ret;
+	return Ret;
 }
 
 geBoolean geBitmap_UnLock_Internal(geBitmap *Bmp,geBoolean Apply)
 {
-geBoolean Ret = GE_TRUE;
+	geBoolean Ret = GE_TRUE;
 
 	if ( ! Bmp )
 	{
@@ -796,22 +1471,22 @@ geBoolean Ret = GE_TRUE;
 
 	assert(Bmp == NULL);
 
-return Ret;
+	return Ret;
 }
 
 GENESISAPI geBoolean	GENESISCC geBitmap_UnLock(geBitmap *Bmp)
 {
-return geBitmap_UnLock_Internal(Bmp,GE_TRUE);
+	return geBitmap_UnLock_Internal(Bmp,GE_TRUE);
 }
 
 geBoolean geBitmap_UnLock_NoChange(geBitmap *Bmp)
 {
-return geBitmap_UnLock_Internal(Bmp,GE_FALSE);
+	return geBitmap_UnLock_Internal(Bmp,GE_FALSE);
 }
 
 GENESISAPI void *	GENESISCC geBitmap_GetBits(geBitmap *Bmp)
 {
-void * bits;
+	void * bits;
 
 	assert( geBitmap_IsValid(Bmp) );
 
@@ -843,14 +1518,14 @@ void * bits;
 		bits = Bmp->Data[0];
 	}
 
-return bits;
+	return bits;
 }
 
 /*}{ ************* _CreateLock_#? *********************/
 
 geBitmap * geBitmap_CreateLock_CopyInfo(geBitmap *BmpSrc,int LockCnt,int mip)
 {
-geBitmap * Bmp;
+	geBitmap * Bmp;
 
 	assert( geBitmap_IsValid(BmpSrc) );
 
@@ -877,7 +1552,7 @@ geBitmap * Bmp;
 
 	BmpSrc->LockCount += LockCnt;
 
-return Bmp;
+	return Bmp;
 }
 
 void geBitmap_MakeMipInfo(geBitmap_Info *Src,int mip,geBitmap_Info * Target)
@@ -898,7 +1573,7 @@ geBitmap * geBitmap_CreateLockFromMip(geBitmap *Src,int mip,
 	uint32		ColorKey,
 	int			LockCnt)
 {
-geBitmap * Ret;
+	geBitmap * Ret;
 
 	assert( geBitmap_IsValid(Src) );
 	if ( mip < 0 || mip >= MAXMIPLEVELS )
@@ -982,12 +1657,12 @@ geBitmap * Ret;
 		return NULL;
 	}
 
-return Ret;
+	return Ret;
 }
 
 geBitmap * geBitmap_CreateLockFromMipSystem(geBitmap *Src,int mip,int LockCnt)
 {
-geBitmap * Ret;
+	geBitmap * Ret;
 
 	assert( geBitmap_IsValid(Src) );
 	if ( mip < Src->Info.MinimumMip || mip >= MAXMIPLEVELS )
@@ -1029,12 +1704,12 @@ geBitmap * Ret;
 
 	assert( geBitmap_IsValid(Ret) );
 
-return Ret;
+	return Ret;
 }
 
 geBitmap * geBitmap_CreateLockFromMipOnDriver(geBitmap *Src,int mip,int LockCnt)
 {
-geBitmap * Ret;
+	geBitmap * Ret;
 
 	assert( geBitmap_IsValid(Src) );
 	if ( ! Src->DriverHandle || ! Src->Driver || Src->DriverMipLock || mip < Src->DriverInfo.MinimumMip || mip > Src->DriverInfo.MaximumMip )
@@ -1074,7 +1749,7 @@ geBitmap * Ret;
 
 	assert( geBitmap_IsValid(Ret) );
 
-return Ret;
+	return Ret;
 }
 
 /*}{ ************* Driver Attachment *********************/
@@ -1083,22 +1758,284 @@ return Ret;
 
 static geBoolean EnumPFCB(geRDriver_PixelFormat *pFormat,void *Context)
 {
-geRDriver_PixelFormat **pDriverFormatsPtr;
+	geRDriver_PixelFormat **pDriverFormatsPtr;
 	pDriverFormatsPtr = Context;
 	**pDriverFormatsPtr = *pFormat;
 	(*pDriverFormatsPtr) += 1;
-return GE_TRUE;
+	
+	return GE_TRUE;
 }
+
+
+/* 03/28/2003 Wendell Buckner
+    BUMPMAPPING */
+//*****************************************************************************************
+
+GENESISAPI void GENESISCC geBitmap_GetBumpMapPixelFormats( gePixelFormat *DriverFormatsPtr, gePixelFormat *BumpMapPixelFormats, int *BumpMapPixelFormatCount)
+{
+	static gePixelFormat DriverFormats[MAX_DRIVER_FORMATS];
+	static int DriverFormatsCount = 0; 	
+	int i;
+ 
+	do
+	{
+		if ( DriverFormatsPtr == NULL ) break;
+		if ( BumpMapPixelFormatCount == NULL ) break;
+
+		DriverFormatsCount = *BumpMapPixelFormatCount;
+
+		for( i=0; i < DriverFormatsCount; i++ )
+			DriverFormats[i] = DriverFormatsPtr[i];
+
+	} while(GE_FALSE);
+
+	do
+	{
+		if ( BumpMapPixelFormats == NULL ) break;
+		if ( BumpMapPixelFormatCount == NULL ) break;
+
+		for(i=0, *BumpMapPixelFormatCount=0; (i<DriverFormatsCount) && (i < MAX_DRIVER_FORMATS); i++)
+			switch (DriverFormats[i])
+			{
+			case GE_PIXELFORMAT_16BIT_88_UV:
+			case GE_PIXELFORMAT_16BIT_556_UVL:
+			case GE_PIXELFORMAT_24BIT_888_UVL:
+				{
+					BumpMapPixelFormats[*BumpMapPixelFormatCount] = DriverFormats[i];
+					(*BumpMapPixelFormatCount)++;
+				}	
+			}
+	} while(GE_FALSE);
+}
+
+GENESISAPI geBitmap * GENESISCC geBitmap_CreateBumpmap (geBitmap *BaseBmp, geBitmap *BumpBmp, geBitmap *SpecularBmp, gePixelFormat BumpFormat )
+{
+	geBitmap * BumpMapCreated = NULL;
+	int i = 0;
+	static int BumpMapPixelFormatCount = 0;
+	static gePixelFormat BumpMapPixelFormats[MAX_DRIVER_FORMATS];
+	static geBoolean BumpMapFormatsQueried = GE_FALSE;
+	geBitmap *BumpBmpAlt;
+
+	do
+	{
+		if ((BumpFormat != GE_PIXELFORMAT_16BIT_88_UV) && (BumpFormat != GE_PIXELFORMAT_16BIT_556_UVL) && (BumpFormat != GE_PIXELFORMAT_24BIT_888_UVL)) break;
+
+		if(!BaseBmp) break;
+		if(!BumpBmp) break;
+
+		if(BaseBmp->DriverFlags & RDRIVER_PF_COMBINE_BUMPMAP) break;
+		if( BaseBmp->NextBitmap || BumpBmp->NextBitmap ) break;
+
+		if (!BumpMapFormatsQueried) geBitmap_GetBumpMapPixelFormats( NULL, &BumpMapPixelFormats[0],&BumpMapPixelFormatCount);
+			BumpMapFormatsQueried = GE_TRUE;
+
+		if(BumpMapPixelFormatCount == 0) break;
+
+		for(i=0; i < BumpMapPixelFormatCount; i++)
+			if(BumpMapPixelFormats[i] == BumpFormat) break;
+
+		if( i == BumpMapPixelFormatCount) break;
+
+		BumpBmpAlt = geBitmap_Create(BaseBmp->Info.Width,BaseBmp->Info.Height, 1, BumpFormat);
+		if(!BumpBmpAlt) break;
+
+		geBitmap_InitBumpMapAlt ( BumpBmp, BumpBmpAlt );
+
+		BaseBmp->NextBitmap = BumpBmp;
+		BumpBmp->NextBitmap = BumpBmpAlt;
+
+		geBitmap_CreateRef(BaseBmp);
+		geBitmap_CreateRef(BumpBmp);
+		geBitmap_CreateRef(BumpBmpAlt);
+
+		if ( SpecularBmp )
+		{ 
+			BumpBmpAlt->NextBitmap = SpecularBmp;
+			SpecularBmp->NextBitmap = NULL;
+
+			geBitmap_CreateRef(SpecularBmp);
+		}
+		else
+			BumpBmpAlt->NextBitmap = NULL;
+
+		BaseBmp->DriverFlags |= RDRIVER_PF_COMBINE_BUMPMAP;
+
+/* 03/14/2004 Wendell Buckner 
+    BUMPMAPPING - Have a informational variable which tells us what kind of bitmap this is */
+		BumpBmp->Info.IsHeightMap = GE_TRUE;
+
+/* 03/14/2004 Wendell Buckner 
+    BUMPMAPPING - It's useful to navigate through the textures to get to the head or the tail*/
+		BaseBmp->PrevBitmap = NULL;
+		BumpBmp->PrevBitmap = BaseBmp;
+		BumpBmpAlt->PrevBitmap = BumpBmp;
+
+		if ( SpecularBmp ) SpecularBmp->PrevBitmap = BumpBmpAlt;
+
+		BumpMapCreated = BumpBmpAlt;
+  
+	} while(GE_FALSE);
+
+	return BumpMapCreated;
+}
+
+GENESISAPI geBitmap * GENESISCC geBitmap_DestroyBumpmap (geBitmap *BaseBmp)
+{
+	geBitmap *BumpMapDestroyed = NULL;
+	geBitmap *BumpBmp = NULL;
+	geBitmap *BumpBmpAlt = NULL;
+	geBitmap *SpecularBmp = NULL;
+
+	do
+	{
+		if(!BaseBmp) break;
+
+		if(!(BaseBmp->DriverFlags & RDRIVER_PF_COMBINE_BUMPMAP)) break;
+
+		if( (!BaseBmp->NextBitmap) ) break;
+
+		BumpBmp = BaseBmp->NextBitmap;
+		if( (!BumpBmp->NextBitmap) ) break;
+
+// With embm bumpmapping since we add a new bitmap we force the textures to be reloaded to the driver.
+// which ensured that the textures are linked on the driver, but with dot3 we never add a new bitmap and
+// code is constantly adding/deleting (really incrementing/decrementing references) so when we call this
+// routine and remove flag which ensures that we never combine the textures on the driver!
+// So the sucker never gets to the driver.
+		if( BaseBmp->RefCount > 2 ) break;
+
+		BumpBmpAlt = BumpBmp->NextBitmap;
+		if( BumpBmpAlt->NextBitmap ) SpecularBmp = BumpBmpAlt->NextBitmap;
+
+/* 03/14/2004 Wendell Buckner 
+    BUMPMAPPING - Have a informational variable which tells us what kind of bitmap this is */  
+		BumpBmp->Info.IsHeightMap = GE_FALSE;
+
+		BaseBmp->NextBitmap = NULL;
+		BumpBmp->NextBitmap = NULL;
+		BumpBmpAlt->NextBitmap = NULL;
+
+/* 08/10/2004 Wendell Buckner 
+    BUMPMAPPING - It's useful to navigate through the textures to get to the head or the tail*/
+		BaseBmp->PrevBitmap = NULL;
+		BumpBmp->PrevBitmap = NULL;
+		BumpBmpAlt->PrevBitmap = NULL;
+
+		geBitmap_Destroy( &(BaseBmp) );
+		geBitmap_Destroy( &(BumpBmp) );
+		geBitmap_Destroy( &(BumpBmpAlt) );
+
+		if( SpecularBmp ) 
+		{
+/* 08/10/2004 Wendell Buckner
+    BUG FIX EMBM: geBitmap_destroy can set the bitmap to NULL so clear the bitmaps before the calling it */
+			SpecularBmp->PrevBitmap = NULL;
+
+			SpecularBmp->NextBitmap = NULL;
+			geBitmap_Destroy( &(SpecularBmp) );
+		}
+
+		BaseBmp->DriverFlags &= ~RDRIVER_PF_COMBINE_BUMPMAP;
+
+		BumpMapDestroyed = BumpBmpAlt;
+	} while(GE_FALSE);
+
+	return BumpMapDestroyed;
+}
+
+GENESISAPI void GENESISCC geBitmap_AttachBumpmapToDriver( geBitmap *Bmp )
+{
+	geBitmap *BumpBmp     = NULL;
+	geBitmap *BumpBmpAlt  = NULL;
+	geBitmap *BmpSpecular = NULL;
+	int32     BmpCount    = 0;
+	geRDriver_THandle *DriverHandle[3];
+	memset(&DriverHandle,0,sizeof(geRDriver_THandle *) * 3);
+
+	do
+	{
+		if ( !geBitmap_IsValid(Bmp) ) break;
+		if ( !(Bmp->DriverFlags & RDRIVER_PF_COMBINE_BUMPMAP) ) break;
+
+		BumpBmp = Bmp->NextBitmap;
+		if ( !geBitmap_IsValid(BumpBmp) ) break;
+
+		BumpBmpAlt = BumpBmp->NextBitmap;
+		if ( !geBitmap_IsValid(BumpBmpAlt) ) break; 
+
+		if(!Bmp->DriverHandle) break;
+		if(!BumpBmpAlt->DriverHandle) break;;
+
+		DriverHandle[0] = Bmp->DriverHandle;
+		DriverHandle[1] = BumpBmpAlt->DriverHandle;
+		BmpCount = 2;
+
+		BmpSpecular = BumpBmpAlt->NextBitmap;
+
+		if (BmpSpecular) 
+		{
+			DriverHandle[2] = BmpSpecular->DriverHandle;
+			BmpCount++;
+		}
+  
+		Bmp->Driver->THandle_Combine(&DriverHandle[0],BmpCount);
+	} while(GE_FALSE);
+
+}
+
+GENESISAPI void GENESISCC geBitmap_DetachBumpmapFromDriver( geBitmap *Bmp )
+{
+	geBitmap *BumpBmp     = NULL;
+	geBitmap *BumpBmpAlt  = NULL;
+	geBitmap *BmpSpecular = NULL;
+	int32     BmpCount    = 0;
+	geRDriver_THandle *DriverHandle[3];
+
+	memset(&DriverHandle,0,sizeof(geRDriver_THandle *) * 3);
+
+	do
+	{
+		if ( !geBitmap_IsValid(Bmp) ) break;
+		if ( !(Bmp->DriverFlags & RDRIVER_PF_COMBINE_BUMPMAP) ) break;
+		if ( !geBitmap_IsValid(Bmp->NextBitmap) ) break;
+
+		BumpBmp = Bmp->NextBitmap;
+		if ( !geBitmap_IsValid(BumpBmp) ) break;
+
+		BumpBmpAlt = BumpBmp->NextBitmap;
+		if ( !geBitmap_IsValid(BumpBmpAlt) ) break;
+
+		BmpSpecular = BumpBmpAlt->NextBitmap;
+
+		if(!Bmp->DriverHandle) break;
+		if(!BumpBmpAlt->DriverHandle) break;
+
+		DriverHandle[0] = Bmp->DriverHandle;
+		DriverHandle[1] = BumpBmpAlt->DriverHandle;
+		BmpCount = 2;  
+
+		if (BmpSpecular) 
+		{
+			DriverHandle[2] = BmpSpecular->DriverHandle;
+			BmpCount++;
+		}
+  
+		Bmp->Driver->THandle_UnCombine(&DriverHandle[0],BmpCount);
+	} while(GE_FALSE);
+}
+
+//*****************************************************************************************
 
 static int NumBitsOn(uint32 val)
 {
-uint32 count = 0;
+	uint32 count = 0;
 	while(val)
 	{
 		count += val&1;
 		val >>= 1;
 	}
-return count;
+	return count;
 }
 
 static geBoolean IsInArray(uint32 Val,uint32 *Array,int Len)
@@ -1109,7 +2046,7 @@ static geBoolean IsInArray(uint32 Val,uint32 *Array,int Len)
 			return GE_TRUE;
 		Array--;
 	}
-return GE_FALSE;
+	return GE_FALSE;
 }
 
 geBoolean geBitmap_ChooseDriverFormat(
@@ -1122,13 +2059,13 @@ geBoolean geBitmap_ChooseDriverFormat(
 	geRDriver_PixelFormat *DriverFormatsArray,int ArrayLen,
 	geRDriver_PixelFormat *pTarget)
 {
-int i,rating;
-int FormatRating[MAX_DRIVER_FORMATS];
-geRDriver_PixelFormat * DriverPalFormat;
-geRDriver_PixelFormat * pf;
-geBoolean FoundAlpha;
-uint32 SeekMajor,SeekMinor;
-const gePixelFormat_Operations *seekops,*pfops;
+	int i,rating;
+	int FormatRating[MAX_DRIVER_FORMATS];
+	geRDriver_PixelFormat * DriverPalFormat;
+	geRDriver_PixelFormat * pf;
+	geBoolean FoundAlpha;
+	uint32 SeekMajor,SeekMinor;
+	const gePixelFormat_Operations *seekops,*pfops;
 
 	assert(pTarget && DriverFormatsArray && ArrayLen > 0);
 
@@ -1239,11 +2176,24 @@ const gePixelFormat_Operations *seekops,*pfops;
 
 		if ( gePixelFormat_HasPalette(pf->PixelFormat) )
 		{
+
+/* 05/05/2003 Wendell Buckner
+    BUMPMAPPING
+	geBitmap_ChooseDriverFormat() will Ignore the bump map pixel formats for now...
+		 assert(DriverPalFormat);
+		 if ( gePixelFormat_HasGoodAlpha(DriverPalFormat->PixelFormat) )
+			 FoundAlpha = GE_TRUE;*/
+	     if( ( pf->PixelFormat == GE_PIXELFORMAT_16BIT_88_UV) || (pf->PixelFormat == GE_PIXELFORMAT_16BIT_556_UVL) || (pf->PixelFormat == GE_PIXELFORMAT_24BIT_888_UVL) )
+ 		  DriverPalFormat = DriverPalFormat;
+         else 
+		 {
             // if Pixelformat is 8BIT_PAL , look at the palette's format to see if it
 			//		had alpha!
 			assert(DriverPalFormat);
 			if ( gePixelFormat_HasGoodAlpha(DriverPalFormat->PixelFormat) )
 				FoundAlpha = GE_TRUE;
+         }
+
 		}
 
 		if ( SeekAlpha && FoundAlpha )
@@ -1315,13 +2265,13 @@ geBoolean geBitmap_ChooseDriverFormat(
 	geRDriver_PixelFormat *DriverFormatsArray,int ArrayLen,
 	geRDriver_PixelFormat *pTarget)
 {
-int i,rating;
-int FormatRating[MAX_DRIVER_FORMATS];
-geRDriver_PixelFormat * DriverPalFormat;
-geRDriver_PixelFormat * pf;
-geBoolean FoundAlpha;
-uint32 SeekMajor,SeekMinor;
-const gePixelFormat_Operations *seekops,*pfops;
+	int i,rating;
+	int FormatRating[MAX_DRIVER_FORMATS];
+	geRDriver_PixelFormat * DriverPalFormat;
+	geRDriver_PixelFormat * pf;
+	geBoolean FoundAlpha;
+	uint32 SeekMajor,SeekMinor;
+	const gePixelFormat_Operations *seekops,*pfops;
 
 	assert(pTarget && DriverFormatsArray && ArrayLen > 0);
 
@@ -1482,11 +2432,11 @@ const gePixelFormat_Operations *seekops,*pfops;
 geRDriver_THandle * geBitmap_CreateTHandle(DRV_Driver *Driver,int Width,int Height,int NumMipLevels,
 			gePixelFormat SeekFormat1,gePixelFormat SeekFormat2,geBoolean SeekCK,geBoolean SeekAlpha,geBoolean SeekSeparates,uint32 DriverFlags)
 {
-geRDriver_PixelFormat DriverFormats[MAX_DRIVER_FORMATS];
-geRDriver_PixelFormat *DriverFormatsPtr;
-int DriverFormatsCount;
-geRDriver_PixelFormat DriverFormat;
-geRDriver_THandle * Ret;
+	geRDriver_PixelFormat DriverFormats[MAX_DRIVER_FORMATS];
+	geRDriver_PixelFormat *DriverFormatsPtr;
+	int DriverFormatsCount;
+	geRDriver_PixelFormat DriverFormat;
+	geRDriver_THandle * Ret;
 
 	DriverFormatsPtr = DriverFormats;
 	Driver->EnumPixelFormats(EnumPFCB,&DriverFormatsPtr);
@@ -1552,7 +2502,7 @@ geRDriver_THandle * Ret;
 		geErrorLog_AddString(-1,"Bitmap_CreateTHandle : Driver->THandle_Create failed", NULL);
 	}
 
-return Ret;
+	return Ret;
 }
 
 GENESISAPI	geBoolean	GENESISCC	geBitmap_HasAlpha(const geBitmap * Bmp)
@@ -1571,12 +2521,19 @@ GENESISAPI	geBoolean	GENESISCC	geBitmap_HasAlpha(const geBitmap * Bmp)
 			return GE_TRUE;
 	}	
 
-return GE_FALSE;
+	return GE_FALSE;
 }
 
 geBoolean	BITMAP_GENESIS_INTERNAL geBitmap_AttachToDriver(geBitmap *Bmp, 
 	DRV_Driver * Driver, uint32 DriverFlags)
 {
+/* 02/17/2004 Wendell Buckner 
+    BUMPMAPPING */
+	geBoolean IsBumpMapDot3 = GE_FALSE;
+
+/* 05/19/2003 Wendell Buckner 
+    BUMPMAPPING */
+	geBoolean IsBumpMap = GE_FALSE;
 
 	/**************
 	* When you want to change the Driver,
@@ -1613,6 +2570,20 @@ geBoolean	BITMAP_GENESIS_INTERNAL geBitmap_AttachToDriver(geBitmap *Bmp,
 	****************/
 
 	assert( geBitmap_IsValid(Bmp) );
+
+/* 02/17/2004 Wendell Buckner 
+    DOT3 BUMPMAPPING */
+	if(Bmp->DriverFlags & RDRIVER_PF_COMBINE_DOT3BUMPMAP)
+	{
+		IsBumpMapDot3 = GE_TRUE;
+	}
+
+/* 05/19/2003 Wendell Buckner 
+    BUMPMAPPING */
+	if(Bmp->DriverFlags & RDRIVER_PF_COMBINE_BUMPMAP)
+	{
+		IsBumpMap = GE_TRUE;
+	}
 
 	if ( Bmp->LockOwner || Bmp->DataOwner || Bmp->LockCount )
 	{
@@ -1712,12 +2683,26 @@ geBoolean	BITMAP_GENESIS_INTERNAL geBitmap_AttachToDriver(geBitmap *Bmp,
 		//		if Driver is pal & System isn't
 	}
 
-return GE_TRUE;
+/* 02/17/2004 Wendell Buckner 
+    DOT3 BUMPMAPPING */
+	if(IsBumpMapDot3)
+	{
+	 Bmp->DriverFlags |= RDRIVER_PF_COMBINE_DOT3BUMPMAP;
+	}
+
+/* 05/19/2003 Wendell Buckner 
+    BUMPMAPPING */
+	if(IsBumpMap) 
+	{
+	 Bmp->DriverFlags |= RDRIVER_PF_COMBINE_BUMPMAP;
+	}
+
+	return GE_TRUE;
 }
 
 geBoolean geBitmap_FixDriverFlags(uint32 *pFlags)
 {
-uint32 DriverFlags;
+	uint32 DriverFlags;
 	assert(pFlags);
 	DriverFlags = *pFlags;
 	
@@ -1736,7 +2721,8 @@ uint32 DriverFlags;
 	if ( NumBitsOn(DriverFlags & RDRIVER_PF_MAJOR_MASK) == 0 )
 		return GE_FALSE;
 	*pFlags = DriverFlags;
-return GE_TRUE;
+	
+	return GE_TRUE;
 }
 
 geBoolean BITMAP_GENESIS_INTERNAL geBitmap_SetDriverFlags(geBitmap *Bmp,uint32 Flags)
@@ -1748,7 +2734,20 @@ geBoolean BITMAP_GENESIS_INTERNAL geBitmap_SetDriverFlags(geBitmap *Bmp,uint32 F
 		Bmp->DriverFlags = 0;
 		return GE_FALSE;
 	}
-	Bmp->DriverFlags = Flags;
+
+/* 05/27/2003 Wendell Buckner
+    BUMPMAPPING 
+	Bmp->DriverFlags = Flags; */
+	{
+/* 02/28/2004 Wendell Buckner
+     DOT3 BUMPMAPPING 
+/* 05/27/2003 Wendell Buckner
+    BUMPMAPPING 
+     Bmp->DriverFlags &= RDRIVER_PF_COMBINE_BUMPMAP; */
+     Bmp->DriverFlags &= (RDRIVER_PF_COMBINE_DOT3BUMPMAP | RDRIVER_PF_COMBINE_BUMPMAP);
+     Bmp->DriverFlags |= Flags;
+	}
+
 return GE_TRUE;
 }
 
@@ -1828,7 +2827,7 @@ geBoolean Ret = GE_TRUE;
 
 	//Bmp->DriverFlags left intentionally !
 
-return Ret;
+	return Ret;
 }
 
 geBoolean GENESISCC geBitmap_SetGammaCorrection_DontChange(geBitmap *Bmp,geFloat Gamma)
@@ -1917,7 +2916,7 @@ GENESISAPI geBoolean GENESISCC geBitmap_SetGammaCorrection(geBitmap *Bmp,geFloat
 	}
 	Bmp->DriverGammaSet = GE_TRUE;
 
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 geRDriver_THandle * BITMAP_GENESIS_INTERNAL geBitmap_GetTHandle(const geBitmap *Bmp)
@@ -1929,12 +2928,21 @@ geRDriver_THandle * BITMAP_GENESIS_INTERNAL geBitmap_GetTHandle(const geBitmap *
 
 geBoolean geBitmap_Update_SystemToDriver(geBitmap *Bmp)
 {
-geBitmap * SrcLocks[MAXMIPLEVELS];
-geBoolean Ret,MipsChanged;
-int mip,mipMin,mipMax;
-geRDriver_THandle * SaveDriverHandle;
-geBitmap * SaveAlpha;
-int SaveMaxMip;
+	geBitmap * SrcLocks[MAXMIPLEVELS];
+	geBoolean Ret,MipsChanged;
+	int mip,mipMin,mipMax;
+	geRDriver_THandle * SaveDriverHandle;
+	geBitmap * SaveAlpha;
+	int SaveMaxMip;
+
+/* 02/17/2004 Wendell Buckner 
+    DOT3 BUMPMAPPING */
+	geBoolean IsBumpMapDot3 = GE_FALSE;
+
+/* 08/27/2003 Wendell Buckner 
+    BUMPMAPPING 
+     When gamma correction is done globally this routine is called which changes the bump map driver flags */
+	geBoolean IsBumpMap = GE_FALSE;
 	
 	assert( geBitmap_IsValid(Bmp) );
 
@@ -1944,6 +2952,21 @@ int SaveMaxMip;
 		is lock Bmp for Read (system) & Write (driver) , but that's illegal!
 
 	**/
+
+/* 02/17/2004 Wendell Buckner 
+    DOT3 BUMPMAPPING */
+	if(Bmp->DriverFlags & RDRIVER_PF_COMBINE_DOT3BUMPMAP)
+	{
+		IsBumpMapDot3 = GE_TRUE;
+	}
+
+/* 08/27/2003 Wendell Buckner 
+    BUMPMAPPING 
+     When gamma correction is done globally this routine is called which changes the bump map driver flags */
+	if(Bmp->DriverFlags & RDRIVER_PF_COMBINE_BUMPMAP)
+	{
+		IsBumpMap = GE_TRUE;
+	}
 
 	if ( Bmp->LockOwner )
 		Bmp = Bmp->LockOwner;
@@ -2156,14 +3179,29 @@ int SaveMaxMip;
 
 	Bmp->DriverDataChanged = GE_FALSE; // in case _SetPal freaks us out
 
-return Ret;
+/* 02/17/2004 Wendell Buckner 
+    DOT3 BUMPMAPPING */
+	if(IsBumpMapDot3)
+	{
+		Bmp->DriverFlags |= RDRIVER_PF_COMBINE_DOT3BUMPMAP;
+	}
+
+/* 08/27/2003 Wendell Buckner 
+    BUMPMAPPING 
+     When gamma correction is done globally this routine is called which changes the bump map driver flags */
+	if(IsBumpMap) 
+	{
+		Bmp->DriverFlags |= RDRIVER_PF_COMBINE_BUMPMAP;
+	}
+
+	return Ret;
 }
 
 geBoolean geBitmap_Update_DriverToSystem(geBitmap *Bmp)
 {
-geBitmap *DriverLocks[MAXMIPLEVELS];
-geBoolean Ret;
-int mip;
+	geBitmap *DriverLocks[MAXMIPLEVELS];
+	geBoolean Ret;
+	int mip;
 	
 	assert( geBitmap_IsValid(Bmp) );
 
@@ -2258,7 +3296,7 @@ int mip;
 	if ( ! geBitmap_Gamma_Apply(Bmp,GE_FALSE) ) // redo the gamma!
 		return GE_FALSE;
 
-return Ret;
+	return Ret;
 }
 
 /*}{ ************* Mip Control *****************/
@@ -2267,7 +3305,7 @@ return Ret;
 
 GENESISAPI geBoolean GENESISCC geBitmap_RefreshMips(geBitmap *Bmp)
 {
-int mip;
+	int mip;
 
 	assert( geBitmap_IsValid(Bmp) );
 
@@ -2296,15 +3334,15 @@ int mip;
 		Bmp->Modified[mip] = GE_FALSE;
 #endif
 
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 GENESISAPI geBoolean GENESISCC geBitmap_UpdateMips(geBitmap *Bmp,int fm,int to)
 {
-geBitmap * Locks[MAXMIPLEVELS];
-void *FmBits,*ToBits;
-geBitmap_Info FmInfo,ToInfo;
-geBoolean Ret = GE_FALSE;
+	geBitmap * Locks[MAXMIPLEVELS];
+	void *FmBits,*ToBits;
+	geBitmap_Info FmInfo,ToInfo;
+	geBoolean Ret = GE_FALSE;
 
 	assert( geBitmap_IsValid(Bmp) );
 
@@ -2339,14 +3377,14 @@ geBoolean Ret = GE_FALSE;
 	{
 		Ret = geBitmap_UpdateMips_System(Bmp,fm,to);
 	}
-
-return Ret;
+	
+	return Ret;
 }
 
 geBoolean geBitmap_UpdateMips_System(geBitmap *Bmp,int fm,int to)
 {
-geBitmap_Info FmInfo,ToInfo;
-geBoolean Ret;
+	geBitmap_Info FmInfo,ToInfo;
+	geBoolean Ret;
 
 	assert( geBitmap_IsValid(Bmp) );
 
@@ -2396,13 +3434,13 @@ geBoolean Ret;
 
 	Bmp->Info.MaximumMip = max(Bmp->Info.MaximumMip,to);
 
-return Ret;
+	return Ret;
 }
 
 geBoolean geBitmap_UpdateMips_Data(	geBitmap_Info * FmInfo,void * FmBits,
 									geBitmap_Info * ToInfo,void * ToBits)
 {
-int fmxtra,tow,toh,toxtra,fmw,fmh,fmstep,x,y,bpp;
+	int fmxtra,tow,toh,toxtra,fmw,fmh,fmstep,x,y,bpp;
 
 	assert( FmInfo && ToInfo && FmBits && ToBits );
 	assert( FmInfo->Format == ToInfo->Format && FmInfo->HasColorKey == ToInfo->HasColorKey );
@@ -2675,13 +3713,13 @@ int fmxtra,tow,toh,toxtra,fmw,fmh,fmstep,x,y,bpp;
 		}
 	}
 
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 GENESISAPI geBoolean GENESISCC geBitmap_ClearMips(geBitmap *Bmp)
 {
-int mip;
-DRV_Driver * Driver;
+	int mip;
+	DRV_Driver * Driver;
 
 	// WARNING ! This destroys any mips!
 
@@ -2724,12 +3762,12 @@ DRV_Driver * Driver;
 			return GE_FALSE;
 	}
 
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 GENESISAPI geBoolean 	GENESISCC	geBitmap_SetMipCount(geBitmap *Bmp,int Count)
 {
-DRV_Driver * Driver;
+	DRV_Driver * Driver;
 
 	assert( geBitmap_IsValid(Bmp) );
 
@@ -2764,12 +3802,12 @@ DRV_Driver * Driver;
 			return GE_FALSE;
 	}
 
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 geBoolean geBitmap_MakeSystemMips(geBitmap *Bmp,int low,int high)
 {
-int mip;
+	int mip;
 
 	assert( geBitmap_IsValid(Bmp) );
 
@@ -2807,20 +3845,20 @@ int mip;
 	Bmp->Info.MinimumMip = min(Bmp->Info.MinimumMip,low);
 	Bmp->Info.MaximumMip = max(Bmp->Info.MaximumMip,high);
 
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 /*}{ ******* Miscellany ***********/
 
 GENESISAPI uint32 GENESISCC geBitmap_MipBytes(const geBitmap *Bmp,int mip)
 {
-uint32 bytes;
+	uint32 bytes;
 	if ( ! Bmp )
 		return 0;
 	bytes = gePixelFormat_BytesPerPel(Bmp->Info.Format) * 
 						SHIFT_R_ROUNDUP(Bmp->Info.Stride,mip) *
 						SHIFT_R_ROUNDUP(Bmp->Info.Height,mip);
-return bytes;
+	return bytes;
 }
 
 GENESISAPI geBoolean GENESISCC geBitmap_GetInfo(const geBitmap *Bmp, geBitmap_Info *Info, geBitmap_Info *SecondaryInfo)
@@ -2846,7 +3884,7 @@ GENESISAPI geBoolean GENESISCC geBitmap_GetInfo(const geBitmap *Bmp, geBitmap_In
 
 geBoolean geBitmap_MakeDriverLockInfo(geBitmap *Bmp,int mip,geBitmap_Info *Into)
 {
-geRDriver_THandleInfo TInfo;
+	geRDriver_THandleInfo TInfo;
 
 	// MakeDriverLockInfo also doesn't full out the full info, so it must be a valid info first!
 	// Bmp also gets some stuff written into him.
@@ -2884,19 +3922,19 @@ geRDriver_THandleInfo TInfo;
 		Into->ColorKey = Into->Palette->ColorKeyIndex;
 	}
 
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 GENESISAPI int GENESISCC	geBitmap_Width(const geBitmap *Bmp)
 {
 	assert(Bmp);
-return(Bmp->Info.Width);
+	return(Bmp->Info.Width);
 }
 
 GENESISAPI int GENESISCC	geBitmap_Height(const geBitmap *Bmp)
 {
 	assert(Bmp);
-return(Bmp->Info.Height);
+	return(Bmp->Info.Height);
 }
 
 GENESISAPI geBoolean GENESISCC geBitmap_Blit(const geBitmap *Src, int SrcPositionX, int SrcPositionY,
@@ -2920,7 +3958,7 @@ GENESISAPI geBoolean GENESISCC geBitmap_BlitBitmap(const geBitmap * Src, geBitma
 
 GENESISAPI geBoolean GENESISCC geBitmap_BlitBestMip(const geBitmap * Src, geBitmap * Dst )
 {
-int Width,Mip;
+	int Width,Mip;
 	assert( geBitmap_IsValid(Src) );
 	assert( geBitmap_IsValid(Dst) );
 	assert( Src != Dst );
@@ -2939,10 +3977,10 @@ geBoolean geBitmap_BlitMipRect(const geBitmap * Src, int SrcMip, int SrcX,int Sr
 									 geBitmap * Dst, int DstMip, int DstX,int DstY,
 							int SizeX,int SizeY)
 {
-geBitmap * SrcLock=NULL,* DstLock=NULL;
-geBoolean SrcUnLock,DstUnLock;
-geBitmap_Info *SrcLockInfo,*DstLockInfo;
-uint8 *SrcBits,*DstBits;
+	geBitmap * SrcLock=NULL,* DstLock=NULL;
+	geBoolean SrcUnLock,DstUnLock;
+	geBitmap_Info *SrcLockInfo,*DstLockInfo;
+	uint8 *SrcBits,*DstBits;
 	
 	assert(Src && Dst);
 	assert( Src != Dst );
@@ -3049,14 +4087,14 @@ uint8 *SrcBits,*DstBits;
 
 GENESISAPI geBoolean 	GENESISCC	geBitmap_SetFormatMin(geBitmap *Bmp,gePixelFormat NewFormat)
 {
-geBitmap_Palette * Pal;
+	geBitmap_Palette * Pal;
 
 	assert(geBitmap_IsValid(Bmp));
 
 	Pal = geBitmap_GetPalette(Bmp);
 	if ( Bmp->Info.HasColorKey )
 	{
-	uint32 CK=0;
+		uint32 CK=0;
 		if ( gePixelFormat_IsRaw(NewFormat) )
 		{
 			if ( gePixelFormat_IsRaw(Bmp->Info.Format) )
@@ -3161,10 +4199,10 @@ GENESISAPI geBoolean GENESISCC geBitmap_SetFormat(geBitmap *Bmp,
 	}
 	else
 	{
-	geBitmap_Info OldInfo;
-	int OldBPP,NewBPP;
-	int OldMaxMips;
-	DRV_Driver * Driver;
+		geBitmap_Info OldInfo;
+		int OldBPP,NewBPP;
+		int OldMaxMips;
+		DRV_Driver * Driver;
 
 		if ( gePixelFormat_HasPalette(NewFormat) )
 		{
@@ -3316,7 +4354,7 @@ GENESISAPI geBoolean GENESISCC geBitmap_SetFormat(geBitmap *Bmp,
 		}
 	}
 
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 GENESISAPI geBoolean GENESISCC geBitmap_SetColorKey(geBitmap *Bmp, geBoolean HasColorKey, uint32 ColorKey , geBoolean Smart)
@@ -3364,15 +4402,18 @@ GENESISAPI geBoolean GENESISCC geBitmap_SetColorKey(geBitmap *Bmp, geBoolean Has
 	if ( Bmp->DriverHandle )
 		geBitmap_Update_SystemToDriver(Bmp);
 
-return GE_TRUE;
+	return GE_TRUE;
 }
 
-geBoolean geBitmap_UsesColorKey(const geBitmap * Bmp)
+/* 03/24/2004 Wendell Buckner
+    BUG FIX: Rendering Transparent Polys properly (2)  
+geBoolean geBitmap_UsesColorKey(const geBitmap * Bmp) */
+GENESISAPI geBoolean GENESISCC geBitmap_UsesColorKey(const geBitmap * Bmp)
 {
-void * Bits;
-const gePixelFormat_Operations * ops;
-int x,y,w,h,s;
-uint32 pel,ColorKey;
+	void * Bits;
+	const gePixelFormat_Operations * ops;
+	int x,y,w,h,s;
+	uint32 pel,ColorKey;
 
 	if ( ! Bmp->Info.HasColorKey )
 		return GE_FALSE;
@@ -3408,7 +4449,7 @@ uint32 pel,ColorKey;
 //End Dec2001DCS
 		case 1:
 		{
-		uint8 * ptr;
+			uint8 * ptr;
 			ptr = Bits;
 			for(y=h;y--;)
 			{
@@ -3426,7 +4467,7 @@ uint32 pel,ColorKey;
 		}
 		case 2:
 		{
-		uint16 * ptr;
+			uint16 * ptr;
 			ptr = Bits;
 			for(y=h;y--;)
 			{
@@ -3445,12 +4486,12 @@ uint32 pel,ColorKey;
 //Start Dec2001DCS - Added new case 3 
 		case 3:
 		{
-   		uint8 * ptr;
-         uint8   ckR, ckG, ckB;
+   			uint8 * ptr;
+			uint8   ckR, ckG, ckB;
 
-         ckB = (uint8) (ColorKey & 0x000000ff);
-         ckG = (uint8) ((ColorKey >> 8) & 0x000000ff);
-         ckR = (uint8) ((ColorKey >> 16) & 0x000000ff);
+			ckB = (uint8) (ColorKey & 0x000000ff);
+			ckG = (uint8) ((ColorKey >> 8) & 0x000000ff);
+			ckR = (uint8) ((ColorKey >> 16) & 0x000000ff);
 			ptr = Bits;
 			for(y=h;y--;)
 			{
@@ -3460,7 +4501,7 @@ uint32 pel,ColorKey;
 					{
 						return GE_TRUE;	
 					}
-               ptr += 3;
+					ptr += 3;
 				}
 				ptr += ((s-w)*3);
 			}
@@ -3469,7 +4510,7 @@ uint32 pel,ColorKey;
 //End Dec2001DCS
 		case 4:
 		{
-		uint32 * ptr;
+			uint32 * ptr;
 			ptr = Bits;
 			for(y=h;y--;)
 			{
@@ -3486,7 +4527,7 @@ uint32 pel,ColorKey;
 			break;
 		}
 	}
-return GE_FALSE;
+	return GE_FALSE;
 }
 
 
@@ -3579,7 +4620,7 @@ GENESISAPI geBoolean GENESISCC geBitmap_SetPalette(geBitmap *Bmp, const geBitmap
 
 	assert( geBitmap_IsValid(Bmp) );
 
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 GENESISAPI geBitmap_Palette * GENESISCC geBitmap_GetPalette(const geBitmap *Bmp)
@@ -3640,7 +4681,7 @@ GENESISAPI geBoolean GENESISCC geBitmap_SetAlpha(geBitmap *Bmp, const geBitmap *
 		geBitmap_Update_SystemToDriver(Bmp);
 	}
 
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 GENESISAPI geBoolean GENESISCC geBitmap_SetPreferredFormat(geBitmap *Bmp,gePixelFormat Format)
@@ -3656,7 +4697,7 @@ GENESISAPI geBoolean GENESISCC geBitmap_SetPreferredFormat(geBitmap *Bmp,gePixel
 
 	if ( Bmp->PreferredFormat != Format )
 	{
-	DRV_Driver * Driver;
+		DRV_Driver * Driver;
 		Bmp->PreferredFormat = Format;
 		Driver = Bmp->Driver;
 		if ( Driver )
@@ -3668,13 +4709,13 @@ GENESISAPI geBoolean GENESISCC geBitmap_SetPreferredFormat(geBitmap *Bmp,gePixel
 		}
 	}
 
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 GENESISAPI gePixelFormat GENESISCC geBitmap_GetPreferredFormat(const geBitmap *Bmp)
 {
 	if ( ! Bmp ) return 0;
-return Bmp->PreferredFormat;
+	return Bmp->PreferredFormat;
 }
 
 /*}{ ************** FILE I/O ************************/
@@ -3704,8 +4745,8 @@ GENESISAPI geBitmap * GENESISCC geBitmap_CreateFromFileName(const geVFile *BaseF
 
 GENESISAPI geBoolean GENESISCC geBitmap_WriteToFileName(const geBitmap * Bmp,const geVFile *BaseFS,const char *Name)
 {
-geVFile * File;
-geBoolean Ret;
+	geVFile * File;
+	geBoolean Ret;
 
 	if ( BaseFS )
 	{
@@ -3723,7 +4764,7 @@ geBoolean Ret;
 
 	geVFile_Close(File);
 
-return Ret;
+	return Ret;
 }
 
 // GeBm Tag in 4 bytes {}
@@ -3893,10 +4934,10 @@ fail:
 
 GENESISAPI geBoolean GENESISCC geBitmap_WriteToFile(const geBitmap *Bmp, geVFile *F)
 {
-geBmTag_t geBM_Tag;
-uint8  geBM_Version;
-uint8 flags;
-int mip;
+	geBmTag_t geBM_Tag;
+	uint8  geBM_Version;
+	uint8 flags;
+	int mip;
 	
 	assert(Bmp && F);
 	assert( geBitmap_IsValid(Bmp) );
@@ -4044,7 +5085,7 @@ int mip;
 			return GE_FALSE;
 	}
 
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 /*}{********** Windows BMP Types *******/
@@ -4104,9 +5145,9 @@ typedef struct
 
 static geBoolean geBitmap_ReadFromBMP(geBitmap * Bmp,geVFile * F)
 {
-BITMAPFILEHEADER 	bmfh;
-BITMAPINFOHEADER	bmih;
-int bPad,myRowWidth,bmpRowWidth,pelBytes;
+	BITMAPFILEHEADER 	bmfh;
+	BITMAPINFOHEADER	bmih;
+	int bPad,myRowWidth,bmpRowWidth,pelBytes;
 
 	// Windows Bitmap
 
@@ -4219,7 +5260,7 @@ int bPad,myRowWidth,bmpRowWidth,pelBytes;
 		}
 	}
 
-return GE_TRUE;
+	return GE_TRUE;
 }	// end BMP reader
 
 
@@ -4537,11 +5578,11 @@ fail:
 
 geBoolean geBitmap_ReadInfo(geBitmap *Bmp,geVFile * F)
 {
-uint8 data[4];
-uint8 flags;
-uint8 b;
-uint16 w;
-geBitmap_Info * pi;
+	uint8 data[4];
+	uint8 flags;
+	uint8 b;
+	uint16 w;
+	geBitmap_Info * pi;
 
 	pi = &(Bmp->Info);
 
@@ -4613,12 +5654,12 @@ geBitmap_Info * pi;
 
 geBoolean geBitmap_WriteInfo(const geBitmap *Bmp,geVFile * F)
 {
-uint8 data[64];
-uint8 * ptr;
-uint8 flags;
-uint8 b;
-int len,logw,logh;
-const geBitmap_Info * pi;
+	uint8 data[64];
+	uint8 * ptr;
+	uint8 flags;
+	uint8 b;
+	int len,logw,logh;
+	const geBitmap_Info * pi;
 
 /*
 	bit flags :
@@ -4701,10 +5742,10 @@ geBoolean geBitmap_Palette_BlitData(gePixelFormat SrcFormat,const void *SrcData,
 									gePixelFormat DstFormat,	  void *DstData,const geBitmap_Palette * DstPal,
 									int Pixels)
 {
-char *SrcPtr,*DstPtr;
-geBoolean SrcHasCK,DstHasCK;
-uint32 SrcCK=0,DstCK=0;
-int SrcCKi=0,DstCKi=0;
+	char *SrcPtr,*DstPtr;
+	geBoolean SrcHasCK,DstHasCK;
+	uint32 SrcCK=0,DstCK=0;
+	int SrcCKi=0,DstCKi=0;
 
 	assert( SrcData && DstData );
 
@@ -4837,14 +5878,14 @@ int SrcCKi=0,DstCKi=0;
 		}
 	}
 
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 GENESISAPI geBitmap_Palette * GENESISCC geBitmap_Palette_Create(gePixelFormat Format,int Size)
 {
-geBitmap_Palette * P;
-int DataBytes;
-const gePixelFormat_Operations * ops;
+	geBitmap_Palette * P;
+	int DataBytes;
+	const gePixelFormat_Operations * ops;
 
 	ops = gePixelFormat_GetOperations(Format);
 	if ( ! ops->RMask )
@@ -4877,7 +5918,7 @@ const gePixelFormat_Operations * ops;
 
 	P->HasColorKey = GE_FALSE;
 
-return P;
+	return P;
 }
 
 GENESISAPI geBoolean GENESISCC geBitmap_Palette_CreateRef(geBitmap_Palette *P)
@@ -4885,12 +5926,12 @@ GENESISAPI geBoolean GENESISCC geBitmap_Palette_CreateRef(geBitmap_Palette *P)
 	if ( ! P || P->RefCount < 1 )
 		return GE_FALSE;
 	P->RefCount ++;
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 GENESISAPI geBitmap_Palette * GENESISCC geBitmap_Palette_CreateFromBitmap(geBitmap * Bmp,geBoolean Slow)
 {
-geBitmap_Palette * Pal;
+	geBitmap_Palette * Pal;
 	Pal = geBitmap_GetPalette(Bmp);
 	if ( Pal )
 	{
@@ -4905,8 +5946,8 @@ geBitmap_Palette * Pal;
 
 geBitmap_Palette * BITMAP_GENESIS_INTERNAL geBitmap_Palette_CreateFromDriver(DRV_Driver * Driver,gePixelFormat Format,int Size)
 {
-geBitmap_Palette * P;
-geRDriver_THandleInfo TInfo;
+	geBitmap_Palette * P;
+	geRDriver_THandleInfo TInfo;
 
 	assert(Driver);
 
@@ -4940,12 +5981,12 @@ geRDriver_THandleInfo TInfo;
 
 	P->RefCount = 1;
 
-return P;
+	return P;
 }
 
 GENESISAPI geBitmap_Palette * GENESISCC geBitmap_Palette_CreateCopy(const geBitmap_Palette *Palette)
 {
-geBitmap_Palette * P;
+	geBitmap_Palette * P;
 
 	if ( ! Palette )
 		return NULL;
@@ -4967,12 +6008,12 @@ geBitmap_Palette * P;
 		return NULL;
 	}
 
-return P;
+	return P;
 }
 
 GENESISAPI geBoolean GENESISCC geBitmap_Palette_Destroy(geBitmap_Palette ** ppPalette)
 {
-geBitmap_Palette * Palette;
+	geBitmap_Palette * Palette;
 	assert(ppPalette);
 	if ( Palette = *ppPalette )
 	{
@@ -4992,7 +6033,7 @@ geBitmap_Palette * Palette;
 		}
 	}
 	*ppPalette = NULL;
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 GENESISAPI geBoolean GENESISCC geBitmap_Palette_Lock(geBitmap_Palette *P, void **pBits, gePixelFormat *pFormat,int *pSize)
@@ -5095,12 +6136,12 @@ GENESISAPI geBoolean GENESISCC geBitmap_Palette_UnLock(geBitmap_Palette *P)
 			P->DriverBits = NULL;
 		}
 	}
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 GENESISAPI geBoolean GENESISCC geBitmap_Palette_SetFormat(geBitmap_Palette * P,gePixelFormat Format)
 {
-void * NewData;
+	void * NewData;
 	
 	assert(P);
 
@@ -5126,15 +6167,15 @@ void * NewData;
 	P->Data = NewData;
 	P->Format = Format;
 
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 GENESISAPI geBoolean GENESISCC geBitmap_Palette_GetData(const geBitmap_Palette *P,void *Into,gePixelFormat Format,int Size)
 {
-gePixelFormat FmFormat;
-const void *FmData;
-int FmSize;
-geBoolean Ret;
+	gePixelFormat FmFormat;
+	const void *FmData;
+	int FmSize;
+	geBoolean Ret;
 
 	assert(P);
 	assert(Into);
@@ -5149,7 +6190,7 @@ geBoolean Ret;
 	
 	geBitmap_Palette_UnLock((geBitmap_Palette *)P);
 
-return Ret;
+	return Ret;
 }
 
 GENESISAPI geBoolean GENESISCC geBitmap_Palette_GetInfo(const geBitmap_Palette *P,geBitmap_Info *pInfo)
@@ -5165,15 +6206,15 @@ GENESISAPI geBoolean GENESISCC geBitmap_Palette_GetInfo(const geBitmap_Palette *
 	pInfo->MaximumMip = pInfo->MinimumMip = 0;
 	pInfo->Palette = NULL;
 
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 GENESISAPI geBoolean GENESISCC geBitmap_Palette_SetData(geBitmap_Palette *P,const void *From,gePixelFormat Format,int Colors)
 {
-gePixelFormat PalFormat;
-void *PalData;
-int PalSize;
-geBoolean Ret;
+	gePixelFormat PalFormat;
+	void *PalData;
+	int PalSize;
+	geBoolean Ret;
 
 	assert(P);
 	assert(From);
@@ -5189,15 +6230,15 @@ geBoolean Ret;
 	if ( ! geBitmap_Palette_UnLock(P) )
 		return GE_FALSE;
 
-return Ret;
+	return Ret;
 }
 
 GENESISAPI geBoolean GENESISCC geBitmap_Palette_Copy(const geBitmap_Palette * Fm,geBitmap_Palette * To)
 {
-gePixelFormat FmFormat,ToFormat;
-void *FmData,*ToData;
-int FmSize,ToSize;
-geBoolean Ret;
+	gePixelFormat FmFormat,ToFormat;
+	void *FmData,*ToData;
+	int FmSize,ToSize;
+	geBoolean Ret;
 
 	assert(Fm);
 	assert(To);
@@ -5225,7 +6266,7 @@ geBoolean Ret;
 	geBitmap_Palette_UnLock((geBitmap_Palette *)Fm);
 	geBitmap_Palette_UnLock(To);
 
-return Ret;
+	return Ret;
 }
 
 GENESISAPI geBoolean GENESISCC geBitmap_Palette_SetEntryColor(geBitmap_Palette *P,int Color,int R,int G,int B,int A)
@@ -5259,7 +6300,7 @@ GENESISAPI geBoolean GENESISCC geBitmap_Palette_SetEntryColor(geBitmap_Palette *
 
 GENESISAPI geBoolean GENESISCC geBitmap_Palette_GetEntryColor(const geBitmap_Palette *P,int Color,int *R,int *G,int *B,int *A)
 {
-uint32 Pixel;
+	uint32 Pixel;
 	assert(P);
 	if ( P->HasColorKey )
 	{
@@ -5331,7 +6372,7 @@ GENESISAPI geBoolean GENESISCC geBitmap_Palette_SetEntry(geBitmap_Palette *P,int
 
 		geBitmap_Palette_UnLock(P);
 	}
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 GENESISAPI geBoolean GENESISCC geBitmap_Palette_GetEntry(const geBitmap_Palette *P,int Color,uint32 *Pixel)
@@ -5371,7 +6412,7 @@ GENESISAPI geBoolean GENESISCC geBitmap_Palette_GetEntry(const geBitmap_Palette 
 
 		geBitmap_Palette_UnLock((geBitmap_Palette *)P);
 	}
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 #define PALETTE_INFO_FORMAT_MASK	(0x1F)
@@ -5380,10 +6421,10 @@ return GE_TRUE;
 
 GENESISAPI geBitmap_Palette * GENESISCC geBitmap_Palette_CreateFromFile(geVFile *F)
 {
-geBitmap_Palette * P;
-int Size;
-gePixelFormat Format;
-uint8 flags,b;
+	geBitmap_Palette * P;
+	int Size;
+	gePixelFormat Format;
+	uint8 flags,b;
 
 	if ( ! geVFile_Read(F, &flags, sizeof(flags)) )
 		return NULL;
@@ -5419,14 +6460,14 @@ uint8 flags,b;
 		}
 	}
 
-return P;
+	return P;
 }
 
 GENESISAPI geBoolean GENESISCC geBitmap_Palette_WriteToFile(const geBitmap_Palette *P,geVFile *F)
 {
-int Size;
-gePixelFormat Format;
-void *Data;
+	int Size;
+	gePixelFormat Format;
+	void *Data;
 
 	assert(P);
 
@@ -5472,7 +6513,7 @@ void *Data;
 		
 	geBitmap_Palette_UnLock((geBitmap_Palette *)P);
 
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 /*}{ ******************** IsValid funcs **************************/
@@ -5519,7 +6560,7 @@ geBoolean geBitmap_IsValid(const geBitmap *Bmp)
 			return GE_FALSE;
 	}
 
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 geBoolean geBitmap_Info_IsValid(const geBitmap_Info *Info)
@@ -5540,7 +6581,7 @@ geBoolean geBitmap_Info_IsValid(const geBitmap_Info *Info)
 		if ( ! geBitmap_Palette_IsValid(Info->Palette) )
 			return GE_FALSE;
 
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 geBoolean geBitmap_Palette_IsValid(const geBitmap_Palette *Pal)
@@ -5556,7 +6597,7 @@ geBoolean geBitmap_Palette_IsValid(const geBitmap_Palette *Pal)
 	assert( Pal->RefCount >= 1 && Pal->Size >= 1 );
 	assert( Pal->Format > GE_PIXELFORMAT_NO_DATA && Pal->Format < GE_PIXELFORMAT_COUNT );
 
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 #ifdef _DEBUG
@@ -5577,10 +6618,10 @@ GENESISAPI uint32 GENESISCC geBitmap_Debug_GetRefs(void)
 GENESISAPI geBoolean GENESISCC geBitmap_GetAverageColor(const geBitmap *Bmp,int *pR,int *pG,int *pB)
 {
 	{
-	int bpp,x,y,w,h,xtra,dock;
-	gePixelFormat Format;
-	uint8 * ptr;
-	uint32 R,G,B,A,Rt,Gt,Bt,cnt,ck;
+		int bpp,x,y,w,h,xtra,dock;
+		gePixelFormat Format;
+		uint8 * ptr;
+		uint32 R,G,B,A,Rt,Gt,Bt,cnt,ck;
 
 		//{} Rt == Rtotal , probably won't overflow; we can handle a 4096x4095 solid-white image
 
@@ -5674,7 +6715,7 @@ GENESISAPI geBoolean GENESISCC geBitmap_GetAverageColor(const geBitmap *Bmp,int 
 		if ( pB ) *pB = (Bt + (cnt>>1)) / cnt;
 	}
 
-return GE_TRUE;
+	return GE_TRUE;
 }
 
 /*}{ ******************** EOF **************************/

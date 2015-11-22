@@ -47,8 +47,15 @@ void Render_SetHardwareMode(int32 NewMode, uint32 NewFlags);
 geBoolean DRIVERCC Render_GouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint32 Flags);
 geBoolean DRIVERCC Render_WorldPoly(DRV_TLVertex *Pnts, int32 NumPoints, geRDriver_THandle *THandle, DRV_TexInfo *TexInfo, DRV_LInfo *LInfo, uint32 Flags);
 geBoolean DRIVERCC Render_MiscTexturePoly(DRV_TLVertex *Pnts, int32 NumPoints, geRDriver_THandle *THandle, uint32 Flags);
+// changed QD Shadows
+geBoolean DRIVERCC Render_StencilPoly(DRV_XYZVertex *Pnts, int32 NumPoints, uint32 Flags);
+geBoolean DRIVERCC DrawShadowPoly(geFloat r, geFloat g, geFloat b, geFloat a);
+// end change
 geBoolean DRIVERCC DrawDecal(geRDriver_THandle *THandle, RECT *SRect, int32 x, int32 y);
-geBoolean DRIVERCC BeginScene(geBoolean Clear, geBoolean ClearZ, RECT *WorldRect);
+// changed QD Shadows
+//geBoolean DRIVERCC BeginScene(geBoolean Clear, geBoolean ClearZ, RECT *WorldRect);
+geBoolean DRIVERCC BeginScene(geBoolean Clear, geBoolean ClearZ, geBoolean ClearStencil, RECT *WorldRect);
+// end change
 geBoolean DRIVERCC EndScene(void);
 geBoolean DRIVERCC BeginWorld(void);
 geBoolean DRIVERCC EndWorld(void);
@@ -56,7 +63,10 @@ geBoolean DRIVERCC BeginMeshes(void);
 geBoolean DRIVERCC EndMeshes(void);
 geBoolean DRIVERCC BeginModels(void);
 geBoolean DRIVERCC EndModels(void);
-
+// changed QD Shadows
+geBoolean DRIVERCC BeginShadowVolumes(void);
+geBoolean DRIVERCC EndShadowVolumes(void);
+// end change
 
 #ifdef __cplusplus
 }

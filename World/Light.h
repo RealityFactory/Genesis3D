@@ -56,6 +56,12 @@ typedef struct
 	uint32		FColorB;
 
 	geBoolean	CastShadow;
+// changed QuestOfDreams DSpotLight
+	geBoolean	Spot;   	// is it a spotlight?
+	geFloat		Angle;		// arc
+	geVec3d		Normal; 	// angles
+	int 		Style;  	// fall off style 0,1,2
+// end change QuestOfDreams
 } Light_DLight;
 
 typedef struct Light_LightInfo
@@ -75,10 +81,23 @@ typedef struct Light_LightInfo
 typedef struct tag_light
 {
 	int light;
-   GE_RGBA color;
-   int style;
-   geVec3d origin;
+	GE_RGBA color;
+	int style;
+	geVec3d origin;
 } light;
+
+// changed QuestOfDreams 05/02/2004
+typedef struct	tag_spotlight
+{
+	int		DummyRadius;
+	int		light;
+	GE_RGBA	color;
+	int		style;
+	geVec3d	origin;
+	geVec3d	angles;
+	int		arc;
+} spotlight;
+// end change
 
 //=====================================================================================
 //	Function ProtoTypes
@@ -93,7 +112,7 @@ geBoolean	Light_SetGBSP(World_BSP *BSP);
 
 Light_DLight *Light_WorldAddLight(geWorld *World);
 void		Light_WorldRemoveLight(geWorld *World, Light_DLight *DLight);
-geBoolean	 Light_SetupLights(geWorld *World);
+geBoolean	Light_SetupLights(geWorld *World);
 geBoolean	Light_SetAttributes(	Light_DLight *Light, 
 								const geVec3d *Pos, 
 								const GE_RGBA *RGBA, 
@@ -106,6 +125,17 @@ void		Light_SetupLightmap(DRV_LInfo *LInfo, BOOL *Dynamic);
 geBoolean	Light_GetLightmapRGB(Surf_SurfInfo *Surf, geVec3d *Pos, GE_RGBA *RGBA);
 geBoolean	Light_GetLightmapRGBBlended(Surf_SurfInfo *Surf, geVec3d *Pos, GE_RGBA *RGBA);
 void		Light_FogVerts(const geFog *Fog, const geVec3d *POV, const geVec3d *Verts, Surf_TexVert *TexVerts, int32 NumVerts);
+
+// added QuestOfDreams DSpotLight
+geBoolean Light_SetSpotAttributes(	Light_DLight *Light, 
+								const geVec3d *Pos, 
+								const GE_RGBA *RGBA, 
+								geFloat Radius,
+								geFloat Arc,
+								const geVec3d *Angles, 
+								int Style,
+								geBoolean CastShadow);
+// end change QuestOfDreams
 
 #ifdef __cplusplus
 }

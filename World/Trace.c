@@ -390,7 +390,7 @@ geBoolean Trace_WorldCollisionExact(geWorld *World,
 //=====================================================================================
 //	Trace_WorldCollisionExact2
 //	Internal only/ does not chek meshes/ returns index numbers into bsp structures for models
-//	FIXME:  This can be replaced by callinf Trace_WorldCollisionExact with the GE_COLLIDE_MODELS
+//	FIXME:  This can be replaced by calling Trace_WorldCollisionExact with the GE_COLLIDE_MODELS
 //	flag only...
 //=====================================================================================
 geBoolean Trace_WorldCollisionExact2(	geWorld *World, 
@@ -451,6 +451,68 @@ geBoolean Trace_WorldCollisionExact2(	geWorld *World,
 
 	return GE_FALSE;
 }
+
+// changed QD Shadows
+// Internal only doesn't check meshes or actors, and ignores translucent contents (CLIP, WINDOW...)
+geBoolean Trace_WorldCollisionExact3(geWorld *World, 
+									const geVec3d *Front, 
+									const geVec3d *Back,
+									geVec3d *Impact,
+									int32 *Node,
+									int32 *Plane,
+									int32 *Side)
+{
+	int32			i;
+	geVec3d			NewFront1, NewBack1;
+	geVec3d			NewFront2, NewBack2;
+	geWorld_Model	*Models;
+
+	assert(World != NULL);
+	assert(World->CurrentBSP != NULL);
+	assert(Front != NULL);
+	assert(Back!= NULL);
+	
+	BSPData = &World->CurrentBSP->BSPData;
+	Models = World->CurrentBSP->Models;
+	
+	GPlaneNum = -1;
+
+	gContents = GE_CONTENTS_SOLID | GE_CONTENTS_EMPTY | GE_CONTENTS_WAVY;
+
+	for (i = 0; i < BSPData->NumGFXModels; i++)
+	{
+		
+		// Move to models center of rotation
+		geVec3d_Subtract(Front, &Models[i].Pivot, &NewFront1);
+		geVec3d_Subtract(Back , &Models[i].Pivot, &NewBack1);
+
+		// InverseTransform the point about models center of rotation
+		geXForm3d_TransposeTransform(&Models[i].XForm, &NewFront1, &NewFront2);
+		geXForm3d_TransposeTransform(&Models[i].XForm, &NewBack1 , &NewBack2);
+
+		// push back into world
+		geVec3d_Add(&NewFront2, &Models[i].Pivot, &NewFront1);
+		geVec3d_Add(&NewBack2 , &Models[i].Pivot, &NewBack1);
+		
+		HitSet = FALSE;
+		
+		if (BSPIntersect(&NewFront1, &NewBack1, BSPData->GFXModels[i].RootNode[0]))
+		{
+			if (GPlaneNum == -1)
+				return FALSE;
+
+			if (Impact) *Impact = GlobalI;
+			if (Node) *Node = GlobalNode;
+			if (Plane) *Plane = GPlaneNum;
+			if (Side) *Side = GlobalSide;
+
+			return GE_TRUE;
+		}
+	}
+
+	return GE_FALSE;
+}
+// end change
 
 //=====================================================================================
 //	Local static support functions

@@ -41,16 +41,16 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
-# ADD CPP /nologo /G5 /MT /W3 /GX /Ot /Ow /Og /Oi /Op /Ob2 /I "..\G3D" /I "World" /I "Engine" /I "Engine\Drivers" /I "Actor" /I "BSP" /I "Math" /I "Entities" /I "Support" /I "Physics" /I "VFile" /I "Bitmap" /I "Bitmap\Compression" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fd"Release/genesis.pdb" /FD /c
+# ADD CPP /nologo /G5 /MT /W3 /GX /Ot /Ow /Og /Oi /Op /Ob2 /I "..\Genesis3D" /I "World" /I "Engine" /I "Engine\Drivers" /I "Actor" /I "BSP" /I "Math" /I "Entities" /I "Support" /I "Physics" /I "VFile" /I "Bitmap" /I "Bitmap\Compression" /I "..\DX8Lib\include" /I "f:\mssdk7a\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /FR /Fd"Release/genesis.pdb" /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
-# ADD RSC /l 0x409 /d "NDEBUG"
+# ADD RSC /l 0x409 /fo"Lib/genesis.res" /d "NDEBUG"
 # SUBTRACT RSC /x
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
-# ADD LIB32 /nologo
+# ADD LIB32 /nologo /out:"Lib\Genesis.lib"
 
 !ELSEIF  "$(CFG)" == "Genesis - Win32 Debug"
 
@@ -65,7 +65,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /nologo /G5 /MTd /W3 /Gm /GX /ZI /Od /I "..\G3D" /I "World" /I "Engine" /I "Engine\Drivers" /I "Actor" /I "BSP" /I "Math" /I "Entities" /I "Support" /I "Physics" /I "VFile" /I "Bitmap" /I "Bitmap\Compression" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /Fd"Debug/genesis.pdb" /FD /GZ /c
+# ADD CPP /nologo /G5 /MTd /W3 /Gm /GX /ZI /Od /I "..\G3D" /I "World" /I "Engine" /I "Engine\Drivers" /I "Actor" /I "BSP" /I "Math" /I "Entities" /I "Support" /I "Physics" /I "VFile" /I "Bitmap" /I "Bitmap\Compression" /I "f:\mssdk7a\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /Fd"Debug/genesis.pdb" /FD /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 # SUBTRACT RSC /x
@@ -166,10 +166,6 @@ SOURCE=.\World\WBitmap.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\World\WBitmap.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\World\World.c
 # End Source File
 # Begin Source File
@@ -262,6 +258,10 @@ SOURCE=.\Actor\actor.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\Actor\body._h
+# End Source File
+# Begin Source File
+
 SOURCE=.\Actor\body.c
 # End Source File
 # Begin Source File
@@ -347,6 +347,10 @@ SOURCE=.\Actor\vkframe.c
 # Begin Source File
 
 SOURCE=.\Actor\vkframe.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\World\WBitmap.h
 # End Source File
 # Begin Source File
 
@@ -773,10 +777,14 @@ SOURCE=.\tsc.c
 
 SOURCE=.\tsc.h
 # End Source File
-# End Group
-# Begin Group "Libraries"
+# Begin Source File
 
-# PROP Default_Filter ""
+SOURCE=.\include\xtra_g3d.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\xtra_g3d.h
+# End Source File
 # End Group
 # Begin Source File
 

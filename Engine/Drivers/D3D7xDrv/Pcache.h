@@ -4,6 +4,10 @@
 /*  Author: John Pollard                                                                */
 /*  Description: D3D poly cache                                                         */
 /*                                                                                      */
+/*  Edit History:                                                                       */
+/*  01/28/2003 Wendell Buckner                                                          */
+/*   Cache decals so that they can be drawn after all the 3d stuff...                   */
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -30,6 +34,15 @@ BOOL PCache_FlushWorldPolys(void);
 BOOL PCache_FlushMiscPolys(void);
 BOOL PCache_InsertMiscPoly(DRV_TLVertex *Verts, int32 NumVerts, geRDriver_THandle *THandle, uint32 Flags);
 
+// changed QD Shadows
+BOOL PCache_FlushStencilPolys(void);
+BOOL PCache_InsertStencilPoly(DRV_XYZVertex *Verts, int32 NumVerts, uint32 Flags);
+// end change
+
 BOOL PCache_Reset(void);
 
+/*  01/28/2003 Wendell Buckner                                                          */
+/*   Cache decals so that they can be drawn after all the 3d stuff...                   */
+BOOL DCache_FlushDecalRects(void);
+BOOL DCache_InsertDecalRect(geRDriver_THandle *THandle, RECT *SRect, int32 x, int32 y);
 #endif

@@ -4,6 +4,12 @@
 /*  Author: John Pollard                                                                */
 /*  Description: DD/D3D wrapper                                                         */
 /*  Edit History                                                                        */
+/*  12/21/2003 Wendell Buckner                                                          */ 
+/*   COMPRESSED TEXTURES - Get the compressed surface formats                           */
+/*  03/26/2003 Wendell Buckner                                                          */
+/*   BUMPMAPPING                                                                        */
+/*  03/25/2003 Wendell Buckner                                                          */
+/*   BUMPMAPPING                                                                        */
 /*  01/10/2003 Wendell Buckner                                                          */
 /*   Add gamma table for true 32-bit alpha/color....                                    */
 /*  12/28/2002 Wendell Buckner                                                          */
@@ -50,6 +56,13 @@
 //	Structure defs
 //================================================================================
 
+// changed QD Shadows
+typedef struct
+{
+	float sx ,sy, sz, rhw;
+	D3DCOLOR color;
+} D3DXYZRHWVERTEX;
+
 typedef struct
 {
     char				Name[MAX_DRIVER_NAME];	// Short name of the driver 
@@ -75,6 +88,19 @@ typedef struct
     WORD				MaxSimultaneousTextures;	
 	
 	BOOL				CanUse;					// We can use this driver
+
+/* 03/25/2003 Wendell Buckner
+    BUMPMAPPING */
+	BOOL			    CanDoBumpMapping; 
+
+/* 02/21/2004 Wendell Buckner
+    BUMPMAPPING */
+	BOOL			    CanDoDot3; 
+
+// changed QD Shadows
+	BOOL				CanDoStencil;
+// end change
+
 } DDMain_D3DDriver;
 
 typedef struct 
@@ -95,6 +121,11 @@ typedef struct
     Allow/make 32-bit (ARGB) mode the default mode... */
     BOOL				HasEightBitAlpha;
 
+/* 03/26/2003 Wendell Buckner
+    BUMPMAPPING */
+	BOOL HasBumpMapSupportNoLuminance;
+	BOOL HasBumpMapSupportSixBitLuminance;
+	BOOL HasBumpMapSupportEightBitLuminance;
 } DDMain_SurfFormat;
 
 typedef struct
@@ -182,6 +213,19 @@ typedef struct
     Allow/make 32-bit (ARGB) mode the default mode...  */
     DDSURFACEDESC2		ddEightBitAlphaSurfFormat;			// 8888 surface desc
 
+/* 03/26/2003 Wendell Buckner
+    BUMPMAPPING */
+	geBoolean			CanDoBumpMapping; 
+    DDSURFACEDESC2		ddBumpMapNoLuminance;						    // 88   surface desc
+	DDSURFACEDESC2		ddBumpMapSixBitLuminance;						// 556  surface desc
+    DDSURFACEDESC2		ddBumpMapEightBitLuminance;						// 888  surface desc */
+
+/* 12/21/2003 Wendell Buckner
+    COMPRESSED TEXTURES - Get the compressed surface formats */
+	DDSURFACEDESC2		ddCompressedOneBitAlphaSurfFormat;			// 1555 surface desc
+	DDSURFACEDESC2		ddCompressedFourBitAlphaSurfFormat;			// 4444 surface desc
+    DDSURFACEDESC2		ddCompressedEightBitAlphaSurfFormat;			// 8888 surface desc
+
 	RGB_LUT				Lut1;
 	RGB_LUT				Lut2;
 	RGB_LUT				Lut3;
@@ -265,7 +309,10 @@ BOOL				D3DMain_RestoreAllSurfaces(void);
 
 BOOL				Main_EnumTextureFormats(void);
 BOOL				D3DMain_EnumDisplayModes(void);
-BOOL				Main_ClearBackBuffer(BOOL Clear, BOOL ClearZ);
+// changed QD Shadows
+//BOOL				Main_ClearBackBuffer(BOOL Clear, BOOL ClearZ);
+BOOL				Main_ClearBackBuffer(BOOL Clear, BOOL ClearZ, BOOL ClearStencil);
+// end change
 BOOL				Main_ShowBackBuffer(void);
 
 BOOL				D3DMain_GetSurfaceFormats(void);
