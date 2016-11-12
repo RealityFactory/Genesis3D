@@ -81,13 +81,13 @@ why this isn't exactly optimal:
 ***********/
 /*}{*************************************************/
 
-#include "palcreate.h"
-#include "tsc.h"
-#include "paloptimize.h"
-#include "ram.h"
-#include "yuv.h"
-#include "mempool.h"
-#include "utility.h"		// delete macro
+#include "PalCreate.h"
+#include "TSC.h"
+#include "PalOptimize.h"
+#include "Ram.h"
+#include "Yuv.h"
+#include "MemPool.h"
+#include "Utility.h"		// delete macro
 #include <stdlib.h>
 #include <assert.h>
 

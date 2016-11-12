@@ -95,20 +95,19 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
 /*                                                                                      */
 /****************************************************************************************/
-#include <Windows.h>
-#include <Assert.h>
+#include <windows.h>
+#include <assert.h>
 #include <stdio.h>
-#include <DDraw.h>
-#include <D3D.h>
-#include <Math.h>
+#include <ddraw.h>
+#include <d3d.h>
+#include <math.h>
 
 #include "D3D_Main.h"
 #include "D3D_Err.h"
-#include "D3D_fx.h"
-#include "d3dcache.h"
+#include "D3D_Fx.h"
+#include "D3DCache.h"
 
 #include "Render.h"
-#include "D3DCache.h"
 #include "THandle.h"
 #include "PCache.h"
 

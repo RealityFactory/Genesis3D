@@ -25,8 +25,8 @@
 
 #include "Genesis.h"
 #include "System.h"
-#include "world.h"
-#include "bitmap.h"
+#include "World.h"
+#include "Bitmap.h"
 #include "BitmapList.h"
 
 #ifdef __cplusplus

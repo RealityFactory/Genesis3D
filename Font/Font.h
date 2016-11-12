@@ -24,9 +24,9 @@
 #define GE_FONT_H
 
 // includes
-#include "genesis.h"
-#include "basetype.h"
-#include "bitmap.h"
+#include "Genesis.h"
+#include "BaseType.h"
+#include "Bitmap.h"
 // **************************
 // to use this API:
 

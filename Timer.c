@@ -20,7 +20,7 @@
 /*                                                                                      */
 /****************************************************************************************/
 
-#include "timer.h"
+#include "Timer.h"
 
 // changed QD - port to VS8: stdout is not a constant anymore
 #if _MSC_VER > 1200

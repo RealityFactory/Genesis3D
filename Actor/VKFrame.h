@@ -40,7 +40,7 @@
 #define GE_VKFRAME_H
 
 #include "TKArray.h"
-#include "vfile.h"
+#include "VFile.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -29,11 +29,11 @@
 /****************************************************************************************/
 
 
-#include "bitmap._h"
-#include "bitmap.__h"
-#include "bitmap_gamma.h"
-#include "pixelformat.h"
-#include "errorlog.h"
+#include "Bitmap._h"
+#include "Bitmap.__h"
+#include "Bitmap_Gamma.h"
+#include "PixelFormat.h"
+#include "ErrorLog.h"
 #include <assert.h>
 #include <math.h>
 

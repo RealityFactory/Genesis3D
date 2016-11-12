@@ -28,13 +28,13 @@
 #include	<string.h>
 #include	<assert.h>
 
-#include	"basetype.h"
-#include	"ram.h"
+#include	"BaseType.h"
+#include	"Ram.h"
 
-#include	"vfile.h"
-#include	"vfile._h"
+#include	"VFile.h"
+#include	"VFile._h"
 
-#include	"fsmemory.h"
+#include	"FSMemory.h"
 
 //	"MF01"
 #define	MEMORYFILE_SIGNATURE	0x3130464D

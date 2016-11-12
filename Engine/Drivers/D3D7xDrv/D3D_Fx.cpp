@@ -54,10 +54,10 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
 /*                                                                                      */
 /****************************************************************************************/
-#include <Windows.h>
+#include <windows.h>
 #include <stdio.h>
-#include <DDraw.h>
-#include <D3D.h>
+#include <ddraw.h>
+#include <d3d.h>
 
 /*  07/16/2000 Wendell Buckner       
 /*    Convert to Directx7...         
@@ -67,7 +67,7 @@
 #include "DCommon.h"
 #include "Render.h"
 #include "Scene.h"
-#include "D3D_FX.h"
+#include "D3D_Fx.h"
 #include "D3D_Main.h"
 #include "D3D_Err.h"
 

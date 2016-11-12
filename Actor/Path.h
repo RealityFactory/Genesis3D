@@ -22,10 +22,10 @@
 #ifndef GE_PATH_H
 #define GE_PATH_H
 
-#include "basetype.h"
-#include "xform3d.h"
-#include "quatern.h"
-#include "vfile.h"
+#include "BaseType.h"
+#include "XForm3d.h"
+#include "Quatern.h"
+#include "VFile.h"
 
 #ifdef __cplusplus
 	extern "C" {

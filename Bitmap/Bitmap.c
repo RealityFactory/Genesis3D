@@ -100,26 +100,26 @@ see {} for notes/long-term-todos
 #include	<stdlib.h>
 #include	<string.h>
 
-#include	"basetype.h"
-#include	"getypes.h"
-#include	"ram.h"
+#include	"BaseType.h"
+#include	"GeTypes.h"
+#include	"Ram.h"
 
-#include	"vfile.h"
+#include	"VFile.h"
 #include	"ErrorLog.h"
 #include	"Log.h"
-#include	"mempool.h"
+#include	"MemPool.h"
 
-#include	"bitmap.h"
-#include	"bitmap._h"
-#include	"bitmap.__h"
-#include	"bitmap_blitdata.h"
-#include	"bitmap_gamma.h"
+#include	"Bitmap.h"
+#include	"Bitmap._h"
+#include	"Bitmap.__h"
+#include	"Bitmap_BlitData.h"
+#include	"Bitmap_Gamma.h"
 
-#include	"palcreate.h"
-#include	"palettize.h"
+#include	"PalCreate.h"
+#include	"Palettize.h"
 
 #ifdef DO_TIMER
-#include	"timer.h"
+#include	"Timer.h"
 #endif
 
 #define allocate(ptr)	ptr = geRam_Allocate(sizeof(*ptr))

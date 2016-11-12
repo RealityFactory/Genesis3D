@@ -19,9 +19,9 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
 /*                                                                                      */
 /****************************************************************************************/
-#include <Assert.h>
-#include <Windows.h>
-#include <Math.h>
+#include <assert.h>
+#include <windows.h>
+#include <math.h>
 
 #include "BaseType.h"
 #include "System.h"

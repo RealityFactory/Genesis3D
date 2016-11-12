@@ -24,14 +24,14 @@
 #include <string.h>
 #include <stdio.h>  //sscanf
 
-#include "path.h"
+#include "Path.h"
 #include "Quatern.h"
-#include "errorlog.h"
-#include "ram.h"
-#include "tkarray.h"
+#include "ErrorLog.h"
+#include "Ram.h"
+#include "TKArray.h"
 #include "VKFrame.h"
 #include "QKFrame.h"
-#include "vec3d.h"
+#include "Vec3d.h"
 
 #define min(aa,bb)  (( (aa)>(bb) ) ? (bb) : (aa) )
 #define max(aa,bb)  (( (aa)>(bb) ) ? (aa) : (bb) )

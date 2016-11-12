@@ -30,8 +30,8 @@ typedef unsigned long ulong;
 
 #pragma message("TSC on")
 
-#include "ram.h"
-#include "log.h"
+#include "Ram.h"
+#include "Log.h"
 #include <stdio.h>	//sprintf
 #include <windows.h>	//outputdebug
 
@@ -43,7 +43,7 @@ typedef unsigned long ulong;
 #undef  destroy
 #define destroy(mem)	MemFree(mem)
 
-#include "tsc.h"
+#include "TSC.h"
 
 typedef struct tscNode tscNode;
 struct tscNode 

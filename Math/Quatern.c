@@ -21,8 +21,8 @@
 /****************************************************************************************/
 #include <assert.h>
 #include <math.h>
-#include "basetype.h"
-#include "quatern.h"
+#include "BaseType.h"
+#include "Quatern.h"
 
 
 #ifndef NDEBUG

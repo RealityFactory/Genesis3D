@@ -22,7 +22,7 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include <Windows.H>
+#include <windows.h>
 
 #include "DCommon.h"
 

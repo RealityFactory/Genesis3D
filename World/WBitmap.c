@@ -23,7 +23,7 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
-#include <Assert.h>
+#include <assert.h>
 
 //=====================================================================================
 //=====================================================================================
@@ -31,7 +31,7 @@
 #include "GBSPFile.h"
 #include "Ram.h"
 #include "Bitmap.h"
-#include "Errorlog.h"
+#include "ErrorLog.h"
 #include "Bitmap._h"
 
 //#define USEPERPIXEL

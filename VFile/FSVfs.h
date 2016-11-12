@@ -22,7 +22,7 @@
 #ifndef	FSVFS_H
 #define	FSVFS_H
 
-#include "vfile._h"
+#include "VFile._h"
 
 const	geVFile_SystemAPIs * GENESISCC FSVFS_GetAPIs(void);
 

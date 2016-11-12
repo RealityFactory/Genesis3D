@@ -37,7 +37,7 @@
 
 #include "TKArray.h"
 #include "ErrorLog.h"
-#include "ram.h"
+#include "Ram.h"
 
 typedef struct geTKArray
 {

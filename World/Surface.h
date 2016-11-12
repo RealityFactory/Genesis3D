@@ -22,8 +22,8 @@
 #ifndef GE_SURFACE_H
 #define GE_SURFACE_H
 
-#include <Assert.h>
-#include <Windows.h>
+#include <assert.h>
+#include <windows.h>
 
 #include "BaseType.h"
 #include "PtrTypes.h"

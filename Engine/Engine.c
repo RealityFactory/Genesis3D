@@ -49,15 +49,15 @@
 #include <stdlib.h> // _MAX_PATH
 #include <direct.h>	// getcwd
 
-#include "engine.h"
+#include "Engine.h"
 
-#include "Errorlog.h"
+#include "ErrorLog.h"
 #include "DCommon.h"
 #include "BitmapList.h"
 #include "Bitmap.h"
 #include "Bitmap._h"
 #include "World.h"
-#include "log.h"
+#include "Log.h"
 
 //#define DO_ADDREMOVE_MESSAGES
 #ifndef _DEBUG

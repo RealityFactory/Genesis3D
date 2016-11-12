@@ -30,25 +30,25 @@
 #include	<stdlib.h>
 #include	<string.h>
 
-#include	"basetype.h"
-#include	"getypes.h"
-#include	"ram.h"
+#include	"BaseType.h"
+#include	"GeTypes.h"
+#include	"Ram.h"
 
-#include	"bitmap.h"
-#include	"bitmap._h"
-#include	"bitmap.__h"
-#include	"bitmap_blitdata.h"
+#include	"Bitmap.h"
+#include	"Bitmap._h"
+#include	"Bitmap.__h"
+#include	"Bitmap_BlitData.h"
 
-#include	"vfile.h"
+#include	"VFile.h"
 #include	"ErrorLog.h"
 
-#include	"palcreate.h"
-#include	"palettize.h"
+#include	"PalCreate.h"
+#include	"Palettize.h"
 
-#include	"tsc.h"
+#include	"TSC.h"
 
 #ifdef DO_TIMER
-#include	"timer.h"
+#include	"Timer.h"
 #endif
 
 //#define DONT_USE_ASM

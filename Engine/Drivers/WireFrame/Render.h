@@ -22,7 +22,7 @@
 #ifndef RENDER_H
 #define RENDER_H
 
-#include <Windows.h>
+#include <windows.h>
 
 #include "DCommon.h"
 

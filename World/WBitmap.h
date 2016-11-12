@@ -26,7 +26,7 @@
 #ifndef WBITMAP_H
 #define WBITMAP_H
 
-#include <Assert.h>
+#include <assert.h>
 
 #include "BaseType.h"
 #include "GBSPFile.h"

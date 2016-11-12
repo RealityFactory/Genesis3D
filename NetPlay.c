@@ -21,14 +21,14 @@
 /****************************************************************************************/
 #define IDIRECTPLAY2_OR_GREATER
 
-#include <Windows.H>
-#include <Assert.h>
+#include <windows.h>
+#include <assert.h>
 
 #include <dplay.h>
 #include <dplobby.h>
-#include <Stdio.h>
+#include <stdio.h>
 
-#include "netplay.h"
+#include "NetPlay.h"
 #include "ErrorLog.h"
 
 //#define INIT_GUID

@@ -22,8 +22,7 @@
 #ifndef GE_LIGHT_H
 #define GE_LIGHT_H
 
-#include <Assert.h>
-//#include <Windows.h>
+#include <assert.h>
 
 #include "Genesis.h"
 #include "BaseType.h"

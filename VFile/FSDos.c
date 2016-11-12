@@ -27,13 +27,13 @@
 #include	<string.h>
 #include	<assert.h>
 
-#include	"basetype.h"
-#include	"ram.h"
+#include	"BaseType.h"
+#include	"Ram.h"
 
-#include	"vfile.h"
-#include	"vfile._h"
+#include	"VFile.h"
+#include	"VFile._h"
 
-#include	"fsdos.h"
+#include	"FSDos.h"
 
 //	"DF01"
 #define	DOSFILE_SIGNATURE	0x31304644

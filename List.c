@@ -33,16 +33,16 @@ List_Ram can still be as high as 30% of the time!
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#include "list.h"
-#include "mempool.h"
-#include "ram.h"
-#include "crc32.h"
+#include "List.h"
+#include "MemPool.h"
+#include "Ram.h"
+#include "CRC32.h"
 
 /**********************************/
 // Timer Stuff
 
 #ifdef DO_TIMER
-#include "timer.h"
+#include "Timer.h"
 
 TIMER_VARS(List_Ram);
 TIMER_VARS(List_RadixWalk);

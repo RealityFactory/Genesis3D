@@ -25,11 +25,11 @@
 #include <string.h>
 #include <float.h>
 
-#include "vec3d.h"
-#include "xform3d.h"
-#include "ram.h"
-#include "matrix33.h"
-#include "quatern.h"
+#include "Vec3d.h"
+#include "XForm3d.h"
+#include "Ram.h"
+#include "Matrix33.h"
+#include "Quatern.h"
 
 #include "PhysicsObject.h"
 #include "PhysicsJoint.h"

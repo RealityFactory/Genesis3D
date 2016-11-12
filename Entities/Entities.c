@@ -19,12 +19,12 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
 /*                                                                                      */
 /****************************************************************************************/
-#include <Windows.h>
-#include <Assert.h>
+#include <windows.h>
+#include <assert.h>
 
 #include "Entities.h"
 #include "BaseType.h"
-#include "Errorlog.h"
+#include "ErrorLog.h"
 #include "Vec3d.h"
 #include "Ram.h"
 

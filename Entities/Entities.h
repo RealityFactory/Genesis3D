@@ -22,11 +22,11 @@
 #ifndef GE_ENTITIES_H
 #define GE_ENTITIES_H
 
-#include <Assert.h>
-#include <Windows.h>
+#include <assert.h>
+#include <windows.h>
 
 #include "BaseType.h"
-#include "Errorlog.h"
+#include "ErrorLog.h"
 #include "Vec3d.h"
 #include "System.h"
 #include "World.h"

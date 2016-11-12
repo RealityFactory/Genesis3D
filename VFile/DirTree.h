@@ -22,7 +22,7 @@
 #ifndef	DIRTREE_H
 #define	DIRTREE_H
 
-#include	"vfile.h"
+#include	"VFile.h"
 
 typedef struct DirTree			DirTree;
 typedef struct DirTree_Finder	DirTree_Finder;

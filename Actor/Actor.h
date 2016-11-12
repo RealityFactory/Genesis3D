@@ -89,15 +89,15 @@
 #ifndef GE_ACTOR_H
 #define GE_ACTOR_H
 
-#include "genesis.h"				
-#include "basetype.h"
-#include "extbox.h"
-#include "bitmap.h"
+#include "Genesis.h"
+#include "BaseType.h"
+#include "ExtBox.h"
+#include "Bitmap.h"
 
 #include "Motion.h"
 
 #ifdef GE_WORLD_H
-#include "camera.h"
+#include "Camera.h"
 #include "Frustum.h"
 #endif
 

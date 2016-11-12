@@ -22,7 +22,7 @@
 #include <assert.h>
 
 //#define INITGUID
-#include <Windows.H>
+#include <windows.h>
 #include <objbase.h>
 
 #include "CSNetMgr.h"

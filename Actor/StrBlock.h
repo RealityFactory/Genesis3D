@@ -23,8 +23,8 @@
 #ifndef GE_STRBLOCK_H
 #define GE_STRBLOCK_H
 
-#include "basetype.h"	// geBoolean
-#include "vfile.h"
+#include "BaseType.h"	// geBoolean
+#include "VFile.h"
 
 #ifdef __cplusplus
 extern "C" {

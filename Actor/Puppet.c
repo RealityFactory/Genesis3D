@@ -57,28 +57,28 @@
 #include <math.h>  //fabs()
 #include <assert.h>
 
-#include "light.h"
-#include "world.h"
-#include "trace.h"		//Trace_WorldCollisionExact2()
-#include "surface.h"	// Surf_InSurfBoundingBox()
+#include "Light.h"
+#include "World.h"
+#include "Trace.h"		//Trace_WorldCollisionExact2()
+#include "Surface.h"	//Surf_InSurfBoundingBox()
 
-#include "xfarray.h"
-#include "puppet.h"
-#include "pose.h"
+#include "XFArray.h"
+#include "Puppet.h"
+#include "Pose.h"
 #include "ErrorLog.h"
-#include "ram.h"
-#include "tclip.h"
+#include "Ram.h"
+#include "TClip.h"
 
 #include "Frustum.h"
 #include "ExtBox.h"
-#include "bodyinst.h"
+#include "BodyInst.h"
 
 #ifdef PROFILE
 #include "rdtsc.h"
 #endif
 
-#include "bitmap.h"
-#include "bitmap._h"
+#include "Bitmap.h"
+#include "Bitmap._h"
 
 #define PUPPET_DEFAULT_MAX_DYNAMIC_LIGHTS 3
 

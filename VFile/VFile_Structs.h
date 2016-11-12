@@ -13,13 +13,13 @@ extern "C" {
 #include	<stdarg.h>
 #include	<string.h>
 
-#include	"basetype.h"
-#include	"ram.h"
-#include	"vfile.h"
-#include	"vfile._h"
-#include	"fsdos.h"
-#include	"fsmemory.h"
-#include	"fsvfs.h"
+#include	"BaseType.h"
+#include	"Ram.h"
+#include	"VFile.h"
+#include	"VFile._h"
+#include	"FSDos.h"
+#include	"FSMemory.h"
+#include	"FSVfs.h"
 
 typedef	struct	FSSearchList
 {

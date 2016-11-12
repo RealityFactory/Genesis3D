@@ -23,7 +23,7 @@
 #define	DIRTREE_COMMON_H
 
 
-#include	"vfile.h"
+#include	"VFile.h"
 
 typedef	struct	DirTree_Header
 {

@@ -22,9 +22,9 @@
 #ifndef D3DCache_H
 #define D3DCache_H
 
-#include <Windows.h>
-#include <DDraw.h>
-#include <D3D.H>
+#include <windows.h>
+#include <ddraw.h>
+#include <d3d.h>
 
 #include "BaseType.h"
 #include "DDMemMgr.h"			

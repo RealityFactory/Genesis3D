@@ -26,14 +26,14 @@
 #include <windowsx.h>
 #pragma warning(default : 4201 4214 4115)
 
-#include "extbox.h"
-#include "ram.h"
+#include "ExtBox.h"
+#include "Ram.h"
 #include "wgClip.h"
 
 #include <assert.h>
 #include <string.h>
 
-#include "font.h"
+#include "Font.h"
 
 #pragma warning (disable:4514)	// unreferenced inline function (caused by Windows)
 

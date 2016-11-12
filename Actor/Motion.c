@@ -29,11 +29,11 @@
 #include <assert.h>
 #include <string.h>		// strcmp, strnicmp
 
-#include "basetype.h"
-#include "ram.h"
-#include "errorlog.h"
-#include "motion.h"
-#include "tkevents.h"
+#include "BaseType.h"
+#include "Ram.h"
+#include "ErrorLog.h"
+#include "Motion.h"
+#include "TKEvents.h"
 #include "StrBlock.h"
 
 #pragma warning(disable : 4201)		// we're using nameless structures

@@ -73,14 +73,14 @@ The problems :
 
 **********/
 
-#include "yuv.h"
-#include "palettize.h"
-#include "utility.h"
-#include "tsc.h"
-#include "log.h"
+#include "Yuv.h"
+#include "Palettize.h"
+#include "Utility.h"
+#include "TSC.h"
+#include "Log.h"
 
-#include "bitmap.h"
-#include "pixelformat.h"
+#include "Bitmap.h"
+#include "PixelFormat.h"
 
 /*******/
 

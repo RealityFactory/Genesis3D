@@ -35,9 +35,9 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
-#include <Windows.h>
-#include <DDraw.h>
-#include <D3D.h>
+#include <windows.h>
+#include <ddraw.h>
+#include <d3d.h>
 
 #include "THandle.h"
 #include "BaseType.h"
@@ -51,7 +51,7 @@
 #include "D3DCache.h"
 #include "D3D_Main.h"
 #include "PCache.h"
-#include "D3d_FX.h"
+#include "D3D_Fx.h"
 
 #include "TPage.h"
 

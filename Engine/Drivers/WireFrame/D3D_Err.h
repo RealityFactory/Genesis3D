@@ -22,9 +22,9 @@
 #ifndef D3D_ERR_H
 #define D3D_ERR_H
 
-#include <Windows.h>
-#include <DDraw.h>
-#include <D3D.h>
+#include <windows.h>
+#include <ddraw.h>
+#include <d3d.h>
 
 //================================================================================
 //	Global functions

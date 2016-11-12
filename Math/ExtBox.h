@@ -22,8 +22,8 @@
 #ifndef GE_EXTBOX_H
 #define GE_EXTBOX_H
 
-#include "basetype.h"
-#include "vec3d.h"
+#include "BaseType.h"
+#include "Vec3d.h"
 
 #ifdef __cplusplus
 	extern "C" {

@@ -40,7 +40,7 @@
 #include <math.h>	 // fabs()
 #include <stdio.h>	 //sscanf
 
-#include "world.h"	// to expose _Render apis in actor.h
+#include "World.h"	// to expose _Render apis in actor.h
 
 #include "Actor.h"
 #include "Ram.h"
@@ -48,7 +48,7 @@
 #include "Body.h"
 #include "Motion.h"
 #include "ErrorLog.h"
-#include "strblock.h"
+#include "StrBlock.h"
 #ifdef _DEBUG
 #include <crtdbg.h>
 #endif

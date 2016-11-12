@@ -23,11 +23,11 @@
 #include	<math.h>
 #include	<assert.h>
 
-#include	"genesis.h"
+#include	"Genesis.h"
 #include	"ErrorLog.h"
 
 #include	"Electric.h"
-#include	"ram.h"
+#include	"Ram.h"
 
 static	int		logBase2(int n)
 {

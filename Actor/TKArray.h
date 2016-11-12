@@ -34,8 +34,8 @@
 	Error conditions are reported to errorlog
 */
 
-#include "basetype.h"
-#include "vfile.h"
+#include "BaseType.h"
+#include "VFile.h"
 
 #ifdef __cplusplus
 extern "C" {

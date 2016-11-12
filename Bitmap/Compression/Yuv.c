@@ -1,7 +1,3 @@
-#include "yuv.h"
-#include "utility.h"
-#include <Assert.h>
-
 /****************************************************************************************/
 /*  Yuv                                                                                 */
 /*                                                                                      */
@@ -23,6 +19,11 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
 /*                                                                                      */
 /****************************************************************************************/
+
+#include "Yuv.h"
+#include "Utility.h"
+#include <assert.h>
+
 
 #pragma warning(disable : 4244)
 

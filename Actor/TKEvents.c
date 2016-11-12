@@ -28,13 +28,13 @@
 	Error conditions are reported to errorlog
 */
 #include <assert.h>
+#include <string.h>"
 #include <stdio.h>
 
 #include "TKEvents.h"
 #include "TKArray.h"
 #include "ErrorLog.h"
-#include "ram.h"
-#include "string.h"
+#include "Ram.h"
 
 typedef struct
 {

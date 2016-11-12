@@ -22,13 +22,13 @@
 #ifndef GE_FOG_H
 #define GE_FOG_H
 
-#include <Assert.h>
+#include <assert.h>
 
 #include "Vec3d.h"
 #include "BaseType.h"
 #include "GeTypes.h"
 #include "Ram.h"
-#include "Errorlog.h"
+#include "ErrorLog.h"
 
 #ifdef __cplusplus
 extern "C" {

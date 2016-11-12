@@ -22,8 +22,7 @@
 #ifndef GE_FRUSTUM_H
 #define GE_FRUSTUM_H
 
-#include <Assert.h>
-//#include <Windows.h>
+#include <assert.h>
 
 #include "BaseType.h"
 #include "GBSPFile.h"

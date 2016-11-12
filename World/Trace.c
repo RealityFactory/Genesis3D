@@ -19,8 +19,8 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
 /*                                                                                      */
 /****************************************************************************************/
-#include <Assert.h>
  
+#include <assert.h>
 #include "XForm3d.h"
 #include "BaseType.h"
 #include "GBSPFile.h"

@@ -29,9 +29,9 @@
 */
 
 #include <stdio.h>
-#include "basetype.h"
-#include "path.h"
-#include "vfile.h"
+#include "BaseType.h"
+#include "Path.h"
+#include "VFile.h"
 
 #ifdef __cplusplus
 extern "C" {

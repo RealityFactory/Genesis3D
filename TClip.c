@@ -80,16 +80,15 @@ TClip_Rasterize      : 0.006183 : 1.$ %
 
 /* 03/24/2004 Wendell Buckner
     BUG FIX: Rendering Transparent Polys properly (2) */
-#include "puppet.h"
+#include "Puppet.h"
 
 #include "TClip.h"
-//#include "engine.h" //already in tclip.h QD
-#include "bitmap._h"
+#include "Bitmap._h"
 
-#include "list.h"
-#include "ram.h"  
+#include "List.h"
+#include "Ram.h"
 
-#include "timer.h"
+#include "Timer.h"
 
 TIMER_VARS(TClip_Triangle);
 

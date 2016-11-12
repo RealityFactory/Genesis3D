@@ -25,7 +25,7 @@
 #include "BaseType.h"
 #include "Vec3d.h"
 #include "XForm3d.h"
-#include "GETypes.h"
+#include "GeTypes.h"
 
 #ifdef __cplusplus
 extern "C" {

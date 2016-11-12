@@ -21,8 +21,8 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
 /*                                                                                      */
 /****************************************************************************************/
-#include <Windows.h>
-#include <Assert.h>
+#include <windows.h>
+#include <assert.h>
 
 /*  07/16/2000 Wendell Buckner
 /*   Convert to Directx7...    

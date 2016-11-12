@@ -27,15 +27,15 @@
 #include	<stdarg.h>
 #include	<string.h>
 
-#include	"basetype.h"
-#include	"ram.h"
+#include	"BaseType.h"
+#include	"Ram.h"
 
-#include	"vfile.h"
-#include	"vfile._h"
+#include	"VFile.h"
+#include	"VFile._h"
 
-#include	"fsdos.h"
-#include	"fsmemory.h"
-#include	"fsvfs.h"
+#include	"FSDos.h"
+#include	"FSMemory.h"
+#include	"FSVfs.h"
 //
 // add include files for file types here
 

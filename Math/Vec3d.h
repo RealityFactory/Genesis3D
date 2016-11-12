@@ -22,7 +22,7 @@
 #ifndef GE_VEC3D_H
 #define GE_VEC3D_H
 
-#include "basetype.h"
+#include "BaseType.h"
 
 #ifdef __cplusplus
 extern "C" {

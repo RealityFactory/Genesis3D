@@ -35,9 +35,9 @@
 #ifndef D3D_MAIN_H
 #define D3D_MAIN_H
 
-#include <Windows.h>
-#include <DDraw.h>
-#include <D3D.h>
+#include <windows.h>
+#include <ddraw.h>
+#include <d3d.h>
 
 #define INITGUID
 

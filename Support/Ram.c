@@ -28,7 +28,7 @@
 #include <crtdbg.h>
 #endif
 
-#include "ram.h"
+#include "Ram.h"
 
 /*
   This controls the MINIMAL_CONFIG flag.  Basically, all overflow, underflow,

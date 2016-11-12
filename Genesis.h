@@ -28,9 +28,9 @@
 #include "BaseType.h"
 #include "Vec3d.h"
 #include "XForm3d.h"
-#include "GETypes.h"
+#include "GeTypes.h"
 #include "ExtBox.h"
-#include "vfile.h"
+#include "VFile.h"
 #include "Bitmap.h"
 
 #ifdef __cplusplus

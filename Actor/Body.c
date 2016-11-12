@@ -37,10 +37,10 @@
 #include <math.h> 						//fabs()
 #include <stdio.h>						//sscanf
 
-#include "body.h"
-#include "body._h"
-#include "ram.h"
-#include "errorlog.h"
+#include "Body.h"
+#include "Body._h"
+#include "Ram.h"
+#include "ErrorLog.h"
 
 
 #define MAX(aa,bb)   ( (aa)>(bb)?(aa):(bb) )

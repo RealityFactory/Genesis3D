@@ -30,7 +30,7 @@
 #ifndef THANDLE_H
 #define THANDLE_H
 
-#include <Windows.h>
+#include <windows.h>
 
 #include "BaseType.h"
 #include "DCommon.h"

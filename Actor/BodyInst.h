@@ -36,11 +36,11 @@
  */
 
 
-#include "basetype.h"
-#include "xform3d.h"
-#include "body.h"
+#include "BaseType.h"
+#include "XForm3d.h"
+#include "Body.h"
 #include "XFArray.h"
-#include "camera.h"
+#include "Camera.h"
 
 
 #ifdef __cplusplus

@@ -44,10 +44,10 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "vec3d.h"
+#include "Vec3d.h"
 #include "QKFrame.h"
-#include "errorlog.h"
-#include "ram.h"
+#include "ErrorLog.h"
+#include "Ram.h"
 
 #define LINEAR_BLEND(a,b,t)  ( (t)*((b)-(a)) + (a) )	
 			// linear blend of a and b  0<t<1 where  t=0 ->a and t=1 ->b

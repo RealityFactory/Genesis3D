@@ -19,10 +19,10 @@
 #include <assert.h>
 #include <math.h>
 
-#include "world.h"
-#include "trace.h"
+#include "World.h"
+#include "Trace.h"
 
-#include "sprite.h"
+#include "Sprite.h"
 
 #include "ErrorLog.h"
 

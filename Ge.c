@@ -20,11 +20,11 @@
 /*                                                                                      */
 /****************************************************************************************/
 
-#include <Windows.h>
-#include <Math.h>
-#include <Assert.h>
+#include <windows.h>
+#include <math.h>
+#include <assert.h>
 
-#include "Genesis.H"
+#include "Genesis.h"
 #include "System.h"
 #include "Ram.h"
 

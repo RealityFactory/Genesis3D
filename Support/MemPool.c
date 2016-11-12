@@ -22,8 +22,8 @@
 #include <string.h>
 #include <assert.h>
 
-#include "mempool.h"
-#include "ram.h"
+#include "MemPool.h"
+#include "Ram.h"
 
 /*
  *	MemPool is a 'root' level object (eg. 'list' uses us).  We sit only above 'Ram'

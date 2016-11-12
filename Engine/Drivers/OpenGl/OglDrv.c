@@ -20,7 +20,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include <math.h>
-#include <gl/gl.h>
+#include <GL/gl.h>
 
 #include "OglDrv.h"
 #include "OglMisc.h"

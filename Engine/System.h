@@ -36,7 +36,7 @@
 #include "ErrorLog.h"
 #include "Genesis.h"
 #include <windows.h>
-#include "dcommon.h"
+#include "DCommon.h"
 #include "Camera.h"
 #include "PtrTypes.h"
 

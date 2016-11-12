@@ -22,7 +22,7 @@
 #ifndef GE_GBSPFILE_H
 #define GE_GBSPFILE_H
 
-#include <Stdio.h>
+#include <stdio.h>
 
 #include "BaseType.h"
 #include "Vec3d.h"

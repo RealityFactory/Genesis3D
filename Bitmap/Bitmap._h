@@ -24,8 +24,8 @@
 /****************************************************************************************/
 
 
-#include	"bitmap.h"
-#include	"dcommon.h"
+#include	"Bitmap.h"
+#include	"DCommon.h"
 
 #ifdef __cplusplus
 extern "C" {

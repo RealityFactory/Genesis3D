@@ -26,10 +26,10 @@
 #ifndef GE_TCLIP_H
 #define GE_TCLIP_H
 
-#include "basetype.h"
-#include "getypes.h"
-#include "bitmap.h"
-#include "engine.h"
+#include "BaseType.h"
+#include "GeTypes.h"
+#include "Bitmap.h"
+#include "Engine.h"
 
 #ifdef __cplusplus
 extern "C" {

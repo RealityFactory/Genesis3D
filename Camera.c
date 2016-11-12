@@ -20,8 +20,8 @@
 /*                                                                                      */
 /****************************************************************************************/
 #include <math.h>
-#include <Assert.h>
-#include <Memory.h>		// memset
+#include <assert.h>
+#include <memory.h>        // memset
 
 #include "Camera.h"
 #include "Ram.h"

@@ -38,10 +38,10 @@
    This object holds the geometry for the body and the list of materials needed.
 */
 
-#include "basetype.h"
-#include "xform3d.h"
-#include "vfile.h"
-#include "bitmap.h"
+#include "BaseType.h"
+#include "XForm3d.h"
+#include "VFile.h"
+#include "Bitmap.h"
 
 #ifdef __cplusplus
 extern "C" {

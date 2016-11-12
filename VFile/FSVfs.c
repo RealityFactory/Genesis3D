@@ -24,10 +24,10 @@
 #include	<string.h>
 #include	<assert.h>
 
-#include	"ram.h"
+#include	"Ram.h"
 
-#include	"fsvfs.h"
-#include	"dirtree.h"
+#include	"FSVfs.h"
+#include	"DirTree.h"
 
 //	"VF00"
 #define	VFSFILEHEADER_SIGNATURE	0x30304656

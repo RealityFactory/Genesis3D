@@ -35,12 +35,12 @@
 
 #include	<math.h>
 
-#include	"genesis.h"
-#include	"engine.h"
-#include	"bitmap.h"
+#include	"Genesis.h"
+#include	"Engine.h"
+#include	"Bitmap.h"
 #include	"PixelFormat.h"
-#include	"errorlog.h"
-#include	"electric.h"
+#include	"ErrorLog.h"
+#include	"Electric.h"
 
 extern	unsigned char	LogoActor_act[];
 extern	int				LogoActor_act_Length;

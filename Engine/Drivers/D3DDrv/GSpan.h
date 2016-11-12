@@ -22,7 +22,7 @@
 #ifndef GSPAN
 #define GSPAN
 
-#include <Windows.h>
+#include <windows.h>
 
 #define MAX_SPAN_LINES			1024
 #define MAX_SPANS				35000

@@ -24,7 +24,7 @@
 /****************************************************************************************/
 
 #include <stdio.h>
-#include "tsc.h"
+#include "TSC.h"
 
 #ifdef __cplusplus
 extern "C" {

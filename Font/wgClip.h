@@ -29,8 +29,8 @@ extern "C" {
 
 #define GE_CLIP_CENTER 1
 #define GE_CLIP_CORNER 0
-#include	"basetype.h"
-#include	"getypes.h"
+#include	"BaseType.h"
+#include	"GeTypes.h"
 
 //***************************************************************
 // returns true if you need to draw at all.

@@ -24,8 +24,8 @@
 #include <assert.h>
 #include <string.h>
 
-#include "ram.h"
-#include "errorlog.h"
+#include "Ram.h"
+#include "ErrorLog.h"
 #include "Pose.h"
 #include "StrBlock.h"
 

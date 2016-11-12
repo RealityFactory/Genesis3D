@@ -18,7 +18,7 @@
 /****************************************************************************************/
 
 #include <windows.h>
-#include <gl/gl.h>
+#include <GL/gl.h>
 
 #include "DCommon.h"
 #include "OglMisc.h"

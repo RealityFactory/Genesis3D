@@ -45,7 +45,7 @@
 #include "XForm3d.h"
 #include "Vec3d.h"
 #include "PixelFormat.h"
-#include "geTypes.h"		// This is a no no
+#include "GeTypes.h"		// This is a no no
 
 #ifdef __cplusplus
 extern "C" {

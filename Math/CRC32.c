@@ -19,7 +19,7 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
 /*                                                                                      */
 /****************************************************************************************/
-#include "crc32.h"
+#include "CRC32.h"
 
 static uint32 crc_table[256] =
 {

@@ -29,9 +29,9 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include "strblock.h"
-#include "ram.h"
-#include "errorlog.h"
+#include "StrBlock.h"
+#include "Ram.h"
+#include "ErrorLog.h"
 
 #define STRBLOCK_MAX_STRINGLEN 255
 

@@ -1,9 +1,6 @@
 #ifndef GE_BRANDO_PALCREATE_H
 #define GE_BRANDO_PALCREATE_H
 
-#include "basetype.h"
-#include "bitmap.h"
-
 /****************************************************************************************/
 /*  PalCreate                                                                           */
 /*                                                                                      */
@@ -25,6 +22,9 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
 /*                                                                                      */
 /****************************************************************************************/
+#include "BaseType.h"
+#include "Bitmap.h"
+
 
 #ifdef __cplusplus
 extern "C" {

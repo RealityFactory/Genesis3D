@@ -46,7 +46,7 @@
 
 #include "TKArray.h"
 #include "Quatern.h"
-#include "vfile.h"
+#include "VFile.h"
 
 #ifdef __cplusplus
 extern "C" {

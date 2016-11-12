@@ -27,16 +27,16 @@
 /*                                                                                      */
 /****************************************************************************************/
 
-#include <Assert.h>
+#include <assert.h>
 
 #include "BaseType.h"
 #include "System.h"
 #include "Genesis.h"
 #include "ErrorLog.h"
 #include "Ram.h"
-#include "engine.h"
+#include "Engine.h"
 
-#include "list.h"
+#include "List.h"
 #include "Surface.h"
 #include "World.h"
 #include "Plane.h"
@@ -47,9 +47,9 @@
 #include "Entities.h"
 #include "User.h"
 
-#include "dcommon.h"
+#include "DCommon.h"
 
-#include "geassert.h"
+#include "geAssert.h"
 
 #include "BitmapList.h"
 //#define SKY_HACK

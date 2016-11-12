@@ -30,11 +30,11 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
-#include <Windows.h>
-#include <Stdio.h>
-#include <Assert.h>
-#include <DDraw.h>
-#include <D3D.h>
+#include <windows.h>
+#include <stdio.h>
+#include <assert.h>
+#include <ddraw.h>
+#include <d3d.h>
 
 #include "D3DCache.h"
 

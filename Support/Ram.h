@@ -22,7 +22,7 @@
 #ifndef GE_RAM_H
 #define GE_RAM_H
 
-#include "basetype.h"
+#include "BaseType.h"
 
 #ifdef __cplusplus
 extern "C" {

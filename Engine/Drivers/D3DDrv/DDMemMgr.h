@@ -22,8 +22,8 @@
 #ifndef DDMEMMGR_H
 #define DDMEMMGR_H
 
-#include <Windows.h>
-#include <Assert.h>
+#include <windows.h>
+#include <assert.h>
 
 #include "BaseType.h"
 

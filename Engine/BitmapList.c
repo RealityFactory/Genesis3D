@@ -29,7 +29,7 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
-#include <Assert.h>
+#include <assert.h>
 
 #ifdef _DEBUG
 #include <windows.h>
@@ -43,11 +43,11 @@
 #include "DCommon.h"
 #include "Bitmap.h"
 #include "Bitmap._h"
-#include "list.h"
-#include "mempool.h"
-#include "errorlog.h"
-#include "ram.h"
-//#include "tsc.h"
+#include "List.h"
+#include "MemPool.h"
+#include "ErrorLog.h"
+#include "Ram.h"
+//#include "TSC.h"
 
 struct BitmapList
 {

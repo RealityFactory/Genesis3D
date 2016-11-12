@@ -22,7 +22,7 @@
 #ifndef	PHYSICSOBJECT_H
 #define PHYSICSOBJECT_H
 
-#include "matrix33.h"
+#include "Matrix33.h"
 
 #ifdef __cplusplus
 extern "C" {

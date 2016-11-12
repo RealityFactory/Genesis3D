@@ -23,8 +23,8 @@
 /*                                                                                      */
 /****************************************************************************************/
 
-#include "basetype.h"
-#include "bitmap.h"
+#include "BaseType.h"
+#include "Bitmap.h"
 
 #ifdef __cplusplus
 extern "C" {

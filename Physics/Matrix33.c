@@ -22,9 +22,9 @@
 #include <assert.h>
 #include <math.h>
 
-#include "vec3d.h"
-#include "xform3d.h"
-#include "matrix33.h"
+#include "Vec3d.h"
+#include "XForm3d.h"
+#include "Matrix33.h"
 
 void Matrix33_MakeCrossProductMatrix33(const geVec3d* v,
 	Matrix33* m)

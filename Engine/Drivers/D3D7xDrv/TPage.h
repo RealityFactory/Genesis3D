@@ -24,10 +24,10 @@
 #ifndef TPAGE_H
 #define TPAGE_H
 
-#include <Windows.h>
+#include <windows.h>
 
-#include <DDraw.h>
-#include <D3D.H>
+#include <ddraw.h>
+#include <d3d.h>
 
 typedef struct TPage_Mgr	TPage_Mgr;
 typedef	struct TPage		TPage;

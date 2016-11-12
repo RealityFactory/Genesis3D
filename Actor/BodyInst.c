@@ -26,11 +26,11 @@
 /****************************************************************************************/
 #include <assert.h>						//assert()
 
-#include "body._h"
-#include "bodyinst.h"
-#include "ram.h"
-#include "errorlog.h"
-#include "strblock.h"
+#include "Body._h"
+#include "BodyInst.h"
+#include "Ram.h"
+#include "ErrorLog.h"
+#include "StrBlock.h"
 
 
 

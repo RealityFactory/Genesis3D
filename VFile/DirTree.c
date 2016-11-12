@@ -25,11 +25,11 @@
 #include	<stdlib.h>
 #include	<string.h>
 
-#include	"basetype.h"
-#include	"ram.h"
+#include	"BaseType.h"
+#include	"Ram.h"
 
-#include	"dirtree.h"
-#include	"dirtree-common.h"
+#include	"DirTree.h"
+#include	"DirTreeCommon.h"
 
 #define	DIRTREE_FILE_SIGNATURE	MAKEFOURCC('D', 'T', '0', '1')
 static int DirTree_SignatureBase=0x696C6345;

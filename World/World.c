@@ -35,9 +35,9 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
-#include <Assert.h>
-#include <Math.h>
- 
+#include <assert.h>
+#include <math.h>
+
 #include "World.h"
 #include "System.h"
 #include "Ram.h"
@@ -59,7 +59,7 @@
 
 #include "Trace.h"
 
-#include "list.h"
+#include "List.h"
 
 #include "Bitmap.h"
 #include "Bitmap._h"

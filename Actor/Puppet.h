@@ -31,10 +31,8 @@
 #include "Body.h"
 #include "Pose.h"
 #include "ExtBox.h"			// geExtBox for gePuppet_RenderThroughFrustum
-// added 08.13.2004 by gekido, linking the rf exe was complaining about unresolved externals... 
-//#include "bitmap.h" //nonsense check your setup (QD)
 #include "Frustum.h"
-#include "vfile.h"
+#include "VFile.h"
 
 #ifdef __cplusplus
 extern "C" {
