@@ -221,7 +221,7 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath="..\Dcommon.h"
+				RelativePath="..\DCommon.h"
 				>
 			</File>
 			<File

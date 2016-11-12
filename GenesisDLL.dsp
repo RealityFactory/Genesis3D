@@ -118,59 +118,59 @@ SOURCE="$(InputPath)"
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\Actor\actor.c
+SOURCE=.\Actor\Actor.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Actor\actor.h
+SOURCE=.\Actor\Actor.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Actor\body.c
+SOURCE=.\Actor\Body.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Actor\body.h
+SOURCE=.\Actor\Body.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Actor\bodyinst.c
+SOURCE=.\Actor\BodyInst.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Actor\bodyinst.h
+SOURCE=.\Actor\BodyInst.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Actor\motion.c
+SOURCE=.\Actor\Motion.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Actor\motion.h
+SOURCE=.\Actor\Motion.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Actor\path.c
+SOURCE=.\Actor\Path.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Actor\path.h
+SOURCE=.\Actor\Path.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Actor\pose.c
+SOURCE=.\Actor\Pose.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Actor\pose.h
+SOURCE=.\Actor\Pose.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Actor\puppet.c
+SOURCE=.\Actor\Puppet.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Actor\puppet.h
+SOURCE=.\Actor\Puppet.h
 # End Source File
 # Begin Source File
 
@@ -182,35 +182,35 @@ SOURCE=.\Actor\QKFrame.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Actor\strblock.c
+SOURCE=.\Actor\StrBlock.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Actor\strblock.h
+SOURCE=.\Actor\StrBlock.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Actor\tkarray.c
+SOURCE=.\Actor\TKArray.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Actor\tkarray.h
+SOURCE=.\Actor\TKArray.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Actor\tkevents.c
+SOURCE=.\Actor\TKEvents.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Actor\tkevents.h
+SOURCE=.\Actor\TKEvents.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Actor\vkframe.c
+SOURCE=.\Actor\VKFrame.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Actor\vkframe.h
+SOURCE=.\Actor\VKFrame.h
 # End Source File
 # Begin Source File
 
@@ -218,7 +218,7 @@ SOURCE=.\Actor\XFArray.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Actor\xfarray.h
+SOURCE=.\Actor\XFArray.h
 # End Source File
 # End Group
 # Begin Group "Bitmap"
@@ -229,84 +229,80 @@ SOURCE=.\Actor\xfarray.h
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\Bitmap\Compression\image.h
+SOURCE=.\Bitmap\Compression\PalCreate.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Bitmap\Compression\palcreate.c
+SOURCE=.\Bitmap\Compression\PalCreate.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Bitmap\Compression\palcreate.h
+SOURCE=.\Bitmap\Compression\Palettize.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Bitmap\Compression\palettize.c
+SOURCE=.\Bitmap\Compression\Palettize.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Bitmap\Compression\palettize.h
+SOURCE=.\Bitmap\Compression\PalOptimize.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Bitmap\Compression\paloptimize.c
+SOURCE=.\Bitmap\Compression\PalOptimize.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Bitmap\Compression\paloptimize.h
+SOURCE=.\Bitmap\Compression\Utility.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Bitmap\Compression\utility.h
+SOURCE=.\Bitmap\Compression\Yuv.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Bitmap\Compression\yuv.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\Bitmap\Compression\yuv.h
+SOURCE=.\Bitmap\Compression\Yuv.h
 # End Source File
 # End Group
 # Begin Source File
 
-SOURCE=.\Bitmap\bitmap.__h
+SOURCE=.\Bitmap\Bitmap.__h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Bitmap\bitmap._h
+SOURCE=.\Bitmap\Bitmap._h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Bitmap\bitmap.c
+SOURCE=.\Bitmap\Bitmap.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Bitmap\bitmap.h
+SOURCE=.\Bitmap\Bitmap.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Bitmap\bitmap_blitdata.c
+SOURCE=.\Bitmap\Bitmap_BlitData.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Bitmap\bitmap_blitdata.h
+SOURCE=.\Bitmap\Bitmap_BlitData.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Bitmap\bitmap_gamma.c
+SOURCE=.\Bitmap\Bitmap_Gamma.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Bitmap\bitmap_gamma.h
+SOURCE=.\Bitmap\Bitmap_Gamma.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Bitmap\pixelformat.c
+SOURCE=.\Bitmap\PixelFormat.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Bitmap\pixelformat.h
+SOURCE=.\Bitmap\PixelFormat.h
 # End Source File
 # End Group
 # Begin Group "Engine"
@@ -317,27 +313,27 @@ SOURCE=.\Bitmap\pixelformat.h
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\Engine\Logo\A_CORONA.c
+SOURCE=.\Engine\Logo\A_Corona.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Engine\Logo\A_STREAK.c
+SOURCE=.\Engine\Logo\A_Streak.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Engine\Logo\CORONA.c
+SOURCE=.\Engine\Logo\Corona.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Engine\Logo\electric.c
+SOURCE=.\Engine\Logo\Electric.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Engine\Logo\electric.h
+SOURCE=.\Engine\Logo\Electric.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Engine\Logo\logo.c
+SOURCE=.\Engine\Logo\Logo.c
 # End Source File
 # Begin Source File
 
@@ -345,7 +341,7 @@ SOURCE=.\Engine\Logo\LogoActor.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Engine\Logo\streak.c
+SOURCE=.\Engine\Logo\Streak.c
 # End Source File
 # Begin Source File
 
@@ -362,15 +358,15 @@ SOURCE=.\Engine\BitmapList.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Engine\engine.c
+SOURCE=.\Engine\Engine.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Engine\engine.h
+SOURCE=.\Engine\Engine.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Engine\fontbmp.c
+SOURCE=.\Engine\FontBmp.c
 # End Source File
 # Begin Source File
 
@@ -406,11 +402,11 @@ SOURCE=.\Math\Box.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Math\crc32.c
+SOURCE=.\Math\CRC32.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Math\crc32.h
+SOURCE=.\Math\CRC32.h
 # End Source File
 # Begin Source File
 
@@ -422,11 +418,11 @@ SOURCE=.\Math\ExtBox.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Math\quatern.c
+SOURCE=.\Math\Quatern.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Math\quatern.h
+SOURCE=.\Math\Quatern.h
 # End Source File
 # Begin Source File
 
@@ -438,11 +434,11 @@ SOURCE=.\Math\Vec3d.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Math\Xform3d.c
+SOURCE=.\Math\XForm3d.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Math\Xform3d.h
+SOURCE=.\Math\XForm3d.h
 # End Source File
 # End Group
 # Begin Group "Support"
@@ -450,15 +446,15 @@ SOURCE=.\Math\Xform3d.h
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\Support\Basetype.h
+SOURCE=.\Support\BaseType.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Support\Errorlog.c
+SOURCE=.\Support\ErrorLog.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Support\Errorlog.h
+SOURCE=.\Support\ErrorLog.h
 # End Source File
 # Begin Source File
 
@@ -470,19 +466,19 @@ SOURCE=.\Support\geAssert.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Support\log.c
+SOURCE=.\Support\Log.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Support\log.h
+SOURCE=.\Support\Log.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Support\mempool.c
+SOURCE=.\Support\MemPool.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Support\mempool.h
+SOURCE=.\Support\MemPool.h
 # End Source File
 # Begin Source File
 
@@ -494,7 +490,7 @@ SOURCE=.\Support\Ram.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Support\ramdll.c
+SOURCE=.\Support\RamDLL.c
 # End Source File
 # End Group
 # Begin Group "VFile"
@@ -502,59 +498,59 @@ SOURCE=.\Support\ramdll.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=".\VFile\dirtree-common.c"
+SOURCE=".\VFile\DirTreeCommon.c"
 # End Source File
 # Begin Source File
 
-SOURCE=".\VFile\dirtree-common.h"
+SOURCE=".\VFile\DirTreeCommon.h"
 # End Source File
 # Begin Source File
 
-SOURCE=.\VFile\dirtree.c
+SOURCE=.\VFile\DirTree.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\VFile\dirtree.h
+SOURCE=.\VFile\DirTree.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\VFile\fsdos.c
+SOURCE=.\VFile\FSDos.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\VFile\fsdos.h
+SOURCE=.\VFile\FSDos.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\VFile\Fsmemory.c
+SOURCE=.\VFile\FSMemory.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\VFile\Fsmemory.h
+SOURCE=.\VFile\FSMemory.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\VFile\fsvfs.c
+SOURCE=.\VFile\FSVfs.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\VFile\fsvfs.h
+SOURCE=.\VFile\FSVfs.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\VFile\vfile._h
+SOURCE=.\VFile\VFile._h
 # End Source File
 # Begin Source File
 
-SOURCE=.\VFile\vfile.c
+SOURCE=.\VFile\VFile.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\VFile\vfile.h
+SOURCE=.\VFile\VFile.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\VFile\vfile_structs.h
+SOURCE=.\VFile\VFile_Structs.h
 # End Source File
 # End Group
 # Begin Group "World"
@@ -578,11 +574,11 @@ SOURCE=.\World\Frustum.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\World\Gbspfile.c
+SOURCE=.\World\GBSPFile.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\World\Gbspfile.h
+SOURCE=.\World\GBSPFile.h
 # End Source File
 # Begin Source File
 
@@ -654,11 +650,11 @@ SOURCE=.\World\World.h
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\Font\font.c
+SOURCE=.\Font\Font.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Font\font.H
+SOURCE=.\Font\Font.h
 # End Source File
 # Begin Source File
 
@@ -674,11 +670,11 @@ SOURCE=.\Font\wgClip.H
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\Physics\matrix33.c
+SOURCE=.\Physics\Matrix33.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Physics\matrix33.h
+SOURCE=.\Physics\Matrix33.h
 # End Source File
 # Begin Source File
 
@@ -723,23 +719,23 @@ SOURCE=.\Genesis.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\genesis.rc
+SOURCE=.\Genesis.rc
 # End Source File
 # Begin Source File
 
-SOURCE=.\getypes.h
+SOURCE=.\GeTypes.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\list.c
+SOURCE=.\List.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\list.h
+SOURCE=.\List.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Ptrtypes.h
+SOURCE=.\PtrTypes.h
 # End Source File
 # Begin Source File
 
@@ -763,35 +759,35 @@ SOURCE=.\Sound3d.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\sprite.c
+SOURCE=.\Sprite.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\sprite.h
+SOURCE=.\Sprite.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Tclip.c
+SOURCE=.\TClip.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\tclip.h
+SOURCE=.\TClip.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\timer.c
+SOURCE=.\Timer.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\timer.h
+SOURCE=.\Timer.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\tsc.c
+SOURCE=.\TSC.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\tsc.h
+SOURCE=.\TSC.h
 # End Source File
 # End Group
 # Begin Group "Libraries"

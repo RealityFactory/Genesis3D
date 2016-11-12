@@ -216,7 +216,7 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath="D3d_err.cpp"
+				RelativePath="D3D_Err.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -239,38 +239,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="D3d_err.h"
+				RelativePath="D3D_Err.h"
 				>
 			</File>
 			<File
-				RelativePath="D3d_fx.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="D3d_fx.h"
-				>
-			</File>
-			<File
-				RelativePath="D3d_main.cpp"
+				RelativePath="D3D_Fx.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -293,38 +266,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="D3d_main.h"
+				RelativePath="D3D_Fx.h"
 				>
 			</File>
 			<File
-				RelativePath="D3dcache.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="D3dcache.h"
-				>
-			</File>
-			<File
-				RelativePath="D3ddrv.cpp"
+				RelativePath="D3D_Main.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -347,11 +293,65 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="D3ddrv.h"
+				RelativePath="D3D_Main.h"
 				>
 			</File>
 			<File
-				RelativePath="..\Dcommon.h"
+				RelativePath="D3DCache.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="2"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="D3DCache.h"
+				>
+			</File>
+			<File
+				RelativePath="D3DDrv.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="2"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="D3DDrv.h"
+				>
+			</File>
+			<File
+				RelativePath="..\DCommon.h"
 				>
 			</File>
 			<File
@@ -382,7 +382,7 @@
 				>
 			</File>
 			<File
-				RelativePath="Gspan.cpp"
+				RelativePath="GSpan.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -405,11 +405,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="Gspan.h"
+				RelativePath="GSpan.h"
 				>
 			</File>
 			<File
-				RelativePath="Pcache.cpp"
+				RelativePath="PCache.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -432,7 +432,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="Pcache.h"
+				RelativePath="PCache.h"
 				>
 			</File>
 			<File
@@ -517,7 +517,7 @@
 				>
 			</File>
 			<File
-				RelativePath="tpage.cpp"
+				RelativePath="TPage.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"

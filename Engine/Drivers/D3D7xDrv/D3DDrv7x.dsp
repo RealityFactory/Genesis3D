@@ -96,47 +96,47 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=.\D3d_err.cpp
+SOURCE=.\D3D_Err.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\D3d_err.h
+SOURCE=.\D3D_Err.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\D3d_fx.cpp
+SOURCE=.\D3D_Fx.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\D3d_fx.h
+SOURCE=.\D3D_Fx.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\D3d_main.cpp
+SOURCE=.\D3D_Main.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\D3d_main.h
+SOURCE=.\D3D_Main.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\D3dcache.cpp
+SOURCE=.\D3DCache.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\D3dcache.h
+SOURCE=.\D3DCache.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\D3ddrv7x.cpp
+SOURCE=.\D3DDrv7x.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\D3ddrv7x.h
+SOURCE=.\D3DDrv7x.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\Dcommon.h
+SOURCE=..\DCommon.h
 # End Source File
 # Begin Source File
 
@@ -148,19 +148,19 @@ SOURCE=.\DDMemMgr.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Gspan.cpp
+SOURCE=.\GSpan.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\Gspan.h
+SOURCE=.\GSpan.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Pcache.cpp
+SOURCE=.\PCache.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\Pcache.h
+SOURCE=.\PCache.h
 # End Source File
 # Begin Source File
 
@@ -188,7 +188,7 @@ SOURCE=.\THandle.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\tpage.cpp
+SOURCE=.\TPage.cpp
 # End Source File
 # Begin Source File
 

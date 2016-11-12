@@ -270,7 +270,7 @@
 				>
 			</File>
 			<File
-				RelativePath="genesis.rc"
+				RelativePath="Genesis.rc"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -290,11 +290,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="getypes.h"
+				RelativePath="GeTypes.h"
 				>
 			</File>
 			<File
-				RelativePath="list.c"
+				RelativePath="List.c"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -316,11 +316,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="list.h"
+				RelativePath="List.h"
 				>
 			</File>
 			<File
-				RelativePath="Ptrtypes.h"
+				RelativePath="PtrTypes.h"
 				>
 			</File>
 			<File
@@ -380,7 +380,7 @@
 				>
 			</File>
 			<File
-				RelativePath="sprite.c"
+				RelativePath="Sprite.c"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -402,37 +402,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="sprite.h"
+				RelativePath="Sprite.h"
 				>
 			</File>
 			<File
-				RelativePath="Tclip.c"
-				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="tclip.h"
-				>
-			</File>
-			<File
-				RelativePath="timer.c"
+				RelativePath="TClip.c"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -454,11 +428,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="timer.h"
+				RelativePath="TClip.h"
 				>
 			</File>
 			<File
-				RelativePath="tsc.c"
+				RelativePath="Timer.c"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -480,14 +454,40 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="tsc.h"
+				RelativePath="Timer.h"
+				>
+			</File>
+			<File
+				RelativePath="TSC.c"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="TSC.h"
 				>
 			</File>
 			<Filter
 				Name="Actor"
 				>
 				<File
-					RelativePath="Actor\actor.c"
+					RelativePath="Actor\Actor.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -509,37 +509,11 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="Actor\actor.h"
+					RelativePath="Actor\Actor.h"
 					>
 				</File>
 				<File
-					RelativePath="Actor\body.c"
-					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="Actor\body.h"
-					>
-				</File>
-				<File
-					RelativePath="Actor\bodyinst.c"
+					RelativePath="Actor\Body.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -561,37 +535,11 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="Actor\bodyinst.h"
+					RelativePath="Actor\Body.h"
 					>
 				</File>
 				<File
-					RelativePath="Actor\motion.c"
-					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="Actor\motion.h"
-					>
-				</File>
-				<File
-					RelativePath="Actor\path.c"
+					RelativePath="Actor\BodyInst.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -613,37 +561,11 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="Actor\path.h"
+					RelativePath="Actor\BodyInst.h"
 					>
 				</File>
 				<File
-					RelativePath="Actor\pose.c"
-					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="Actor\pose.h"
-					>
-				</File>
-				<File
-					RelativePath="Actor\puppet.c"
+					RelativePath="Actor\Motion.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -665,7 +587,85 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="Actor\puppet.h"
+					RelativePath="Actor\Motion.h"
+					>
+				</File>
+				<File
+					RelativePath="Actor\Path.c"
+					>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="Actor\Path.h"
+					>
+				</File>
+				<File
+					RelativePath="Actor\Pose.c"
+					>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="Actor\Pose.h"
+					>
+				</File>
+				<File
+					RelativePath="Actor\Puppet.c"
+					>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="Actor\Puppet.h"
 					>
 				</File>
 				<File
@@ -695,7 +695,7 @@
 					>
 				</File>
 				<File
-					RelativePath="Actor\strblock.c"
+					RelativePath="Actor\StrBlock.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -717,37 +717,11 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="Actor\strblock.h"
+					RelativePath="Actor\StrBlock.h"
 					>
 				</File>
 				<File
-					RelativePath="Actor\tkarray.c"
-					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="Actor\tkarray.h"
-					>
-				</File>
-				<File
-					RelativePath="Actor\tkevents.c"
+					RelativePath="Actor\TKArray.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -769,11 +743,11 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="Actor\tkevents.h"
+					RelativePath="Actor\TKArray.h"
 					>
 				</File>
 				<File
-					RelativePath="Actor\vkframe.c"
+					RelativePath="Actor\TKEvents.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -795,7 +769,33 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="Actor\vkframe.h"
+					RelativePath="Actor\TKEvents.h"
+					>
+				</File>
+				<File
+					RelativePath="Actor\VKFrame.c"
+					>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="Actor\VKFrame.h"
 					>
 				</File>
 				<File
@@ -821,7 +821,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="Actor\xfarray.h"
+					RelativePath="Actor\XFArray.h"
 					>
 				</File>
 			</Filter>
@@ -829,41 +829,15 @@
 				Name="Bitmap"
 				>
 				<File
-					RelativePath="Bitmap\bitmap.__h"
+					RelativePath="Bitmap\Bitmap.__h"
 					>
 				</File>
 				<File
-					RelativePath="Bitmap\bitmap._h"
+					RelativePath="Bitmap\Bitmap._h"
 					>
 				</File>
 				<File
-					RelativePath="Bitmap\bitmap.c"
-					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="Bitmap\bitmap.h"
-					>
-				</File>
-				<File
-					RelativePath="Bitmap\bitmap_blitdata.c"
+					RelativePath="Bitmap\Bitmap.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -885,37 +859,11 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="Bitmap\bitmap_blitdata.h"
+					RelativePath="Bitmap\Bitmap.h"
 					>
 				</File>
 				<File
-					RelativePath="Bitmap\bitmap_gamma.c"
-					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="Bitmap\bitmap_gamma.h"
-					>
-				</File>
-				<File
-					RelativePath="Bitmap\pixelformat.c"
+					RelativePath="Bitmap\Bitmap_BlitData.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -937,18 +885,66 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="Bitmap\pixelformat.h"
+					RelativePath="Bitmap\Bitmap_BlitData.h"
+					>
+				</File>
+				<File
+					RelativePath="Bitmap\Bitmap_Gamma.c"
+					>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="Bitmap\Bitmap_Gamma.h"
+					>
+				</File>
+				<File
+					RelativePath="Bitmap\PixelFormat.c"
+					>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="Bitmap\PixelFormat.h"
 					>
 				</File>
 				<Filter
 					Name="Compression"
 					>
 					<File
-						RelativePath="Bitmap\Compression\image.h"
-						>
-					</File>
-					<File
-						RelativePath="Bitmap\Compression\palcreate.c"
+						RelativePath="Bitmap\Compression\PalCreate.c"
 						>
 						<FileConfiguration
 							Name="Release|Win32"
@@ -970,37 +966,11 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="Bitmap\Compression\palcreate.h"
+						RelativePath="Bitmap\Compression\PalCreate.h"
 						>
 					</File>
 					<File
-						RelativePath="Bitmap\Compression\palettize.c"
-						>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AdditionalIncludeDirectories=""
-								PreprocessorDefinitions=""
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AdditionalIncludeDirectories=""
-								PreprocessorDefinitions=""
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath="Bitmap\Compression\palettize.h"
-						>
-					</File>
-					<File
-						RelativePath="Bitmap\Compression\paloptimize.c"
+						RelativePath="Bitmap\Compression\Palettize.c"
 						>
 						<FileConfiguration
 							Name="Release|Win32"
@@ -1022,15 +992,11 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="Bitmap\Compression\paloptimize.h"
+						RelativePath="Bitmap\Compression\Palettize.h"
 						>
 					</File>
 					<File
-						RelativePath="Bitmap\Compression\utility.h"
-						>
-					</File>
-					<File
-						RelativePath="Bitmap\Compression\yuv.c"
+						RelativePath="Bitmap\Compression\PalOptimize.c"
 						>
 						<FileConfiguration
 							Name="Release|Win32"
@@ -1052,7 +1018,37 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="Bitmap\Compression\yuv.h"
+						RelativePath="Bitmap\Compression\PalOptimize.h"
+						>
+					</File>
+					<File
+						RelativePath="Bitmap\Compression\Utility.h"
+						>
+					</File>
+					<File
+						RelativePath="Bitmap\Compression\Yuv.c"
+						>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories=""
+								PreprocessorDefinitions=""
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories=""
+								PreprocessorDefinitions=""
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="Bitmap\Compression\Yuv.h"
 						>
 					</File>
 				</Filter>
@@ -1087,7 +1083,7 @@
 					>
 				</File>
 				<File
-					RelativePath="Engine\engine.c"
+					RelativePath="Engine\Engine.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -1109,11 +1105,11 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="Engine\engine.h"
+					RelativePath="Engine\Engine.h"
 					>
 				</File>
 				<File
-					RelativePath="Engine\fontbmp.c"
+					RelativePath="Engine\FontBmp.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -1164,7 +1160,7 @@
 					Name="Logo"
 					>
 					<File
-						RelativePath="Engine\Logo\A_CORONA.c"
+						RelativePath="Engine\Logo\A_Corona.c"
 						>
 						<FileConfiguration
 							Name="Release|Win32"
@@ -1186,7 +1182,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="Engine\Logo\A_STREAK.c"
+						RelativePath="Engine\Logo\A_Streak.c"
 						>
 						<FileConfiguration
 							Name="Release|Win32"
@@ -1208,7 +1204,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="Engine\Logo\CORONA.c"
+						RelativePath="Engine\Logo\Corona.c"
 						>
 						<FileConfiguration
 							Name="Release|Win32"
@@ -1230,7 +1226,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="Engine\Logo\electric.c"
+						RelativePath="Engine\Logo\Electric.c"
 						>
 						<FileConfiguration
 							Name="Release|Win32"
@@ -1252,11 +1248,11 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="Engine\Logo\electric.h"
+						RelativePath="Engine\Logo\Electric.h"
 						>
 					</File>
 					<File
-						RelativePath="Engine\Logo\logo.c"
+						RelativePath="Engine\Logo\Logo.c"
 						>
 						<FileConfiguration
 							Name="Release|Win32"
@@ -1300,7 +1296,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="Engine\Logo\streak.c"
+						RelativePath="Engine\Logo\Streak.c"
 						>
 						<FileConfiguration
 							Name="Release|Win32"
@@ -1405,7 +1401,7 @@
 					>
 				</File>
 				<File
-					RelativePath="Math\crc32.c"
+					RelativePath="Math\CRC32.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -1427,7 +1423,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="Math\crc32.h"
+					RelativePath="Math\CRC32.h"
 					>
 				</File>
 				<File
@@ -1457,7 +1453,7 @@
 					>
 				</File>
 				<File
-					RelativePath="Math\quatern.c"
+					RelativePath="Math\Quatern.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -1479,7 +1475,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="Math\quatern.h"
+					RelativePath="Math\Quatern.h"
 					>
 				</File>
 				<File
@@ -1509,7 +1505,7 @@
 					>
 				</File>
 				<File
-					RelativePath="Math\Xform3d.c"
+					RelativePath="Math\XForm3d.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -1531,7 +1527,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="Math\Xform3d.h"
+					RelativePath="Math\XForm3d.h"
 					>
 				</File>
 			</Filter>
@@ -1539,11 +1535,11 @@
 				Name="Support"
 				>
 				<File
-					RelativePath="Support\Basetype.h"
+					RelativePath="Support\BaseType.h"
 					>
 				</File>
 				<File
-					RelativePath="Support\Errorlog.c"
+					RelativePath="Support\ErrorLog.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -1565,7 +1561,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="Support\Errorlog.h"
+					RelativePath="Support\ErrorLog.h"
 					>
 				</File>
 				<File
@@ -1595,7 +1591,7 @@
 					>
 				</File>
 				<File
-					RelativePath="Support\log.c"
+					RelativePath="Support\Log.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -1617,11 +1613,11 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="Support\log.h"
+					RelativePath="Support\Log.h"
 					>
 				</File>
 				<File
-					RelativePath="Support\mempool.c"
+					RelativePath="Support\MemPool.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -1643,7 +1639,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="Support\mempool.h"
+					RelativePath="Support\MemPool.h"
 					>
 				</File>
 				<File
@@ -1673,7 +1669,7 @@
 					>
 				</File>
 				<File
-					RelativePath="Support\ramdll.c"
+					RelativePath="Support\RamDLL.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -1699,7 +1695,7 @@
 				Name="VFile"
 				>
 				<File
-					RelativePath="VFile\dirtree-common.c"
+					RelativePath="VFile\DirTreeCommon.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -1721,37 +1717,11 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="VFile\dirtree-common.h"
+					RelativePath="VFile\DirTreeCommon.h"
 					>
 				</File>
 				<File
-					RelativePath="VFile\dirtree.c"
-					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="VFile\dirtree.h"
-					>
-				</File>
-				<File
-					RelativePath="VFile\fsdos.c"
+					RelativePath="VFile\DirTree.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -1773,37 +1743,11 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="VFile\fsdos.h"
+					RelativePath="VFile\DirTree.h"
 					>
 				</File>
 				<File
-					RelativePath="VFile\Fsmemory.c"
-					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="VFile\Fsmemory.h"
-					>
-				</File>
-				<File
-					RelativePath="VFile\fsvfs.c"
+					RelativePath="VFile\FSDos.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -1825,15 +1769,11 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="VFile\fsvfs.h"
+					RelativePath="VFile\FSDos.h"
 					>
 				</File>
 				<File
-					RelativePath="VFile\vfile._h"
-					>
-				</File>
-				<File
-					RelativePath="VFile\vfile.c"
+					RelativePath="VFile\FSMemory.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -1855,11 +1795,67 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="VFile\vfile.h"
+					RelativePath="VFile\FSMemory.h"
 					>
 				</File>
 				<File
-					RelativePath="VFile\vfile_structs.h"
+					RelativePath="VFile\FSVfs.c"
+					>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="VFile\FSVfs.h"
+					>
+				</File>
+				<File
+					RelativePath="VFile\VFile._h"
+					>
+				</File>
+				<File
+					RelativePath="VFile\VFile.c"
+					>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="VFile\VFile.h"
+					>
+				</File>
+				<File
+					RelativePath="VFile\VFile_Structs.h"
 					>
 				</File>
 			</Filter>
@@ -1919,7 +1915,7 @@
 					>
 				</File>
 				<File
-					RelativePath="World\Gbspfile.c"
+					RelativePath="World\GBSPFile.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -1941,7 +1937,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="World\Gbspfile.h"
+					RelativePath="World\GBSPFile.h"
 					>
 				</File>
 				<File
@@ -2157,7 +2153,7 @@
 				Name="Font"
 				>
 				<File
-					RelativePath="Font\font.c"
+					RelativePath="Font\Font.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -2179,7 +2175,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="Font\font.H"
+					RelativePath="Font\Font.h"
 					>
 				</File>
 				<File
@@ -2213,7 +2209,7 @@
 				Name="Physics"
 				>
 				<File
-					RelativePath="Physics\matrix33.c"
+					RelativePath="Physics\Matrix33.c"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -2235,7 +2231,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="Physics\matrix33.h"
+					RelativePath="Physics\Matrix33.h"
 					>
 				</File>
 				<File
