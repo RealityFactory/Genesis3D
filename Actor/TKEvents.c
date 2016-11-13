@@ -28,7 +28,7 @@
 	Error conditions are reported to errorlog
 */
 #include <assert.h>
-#include <string.h>"
+#include <string.h>
 #include <stdio.h>
 
 #include "TKEvents.h"
