@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <windows.h>
@@ -61,13 +61,13 @@ TPage_Mgr			*TPageMgr;
 
 DDSURFACEDESC2		CurrentSurfDesc;
 
-THandle_MipData		SystemToVideo[MAX_LMAP_LOG_SIZE];	
+THandle_MipData		SystemToVideo[MAX_LMAP_LOG_SIZE];
 
 geBoolean			CacheNeedsUpdate;
 /*
 #ifdef D3D_MANAGE_TEXTURES
 	#define			NUM_LMAP_VIDEO_SURFACES		10;
-	THandle_MipData		SystemToVideo[MAX_LMAP_LOG_SIZE];	
+	THandle_MipData		SystemToVideo[MAX_LMAP_LOG_SIZE];
 #endif
 */
 
@@ -95,7 +95,7 @@ void FreeAllCaches(void)
 	if (MemMgr)
 		DDMemMgr_Destroy(MemMgr);
 
-	
+
 #ifdef USE_TPAGES
 	if (TPageMgr)
 	{
@@ -242,7 +242,7 @@ geRDriver_THandle *Create3DTHandle(geRDriver_THandle *THandle, int32 Width, int3
 	// Create the surfaces to hold all the mips
 	THandle->MipData = (THandle_MipData*)malloc(sizeof(THandle_MipData)*NumMipLevels);
 	memset(THandle->MipData, 0, sizeof(THandle_MipData)*NumMipLevels);
-	
+
 	if (!THandle->MipData)
 	{
 		THandle_Destroy(THandle);
@@ -294,7 +294,7 @@ geRDriver_THandle *CreateLightmapTHandle(geRDriver_THandle *THandle, int32 Width
 	assert(NumMipLevels < THANDLE_MAX_MIP_LEVELS);
 
 	assert(NumMipLevels == 1);
-	
+
 	// Save some info about the lightmap
 	THandle->Width = Width;
 	THandle->Height = Height;
@@ -326,7 +326,7 @@ geRDriver_THandle *CreateLightmapTHandle(geRDriver_THandle *THandle, int32 Width
 			THandle_Destroy(THandle);
 			return NULL;
 		}
-	
+
 		D3DSetTexture(0, THandle->MipData[0].Texture);
 	}
 	#endif
@@ -370,13 +370,13 @@ geRDriver_THandle *Create2DTHandle(geRDriver_THandle *THandle, int32 Width, int3
 	// Create the surfaces to hold all the mips
 	THandle->MipData = (THandle_MipData*)malloc(sizeof(THandle_MipData)*NumMipLevels);
 	memset(THandle->MipData, 0, sizeof(THandle_MipData)*NumMipLevels);
-	
+
 	if (!THandle->MipData)
 	{
 		THandle_Destroy(THandle);
 		return NULL;
 	}
-	
+
 	if (!THandle_CreateSurfaces(&THandle->MipData[0], Width, Height, &CurrentSurfDesc, GE_TRUE, 0))
 	{
 		THandle_Destroy(THandle);
@@ -490,7 +490,7 @@ geBoolean DRIVERCC THandle_Destroy(geRDriver_THandle *THandle)
 			CacheNeedsUpdate = GE_TRUE;
 			THandle->MipData[i].CacheType = NULL;
 		}
-		
+
 		if (THandle->MipData[i].Surface)
 		{
 			assert(THandle->MipData[i].Texture);
@@ -513,21 +513,21 @@ geBoolean DRIVERCC THandle_Destroy(geRDriver_THandle *THandle)
 //=====================================================================================
 geBoolean DRIVERCC THandle_Lock(geRDriver_THandle *THandle, int32 MipLevel, void **Bits)
 {
-    DDSURFACEDESC2		SurfDesc;
-    HRESULT				Result;
+	DDSURFACEDESC2		SurfDesc;
+	HRESULT				Result;
 
-    assert(!(THandle->MipData[MipLevel].Flags & THANDLE_LOCKED));
+	assert(!(THandle->MipData[MipLevel].Flags & THANDLE_LOCKED));
 
 	// Lock the surface so it can be filled with the data
-    memset(&SurfDesc, 0, sizeof(DDSURFACEDESC2));
-    SurfDesc.dwSize = sizeof(DDSURFACEDESC2);
+	memset(&SurfDesc, 0, sizeof(DDSURFACEDESC2));
+	SurfDesc.dwSize = sizeof(DDSURFACEDESC2);
 
-    Result = THandle->MipData[MipLevel].Surface->Lock(NULL, &SurfDesc, DDLOCK_WAIT, NULL);
+	Result = THandle->MipData[MipLevel].Surface->Lock(NULL, &SurfDesc, DDLOCK_WAIT, NULL);
 
-    if (Result != DD_OK) 
+	if (Result != DD_OK)
 	{
-        return GE_FALSE;
-    }
+		return GE_FALSE;
+	}
 
 	THandle->MipData[MipLevel].Flags |= THANDLE_LOCKED;
 
@@ -541,18 +541,18 @@ geBoolean DRIVERCC THandle_Lock(geRDriver_THandle *THandle, int32 MipLevel, void
 //=====================================================================================
 geBoolean DRIVERCC THandle_UnLock(geRDriver_THandle *THandle, int32 MipLevel)
 {
-    HRESULT				Result;
+	HRESULT				Result;
 
-    assert(MipLevel <= THandle->NumMipLevels);
-    assert(THandle->MipData[MipLevel].Flags & THANDLE_LOCKED);
+	assert(MipLevel <= THandle->NumMipLevels);
+	assert(THandle->MipData[MipLevel].Flags & THANDLE_LOCKED);
 
 	// Unlock the surface
-    Result = THandle->MipData[MipLevel].Surface->Unlock(NULL);
+	Result = THandle->MipData[MipLevel].Surface->Unlock(NULL);
 
-    if (Result != DD_OK) 
+	if (Result != DD_OK)
 	{
-        return GE_FALSE;
-    }
+		return GE_FALSE;
+	}
 
 	THandle->MipData[MipLevel].Flags |= THANDLE_UPDATE;
 	THandle->MipData[MipLevel].Flags &= ~THANDLE_LOCKED;
@@ -609,7 +609,7 @@ geBoolean CreateSystemToVideoSurfaces(void)
 		int32		Size;
 
 		Size = 1<<i;
-		
+
 		if (!THandle_CreateSurfaces(&SystemToVideo[i], Size, Size, &SurfDesc, GE_FALSE, 1))
 		{
 			DestroySystemToVideoSurfaces();
@@ -639,7 +639,7 @@ geBoolean THandle_CreateSurfaces(THandle_MipData *Surf, int32 Width, int32 Heigh
 	LPDIRECTDRAWSURFACE4 Surface;
 	DDSURFACEDESC2		ddsd;
 	HRESULT				Hr;
-			
+
 	memcpy(&ddsd, SurfDesc, sizeof(DDSURFACEDESC2));
 
 	ddsd.dwSize = sizeof(DDSURFACEDESC2);
@@ -664,22 +664,22 @@ geBoolean THandle_CreateSurfaces(THandle_MipData *Surf, int32 Width, int32 Heigh
 	ddsd.dwHeight = Height;
 
 	ddsd.dwTextureStage = Stage;
-			
+
 	Hr = AppInfo.lpDD->CreateSurface(&ddsd, &Surface, NULL);
 
-	if(Hr != DD_OK) 
-	{ 
+	if(Hr != DD_OK)
+	{
 		return FALSE;
 	}
 
 	Surf->Surface = Surface;
-	
+
 	Surf->Texture = NULL;
 
-	Hr = Surface->QueryInterface(IID_IDirect3DTexture2, (void**)&Surf->Texture);  
+	Hr = Surface->QueryInterface(IID_IDirect3DTexture2, (void**)&Surf->Texture);
 
-	if(Hr != DD_OK) 
-	{ 
+	if(Hr != DD_OK)
+	{
 		Surface->Release();
 		return GE_FALSE;
 	}
@@ -687,11 +687,11 @@ geBoolean THandle_CreateSurfaces(THandle_MipData *Surf, int32 Width, int32 Heigh
 	if (ColorKey)
 	{
 		DDCOLORKEY			CKey;
-		
+
 		// Create the color key for this surface
 		CKey.dwColorSpaceLowValue = 1;
 		CKey.dwColorSpaceHighValue = 1;
-		
+
 		if (Surf->Surface->SetColorKey(DDCKEY_SRCBLT , &CKey) != DD_OK)
 		{
 			SetLastDrvError(DRV_ERROR_GENERIC, "THandle_CreateSurfaces: SetColorKey failed for texture.");
@@ -726,9 +726,9 @@ geBoolean THandle_CheckCache(void)
 	geRDriver_THandle	*pTHandle;
 	int32				i, Stage0, Stage1;
 /* 11/25/2002 Wendell Buckner
-    Raise texture limits to 16384 x 16384. 
+	Raise texture limits to 16384 x 16384.
 	int32				MaxTable1[9],  MaxTable2[9]; */
-    int32				MaxTable1[14], MaxTable2[14];
+	int32				MaxTable1[14], MaxTable2[14];
 
 	if (!CacheNeedsUpdate)
 		return GE_TRUE;
@@ -753,8 +753,8 @@ geBoolean THandle_CheckCache(void)
 		MaxTable1[10] = 64;			// 1024x1024
 		MaxTable1[11] = 64;			// 2048x2048
 		MaxTable1[12] = 64;			// 4096x4096
-        MaxTable1[13] = 64;			// 8192x8192
-        MaxTable1[14] = 64;			//16384x1638
+		MaxTable1[13] = 64;			// 8192x8192
+		MaxTable1[14] = 64;			//16384x1638
 #else
 	if (AppInfo.DeviceIdentifier.dwVendorId == 4634)		// 3dfx series have a limit on the number of texture handles
 	{
@@ -801,8 +801,8 @@ geBoolean THandle_CheckCache(void)
 		MaxTable1[10] = 64;			// 1024x1024
 		MaxTable1[11] = 64;			// 2048x2048
 		MaxTable1[12] = 64;			// 4096x4096
-        MaxTable1[13] = 64;			// 8192x8192
-        MaxTable1[14] = 64;			//16384x16384
+		MaxTable1[13] = 64;			// 8192x8192
+		MaxTable1[14] = 64;			//16384x16384
 
 		MaxTable2[0] = 128;			//  1x1
 		MaxTable2[1] = 128;			//  2x2
@@ -818,8 +818,8 @@ geBoolean THandle_CheckCache(void)
 		MaxTable2[10] = 64;			// 1024x1024
 		MaxTable2[11] = 64;			// 2048x2048
 		MaxTable2[12] = 64;			// 4096x4096
-        MaxTable2[13] = 64;			// 8192x8192
-        MaxTable2[14] = 64;			//16384x16384
+		MaxTable2[13] = 64;			// 8192x8192
+		MaxTable2[14] = 64;			//16384x16384
 	}
 #endif
 
@@ -830,7 +830,7 @@ geBoolean THandle_CheckCache(void)
 	}
 	else
 	{
-		Stage0 = 0;							   
+		Stage0 = 0;
 		Stage1 = 0;
 	}
 

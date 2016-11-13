@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GSPAN
@@ -27,7 +27,7 @@
 #define MAX_SPAN_LINES			1024
 #define MAX_SPANS				35000
 
-typedef struct 
+typedef struct
 {
 	int32	x1;								// Starting x on screen
 	int32	x2;								// Ending x on screen
@@ -35,11 +35,11 @@ typedef struct
 
 typedef struct _SList
 {
-    int32	Min, Max;
-    uint8	Used;
-    uint32	Flags;
-    _SList	*Last;
-    _SList	*Next;
+	int32	Min, Max;
+	uint8	Used;
+	uint32	Flags;
+	_SList	*Last;
+	_SList	*Next;
 } SLIST;
 
 typedef struct

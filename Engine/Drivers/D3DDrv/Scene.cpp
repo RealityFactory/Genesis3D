@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <windows.h>
@@ -70,9 +70,9 @@ BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, BOOL ClearStencil, RECT *World
 			D3DMain_Log("D3DClearBuffers failed.");
 			return FALSE;
 		}
-		
+
 		D3DDRV.NumRenderedPolys = 0;
-		
+
 		Result = AppInfo.lpD3DDevice->BeginScene();
 
 		if (Result != D3D_OK)
@@ -88,7 +88,7 @@ BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, BOOL ClearStencil, RECT *World
 #else
 		D3DPolygonMode (D3DFILL_SOLID);
 #endif
-		
+
 		D3DZWriteEnable (TRUE);
 		D3DZEnable(TRUE);
 		D3DZFunc(D3DCMP_LESSEQUAL);
@@ -230,7 +230,7 @@ BOOL DRIVERCC BeginShadowVolumes(void)
 	return TRUE;
 }
 
-BOOL DRIVERCC EndShadowVolumes(void) 
+BOOL DRIVERCC EndShadowVolumes(void)
 {
 	return TRUE;
 }

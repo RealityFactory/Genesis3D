@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <windows.h>
@@ -52,12 +52,12 @@ BOOL DRIVERCC DrvInit(DRV_DriverHook *Hook)
 		//SetLastDrvError(DRV_ERROR_INIT_ERROR, "D3D_DrvInit: Could not init driver.\n");
 		return FALSE;
 	}
-	
+
 	// If they are asking for a window mode, use there hWnd for the size
 	if (Hook->Width ==-1 && Hook->Height == -1)
 	{
 		GetClientRect(Hook->hWnd, &WRect);
-		
+
 		Hook->Width = (WRect.right - WRect.left);
 		Hook->Height = (WRect.bottom - WRect.top);
 	}
@@ -85,7 +85,7 @@ geBoolean DRIVERCC DrvResetAll(void)
 	return D3DMain_Reset();
 }
 
-geRDriver_PixelFormat	PixelFormat[10]; 
+geRDriver_PixelFormat	PixelFormat[10];
 
 #define NUM_PIXEL_FORMATS (sizeof(PixelFormats)/sizeof(geRDriver_PixelFormat))
 
@@ -119,7 +119,7 @@ geBoolean DRIVERCC EnumPixelFormats(DRV_ENUM_PFORMAT_CB *Cb, void *Context)
 	// Create the surface formats now
 	PixelFormat[0].PixelFormat = Format3d;							// 3d 565/555 surface
 	PixelFormat[0].Flags = RDRIVER_PF_3D | RDRIVER_PF_COMBINE_LIGHTMAP;
-		
+
 	PixelFormat[1].PixelFormat = GE_PIXELFORMAT_16BIT_4444_ARGB;	// 3d 4444 surface
 	PixelFormat[1].Flags = RDRIVER_PF_3D | RDRIVER_PF_COMBINE_LIGHTMAP;
 
@@ -129,7 +129,7 @@ geBoolean DRIVERCC EnumPixelFormats(DRV_ENUM_PFORMAT_CB *Cb, void *Context)
 	PixelFormat[3].PixelFormat = Format3d;							// Lightmap 565/555 surface
 	PixelFormat[3].Flags = RDRIVER_PF_LIGHTMAP;
 
-	PixelFormat[4].PixelFormat = GE_PIXELFORMAT_16BIT_1555_ARGB;	
+	PixelFormat[4].PixelFormat = GE_PIXELFORMAT_16BIT_1555_ARGB;
 	PixelFormat[4].Flags = RDRIVER_PF_3D | RDRIVER_PF_COMBINE_LIGHTMAP;
 
 	// Then hand them off to the caller
@@ -150,22 +150,22 @@ geBoolean DRIVERCC SetGamma(geFloat Gamma)
 geBoolean DRIVERCC GetGamma(geFloat *Gamma)
 {
 	*Gamma = 1.0f;
-		
+
 	return GE_TRUE;
 }
 
 BOOL DRIVERCC EnumSubDrivers2(DRV_ENUM_DRV_CB *Cb, void *Context);
 BOOL DRIVERCC EnumModes2(int32 Driver, char *DriverName, DRV_ENUM_MODES_CB *Cb, void *Context);
 
-DRV_Driver D3DDRV = 
+DRV_Driver D3DDRV =
 {
-    "D3D driver. v"DRV_VMAJS"."DRV_VMINS". Copyright 1999, WildTangent Inc.; All Rights Reserved.",
+	"D3D driver. v"DRV_VMAJS"."DRV_VMINS". Copyright 1999, WildTangent Inc.; All Rights Reserved.",
 	DRV_VERSION_MAJOR,
 	DRV_VERSION_MINOR,
 
 	DRV_ERROR_NONE,
 	NULL,
-	
+
 	EnumSubDrivers2,
 	EnumModes2,
 
@@ -216,7 +216,7 @@ DRV_Driver D3DDRV =
 	DrawDecal,
 
 	0,0,0,
-	
+
 	&CacheInfo,
 
 	ScreenShot,
@@ -240,11 +240,11 @@ DllExport BOOL DriverHook(DRV_Driver **Driver)
 	EngineSettings.PreferenceFlags = 0;//DRV_PREFERENCE_NO_MIRRORS;
 
 	D3DDRV.EngineSettings = &EngineSettings;
-    
+
 	*Driver = &D3DDRV;
 
 	// Make sure the error string ptr is not null, or invalid!!!
-    D3DDRV.LastErrorStr = LastErrorStr;
+	D3DDRV.LastErrorStr = LastErrorStr;
 
 	SetLastDrvError(DRV_ERROR_NONE, "D3DDrv:  No error.");
 
@@ -254,7 +254,7 @@ DllExport BOOL DriverHook(DRV_Driver **Driver)
 void SetLastDrvError(int32 Error, char *ErrorStr)
 {
 	LastError = Error;
-	
+
 	if (ErrorStr)
 	{
 		strcpy(LastErrorStr, ErrorStr);
@@ -262,15 +262,15 @@ void SetLastDrvError(int32 Error, char *ErrorStr)
 	else
 		LastErrorStr[0] = NULL;
 
-    D3DDRV.LastErrorStr = LastErrorStr;
-    D3DDRV.LastError = LastError;
+	D3DDRV.LastErrorStr = LastErrorStr;
+	D3DDRV.LastError = LastError;
 }
 
 //	eaa3 05/31/2000 Added Orf's Direct3D screenshot code to the driver
 //	..so we can get SCREENSHOTS out of both Glide and D3d.
 
 BOOL DRIVERCC ScreenShot(const char *Name)
-{	
+{
   DDSURFACEDESC2 ddsd;
 	BITMAPFILEHEADER bfh;
 	BITMAPINFOHEADER bih;
@@ -284,26 +284,26 @@ BOOL DRIVERCC ScreenShot(const char *Name)
 	int width, height, bpp;
 	int datasize;
 	BOOL success = FALSE;
-	
+
 	memset(&ddsd,0,sizeof(ddsd));
 	ddsd.dwSize = sizeof(ddsd);
 	result = AppInfo.lpBackBuffer->GetSurfaceDesc(&ddsd);
 	if(FAILED(result))
 	  goto cleanup;
-	
+
 	width = ddsd.dwWidth;
 	height= ddsd.dwHeight;
 	bpp = ddsd.ddpfPixelFormat.dwRGBBitCount / 8;
-	
+
 	if(bpp < 2)
 	  bpp = 2;
 	if(bpp > 3)
 	  bpp = 3;
-	
+
 	datasize = width * bpp * height;
 	if(width * bpp % 4)
 		datasize += height * (4 - width * bpp % 4);
-			
+
 	memset((void*)&bfh, 0, sizeof(bfh));
 	bfh.bfType = 'B'+('M'<<8);
 	bfh.bfSize = sizeof(bfh) + sizeof(bih) + datasize;
@@ -316,63 +316,63 @@ BOOL DRIVERCC ScreenShot(const char *Name)
 	bih.biBitCount = bpp * 8;
 	bih.biCompression = BI_RGB;
 	result = AppInfo.lpBackBuffer->GetDC(&surfDC);
-	
+
 	if(FAILED(result))
 	  goto cleanup;
-		
-	bitmap = CreateDIBSection(NULL, (BITMAPINFO *)&bih, DIB_RGB_COLORS, 
+
+	bitmap = CreateDIBSection(NULL, (BITMAPINFO *)&bih, DIB_RGB_COLORS,
 				&data, NULL, 0);
-				
+
 	if(!bitmap)
 	  goto cleanup;
 	if(!data)
 	  goto cleanup;
-		
+
 	memDC = CreateCompatibleDC(surfDC);
 	if(!memDC)
 	  goto cleanup;
-		
+
 	oldbit = (HBITMAP)SelectObject(memDC, bitmap);
 	if(!oldbit || FAILED(oldbit))
 	  goto cleanup;
-		
+
 	result = BitBlt(memDC, 0, 0, width, height, surfDC, 0, 0, SRCCOPY);
 	if(!result)
 	  goto cleanup;
-		
+
 	AppInfo.lpBackBuffer->ReleaseDC(surfDC);
 	surfDC = NULL;
-	
+
 	file = fopen(Name, "wb");
-	
+
 	if(!file)
 	  goto cleanup;
-		
+
 	fwrite((void*)&bfh, sizeof(bfh), 1, file);
 	fwrite((void*)&bih, sizeof(bih), 1, file);
 	fwrite((void*)data, 1, datasize, file);
-	
+
 	success = TRUE;
-	
+
 cleanup:
 
 	if(oldbit && !FAILED(oldbit))
 	  SelectObject(memDC, oldbit);
-	
+
 	if(memDC)
 	  DeleteDC(memDC);
-	
+
 	if(surfDC)
 	  AppInfo.lpBackBuffer->ReleaseDC(surfDC);
 
 	if(bitmap)
 	  DeleteObject(bitmap);
-		
+
 	if(file)
 	  fclose(file);
-		
+
 	return success;
-	
-} 
+
+}
 
 

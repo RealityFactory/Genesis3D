@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef D3DCache_H
@@ -27,7 +27,7 @@
 #include <d3d.h>
 
 #include "BaseType.h"
-#include "DDMemMgr.h"			
+#include "DDMemMgr.h"
 
 #define	D3DCACHE_MAX_NAME			256
 

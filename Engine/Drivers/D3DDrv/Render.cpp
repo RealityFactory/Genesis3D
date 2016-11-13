@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <windows.h>
@@ -56,7 +56,7 @@ geBoolean DRIVERCC RenderGouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint32
 	}
 
 	Alpha = Pnts->a;
-	
+
 	D3DBlendFunc (D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA);
 
 	D3DSetTexture(0, NULL);
@@ -67,10 +67,10 @@ geBoolean DRIVERCC RenderGouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint32
 		D3DZEnable(TRUE);
 
 	if(Flags & DRV_RENDER_NO_ZWRITE)	// We are assuming that this is not going to change all that much
-		D3DZWriteEnable(FALSE);	
+		D3DZWriteEnable(FALSE);
 	else
 		D3DZWriteEnable(TRUE);
-	
+
 	int32 SAlpha = (int32)Alpha<<24;
 	pPnts = Pnts;
 	pD3DPnts = D3DPnts;
@@ -95,12 +95,12 @@ geBoolean DRIVERCC RenderGouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint32
 				Val = AppInfo.FogEnd;
 
 			FogVal = (DWORD)((AppInfo.FogEnd-Val)/(AppInfo.FogEnd-AppInfo.FogStart)*255.0f);
-		
+
 			if (FogVal < 0)
 				FogVal = 0;
 			else if (FogVal > 255)
 				FogVal = 255;
-		
+
 			pD3DPnts->specular = (FogVal<<24);		// Alpha component in specular is the fog value (0...255)
 		}
 		else
@@ -138,7 +138,7 @@ geBoolean DRIVERCC RenderWorldPoly(DRV_TLVertex *Pnts, int32 NumPoints, geRDrive
 	SPAN			*pSpans;
 	int32			WidthHeight;
 #endif
-	
+
 	if(!AppInfo.RenderingIsOK)
 	{
 		return	TRUE;
@@ -152,8 +152,8 @@ geBoolean DRIVERCC RenderWorldPoly(DRV_TLVertex *Pnts, int32 NumPoints, geRDrive
 #ifdef USE_SPANS
 	if (RenderMode != RENDER_WORLD)
 		goto NotWorld;
-	
-	CPnt = Pnts;						// Set to the first points in the array 
+
+	CPnt = Pnts;						// Set to the first points in the array
 
 	x1 = (int32)CPnt->x;
 	y1 = (int32)CPnt->y;
@@ -170,14 +170,14 @@ geBoolean DRIVERCC RenderWorldPoly(DRV_TLVertex *Pnts, int32 NumPoints, geRDrive
 
 		EdgeOutNoUV (x1, y1, x2, y2);
 
-		if (x2 > MaxX) 
+		if (x2 > MaxX)
 			MaxX = x2;
-		else if (x2 < MinX) 
+		else if (x2 < MinX)
 			MinX = x2;
-	
-		if (y2 > MaxY) 
+
+		if (y2 > MaxY)
 			MaxY = y2;
-		else if (y2 < MinY) 
+		else if (y2 < MinY)
 			MinY = y2;
 
 		// Swap
@@ -189,7 +189,7 @@ geBoolean DRIVERCC RenderWorldPoly(DRV_TLVertex *Pnts, int32 NumPoints, geRDrive
 	EdgeOutNoUV (x1, y1, FirstX, FirstY);
 
 	OldPixels = NumWorldPixels;
-	
+
 	pSpans = &SpanLines[MinY];
 
 	WidthHeight = ClientWindow.Width*ClientWindow.Height;
@@ -212,9 +212,9 @@ geBoolean DRIVERCC RenderWorldPoly(DRV_TLVertex *Pnts, int32 NumPoints, geRDrive
 
 	NotWorld:;
 #endif
-	
+
 	D3DDRV.NumRenderedPolys++;
-	
+
 	// Insert the poly into the world cache, for later rendering
 	PCache_InsertWorldPoly(Pnts, NumPoints, THandle, TexInfo, LInfo, Flags);
 
@@ -237,7 +237,7 @@ geBoolean DRIVERCC RenderMiscTexturePoly(DRV_TLVertex *Pnts, int32 NumPoints, ge
 	{
 		PCache_FlushMiscPolys();
 	}
-				
+
 	PCache_InsertMiscPoly(Pnts, NumPoints, THandle, Flags);
 
 	if (Flags & DRV_RENDER_FLUSH)
@@ -285,7 +285,7 @@ geBoolean DRIVERCC DrawDecal(geRDriver_THandle *THandle, RECT *SRect, int32 x, i
 		Width = (pSRect->right - pSRect->left)+1;
 		Height = (pSRect->bottom - pSRect->top)+1;
 	}
-	
+
 	if (x + Width <= 0)
 		return TRUE;
 	if (y + Height <= 0)
@@ -293,10 +293,10 @@ geBoolean DRIVERCC DrawDecal(geRDriver_THandle *THandle, RECT *SRect, int32 x, i
 
 	if (x >= ClientWindow.Width)
 		return TRUE;
-	
+
 	if (y >= ClientWindow.Height)
 		return TRUE;
-	
+
 	if (x + Width >= (ClientWindow.Width-1))
 		pSRect->right -= ((x + Width) - (ClientWindow.Width-1));
 	if (y + Height >= (ClientWindow.Height-1))
@@ -312,7 +312,7 @@ geBoolean DRIVERCC DrawDecal(geRDriver_THandle *THandle, RECT *SRect, int32 x, i
 		pSRect->top += -y;
 		y=0;
 	}
-	
+
 #if 0
 	AppInfo.lpBackBuffer->BltFast(x, y, THandle->MipData[0].Surface, pSRect, DDBLTFAST_SRCCOLORKEY | DDBLTFAST_WAIT);
 #else
@@ -325,9 +325,9 @@ geBoolean DRIVERCC DrawDecal(geRDriver_THandle *THandle, RECT *SRect, int32 x, i
 	DRect.right = x+Width;
 	DRect.top = y;
 	DRect.bottom = y+Height;
-	
-	ddrval= AppInfo.lpBackBuffer->Blt(&DRect, THandle->MipData[0].Surface, pSRect, 
-		             (DDBLT_KEYSRC | DDBLT_WAIT), NULL);
+
+	ddrval= AppInfo.lpBackBuffer->Blt(&DRect, THandle->MipData[0].Surface, pSRect,
+					 (DDBLT_KEYSRC | DDBLT_WAIT), NULL);
 
 	if(ddrval==DDERR_SURFACELOST)
 	{

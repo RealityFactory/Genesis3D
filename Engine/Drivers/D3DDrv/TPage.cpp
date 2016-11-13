@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <windows.h>
@@ -100,7 +100,7 @@ TPage_Mgr *TPage_MgrCreate(LPDIRECTDRAW4 lpDD, const DDSURFACEDESC2 *SurfaceDesc
 	// Remeber the DD object
 	TPageMgr->lpDD = lpDD;
 	// Ref the dd object
-	lpDD->AddRef();			
+	lpDD->AddRef();
 
 	TPageMgr->NumPages = NumPages;
 
@@ -141,7 +141,7 @@ void TPage_MgrDestroy(TPage_Mgr **TPageMgr)
 	Mgr = *TPageMgr;
 
 	assert(Mgr);
-	
+
 	// Free the pages
 	for (Page = Mgr->TPages; Page; Page = Next)
 	{
@@ -154,7 +154,7 @@ void TPage_MgrDestroy(TPage_Mgr **TPageMgr)
 	assert(Mgr->TPages == NULL);
 
 	// Release our ref on the DD object
-	Mgr->lpDD->Release();			
+	Mgr->lpDD->Release();
 
 	free(*TPageMgr);
 
@@ -178,7 +178,7 @@ geBoolean TPage_MgrHasTPage(TPage_Mgr *Mgr, TPage *Page)
 			return GE_TRUE;
 		}
 	}
-	
+
 	return GE_FALSE;
 }
 
@@ -504,19 +504,19 @@ geBoolean TPage_CreateSurfaces(TPage *Page, LPDIRECTDRAW4 lpDD, const DDSURFACED
 
 	Hr = lpDD->CreateSurface(&ddsd, &Page->Surface, NULL);
 
-	if (Hr != DD_OK) 
+	if (Hr != DD_OK)
 		return GE_FALSE;
 
-	Hr = Page->Surface->QueryInterface(IID_IDirect3DTexture2, (void**)&Page->Texture);  
+	Hr = Page->Surface->QueryInterface(IID_IDirect3DTexture2, (void**)&Page->Texture);
 
-	if(Hr != DD_OK) 
-	{ 
+	if(Hr != DD_OK)
+	{
 		Page->Surface->Release();
 		Page->Surface = NULL;
 		Page->Texture = NULL;
 		return GE_FALSE;
 	}
-	
+
 	return GE_TRUE;		// All good dude
 }
 
@@ -592,7 +592,7 @@ void TPage_BlockDestroy(TPage_Block **Block)
 	TPage_Block	*Block2;
 
 	assert(Block);
-	
+
 	Block2 = *Block;
 
 	assert(Block2);
@@ -609,7 +609,7 @@ void TPage_BlockDestroy(TPage_Block **Block)
 
 	if (Block2->Texture)
 		Block2->Texture->Release();
-	
+
 	// Free the block
 	free(Block2);
 

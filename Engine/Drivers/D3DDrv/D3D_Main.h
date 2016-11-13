@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef D3D_MAIN_H
@@ -47,39 +47,39 @@
 
 typedef struct
 {
-    char				Name[MAX_DRIVER_NAME];	// Short name of the driver 
-    char				About[MAX_DRIVER_NAME];	// Short string about the driver 
-    D3DDEVICEDESC		Desc;					// D3DDEVICEDESC for complete information 
-    GUID				Guid;					// it's GUID 
-    BOOL				IsHardware;				// does this driver represent a hardware device? 
-    BOOL				DoesTextures;			// does this driver do texture mapping? 
-    BOOL				DoesZBuffer;			// can this driver use a z-buffer? 
-    BOOL				CanDoWindow;			// can it render to Window's display depth? 
+	char				Name[MAX_DRIVER_NAME];	// Short name of the driver
+	char				About[MAX_DRIVER_NAME];	// Short string about the driver
+	D3DDEVICEDESC		Desc;					// D3DDEVICEDESC for complete information
+	GUID				Guid;					// it's GUID
+	BOOL				IsHardware;				// does this driver represent a hardware device?
+	BOOL				DoesTextures;			// does this driver do texture mapping?
+	BOOL				DoesZBuffer;			// can this driver use a z-buffer?
+	BOOL				CanDoWindow;			// can it render to Window's display depth?
 	BOOL				DoesTransparency;
 	BOOL				DoesAlpha;
 	BOOL				DoesClamping;
 	BOOL				DoesSrcBlending;
 	BOOL				DoesDestBlending;
 
-    WORD				MaxTextureBlendStages;
-    WORD				MaxSimultaneousTextures;	
-	
+	WORD				MaxTextureBlendStages;
+	WORD				MaxSimultaneousTextures;
+
 	BOOL				CanUse;					// We can use this driver
 } DDMain_D3DDriver;
 
-typedef struct 
+typedef struct
 {
-    int32				Width;							// width
-    int32				Height;							// height
-    int32				Bpp;							// bits per pixel 
-    BOOL				ThisDriverCanDo;				// == TRUE if d3d driver can render into
+	int32				Width;							// width
+	int32				Height;							// height
+	int32				Bpp;							// bits per pixel
+	BOOL				ThisDriverCanDo;				// == TRUE if d3d driver can render into
 } App_Mode;
 
 typedef struct
 {
-    DDSURFACEDESC2		ddsd;							// DDSURFACEDESC for complete information 
-    BOOL				HasOneBitAlpha;	
-    BOOL				HasFourBitAlpha;
+	DDSURFACEDESC2		ddsd;							// DDSURFACEDESC for complete information
+	BOOL				HasOneBitAlpha;
+	BOOL				HasFourBitAlpha;
 } DDMain_SurfFormat;
 
 typedef struct
@@ -90,7 +90,7 @@ typedef struct
 	uint32				A[256];
 } RGB_LUT;
 
-// App_Info, used for everything global. 
+// App_Info, used for everything global.
 typedef struct
 {
 	// Window info
@@ -120,16 +120,16 @@ typedef struct
 	char				DDName[MAX_DRIVER_NAME];			// Have no idea how big to make this.  Anyone?
 
 	LPDIRECTDRAW4		lpDD;								// The current initialized DD object
-    LPDIRECT3D3		    lpD3D;								// The current initialized D3D object
+	LPDIRECT3D3		    lpD3D;								// The current initialized D3D object
 
-    LPDIRECTDRAWSURFACE4	lpFrontBuffer;						// front buffer surface 
-    LPDIRECTDRAWSURFACE4	lpBackBuffer;						// back buffer surface 
-    LPDIRECTDRAWSURFACE4	lpZBuffer;							// z-buffer surface 
+	LPDIRECTDRAWSURFACE4	lpFrontBuffer;						// front buffer surface
+	LPDIRECTDRAWSURFACE4	lpBackBuffer;						// back buffer surface
+	LPDIRECTDRAWSURFACE4	lpZBuffer;							// z-buffer surface
 	LPDIRECTDRAWCLIPPER lpClipper;							// Clipper in windowed case
-    BOOL				BackBufferInVideo;					// back buf in video mem? 
-    BOOL				ZBufferInVideo;						// is Z-buf in video mem? 
-    LPDIRECT3DDEVICE3	lpD3DDevice;						// D3D device 
-    LPDIRECT3DVIEWPORT3	lpD3DViewport;						// D3D viewport
+	BOOL				BackBufferInVideo;					// back buf in video mem?
+	BOOL				ZBufferInVideo;						// is Z-buf in video mem?
+	LPDIRECT3DDEVICE3	lpD3DDevice;						// D3D device
+	LPDIRECT3DVIEWPORT3	lpD3DViewport;						// D3D viewport
 
 	LPDIRECT3DMATERIAL3	BackgroundMaterial;
 
@@ -145,9 +145,9 @@ typedef struct
 	RGB_LUT				Lut2;
 	RGB_LUT				Lut3;
 
-	BOOL				IsPrimary;							// 
+	BOOL				IsPrimary;							//
 	BOOL				FullScreen;
-	
+
 	int32				NumModes;
 	App_Mode			Modes[MAX_APP_MODES];
 
@@ -158,16 +158,16 @@ typedef struct
 
 	// Surface formats
 	int32				NumSurfFormats;						// Num 2D texture formats avail (from DD4 object)
-    DDMain_SurfFormat	SurfFormats[DDMAIN_MAX_SURFACE_FORMATS];
+	DDMain_SurfFormat	SurfFormats[DDMAIN_MAX_SURFACE_FORMATS];
 
-    // Texture formats
+	// Texture formats
 	int32				NumTextureFormats;					// Num 3D texture formats avail (from device)
-    DDMain_SurfFormat	TextureFormats[DDMAIN_MAX_TEXTURE_FORMATS];
+	DDMain_SurfFormat	TextureFormats[DDMAIN_MAX_TEXTURE_FORMATS];
 
 	BOOL				LogToFile;
 	BOOL				FoundGoodDevice;
 	BOOL				CanDoWindow;
-	
+
 	BOOL				RenderingIsOK;
 
 	DWORD				VidMemFree;
