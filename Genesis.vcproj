@@ -4,6 +4,7 @@
 	Version="8,00"
 	Name="Genesis"
 	ProjectGUID="{C3C7A259-E517-452A-8F8E-4EAABF367737}"
+	RootNamespace="Genesis"
 	>
 	<Platforms>
 		<Platform
@@ -54,6 +55,7 @@
 				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
 				CompileAs="1"
+				DisableSpecificWarnings="4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -130,6 +132,7 @@
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				CompileAs="1"
+				DisableSpecificWarnings="4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
