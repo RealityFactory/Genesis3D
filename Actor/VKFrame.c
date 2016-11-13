@@ -542,7 +542,7 @@ geBoolean GENESISCC geVKFrame_WriteToFile(geVFile *pFile, geTKArray *KeyList,
 }
 
 
-geTKArray *GENESISCC geVKFrame_CreateFromFile(geVFile *pFile, int *InterpolationType, int *Looping)
+geTKArray *GENESISCC geVKFrame_CreateFromFile(geVFile *pFile, geVKFrame_InterpolationType *InterpolationType, int *Looping)
 {
 	#define ERROREXIT  {geErrorLog_Add( ERR_PATH_FILE_READ , NULL);if (KeyList != NULL){geTKArray_Destroy(&KeyList);}	return NULL;}
 	int i,u,NumElements;
@@ -657,7 +657,7 @@ uint32 GENESISCC geVKFrame_ComputeBlockSize(geTKArray *KeyList, int Compression)
 }
 
 
-geTKArray *GENESISCC geVKFrame_CreateFromBinaryFile(geVFile *pFile, int *InterpolationType, int *Looping)
+geTKArray *GENESISCC geVKFrame_CreateFromBinaryFile(geVFile *pFile, geVKFrame_InterpolationType *InterpolationType, int *Looping)
 {
 	uint32 u;
 	int BlockSize;

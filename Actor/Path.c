@@ -1298,7 +1298,7 @@ gePath* GENESISCC gePath_CreateFromFile_F0_(geVFile* pFile)
 GENESISAPI gePath* GENESISCC gePath_CreateFromFile(geVFile* pFile)
 {
 	uint32 u, v, flag;
-	int Interp,Loop;
+	int Loop;
 	gePath* P;
 	#define LINE_LENGTH 256
 	char line[LINE_LENGTH];
@@ -1368,6 +1368,7 @@ GENESISAPI gePath* GENESISCC gePath_CreateFromFile(geVFile* pFile)
 	}
 	if (flag!=GE_FALSE)
 	{
+		geQKFrame_InterpolationType Interp;
 		P->Rotation.KeyList = geQKFrame_CreateFromFile(pFile,&Interp,&Loop);
 		if (P->Rotation.KeyList == NULL)
 			EXIT_ERROR
@@ -1399,6 +1400,7 @@ GENESISAPI gePath* GENESISCC gePath_CreateFromFile(geVFile* pFile)
 
 	if (flag!=GE_FALSE)
 	{
+		geVKFrame_InterpolationType Interp;
 		P->Translation.KeyList = geVKFrame_CreateFromFile(pFile,&Interp,&Loop);
 		if (P->Translation.KeyList == NULL)
 			EXIT_ERROR
@@ -1587,7 +1589,7 @@ GENESISAPI geBoolean GENESISCC gePath_WriteToBinaryFile(const gePath *P, geVFile
 static gePath * GENESISCC gePath_CreateFromBinaryFile(geVFile *F,uint32 Header)
 {
 	gePath *P;
-	int Interp,Looping;
+	int Looping;
 
 	assert( F != NULL );
 
@@ -1621,6 +1623,7 @@ static gePath * GENESISCC gePath_CreateFromBinaryFile(geVFile *F,uint32 Header)
 
 	if ((Header >> 1) & 0x1)
 	{
+		geVKFrame_InterpolationType Interp;
 		P->Translation.KeyList = geVKFrame_CreateFromBinaryFile(F,&Interp,&Looping);
 		if (P->Translation.KeyList == NULL)
 		{
@@ -1635,6 +1638,7 @@ static gePath * GENESISCC gePath_CreateFromBinaryFile(geVFile *F,uint32 Header)
 
 	if (Header & 0x1)
 	{
+		geQKFrame_InterpolationType Interp;
 		P->Rotation.KeyList = geQKFrame_CreateFromBinaryFile(F,&Interp,&Looping);
 		if (P->Rotation.KeyList == NULL)
 		{

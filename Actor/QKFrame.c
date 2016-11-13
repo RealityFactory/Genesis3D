@@ -791,7 +791,7 @@ geBoolean GENESISCC geQKFrame_WriteToFile(geVFile *pFile, geTKArray *KeyList,
 }
 
 
-geTKArray *GENESISCC geQKFrame_CreateFromFile(geVFile *pFile, int *InterpolationType, int *Looping)
+geTKArray *GENESISCC geQKFrame_CreateFromFile(geVFile *pFile, geQKFrame_InterpolationType *InterpolationType, int *Looping)
 {
 	int i,u,NumElements;
 	int Compression;
@@ -961,7 +961,7 @@ uint32 GENESISCC geQKFrame_ComputeBlockSize(geTKArray *KeyList, int Compression)
 	return Size;
 }
 
-geTKArray *GENESISCC geQKFrame_CreateFromBinaryFile(geVFile *pFile, int *InterpolationType, int *Looping)
+geTKArray *GENESISCC geQKFrame_CreateFromBinaryFile(geVFile *pFile, geQKFrame_InterpolationType *InterpolationType, int *Looping)
 {
 	uint32 u;
 	int BlockSize;
