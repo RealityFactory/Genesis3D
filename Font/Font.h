@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  FONT.H                                                                              */
+/*  Font.h                                                                              */
 /*                                                                                      */
 /*  Author: Thom Robertson                                                              */
 /*  Description: Bitmapped font support interface                                       */
@@ -16,8 +16,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_FONT_H
@@ -42,7 +42,7 @@
 
 
 
-//*************************************************************************************** 
+//***************************************************************************************
 // these are bit flags for _DrawText(). Currently only _WORDWRAP is implemented, and without
 // it, the function will still wrap, just not on word boundaries.
 // Note that these will fail for non ascii fonts.
@@ -60,13 +60,13 @@ extern "C" {
 typedef struct geFont geFont;			// an instance of a font
 
 
-//*************************************************************************************** 
-GENESISAPI geFont *GENESISCC geFont_Create(const geEngine *Engine, const char *fontNameString, 
-                                               const int fontSize,
-											   const int fontWeight , const geBoolean antialiased) ;
+//***************************************************************************************
+GENESISAPI geFont *GENESISCC geFont_Create(const geEngine *Engine, const char *fontNameString,
+											const int fontSize,
+											const int fontWeight , const geBoolean antialiased) ;
    // Creates a font, and returns a pointer to it.
    // Pass in the string name of the TrueType font (case sensitive), and the height in pixels.
-   
+
    // ARGUMENTS:
    // fontNameString - char pointer to a string containing the case sensitive name of the font.
    // fontSize - the pixel height of the requested font.
@@ -79,11 +79,11 @@ GENESISAPI geFont *GENESISCC geFont_Create(const geEngine *Engine, const char *f
    // to it with the _AddCharacters() function before you can use the font.
    // NOTE: all fonts start out with a grayscale palette, with the range 0 to 128.
 
-//*************************************************************************************** 
+//***************************************************************************************
 GENESISAPI void GENESISCC geFont_CreateRef(geFont *font);
 
 
-//*************************************************************************************** 
+//***************************************************************************************
 GENESISAPI void GENESISCC geFont_Destroy(geFont **font);
    // destroys a font.
 
@@ -93,12 +93,12 @@ GENESISAPI void GENESISCC geFont_Destroy(geFont **font);
    // RETURNS:
    // nothing.
 
-//*************************************************************************************** 
-GENESISAPI geBoolean GENESISCC geFont_AddCharacters(geFont *font, 
-                                                  unsigned char leastIndex, 
-                                                  unsigned char mostIndex
-                                                  );
-   // Adds a set of characters to the font defined by the ascii range passed in 
+//***************************************************************************************
+GENESISAPI geBoolean GENESISCC geFont_AddCharacters(geFont *font,
+													unsigned char leastIndex,
+													unsigned char mostIndex
+													);
+   // Adds a set of characters to the font defined by the ascii range passed in
    // (leastIndex and mostIndex, inclusive).
 
    // ARGUMENTS:
@@ -131,7 +131,7 @@ GENESISAPI void GENESISCC geFont_DestroyBitmapBuffer( geFont *font );
 
 //*******************************************************************************
 GENESISAPI geBoolean GENESISCC geFont_AddBitmapBuffer(
-                                  geFont *font, const uint32 width, const uint32 height);
+									geFont *font, const uint32 width, const uint32 height);
    // Adds a geBitmap to the geFont, to be used as a temporary "scratch-pad".  This is
    // required for using geFont_DrawText() when no characters have been added.
 
@@ -151,10 +151,10 @@ GENESISAPI geBoolean GENESISCC geFont_AddBitmapBuffer(
    // if you call this function on a geFont that already has a valid buffer, the buffer is
    // destroyed, and replaced by the new one.
 
-//*************************************************************************************** 
-GENESISAPI geBoolean GENESISCC geFont_DrawText(geFont *font, const char *textString, 
-                                           const GE_Rect *Rect, const GE_RGBA *Color, 
-                                           uint32 flags, const GE_Rect *clipRect);
+//***************************************************************************************
+GENESISAPI geBoolean GENESISCC geFont_DrawText(geFont *font, const char *textString,
+												const GE_Rect *Rect, const GE_RGBA *Color,
+												uint32 flags, const GE_Rect *clipRect);
    // This is the function you put between geEngine_BeginFrame() and _EndFrame(), the function
    // that draws text to the screen.
 
@@ -175,7 +175,7 @@ GENESISAPI geBoolean GENESISCC geFont_DrawText(geFont *font, const char *textStr
 
    // NOTES:
    // Assuming you've added characters to the font, characters which have NOT been added
-   // WILL cause an assert if you try to draw them.  
+   // WILL cause an assert if you try to draw them.
    // Only GE_FONTSET_WORDWRAP is meaningfull right now.  Using any other flags will cause
    // an assert.
    // As stated above, you can use an entirely different way of creating a string, by
@@ -184,11 +184,11 @@ GENESISAPI geBoolean GENESISCC geFont_DrawText(geFont *font, const char *textStr
    // (hopefully) more unicode-tolerant way (DrawText() ).
 
 
-//*************************************************************************************** 
-GENESISAPI geBoolean GENESISCC geFont_DrawTextToBitmap(geFont *font, const char *textString, 
-                                           const GE_Rect *Rect, const GE_RGBA *Color, 
-                                           uint32 flags, const GE_Rect *clipRect,
-                                           geBitmap *targetBitmap);
+//***************************************************************************************
+GENESISAPI geBoolean GENESISCC geFont_DrawTextToBitmap(geFont *font, const char *textString,
+														const GE_Rect *Rect, const GE_RGBA *Color,
+														uint32 flags, const GE_Rect *clipRect,
+														geBitmap *targetBitmap);
    // This is the function you put between geEngine_BeginFrame() and _EndFrame(), the function
    // that draws text to the screen.
 
@@ -211,7 +211,7 @@ GENESISAPI geBoolean GENESISCC geFont_DrawTextToBitmap(geFont *font, const char 
 
    // NOTES:
    // Assuming you've added characters to the font, characters which have NOT been added
-   // WILL cause an assert if you try to draw them.  
+   // WILL cause an assert if you try to draw them.
    // Only GE_FONTSET_WORDWRAP is meaningfull right now.  Using any other flags will cause
    // an assert.
    // As stated above, you can use an entirely different way of creating a string, by
@@ -223,7 +223,7 @@ GENESISAPI geBoolean GENESISCC geFont_DrawTextToBitmap(geFont *font, const char 
    // then a green piece, then a blue piece.  You'll end up with three lines of blue text.
 
 
-//*************************************************************************************** 
+//***************************************************************************************
 GENESISAPI int32 GENESISCC geFont_GetStringPixelWidth (geFont *font, const char *textString);
 GENESISAPI int32 GENESISCC geFont_GetStringPixelHeight(geFont *font, const char *textString);
    // These two functions return the pixel width and height of the string passed in.
@@ -240,7 +240,7 @@ GENESISAPI int32 GENESISCC geFont_GetStringPixelHeight(geFont *font, const char 
    // NOTES:
    // these two functions assume no text wrapping!
 
-//*************************************************************************************** 
+//***************************************************************************************
 GENESISAPI geBitmap* GENESISCC geFont_GetBuffer(geFont *font);
    // This function returns a pointer to the drawing buffer contained by the font.
 
@@ -251,14 +251,14 @@ GENESISAPI geBitmap* GENESISCC geFont_GetBuffer(geFont *font);
    // a valid pointer to a geBitmap, OR NULL, signifying that the buffer wasn't initialized.
 
 
-//*************************************************************************************** 
-GENESISAPI geBoolean GENESISCC geFont_GetCharMap(geFont *font, uint8 character, GE_Rect *Rect, 
-												 geBitmap **targetBitmap, int32 *fullWidth, int32 *fullHeight, 
+//***************************************************************************************
+GENESISAPI geBoolean GENESISCC geFont_GetCharMap(geFont *font, uint8 character, GE_Rect *Rect,
+												 geBitmap **targetBitmap, int32 *fullWidth, int32 *fullHeight,
 												 int32 *offsetX, int32 *offsetY);
 
-//*************************************************************************************** 
+//***************************************************************************************
 GENESISAPI void GENESISCC geFont_EnableAntialiasing(geFont *font, const geBoolean anti);
-//*************************************************************************************** 
+//***************************************************************************************
 GENESISAPI geBoolean GENESISCC geFont_IsAntialiased(geFont *font);
 
 #ifdef __cplusplus

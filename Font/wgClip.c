@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  WGCLIP.C                                                                            */
+/*  wgClip.c                                                                            */
 /*                                                                                      */
 /*  Author: Thom Robertson                                                              */
 /*  Description: 2D rectangular clip testing support                                    */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #define	WIN32_LEAN_AND_MEAN
@@ -39,9 +39,9 @@
 //***************************************************************
 // returns true if you need to draw at all.
 GENESISAPI geBoolean GENESISCC CalculateClipping(
-                           GE_Rect *artRect, int32 *resultX, int32 *resultY, 
-                           int32 x, int32 y,
-                           const GE_Rect bounds, int32 type)
+						   GE_Rect *artRect, int32 *resultX, int32 *resultY,
+						   int32 x, int32 y,
+						   const GE_Rect bounds, int32 type)
 {
 
 	int32 localX, localY;
@@ -72,10 +72,10 @@ GENESISAPI geBoolean GENESISCC CalculateClipping(
 	}
 	else
 	{
-		shiftX = 0;                                                     
+		shiftX = 0;
 		shiftY = 0;
 	}
-	
+
 	if (artRect->Right + localX - shiftX > bounds.Right)
 	{
 		artRect->Right 	-= (artRect->Right + localX - shiftX) - bounds.Right;  // push Right edge Leftward

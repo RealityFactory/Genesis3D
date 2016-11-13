@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <windows.h>
@@ -52,9 +52,9 @@ static geBoolean InsertEntityInClassList(geWorld *World, geEntity *Entity)
 
 	if (!Entity->Class)		// Ignore all no classes
 		return GE_TRUE;
-	
+
 	assert(Entity->Class->Name);	// Must have a class name
-	
+
 	EntClassName = Entity->Class->Name;
 
 	WSet = World->EntClassSets;
@@ -100,7 +100,7 @@ geBoolean Ent_WorldInit(geWorld *World)
 	geEntity			*Entity;
 
 	assert(World != NULL);
-	
+
 	GWorld = World;
 
 	World->NumEntClassSets = 0;
@@ -122,7 +122,7 @@ geBoolean Ent_WorldInit(geWorld *World)
 	World->EntClassSets[0].ClassName = NULL;
 	World->EntClassSets[0].Set = EntitySet;
 	World->NumEntClassSets++;
-		
+
 	// Build class sets
 	Entity = NULL;
 	while (1)
@@ -147,7 +147,7 @@ void Ent_WorldShutdown(geWorld *World)
 	int32		i;
 
 	assert(World);
-	
+
 	for (i=0; i< World->NumEntClassSets; i++)
 		geEntity_EntitySetDestroy(World->EntClassSets[i].Set);
 }
@@ -255,15 +255,15 @@ geBoolean geEntity_AddEpair(geEntity *Entity, geEntity_Epair *Epair)
 	assert(Epair);
 
 	assert(Epair->Next == NULL);		// Make sure this is a fresh one (ahh yahh)
-	
+
 	if (!Entity->Epairs)
 	{
 		Entity->Epairs = Epair;
 		return GE_TRUE;
 	}
 
-	// Jump to end of list 
-	for (Ep = Entity->Epairs; Ep->Next; Ep = Ep->Next);	
+	// Jump to end of list
+	for (Ep = Entity->Epairs; Ep->Next; Ep = Ep->Next);
 
 	Ep->Next = Epair;
 
@@ -430,7 +430,7 @@ geEntity_Field *geEntity_ClassFindFieldByName(geEntity_Class *Class, const char 
 	{
 		if	(!stricmp(Field->Name, Name))
 			return Field;
-		
+
 	}
 
 	return NULL;
@@ -461,13 +461,13 @@ void geEntity_EntitySetDestroy(geEntity_EntitySet *EntitySet)
 {
 	geEntity_EntitySet	*Set, *Next;
 	geEntity_Class		*Class, *NextClass;
-	
+
 	assert(EntitySet);
 
 	if (EntitySet->OwnsEntities)		// Free stuff if we created all this stuff
 	{
 		for (Class = EntitySet->Classes; Class; Class = NextClass)
-		{			   
+		{
 			NextClass = Class->Next;
 
 			geEntity_ClassDestroy(Class);
@@ -515,7 +515,7 @@ GENESISAPI void geEntity_GetName(const geEntity *Entity, char *Buff, int MaxLen)
 
 	assert(Entity);
 	assert(Buff);
-	
+
 	EntName = geEntity_GetStringForKey(Entity, "%Name%");
 	assert(EntName);
 	Length = strlen(EntName) + 1;
@@ -543,7 +543,7 @@ geEntity *geEntity_EntitySetFindEntityByName(geEntity_EntitySet *EntitySet, cons
 		if (!stricmp(Name, EntName))
 			return Set->Entity;
 	}
-	
+
 	return NULL;
 }
 
@@ -553,7 +553,7 @@ geEntity *geEntity_EntitySetFindEntityByName(geEntity_EntitySet *EntitySet, cons
 geBoolean geEntity_EntitySetAddEntity(geEntity_EntitySet *EntitySet, geEntity *Entity)
 {
 	geEntity_EntitySet	*NewSet, *Set;
-	
+
 	assert(EntitySet);
 	assert(Entity);
 
@@ -574,9 +574,9 @@ geBoolean geEntity_EntitySetAddEntity(geEntity_EntitySet *EntitySet, geEntity *E
 
 	// Store the entity
 	NewSet->Entity = Entity;
-	
+
 	// Jump to end of list (we allways want them to work on the first set in the list...)
-	for (Set = EntitySet; Set->Next; Set = Set->Next);		
+	for (Set = EntitySet; Set->Next; Set = Set->Next);
 
 	// Add the newset
 	Set->Next = NewSet;
@@ -654,7 +654,7 @@ static geBoolean BuildClassTypes(geEntity_EntitySet *EntitySet)
 	const char			*Name;
 	geEntity_Class		*Class;
 	geEntity_EntitySet	*Set;
-	
+
 	// Fill in the pre-defined atomic types
 	Class = geEntity_ClassCreate(TYPE_INT, "int", sizeof(int32));
 	geEntity_EntitySetAddClass(EntitySet, Class);
@@ -679,18 +679,18 @@ static geBoolean BuildClassTypes(geEntity_EntitySet *EntitySet)
 
 	Class = geEntity_ClassCreate(TYPE_MODEL, "model", sizeof(void*));
 	geEntity_EntitySetAddClass(EntitySet, Class);
-	
+
 	//	Find all the %typedef% keywords, and allocate them as TYPE_STRUCT's
 	for (Set = EntitySet; Set; Set = Set->Next)
 	{
 		geEntity *Entity;
-		
+
 		Entity = Set->Entity;
 
 		Name = geEntity_GetStringForKey(Entity, "classname");
 
 		if (!Name)
-			continue;	
+			continue;
 
 		if (stricmp(Name, "%typedef%"))	// No %typedef% info
 			continue;
@@ -719,11 +719,11 @@ static geBoolean BuildClassTypes(geEntity_EntitySet *EntitySet)
 		Name = geEntity_GetStringForKey(Entity, "classname");
 
 		if (!Name)		// Not a class entity (Error?)
-			continue;	
+			continue;
 
 		if (stricmp(Name, "%typedef%"))	// Not a typedef
 			continue;
-		
+
 		Name = geEntity_GetStringForKey(Entity, "%typename%");
 
 		if (!Name)
@@ -770,7 +770,7 @@ static geBoolean BuildClassTypes(geEntity_EntitySet *EntitySet)
 			assert(Epair);
 			assert(!stricmp(Epair->Key, "%defaultvalue%"));
 
-		}	
+		}
 	}
 
 	return GE_TRUE;
@@ -791,10 +791,10 @@ static geBoolean BuildClassTypes(geEntity_EntitySet *EntitySet)
 static geBoolean ParseClassUserData(geEntity_EntitySet *EntitySet, geEntity *Entity)
 {
 	geEntity_Epair	*Epair;
-	
+
 	if (!Entity->Class)
 		return GE_TRUE;
-	
+
 	for (Epair = Entity->Epairs; Epair; Epair = Epair->Next)
 	{
 		char			*UData;
@@ -809,8 +809,8 @@ static geBoolean ParseClassUserData(geEntity_EntitySet *EntitySet, geEntity *Ent
 
 		// Find the field in this class
 		Field = geEntity_ClassFindFieldByName(Entity->Class, Epair->Key);
-		
-		if	(!Field)		
+
+		if	(!Field)
 			return GE_FALSE;
 			//continue;
 
@@ -873,10 +873,10 @@ static geBoolean ParseClassUserData(geEntity_EntitySet *EntitySet, geEntity *Ent
 					geErrorLog_Add(GE_ERR_MODEL_NOT_IN_ENTITY, NULL);
 					return GE_FALSE;
 				}
-			
+
 				// Point their structure directly to the model
 				*(geWorld_Model**)(UData + Field->Offset) = &GWorld->CurrentBSP->Models[M];
-			
+
 				break;
 
 			case TYPE_STRUCT:
@@ -915,7 +915,7 @@ static geBoolean ParseClassData(geEntity_EntitySet *EntitySet)
 	//  references in the user structures in the bsp file.
 	//
 
-	
+
 	for (Set = EntitySet; Set; Set = Set->Next)
 	{
 		geEntity		*Entity;
@@ -927,7 +927,7 @@ static geBoolean ParseClassData(geEntity_EntitySet *EntitySet)
 
 		if (!Name)
 			continue;
-		
+
 		Class = geEntity_EntitySetFindClassByName(EntitySet, Name);
 
 		Entity->Class = NULL;
@@ -940,13 +940,13 @@ static geBoolean ParseClassData(geEntity_EntitySet *EntitySet)
 		Entity->Class = Class;
 		// Make user data big enough to hold all possible data from class type
 		Entity->UserData = GE_RAM_ALLOCATE_ARRAY(char, Class->FieldSize);
-		
+
 		if	(!Entity->UserData)
 		{
 			geErrorLog_Add(GE_ERR_GET_ENTITY_DATA_ERROR, NULL);
 			return GE_FALSE;
 		}
-		
+
 		// Clear the userdata
 		memset(Entity->UserData, 0, Class->FieldSize);
 	}
@@ -961,7 +961,7 @@ static geBoolean ParseClassData(geEntity_EntitySet *EntitySet)
 
 		if (!Name)
 			continue;
-		
+
 		if (!ParseClassUserData(EntitySet, Entity))
 		{
 			geErrorLog_Add(GE_ERR_GET_ENTITY_DATA_ERROR, NULL);
@@ -1097,7 +1097,7 @@ geEntity_EntitySet *LoadEntitySet(const char *EntityData, int32 EntityDataSize)
 
 	geVFile_Close(MemFile);
 	MemFile = NULL;
-		
+
 	if (!geEntity_EntitySetBuildClasses(EntitySet))
 		goto ExitWithError;
 

@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_ENTITIES_H
@@ -49,7 +49,7 @@ typedef	enum
 	TYPE_STRING,
 	TYPE_MODEL,
 	TYPE_STRUCT,
-	TYPE_PTR,
+	TYPE_PTR
 } geEntity_ClassType;
 
 typedef struct	geEntity_Class	geEntity_Class;
@@ -75,7 +75,7 @@ typedef	struct geEntity_Class
 
 	struct geEntity_Class	*Next;
 
-} geEntity_Class; 
+} geEntity_Class;
 
 typedef struct geEntity_Epair
 {
@@ -98,7 +98,7 @@ typedef struct geEntity_EntitySet
 	struct geEntity_EntitySet	*Next;				// Next entity in this set
 	struct geEntity_EntitySet	*Current;			// Current entity set as an iterator
 
-	geBoolean					OwnsEntities;		// GE_TRUE if 
+	geBoolean					OwnsEntities;		// GE_TRUE if
 
 	geEntity					*Entity;			// The entity
 	geEntity_Class				*Classes;			// List of classes for set

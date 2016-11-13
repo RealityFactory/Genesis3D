@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  FONT.C                                                                              */
+/*  Font.c                                                                              */
 /*                                                                                      */
 /*  Author: Thom Robertson                                                              */
 /*  Description: Bitmapped font support implementation                                  */
@@ -16,8 +16,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #define	WIN32_LEAN_AND_MEAN
@@ -37,7 +37,7 @@
 
 #pragma warning (disable:4514)	// unreferenced inline function (caused by Windows)
 
-//*************************************************************************************** 
+//***************************************************************************************
 GENESISAPI geBoolean  GENESISCC geFont_TestDraw(geFont *font, int16 x, int16 y, int16 index);
    // This is a debugging function that you shouldn't have to use.  It outputs an entire
    // bitmap full of characters to the screen and the x,y location.
@@ -77,7 +77,7 @@ typedef struct geFontCharacterRecord
 } geFontCharacterRecord;
 
 //*******************************************************************************
-typedef struct geFont 
+typedef struct geFont
 {
    char fontNameString[64];
    int16 fontSize;
@@ -95,15 +95,15 @@ typedef struct geFont
 
 
 
-GENESISAPI geBoolean GENESISCC geFont_DrawUsingDIB(geFont *font, const char *textString, 
-                                                   RECT box, geBitmap *targetBitmap,
-                                                   const GE_RGBA *Color, uint32 flags);
+GENESISAPI geBoolean GENESISCC geFont_DrawUsingDIB(geFont *font, const char *textString,
+												   RECT box, geBitmap *targetBitmap,
+												   const GE_RGBA *Color, uint32 flags);
 
 //*******************************************************************************
 //*******************************************************************************
-GENESISAPI geFont *GENESISCC geFont_Create(const geEngine *Engine, const char *fontNameString, 
-                                               const int fontSize, const int fontWeight,
-                                               const geBoolean anti)
+GENESISAPI geFont *GENESISCC geFont_Create(const geEngine *Engine, const char *fontNameString,
+											   const int fontSize, const int fontWeight,
+											   const geBoolean anti)
 {
    geFont *font;
    int i;
@@ -134,7 +134,7 @@ GENESISAPI geFont *GENESISCC geFont_Create(const geEngine *Engine, const char *f
    return font;
 }
 
-//*************************************************************************************** 
+//***************************************************************************************
 GENESISAPI void GENESISCC geFont_CreateRef(geFont *font)
 {
    assert(font);
@@ -194,11 +194,11 @@ static	void	IdentityMat(LPMAT2 lpMat)
 }
 
 //*******************************************************************************
-void PlaceLetter(int16 locX, int16 locY, geFont *font, geFontBitmap *fontMap, 
-                 uint32 asciiValue, unsigned char *cellBuffer, DWORD bufferSize)
+void PlaceLetter(int16 locX, int16 locY, geFont *font, geFontBitmap *fontMap,
+				 uint32 asciiValue, unsigned char *cellBuffer, DWORD bufferSize)
 {
    GLYPHMETRICS glyphMetrics;
-   HDC hdc; 
+   HDC hdc;
    MAT2 mat2;
    int32 success, bufferReturnSize;
    uint32 x,y;
@@ -241,7 +241,7 @@ void PlaceLetter(int16 locX, int16 locY, geFont *font, geFontBitmap *fontMap,
    assert(GDI_ERROR != success);
 //   success    = GetGlyphOutline( hdc, asciiValue, GGO_METRICS, &glyphMetrics, 0, NULL, &mat2);
 //   assert(GDI_ERROR != success);
-   SelectObject( hdc, win32OldFont); 
+   SelectObject( hdc, win32OldFont);
 
    ReleaseDC(GetDesktopWindow(),hdc);
 
@@ -297,7 +297,7 @@ void PlaceLetter(int16 locX, int16 locY, geFont *font, geFontBitmap *fontMap,
    destBits = geBitmap_GetBits(lock);
 
    // clear the character space to 0s...
-   if (GGO_BITMAP == ggoFormat)                        
+   if (GGO_BITMAP == ggoFormat)
    {
 
       for ( y = 0; 
@@ -341,10 +341,10 @@ void PlaceLetter(int16 locX, int16 locY, geFont *font, geFontBitmap *fontMap,
 }
 
 //*******************************************************************************
-GENESISAPI geBoolean GENESISCC geFont_AddCharacters(geFont *font, 
-                                                  unsigned char leastIndex, 
-                                                  unsigned char mostIndex
-                                                  )
+GENESISAPI geBoolean GENESISCC geFont_AddCharacters(geFont *font,
+												  unsigned char leastIndex,
+												  unsigned char mostIndex
+												  )
 {
    MAT2 mat2;
    GLYPHMETRICS glyphMetrics;
@@ -493,9 +493,9 @@ GENESISAPI geBoolean GENESISCC geFont_AddCharacters(geFont *font,
 }
 
 //*******************************************************************************
-GENESISAPI geBoolean GENESISCC geFont_DrawText(geFont *font, const char *textString, 
-                                           const GE_Rect *Rect, const GE_RGBA *Color, 
-                                           uint32 flags, const GE_Rect *clipRect)
+GENESISAPI geBoolean GENESISCC geFont_DrawText(geFont *font, const char *textString,
+										   const GE_Rect *Rect, const GE_RGBA *Color,
+										   uint32 flags, const GE_Rect *clipRect)
 {
 
    int32 x,y,i;
@@ -717,7 +717,7 @@ GENESISAPI geBoolean GENESISCC geFont_DrawText(geFont *font, const char *textStr
 
 
 //*******************************************************************************
-GENESISAPI void GENESISCC geFont_DestroyBitmapBuffer( geFont *font ) 
+GENESISAPI void GENESISCC geFont_DestroyBitmapBuffer( geFont *font )
 {
    geBoolean success;
    assert(font);
@@ -733,7 +733,7 @@ GENESISAPI void GENESISCC geFont_DestroyBitmapBuffer( geFont *font )
 
 //*******************************************************************************
 GENESISAPI geBoolean GENESISCC geFont_AddBitmapBuffer(
-                                  geFont *font, const uint32 width, const uint32 height) 
+								  geFont *font, const uint32 width, const uint32 height)
 {
    geBoolean success;
    geBitmap_Palette * palette;
@@ -741,13 +741,13 @@ GENESISAPI geBoolean GENESISCC geFont_AddBitmapBuffer(
 
    assert(font);
 
-   assert(width  < 1000);  // just checking for absurd values that indicate 
+   assert(width  < 1000);  // just checking for absurd values that indicate
    assert(height < 1000);  // an un-initialized state.
 
    if (font->buffer)
       geFont_DestroyBitmapBuffer( font );
 
-   font->buffer = geBitmap_Create(width, height, 1, GE_PIXELFORMAT_8BIT); 
+   font->buffer = geBitmap_Create(width, height, 1, GE_PIXELFORMAT_8BIT);
    assert(font->buffer);
 
    // and a pallette for it.
@@ -774,10 +774,10 @@ GENESISAPI geBoolean GENESISCC geFont_AddBitmapBuffer(
 }
 
 //*******************************************************************************
-GENESISAPI geBoolean GENESISCC geFont_DrawTextToBitmap(geFont *font, const char *textString, 
-                                           const GE_Rect *Rect, const GE_RGBA *Color, 
-                                           uint32 flags, const GE_Rect *clipRect,
-                                           geBitmap *targetBitmap)
+GENESISAPI geBoolean GENESISCC geFont_DrawTextToBitmap(geFont *font, const char *textString,
+										   const GE_Rect *Rect, const GE_RGBA *Color,
+										   uint32 flags, const GE_Rect *clipRect,
+										   geBitmap *targetBitmap)
 {
 
    int32 x,y,i;
@@ -997,9 +997,9 @@ GENESISAPI geBoolean GENESISCC geFont_TestDraw(geFont *font, int16 x, int16 y, i
 
 
 //*******************************************************************************
-GENESISAPI geBoolean GENESISCC geFont_DrawUsingDIB(geFont *font, const char *textString, 
-                                                   RECT box, geBitmap *targetBitmap,
-                                                   const GE_RGBA *Color, uint32 flags)
+GENESISAPI geBoolean GENESISCC geFont_DrawUsingDIB(geFont *font, const char *textString,
+												   RECT box, geBitmap *targetBitmap,
+												   const GE_RGBA *Color, uint32 flags)
 {
 
    geBoolean success;
@@ -1048,8 +1048,8 @@ GENESISAPI geBoolean GENESISCC geFont_DrawUsingDIB(geFont *font, const char *tex
    lpDIBBuffer = NULL;
    hPalette    = NULL;
 
-   pLogPal = (LOGPALETTE *) 
-             GE_RAM_ALLOCATE_ARRAY (char, sizeof(LOGPALETTE) + (sizeof(PALETTEENTRY) * 256));
+   pLogPal = (LOGPALETTE *)
+			 GE_RAM_ALLOCATE_ARRAY (char, sizeof(LOGPALETTE) + (sizeof(PALETTEENTRY) * 256));
 
    assert(pLogPal);
 
@@ -1058,15 +1058,15 @@ GENESISAPI geBoolean GENESISCC geFont_DrawUsingDIB(geFont *font, const char *tex
    pLogPal->palVersion    = 0x300;
    pLogPal->palNumEntries = 256;
 
-   pbmi = (BITMAPINFO *) 
-          GE_RAM_ALLOCATE_ARRAY(char,sizeof (BITMAPINFOHEADER) + (sizeof (RGBQUAD) * 256));
+   pbmi = (BITMAPINFO *)
+		  GE_RAM_ALLOCATE_ARRAY(char,sizeof (BITMAPINFOHEADER) + (sizeof (RGBQUAD) * 256));
 
    if (pbmi == NULL)
    {
       geRam_Free(pLogPal);
       assert(0);
    }
- 
+
    memset(pbmi, 0, sizeof (BITMAPINFOHEADER) + (sizeof (RGBQUAD) * 256));
 
    pbmih = &(pbmi->bmiHeader);
@@ -1081,7 +1081,7 @@ GENESISAPI geBoolean GENESISCC geFont_DrawUsingDIB(geFont *font, const char *tex
    pbmih->biYPelsPerMeter =  0;
    pbmih->biClrUsed       =  0;
    pbmih->biClrImportant  =  0;
-  
+
    pbmih->biCompression = BI_RGB;
 
 
@@ -1095,7 +1095,6 @@ GENESISAPI geBoolean GENESISCC geFont_DrawUsingDIB(geFont *font, const char *tex
       pbmi->bmiColors[i].rgbRed   = (unsigned char) fcolorR;
       pbmi->bmiColors[i].rgbGreen = (unsigned char) fcolorG;
       pbmi->bmiColors[i].rgbBlue  = (unsigned char) fcolorB;
-   
    }
 
    hPalette = CreatePalette(pLogPal);
@@ -1114,7 +1113,7 @@ GENESISAPI geBoolean GENESISCC geFont_DrawUsingDIB(geFont *font, const char *tex
                            0);              // Bitmap file offset
 
    ReleaseDC(GetDesktopWindow(), hdc);
-   
+
    assert(hDIB);
 
    // now we DrawText to the DIB
@@ -1126,13 +1125,13 @@ GENESISAPI geBoolean GENESISCC geFont_DrawUsingDIB(geFont *font, const char *tex
     					    0,0,0,0,OUT_TT_ONLY_PRECIS ,0,0,0, font->fontNameString);
    assert(winFont);
 
-   oldFont = SelectObject( drawDC, winFont); 
-   oldMap  = SelectObject( drawDC, hDIB); 
+   oldFont = SelectObject( drawDC, winFont);
+   oldMap  = SelectObject( drawDC, hDIB);
 
 	SetTextColor(drawDC, RGB(Color->r,Color->g,Color->b));
    SetBkColor  (drawDC, RGB(0,0,0));
 
- 	SetBkMode( drawDC, OPAQUE );
+	SetBkMode( drawDC, OPAQUE );
 
 	// we are accounting for the fact that Windows GDI stuff doesn't seem to draw on the end of a rect
 	box.bottom++;
@@ -1330,8 +1329,8 @@ GENESISAPI geBitmap* GENESISCC geFont_GetBuffer(geFont *font)
 
 
 //*******************************************************************************
-GENESISAPI geBoolean GENESISCC geFont_GetCharMap(geFont *font, uint8 character, GE_Rect *Rect, 
-												 geBitmap **targetBitmap, int32 *fullWidth, int32 *fullHeight, 
+GENESISAPI geBoolean GENESISCC geFont_GetCharMap(geFont *font, uint8 character, GE_Rect *Rect,
+												 geBitmap **targetBitmap, int32 *fullWidth, int32 *fullHeight,
 												 int32 *offsetX, int32 *offsetY)
 {
 

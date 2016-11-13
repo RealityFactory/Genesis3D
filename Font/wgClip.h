@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  WGCLIP.H                                                                            */
+/*  wgClip.h                                                                            */
 /*                                                                                      */
 /*  Author: Thom Robertson                                                              */
 /*  Description: 2D rectangular clip testing support                                    */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_CLIP_H
@@ -35,9 +35,9 @@ extern "C" {
 //***************************************************************
 // returns true if you need to draw at all.
 GENESISAPI geBoolean GENESISCC CalculateClipping(
-                           GE_Rect *artRect, int32 *resultX, int32 *resultY, 
-                           int32 x, int32 y,
-                           const GE_Rect bounds, int32 type);
+						   GE_Rect *artRect, int32 *resultX, int32 *resultY,
+						   int32 x, int32 y,
+						   const GE_Rect bounds, int32 type);
 
 #ifdef __cplusplus
 }
