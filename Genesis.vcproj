@@ -484,32 +484,6 @@
 				RelativePath="TSC.h"
 				>
 			</File>
-			<File
-				RelativePath="include\xtra_g3d.c"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="include\xtra_g3d.h"
-				>
-			</File>
 			<Filter
 				Name="World"
 				>
@@ -2344,15 +2318,15 @@
 					>
 				</File>
 			</Filter>
+			<File
+				RelativePath="CSNetMgr.h"
+				>
+			</File>
+			<File
+				RelativePath="NetPlay.h"
+				>
+			</File>
 		</Filter>
-		<File
-			RelativePath="CSNetMgr.h"
-			>
-		</File>
-		<File
-			RelativePath="NetPlay.h"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

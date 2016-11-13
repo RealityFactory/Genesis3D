@@ -779,20 +779,12 @@ SOURCE=.\TSC.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\include\xtra_g3d.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\include\xtra_g3d.h
-# End Source File
-# End Group
-# Begin Source File
-
 SOURCE=.\CSNetMgr.h
 # End Source File
 # Begin Source File
 
 SOURCE=.\NetPlay.h
 # End Source File
+# End Group
 # End Target
 # End Project
