@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  BOX.H                                                                               */
+/*  Box.h                                                                               */
 /*                                                                                      */
 /*  Author: Jason Wood                                                                  */
 /*  Description: Box is a 3D Oriented Bounding Box                                      */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 
@@ -36,7 +36,7 @@ typedef struct geBox
 	// the Box's local frame origin lies at (0, 0, 0) in local space
 	//
 	// these are the scaled Box axes in the global frame
-	 
+
 	geVec3d GlobalFrameAxes[3];
 
 	// the transformation that takes the Box's axes from local space

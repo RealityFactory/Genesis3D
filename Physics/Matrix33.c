@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  MATRIX33.H                                                                          */
+/*  Matrix33.h                                                                          */
 /*                                                                                      */
 /*  Author: Jason Wood                                                                  */
 /*  Description: Pure 3x3 matrix                                                        */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <assert.h>
@@ -112,7 +112,7 @@ void Matrix33_SetIdentity(Matrix33* m)
 	for (i = 0; i < 3; i++)
 		for (j = 0; j < 3; j++)
 		{
-			if (i == j) 
+			if (i == j)
 				m->x[i][j] = 1.f;
 			else m->x[i][j] = 0.f;
 		}
@@ -174,7 +174,7 @@ void Matrix33_GetInverse(const Matrix33* m, Matrix33* inv)
 			geFloat divby = copy.x[i][i];
 
 			assert(fabs(divby) >= 1e-5);
-			
+
 			for (j = 0; j < 3; j++)
 			{
 				inv->x[i][j] /= divby;

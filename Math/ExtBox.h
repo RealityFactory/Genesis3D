@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  EXTBOX.H                                                                            */
+/*  ExtBox.h                                                                            */
 /*                                                                                      */
 /*  Author:                                                                             */
 /*  Description: Axial aligned bounding box (extent box) support                        */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_EXTBOX_H
@@ -54,7 +54,7 @@ GENESISAPI void GENESISCC geExtBox_ExtendToEnclose( geExtBox *B, const geVec3d *
 // If intersection, returns GE_TRUE and fills bResult (if not NULL)
 // with the intersected box,
 // bResult may be one of b1 or b2.
-// 
+//
 GENESISAPI geBoolean GENESISCC geExtBox_Intersection ( const geExtBox *B1, const geExtBox *B2, geExtBox *Result	);
 
 // computes union of b1 and b2 and returns in bResult.
@@ -71,17 +71,17 @@ GENESISAPI void GENESISCC geExtBox_SetScaling     (       geExtBox *B, const geV
 GENESISAPI void GENESISCC geExtBox_Scale          (       geExtBox *B, geFloat DX, geFloat DY,geFloat DZ );
 
 //  Creates a box that encloses the entire area of a box that moves along linear path
-GENESISAPI void GENESISCC geExtBox_LinearSweep(	const geExtBox *BoxToSweep, 
-						const geVec3d *StartPoint, 
-						const geVec3d *EndPoint, 
+GENESISAPI void GENESISCC geExtBox_LinearSweep(	const geExtBox *BoxToSweep,
+						const geVec3d *StartPoint,
+						const geVec3d *EndPoint,
 						geExtBox *EnclosingBox );
 
-// Collides a ray with box B.  The ray is directed, from Start to End.  
-//   Only returns a ray hitting the outside of the box.  
-//     on success, GE_TRUE is returned, and 
+// Collides a ray with box B.  The ray is directed, from Start to End.
+//   Only returns a ray hitting the outside of the box.
+//     on success, GE_TRUE is returned, and
 //       if T is non-NULL, T is returned as 0..1 where 0 is a collision at Start, and 1 is a collision at End
 //       if Normal is non-NULL, Normal is the surface normal of the box where the collision occured.
-GENESISAPI geBoolean GENESISCC geExtBox_RayCollision( const geExtBox *B, const geVec3d *Start, const geVec3d *End, 
+GENESISAPI geBoolean GENESISCC geExtBox_RayCollision( const geExtBox *B, const geVec3d *Start, const geVec3d *End,
 								geFloat *T, geVec3d *Normal );
 
 #ifdef __cplusplus

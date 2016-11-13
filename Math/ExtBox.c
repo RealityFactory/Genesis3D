@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  EXTBOX.C                                                                            */
+/*  ExtBox.c                                                                            */
 /*                                                                                      */
 /*  Author:                                                                             */
 /*  Description: Axial aligned bounding box support                                     */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include "ExtBox.h"
@@ -28,7 +28,7 @@
 geBoolean GENESISCC geExtBox_IsValid(  const geExtBox *B )
 {
 	if (B == NULL) return GE_FALSE;
-	
+
 	if (geVec3d_IsValid(&(B->Min)) == GE_FALSE)
 		return GE_FALSE;
 	if (geVec3d_IsValid(&(B->Max)) == GE_FALSE)
@@ -56,12 +56,12 @@ void GENESISCC geExtBox_Set(  geExtBox *B,
 		{	B->Max.X = X1;	B->Min.X = X2;	}
 	else
 		{	B->Max.X = X2;  B->Min.X = X1;  }
-	
+
 	if ( Y1 > Y2 )
 		{	B->Max.Y = Y1;	B->Min.Y = Y2;	}
 	else
 		{	B->Max.Y = Y2;  B->Min.Y = Y1;  }
-	
+
 	if ( Z1 > Z2 )
 		{	B->Max.Z = Z1;	B->Min.Z = Z2;	}
 	else
@@ -79,7 +79,7 @@ void GENESISCC geExtBox_SetToPoint ( geExtBox *B, const geVec3d *Point )
 	assert( Point != NULL );
 	assert( geVec3d_IsValid(Point) != GE_FALSE );
 
-	
+
 	B->Max = *Point;
 	B->Min = *Point;
 }
@@ -113,7 +113,7 @@ static geBoolean GENESISCC geExtBox_Intersects(  const geExtBox *B1,  const geEx
 }
 
 
-	
+
 geBoolean GENESISCC geExtBox_Intersection( const geExtBox *B1, const geExtBox *B2, geExtBox *Result )
 {
 	geBoolean rslt;
@@ -229,7 +229,7 @@ void GENESISCC geExtBox_Scale( geExtBox *B, geFloat ScaleX, geFloat ScaleY, geFl
 
 	geExtBox_GetTranslation( B, &Center );
 	geExtBox_GetScaling    ( B, &Scale  );
-	
+
 	DX = ScaleX * Scale.X * 0.5f;
 	DY = ScaleY * Scale.Y * 0.5f;
 	DZ = ScaleZ * Scale.Z * 0.5f;
@@ -237,11 +237,11 @@ void GENESISCC geExtBox_Scale( geExtBox *B, geFloat ScaleX, geFloat ScaleY, geFl
 	B->Min.X = Center.X - DX;
 	B->Min.Y = Center.Y - DY;
 	B->Min.Z = Center.Z - DZ;
-	
+
 	B->Max.X = Center.X + DX;
 	B->Max.Y = Center.Y + DY;
 	B->Max.Z = Center.Z + DZ;
-	
+
 	assert (geExtBox_IsValid (B) != GE_FALSE);
 }
 
@@ -266,15 +266,15 @@ void GENESISCC geExtBox_SetScaling( geExtBox *B, const geVec3d *pScale )
 	B->Min.X = Center.X - DX;
 	B->Min.Y = Center.Y - DY;
 	B->Min.Z = Center.Z - DZ;
-	
+
 	B->Max.X = Center.X + DX;
 	B->Max.Y = Center.Y + DY;
 	B->Max.Z = Center.Z + DZ;
 }
 
-void GENESISCC geExtBox_LinearSweep(	const geExtBox *BoxToSweep, 
-						const geVec3d *StartPoint, 
-						const geVec3d *EndPoint, 
+void GENESISCC geExtBox_LinearSweep(	const geExtBox *BoxToSweep,
+						const geVec3d *StartPoint,
+						const geVec3d *EndPoint,
 						geExtBox *EnclosingBox )
 {
 
@@ -289,40 +289,40 @@ void GENESISCC geExtBox_LinearSweep(	const geExtBox *BoxToSweep,
 
 	if (EndPoint->X > StartPoint->X)
 		{
-			EnclosingBox->Min.X += StartPoint->X; 
-			EnclosingBox->Max.X += EndPoint->X; 
+			EnclosingBox->Min.X += StartPoint->X;
+			EnclosingBox->Max.X += EndPoint->X;
 		}
 	else
 		{
-			EnclosingBox->Min.X += EndPoint->X; 
-			EnclosingBox->Max.X += StartPoint->X; 
+			EnclosingBox->Min.X += EndPoint->X;
+			EnclosingBox->Max.X += StartPoint->X;
 		}
 
 	if (EndPoint->Y > StartPoint->Y)
 		{
-			EnclosingBox->Min.Y += StartPoint->Y; 
-			EnclosingBox->Max.Y += EndPoint->Y; 
+			EnclosingBox->Min.Y += StartPoint->Y;
+			EnclosingBox->Max.Y += EndPoint->Y;
 		}
 	else
 		{
-			EnclosingBox->Min.Y += EndPoint->Y; 
-			EnclosingBox->Max.Y += StartPoint->Y; 
+			EnclosingBox->Min.Y += EndPoint->Y;
+			EnclosingBox->Max.Y += StartPoint->Y;
 		}
 
 	if (EndPoint->Z > StartPoint->Z)
 		{
-			EnclosingBox->Min.Z += StartPoint->Z; 
-			EnclosingBox->Max.Z += EndPoint->Z; 
+			EnclosingBox->Min.Z += StartPoint->Z;
+			EnclosingBox->Max.Z += EndPoint->Z;
 		}
 	else
 		{
-			EnclosingBox->Min.Z += EndPoint->Z; 
-			EnclosingBox->Max.Z += StartPoint->Z; 
+			EnclosingBox->Min.Z += EndPoint->Z;
+			EnclosingBox->Max.Z += StartPoint->Z;
 		}
 	assert (geExtBox_IsValid (EnclosingBox) != GE_FALSE );
 }
 
-static geBoolean GENESISCC geExtBox_XFaceDist(  const geVec3d *Start, 
+static geBoolean GENESISCC geExtBox_XFaceDist(  const geVec3d *Start,
 												const geVec3d *Delta, const geExtBox *B, geFloat *T, geFloat X)
 {
 	geFloat t;
@@ -404,7 +404,7 @@ static geBoolean GENESISCC geExtBox_ZFaceDist(  const geVec3d *Start, const geVe
 
 
 
-geBoolean GENESISCC geExtBox_RayCollision( const geExtBox *B, const geVec3d *Start, const geVec3d *End, 
+geBoolean GENESISCC geExtBox_RayCollision( const geExtBox *B, const geVec3d *Start, const geVec3d *End,
 								geFloat *T, geVec3d *Normal )
 {
 	// only detects rays going 'in' to the box
@@ -421,12 +421,12 @@ geBoolean GENESISCC geExtBox_RayCollision( const geExtBox *B, const geVec3d *Sta
 	assert (geExtBox_IsValid( B )!= GE_FALSE );
 
 	geVec3d_Subtract(End,Start,&Delta);
-	
+
 	if (Normal == NULL)
 		Normal = &LocalNormal;
 	if (T == NULL)
 		T = &LocalT;
-	
+
 	// test x end of box, facing away from ray direction.
 	if (Delta.X > 0.0f)
 		{
@@ -448,10 +448,10 @@ geBoolean GENESISCC geExtBox_RayCollision( const geExtBox *B, const geVec3d *Sta
 						return GE_TRUE;
 					}
 		}
-	
+
 	// test y end of box, facing away from ray direction.
 	if (Delta.Y > 0.0f)
-		{	
+		{
 			if ( (Start->Y <= B->Min.Y) && (B->Min.Y <= End->Y) &&
 				 (geExtBox_YFaceDist(  Start ,&Delta, B, &t, B->Min.Y ) != GE_FALSE) )
 				{
@@ -470,12 +470,12 @@ geBoolean GENESISCC geExtBox_RayCollision( const geExtBox *B, const geVec3d *Sta
 					return GE_TRUE;
 				}
 		}
-	
+
 	// test z end of box, facing away from ray direction.
 	if (Delta.Z > 0.0f)
-		{	
+		{
 			if ( (Start->Z <= B->Min.Z) && (B->Min.Z <= End->Z) &&
-			     (geExtBox_ZFaceDist(  Start ,&Delta, B, &t, B->Min.Z ) != GE_FALSE) )
+				 (geExtBox_ZFaceDist(  Start ,&Delta, B, &t, B->Min.Z ) != GE_FALSE) )
 				{
 					geVec3d_Set( Normal,  0.0f, 0.0f, -1.0f );
 					*T = t;
@@ -483,7 +483,7 @@ geBoolean GENESISCC geExtBox_RayCollision( const geExtBox *B, const geVec3d *Sta
 				}
 		}
 	else if (Delta.Z < 0.0f)
-		{			
+		{
 			if ( (End->Z <= B->Max.Z) && (B->Max.Z <= Start->Z) &&
 				 (geExtBox_ZFaceDist(  Start ,&Delta, B, &t, B->Max.Z ) != GE_FALSE) )
 				{
@@ -492,5 +492,5 @@ geBoolean GENESISCC geExtBox_RayCollision( const geExtBox *B, const geVec3d *Sta
 					return GE_TRUE;
 				}
 		}
-	return GE_FALSE;	
+	return GE_FALSE;
 }

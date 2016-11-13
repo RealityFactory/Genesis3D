@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  PHYSICSJOINT.H                                                                      */
+/*  PhysicsJoint.c                                                                      */
 /*                                                                                      */
 /*  Author: Jason Wood                                                                  */
 /*  Description: Rigid body joint implementation                                        */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <math.h>
@@ -45,7 +45,7 @@ typedef struct gePhysicsJoint
 
 #define JOINT_ASSEMBLY_RATE_MULTIPLIER (4.f)
 
-GENESISAPI gePhysicsJoint * GENESISCC gePhysicsJoint_Create(gePhysicsJoint_Kind Kind, const geVec3d *Location, 
+GENESISAPI gePhysicsJoint * GENESISCC gePhysicsJoint_Create(gePhysicsJoint_Kind Kind, const geVec3d *Location,
 	geFloat assemblyRate, gePhysicsObject *PS1, gePhysicsObject *PS2, geFloat physicsScale)
 {
 	gePhysicsJoint*	pPhysjnt;
@@ -75,8 +75,8 @@ GENESISAPI gePhysicsJoint * GENESISCC gePhysicsJoint_Create(gePhysicsJoint_Kind 
 			if (PS1 == NULL)
 			{
 				/*
-				GenVSI_Error(VSI, 
-					GE_FALSE, 
+				GenVSI_Error(VSI,
+					GE_FALSE,
 					"Joint_Spawn: World joint needs non-NULL gePhysicsObject1 field.\n");
 				*/
 				return NULL;
@@ -85,14 +85,14 @@ GENESISAPI gePhysicsJoint * GENESISCC gePhysicsJoint_Create(gePhysicsJoint_Kind 
 			if (pJoint->Next == pJoint)
 			{
 				/*
-				GenVSI_Error(VSI, 
-					GE_FALSE, 
+				GenVSI_Error(VSI,
+					GE_FALSE,
 					"Joint_Spawn: Next field points to parent.\n");
 				*/
 				return NULL;
 			}
 			#endif
-			
+
 			gePhysicsObject_GetLocation(PS1, &POLocation, 0);
 
 			geVec3d_Subtract(&physicsSpaceLocation,
@@ -105,8 +105,8 @@ GENESISAPI gePhysicsJoint * GENESISCC gePhysicsJoint_Create(gePhysicsJoint_Kind 
 			if (PS1 == NULL || PS2 == NULL)
 			{
 				/*
-				GenVSI_Error(VSI, 
-					GE_FALSE, 
+				GenVSI_Error(VSI,
+					GE_FALSE,
 					"Joint_Spawn: Spherical joint needs 2 non-NULL gePhysicsObjects.\n");
 				*/
 				return NULL;
@@ -115,8 +115,8 @@ GENESISAPI gePhysicsJoint * GENESISCC gePhysicsJoint_Create(gePhysicsJoint_Kind 
 			if (pJoint->Next == pJoint)
 			{
 				/*
-				GenVSI_Error(VSI, 
-					GE_FALSE, 
+				GenVSI_Error(VSI,
+					GE_FALSE,
 					"Joint_Spawn: Next field points to parent.\n");
 				*/
 			}
@@ -124,8 +124,8 @@ GENESISAPI gePhysicsJoint * GENESISCC gePhysicsJoint_Create(gePhysicsJoint_Kind 
 			if (PS1 == PS2)
 			{
 				/*
-				GenVSI_Error(VSI, 
-					GE_FALSE, 
+				GenVSI_Error(VSI,
+					GE_FALSE,
 					"Joint_Spawn: Spherical joint: need 2 distinct gePhysicsObjects.\n");
 				*/
 				return NULL;
@@ -144,8 +144,8 @@ GENESISAPI gePhysicsJoint * GENESISCC gePhysicsJoint_Create(gePhysicsJoint_Kind 
 
 		default:
 			/*
-			GenVSI_Error(VSI, 
-				GE_FALSE, 
+			GenVSI_Error(VSI,
+				GE_FALSE,
 				"Joint_Spawn: unsupported joint type %d.\n", ij->jointType);
 			*/
 			return NULL;
@@ -177,7 +177,7 @@ GENESISAPI void GENESISCC gePhysicsJoint_GetLocationA(const gePhysicsJoint* pPhy
 {
 	assert(pPhysjnt != NULL);
 	assert(pLoc != NULL);
-	
+
 	geVec3d_Copy(&pPhysjnt->locationA, pLoc);
 }
 
@@ -185,7 +185,7 @@ GENESISAPI void GENESISCC gePhysicsJoint_GetLocationB(const gePhysicsJoint* pPhy
 {
 	assert(pPhysjnt != NULL);
 	assert(pLoc != NULL);
-	
+
 	geVec3d_Copy(&pPhysjnt->locationB, pLoc);
 }
 
@@ -193,7 +193,7 @@ GENESISAPI void GENESISCC gePhysicsJoint_SetLocationA(gePhysicsJoint* pPhysjnt, 
 {
 	assert(pPhysjnt != NULL);
 	assert(pLoc != NULL);
-	
+
 	geVec3d_Copy(pLoc, &pPhysjnt->locationA);
 }
 
@@ -201,7 +201,7 @@ GENESISAPI void GENESISCC gePhysicsJoint_SetLocationB(gePhysicsJoint* pPhysjnt, 
 {
 	assert(pPhysjnt != NULL);
 	assert(pLoc != NULL);
-	
+
 	geVec3d_Copy(pLoc, &pPhysjnt->locationB);
 }
 
@@ -209,7 +209,7 @@ GENESISAPI void GENESISCC gePhysicsJoint_GetLocationAInWorldSpace(const gePhysic
 {
 	assert(pPhysjnt != NULL);
 	assert(pLoc != NULL);
-	
+
 	geVec3d_Copy(&pPhysjnt->locationAInWorldSpace, pLoc);
 }
 
@@ -217,7 +217,7 @@ GENESISAPI void GENESISCC gePhysicsJoint_GetLocationBInWorldSpace(const gePhysic
 {
 	assert(pPhysjnt != NULL);
 	assert(pLoc != NULL);
-	
+
 	geVec3d_Copy(&pPhysjnt->locationBInWorldSpace, pLoc);
 }
 
@@ -225,7 +225,7 @@ GENESISAPI void GENESISCC gePhysicsJoint_SetLocationAInWorldSpace(gePhysicsJoint
 {
 	assert(pPhysjnt != NULL);
 	assert(pLoc != NULL);
-	
+
 	geVec3d_Copy(pLoc, &pPhysjnt->locationAInWorldSpace);
 }
 
@@ -233,7 +233,7 @@ GENESISAPI void GENESISCC gePhysicsJoint_SetLocationBInWorldSpace(gePhysicsJoint
 {
 	assert(pPhysjnt != NULL);
 	assert(pLoc != NULL);
-	
+
 	geVec3d_Copy(pLoc, &pPhysjnt->locationBInWorldSpace);
 }
 

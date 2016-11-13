@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  PHYSICSOBJECT.C                                                                     */
+/*  PhysicsObject.c                                                                     */
 /*                                                                                      */
 /*  Author: Jason Wood                                                                  */
 /*  Description: Constrained rigid body implementation                                  */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <math.h>
@@ -48,9 +48,9 @@ typedef struct
 typedef struct gePhysicsObject
 {
 	geFloat mass, oneOverMass;
-	
+
 	geVec3d	OriginalLocation;
-	
+
 	Matrix33 inertiaTensor,
 		inertiaTensorInverse;
 	geBoolean							isAffectedByGravity;
@@ -110,13 +110,13 @@ GENESISAPI gePhysicsObject * GENESISCC gePhysicsObject_Create(
 	assert(mass >= 0.1f);
 
 	pgePhysicsObject->mass = mass;
-	pgePhysicsObject->oneOverMass = 1.f / mass;	
+	pgePhysicsObject->oneOverMass = 1.f / mass;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// initialize gePhysicsObject's state
 
 	for (i = 0; i < 2; i ++)
-	{		
+	{
 		geVec3d_Clear(&pgePhysicsObject->configs[i].linearVelocity);
 		geVec3d_Clear(&pgePhysicsObject->configs[i].angularVelocity);
 		geVec3d_Clear(&pgePhysicsObject->configs[i].force);
@@ -210,9 +210,9 @@ GENESISAPI geBoolean GENESISCC gePhysicsObject_ApplyGlobalFrameForce(gePhysicsOb
 
 // apply impulse in global frame with immediate change in velocities
 GENESISAPI geBoolean GENESISCC gePhysicsObject_ApplyGlobalFrameImpulse(
-									gePhysicsObject* pPhysob, 
-									geVec3d* pImpulse, 
-									geVec3d* pRadVec, 
+									gePhysicsObject* pPhysob,
+									geVec3d* pImpulse,
+									geVec3d* pRadVec,
 									int configIndex)
 {
 	gePhysicsObject_Config* pConfig;
@@ -255,7 +255,7 @@ GENESISAPI geBoolean GENESISCC gePhysicsObject_ComputeForces(gePhysicsObject* po
 	// clear force and torque accumulators
 	geVec3d_Clear(&pConfig->force);
 	geVec3d_Clear(&pConfig->torque);
-	
+
 	// add gravity
 	if (pod->isAffectedByGravity)
 		geVec3d_Set(&pConfig->force, 0.f, PHYSICSOBJECT_GRAVITY * pod->mass, 0.f);
@@ -264,8 +264,8 @@ GENESISAPI geBoolean GENESISCC gePhysicsObject_ComputeForces(gePhysicsObject* po
 	if (! pod->respondsToForces) return GE_TRUE;
 
 	geVec3d_Add(&pConfig->appliedForce, &pConfig->force, &pConfig->force);
-	geVec3d_Add(&pConfig->appliedTorque, &pConfig->torque, &pConfig->torque);	
-	
+	geVec3d_Add(&pConfig->appliedTorque, &pConfig->torque, &pConfig->torque);
+
 	return GE_TRUE;
 }
 
@@ -273,8 +273,8 @@ GENESISAPI geBoolean GENESISCC gePhysicsObject_ComputeForces(gePhysicsObject* po
 // integrate a gePhysicsObject's equations of motion by time step deltaTime
 
 GENESISAPI geBoolean GENESISCC gePhysicsObject_Integrate(
-				gePhysicsObject* pod, 
-				geFloat dt, 
+				gePhysicsObject* pod,
+				geFloat dt,
 				int sourceConfigIndex)
 {
 	gePhysicsObject_Config* pSourceConfig, *pTargetConfig;
@@ -283,7 +283,7 @@ GENESISAPI geBoolean GENESISCC gePhysicsObject_Integrate(
 	geVec3d angularMomentum, angularAcceleration;
 	geVec3d omega_x_L, term1, dtTimesOmega;
 	Matrix33 R, Rt;
-	
+
 	geFloat qmag;
 	geQuaternion qdot;
 	geFloat G[3][4], Gt[4][3];
@@ -305,7 +305,7 @@ GENESISAPI geBoolean GENESISCC gePhysicsObject_Integrate(
 	geVec3d_Add(&pSourceConfig->linearVelocity, &dv, &pTargetConfig->linearVelocity);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	Matrix33_MultiplyVec3d(&pod->inertiaTensor, &pSourceConfig->angularVelocity, &angularMomentum);
 	geVec3d_CrossProduct(&pSourceConfig->angularVelocity, &angularMomentum, &omega_x_L);
 
@@ -318,24 +318,24 @@ GENESISAPI geBoolean GENESISCC gePhysicsObject_Integrate(
 
 	geVec3d_Subtract(&tau, &omega_x_L, &term1);
 
-	Matrix33_MultiplyVec3d(&pod->inertiaTensorInverse, &term1, &angularAcceleration);	
+	Matrix33_MultiplyVec3d(&pod->inertiaTensorInverse, &term1, &angularAcceleration);
 
 	geXForm3d_Rotate(&pSourceConfig->xform, &pSourceConfig->angularVelocity, &dtTimesOmega);
 	geVec3d_Scale(&dtTimesOmega, dt, &dtTimesOmega);
 
-	G[0][0] = -pSourceConfig->orientation.X; 
-	G[0][1] = pSourceConfig->orientation.W; 
-	G[0][2] = -pSourceConfig->orientation.Z; 
+	G[0][0] = -pSourceConfig->orientation.X;
+	G[0][1] = pSourceConfig->orientation.W;
+	G[0][2] = -pSourceConfig->orientation.Z;
 	G[0][3] = pSourceConfig->orientation.Y;
 
-	G[1][0] = -pSourceConfig->orientation.Y; 
-	G[1][1] = pSourceConfig->orientation.Z; 
-	G[1][2] = pSourceConfig->orientation.W; 
+	G[1][0] = -pSourceConfig->orientation.Y;
+	G[1][1] = pSourceConfig->orientation.Z;
+	G[1][2] = pSourceConfig->orientation.W;
 	G[1][3] = -pSourceConfig->orientation.X;
 
-	G[2][0] = -pSourceConfig->orientation.Z; 
-	G[2][1] = -pSourceConfig->orientation.Y; 
-	G[2][2] = pSourceConfig->orientation.X; 
+	G[2][0] = -pSourceConfig->orientation.Z;
+	G[2][1] = -pSourceConfig->orientation.Y;
+	G[2][2] = pSourceConfig->orientation.X;
 	G[2][3] = pSourceConfig->orientation.W;
 
 	for (i = 0; i < 3; i++)
@@ -351,11 +351,11 @@ GENESISAPI geBoolean GENESISCC gePhysicsObject_Integrate(
 	pTargetConfig->orientation.X = pSourceConfig->orientation.X + qdot.X;
 	pTargetConfig->orientation.Y = pSourceConfig->orientation.Y + qdot.Y;
 	pTargetConfig->orientation.Z = pSourceConfig->orientation.Z + qdot.Z;
-	
+
 	qmag = geQuaternion_Normalize(&pTargetConfig->orientation);
-	geQuaternion_ToMatrix(&pTargetConfig->orientation, &pTargetConfig->xform);	
-	
-	pTargetConfig->angularVelocity.X = pSourceConfig->angularVelocity.X + dt * angularAcceleration.X;	
+	geQuaternion_ToMatrix(&pTargetConfig->orientation, &pTargetConfig->xform);
+
+	pTargetConfig->angularVelocity.X = pSourceConfig->angularVelocity.X + dt * angularAcceleration.X;
 	pTargetConfig->angularVelocity.Y = pSourceConfig->angularVelocity.Y + dt * angularAcceleration.Y;
 	pTargetConfig->angularVelocity.Z = pSourceConfig->angularVelocity.Z + dt * angularAcceleration.Z;
 
@@ -394,8 +394,8 @@ GENESISAPI geFloat GENESISCC gePhysicsObject_GetOneOverMass(const gePhysicsObjec
 	return po->oneOverMass;
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_GetXForm(	const gePhysicsObject* po, 
-													geXForm3d* xform, 
+GENESISAPI void GENESISCC gePhysicsObject_GetXForm(	const gePhysicsObject* po,
+													geXForm3d* xform,
 													int configIndex)
 {
 	assert(po != NULL);
@@ -406,8 +406,8 @@ GENESISAPI void GENESISCC gePhysicsObject_GetXForm(	const gePhysicsObject* po,
 	geXForm3d_Copy(&po->configs[configIndex].xform, xform);
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_SetXForm(	gePhysicsObject* po, 
-													const geXForm3d* xform, 
+GENESISAPI void GENESISCC gePhysicsObject_SetXForm(	gePhysicsObject* po,
+													const geXForm3d* xform,
 													int configIndex)
 {
 	assert(po != NULL);
@@ -418,8 +418,8 @@ GENESISAPI void GENESISCC gePhysicsObject_SetXForm(	gePhysicsObject* po,
 	geXForm3d_Copy(xform, &po->configs[configIndex].xform);
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_GetXFormInEditorSpace(const gePhysicsObject* po, 
-																geXForm3d* xform, 
+GENESISAPI void GENESISCC gePhysicsObject_GetXFormInEditorSpace(const gePhysicsObject* po,
+																geXForm3d* xform,
 																int configIndex)
 {
 	assert(po != NULL);
@@ -449,8 +449,8 @@ GENESISAPI void GENESISCC gePhysicsObject_SetOriginalLocation(gePhysicsObject* p
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // get gePhysicsObject's location in Physics space (xlation and olocation are in Physics space units)
-GENESISAPI void GENESISCC gePhysicsObject_GetLocation(	const gePhysicsObject *po, 
-														geVec3d *Location, 
+GENESISAPI void GENESISCC gePhysicsObject_GetLocation(	const gePhysicsObject *po,
+														geVec3d *Location,
 														int configIndex)
 {
 	assert(po != NULL);
@@ -462,8 +462,8 @@ GENESISAPI void GENESISCC gePhysicsObject_GetLocation(	const gePhysicsObject *po
 }
 
 // get gePhysicsObject's location in editor(world) space
-GENESISAPI void GENESISCC gePhysicsObject_GetLocationInEditorSpace(const gePhysicsObject* po, 
-																	geVec3d* loc, 
+GENESISAPI void GENESISCC gePhysicsObject_GetLocationInEditorSpace(const gePhysicsObject* po,
+																	geVec3d* loc,
 																	int configIndex)
 {
 	assert(po != NULL);
@@ -475,8 +475,8 @@ GENESISAPI void GENESISCC gePhysicsObject_GetLocationInEditorSpace(const gePhysi
 	geVec3d_Scale(loc, 1 / po->physicsScale, loc);
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_GetLinearVelocity(const gePhysicsObject* po, 
-															geVec3d* vel, 
+GENESISAPI void GENESISCC gePhysicsObject_GetLinearVelocity(const gePhysicsObject* po,
+															geVec3d* vel,
 															int configIndex)
 {
 	assert(po != NULL);
@@ -487,8 +487,8 @@ GENESISAPI void GENESISCC gePhysicsObject_GetLinearVelocity(const gePhysicsObjec
 	geVec3d_Copy(&po->configs[configIndex].linearVelocity, vel);
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_SetLinearVelocity(gePhysicsObject* po, 
-															const geVec3d* vel, 
+GENESISAPI void GENESISCC gePhysicsObject_SetLinearVelocity(gePhysicsObject* po,
+															const geVec3d* vel,
 															int configIndex)
 {
 	assert(po != NULL);
@@ -499,8 +499,8 @@ GENESISAPI void GENESISCC gePhysicsObject_SetLinearVelocity(gePhysicsObject* po,
 	geVec3d_Copy(vel, &po->configs[configIndex].linearVelocity);
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_GetAngularVelocity(const gePhysicsObject* po, 
-															 geVec3d* vel, 
+GENESISAPI void GENESISCC gePhysicsObject_GetAngularVelocity(const gePhysicsObject* po,
+															 geVec3d* vel,
 															 int configIndex)
 {
 	assert(po != NULL);
@@ -511,8 +511,8 @@ GENESISAPI void GENESISCC gePhysicsObject_GetAngularVelocity(const gePhysicsObje
 	geVec3d_Copy(&po->configs[configIndex].angularVelocity, vel);
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_SetAngularVelocity(gePhysicsObject* po, 
-															 const geVec3d* vel, 
+GENESISAPI void GENESISCC gePhysicsObject_SetAngularVelocity(gePhysicsObject* po,
+															 const geVec3d* vel,
 															 int configIndex)
 {
 	assert(po != NULL);
@@ -523,8 +523,8 @@ GENESISAPI void GENESISCC gePhysicsObject_SetAngularVelocity(gePhysicsObject* po
 	geVec3d_Copy(vel, &po->configs[configIndex].angularVelocity);
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_GetForce( const gePhysicsObject* po, 
-													geVec3d* force, 
+GENESISAPI void GENESISCC gePhysicsObject_GetForce( const gePhysicsObject* po,
+													geVec3d* force,
 													int configIndex)
 {
 	assert(po != NULL);
@@ -535,8 +535,8 @@ GENESISAPI void GENESISCC gePhysicsObject_GetForce( const gePhysicsObject* po,
 	geVec3d_Copy(&po->configs[configIndex].force, force);
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_SetForce(	gePhysicsObject* po, 
-													const geVec3d* force, 
+GENESISAPI void GENESISCC gePhysicsObject_SetForce(	gePhysicsObject* po,
+													const geVec3d* force,
 													int configIndex)
 {
 	assert(po != NULL);
@@ -547,8 +547,8 @@ GENESISAPI void GENESISCC gePhysicsObject_SetForce(	gePhysicsObject* po,
 	geVec3d_Copy(force, &po->configs[configIndex].force);
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_GetTorque(const gePhysicsObject* po, 
-													geVec3d* torque, 
+GENESISAPI void GENESISCC gePhysicsObject_GetTorque(const gePhysicsObject* po,
+													geVec3d* torque,
 													int configIndex)
 {
 	assert(po != NULL);
@@ -559,8 +559,8 @@ GENESISAPI void GENESISCC gePhysicsObject_GetTorque(const gePhysicsObject* po,
 	geVec3d_Copy(&po->configs[configIndex].torque, torque);
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_SetTorque(gePhysicsObject* po, 
-													const geVec3d* torque, 
+GENESISAPI void GENESISCC gePhysicsObject_SetTorque(gePhysicsObject* po,
+													const geVec3d* torque,
 													int configIndex)
 {
 	assert(po != NULL);
@@ -571,8 +571,8 @@ GENESISAPI void GENESISCC gePhysicsObject_SetTorque(gePhysicsObject* po,
 	geVec3d_Copy(torque, &po->configs[configIndex].torque);
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_GetAppliedForce(	const gePhysicsObject* po, 
-															geVec3d* force, 
+GENESISAPI void GENESISCC gePhysicsObject_GetAppliedForce(	const gePhysicsObject* po,
+															geVec3d* force,
 															int configIndex)
 {
 	assert(po != NULL);
@@ -583,8 +583,8 @@ GENESISAPI void GENESISCC gePhysicsObject_GetAppliedForce(	const gePhysicsObject
 	geVec3d_Copy(&po->configs[configIndex].appliedForce, force);
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_SetAppliedForce(	gePhysicsObject* po, 
-															const geVec3d* force, 
+GENESISAPI void GENESISCC gePhysicsObject_SetAppliedForce(	gePhysicsObject* po,
+															const geVec3d* force,
 															int configIndex)
 {
 	assert(po != NULL);
@@ -595,8 +595,8 @@ GENESISAPI void GENESISCC gePhysicsObject_SetAppliedForce(	gePhysicsObject* po,
 	geVec3d_Copy(force, &po->configs[configIndex].appliedForce);
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_GetAppliedTorque(	const gePhysicsObject* po, 
-															geVec3d* torque, 
+GENESISAPI void GENESISCC gePhysicsObject_GetAppliedTorque(	const gePhysicsObject* po,
+															geVec3d* torque,
 															int configIndex)
 {
 	assert(po != NULL);
@@ -607,8 +607,8 @@ GENESISAPI void GENESISCC gePhysicsObject_GetAppliedTorque(	const gePhysicsObjec
 	geVec3d_Copy(&po->configs[configIndex].appliedTorque, torque);
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_SetAppliedTorque(	gePhysicsObject* po, 
-															const geVec3d* torque, 
+GENESISAPI void GENESISCC gePhysicsObject_SetAppliedTorque(	gePhysicsObject* po,
+															const geVec3d* torque,
 															int configIndex)
 {
 	assert(po != NULL);
@@ -655,8 +655,8 @@ GENESISAPI void GENESISCC gePhysicsObject_ClearAppliedTorque(gePhysicsObject* po
 	geVec3d_Clear(&po->configs[configIndex].appliedTorque);
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_IncForce(	gePhysicsObject* po, 
-													const geVec3d* forceInc, 
+GENESISAPI void GENESISCC gePhysicsObject_IncForce(	gePhysicsObject* po,
+													const geVec3d* forceInc,
 													int configIndex)
 {
 	assert(po != NULL);
@@ -667,8 +667,8 @@ GENESISAPI void GENESISCC gePhysicsObject_IncForce(	gePhysicsObject* po,
 	geVec3d_Add(&po->configs[configIndex].force, forceInc, &po->configs[configIndex].force);
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_IncTorque(gePhysicsObject* po, 
-													const geVec3d* torqueInc, 
+GENESISAPI void GENESISCC gePhysicsObject_IncTorque(gePhysicsObject* po,
+													const geVec3d* torqueInc,
 													int configIndex)
 {
 	assert(po != NULL);
@@ -679,8 +679,8 @@ GENESISAPI void GENESISCC gePhysicsObject_IncTorque(gePhysicsObject* po,
 	geVec3d_Add(&po->configs[configIndex].torque, torqueInc, &po->configs[configIndex].torque);
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_IncAppliedForce(	gePhysicsObject* po, 
-															const geVec3d* forceInc, 
+GENESISAPI void GENESISCC gePhysicsObject_IncAppliedForce(	gePhysicsObject* po,
+															const geVec3d* forceInc,
 															int configIndex)
 {
 	assert(po != NULL);
@@ -691,7 +691,7 @@ GENESISAPI void GENESISCC gePhysicsObject_IncAppliedForce(	gePhysicsObject* po,
 	geVec3d_Add(&po->configs[configIndex].appliedForce, forceInc, &po->configs[configIndex].appliedForce);
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_IncAppliedTorque(gePhysicsObject* po, 
+GENESISAPI void GENESISCC gePhysicsObject_IncAppliedTorque(gePhysicsObject* po,
 															const geVec3d* torqueInc, int configIndex)
 {
 	assert(po != NULL);
@@ -702,7 +702,7 @@ GENESISAPI void GENESISCC gePhysicsObject_IncAppliedTorque(gePhysicsObject* po,
 	geVec3d_Add(&po->configs[configIndex].appliedTorque, torqueInc, &po->configs[configIndex].appliedTorque);
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_GetOrientation(	const gePhysicsObject* po, 
+GENESISAPI void GENESISCC gePhysicsObject_GetOrientation(	const gePhysicsObject* po,
 															geQuaternion* orient, int configIndex)
 {
 	assert(po != NULL);
@@ -713,8 +713,8 @@ GENESISAPI void GENESISCC gePhysicsObject_GetOrientation(	const gePhysicsObject*
 	geQuaternion_Copy(&po->configs[configIndex].orientation, orient);
 }
 
-GENESISAPI void GENESISCC gePhysicsObject_SetOrientation(gePhysicsObject* po, 
-														 const geQuaternion* orient, 
+GENESISAPI void GENESISCC gePhysicsObject_SetOrientation(gePhysicsObject* po,
+														 const geQuaternion* orient,
 														 int configIndex)
 {
 	assert(po != NULL);
@@ -743,8 +743,8 @@ GENESISAPI void GENESISCC gePhysicsObject_GetInertiaTensorInverse(const gePhysic
 }
 
 GENESISAPI void GENESISCC gePhysicsObject_GetInertiaTensorInPhysicsSpace(
-										const gePhysicsObject* pPhysob, 
-										Matrix33* pITensor, 
+										const gePhysicsObject* pPhysob,
+										Matrix33* pITensor,
 										int configIndex)
 {
 	Matrix33 R, Rt, RJ;
@@ -762,8 +762,8 @@ GENESISAPI void GENESISCC gePhysicsObject_GetInertiaTensorInPhysicsSpace(
 }
 
 GENESISAPI void GENESISCC gePhysicsObject_GetInertiaTensorInverseInPhysicsSpace(
-										const gePhysicsObject* pPhysob, 
-										Matrix33* pITensorInv, 
+										const gePhysicsObject* pPhysob,
+										Matrix33* pITensorInv,
 										int configIndex)
 {
 	Matrix33 R, Rt, RJi;

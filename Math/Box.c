@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  BOX.C                                                                               */
+/*  Box.c                                                                               */
 /*                                                                                      */
 /*  Author: Jason Wood                                                                  */
 /*  Description: Non-axial aligned box support                                          */
@@ -18,8 +18,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <stdio.h>
@@ -78,7 +78,7 @@ void geBox_Set(geBox* Box, geFloat xScale, geFloat yScale, geFloat zScale, const
 	Box->yScale = yScale;
 	Box->zScale = zScale;
 
-	geBox_SetXForm(Box, Transform);	
+	geBox_SetXForm(Box, Transform);
 }
 
 // set a Box's Transform
@@ -163,7 +163,7 @@ geBoolean geBox_DetectCollisionBetween(const geBox* Box1, const geBox* Box2)
 
 		// rotate offset by the amount A was rotated to bring it
 		// back into its local coord system
-		
+
 		geXForm3d_Rotate(&(BoxA->TransformInv), &centerToCenterVector,
 			&xformedCenterToCenterVector);
 

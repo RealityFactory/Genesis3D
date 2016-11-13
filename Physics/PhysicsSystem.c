@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  PHYSICSSYSTEM.C                                                                     */
+/*  PhysicsSystem.c                                                                     */
 /*                                                                                      */
 /*  Author: Jason Wood                                                                  */
 /*  Description: Rigid body, constraint based physics system implementation             */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <stdio.h>
@@ -36,14 +36,14 @@
 #include "PhysicsSystem.h"
 
 typedef struct LinearSystemStruct
-{	
+{
 	geFloat ** M;
 	geFloat * X;
 	geFloat * KVector;
 }	LinearSystemStruct;
 
 typedef struct gePhysicsSystem
-{	
+{
 	int										sumOfConstraintDimensions;
 	LinearSystemStruct						*linsys;
 	int										PhysicsObjectCount;
@@ -71,7 +71,7 @@ GENESISAPI gePhysicsSystem* GENESISCC gePhysicsSystem_Create(void)
 	if (pPhyssys == NULL)
 	{
 		return NULL;
-	}	
+	}
 
 	memset(pPhyssys, 0, sizeof(*pPhyssys));
 
@@ -196,7 +196,7 @@ GENESISAPI geBoolean	GENESISCC gePhysicsSystem_AddJoint(gePhysicsSystem *PS, geP
 	if (PS->linsys->KVector == NULL)
 	{
 		return GE_FALSE;
-	}	
+	}
 
 	return GE_TRUE;
 }
@@ -280,7 +280,7 @@ GENESISAPI geBoolean GENESISCC gePhysicsSystem_Iterate(gePhysicsSystem* psPtr, g
 		{
 			if (!gePhysicsObject_ComputeForces(psPtr->Objects[i], psPtr->sourceConfigIndex))
 				return GE_FALSE;
-		}			
+		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		// enforce constraints
@@ -294,21 +294,21 @@ GENESISAPI geBoolean GENESISCC gePhysicsSystem_Iterate(gePhysicsSystem* psPtr, g
 		for	(i = 0; i < psPtr->PhysicsObjectCount; i++)
 		{
 			if (!gePhysicsObject_Integrate(psPtr->Objects[i], subStepSize, psPtr->sourceConfigIndex))
-				return GE_FALSE;							
+				return GE_FALSE;
 		}
 
 		psPtr->sourceConfigIndex = (psPtr->sourceConfigIndex == 0 ? 1 : 0);
 		psPtr->targetConfigIndex = (psPtr->targetConfigIndex == 0 ? 1 : 0);
-		
-		// let physical object's control fns update themselves		
+
+		// let physical object's control fns update themselves
 	}
 
 	for	(i = 0; i < psPtr->PhysicsObjectCount; i++)
 	{
-		gePhysicsObject* pod;		
-		
+		gePhysicsObject* pod;
+
 		pod = psPtr->Objects[i];
-		
+
 		gePhysicsObject_ClearAppliedForce(pod, psPtr->sourceConfigIndex);
 		gePhysicsObject_ClearAppliedTorque(pod, psPtr->sourceConfigIndex);
 		gePhysicsObject_SetActiveConfig(psPtr->Objects[i], psPtr->sourceConfigIndex);
@@ -391,10 +391,10 @@ static geBoolean gePhysicsSystem_EnforceConstraints(gePhysicsSystem* PS, geFloat
 		switch(type)
 		{
 			case JT_WORLD:
-				
+
 				podA = gePhysicsJoint_GetObject1(jntData);
-				
-				assert(podA != NULL);				
+
+				assert(podA != NULL);
 
 				gePhysicsObject_GetLocation(podA, &offsetVecA, si);
 				gePhysicsObject_GetXForm(podA, &xformA, si);
@@ -476,12 +476,12 @@ static geBoolean gePhysicsSystem_EnforceConstraints(gePhysicsSystem* PS, geFloat
 
 				iOffset += 3;
 				break;
-			
+
 			case JT_SPHERICAL:
 
 				////////////////////////////////////////////////////////////////////////////////////////////////////
 				 // compute joint locations in world space
-				
+
 				////////////////////////////////////////////////////////////////////////////////////////////////////
 				// for gePhysicsObject A
 
@@ -493,13 +493,13 @@ static geBoolean gePhysicsSystem_EnforceConstraints(gePhysicsSystem* PS, geFloat
 				gePhysicsObject_GetXForm(podA, &xformA, si);
 				gePhysicsJoint_GetLocationA(jntData, &jntLocA);
 
-				geXForm3d_Rotate(&xformA, &jntLocA, &rA);				
+				geXForm3d_Rotate(&xformA, &jntLocA, &rA);
 				geVec3d_Add(&offsetVecA, &rA, &tmpVec);
 				gePhysicsJoint_SetLocationAInWorldSpace(jntData, &tmpVec);
 
 				////////////////////////////////////////////////////////////////////////////////////////////////////
 				// for gePhysicsObject B
-					
+
 				podB = gePhysicsJoint_GetObject2(jntData);
 
 				assert(podB != NULL);
@@ -508,7 +508,7 @@ static geBoolean gePhysicsSystem_EnforceConstraints(gePhysicsSystem* PS, geFloat
 				gePhysicsObject_GetXForm(podB, &xformB, si);
 				gePhysicsJoint_GetLocationB(jntData, &jntLocB);
 
-				geXForm3d_Rotate(&xformB, &jntLocB, &rB);				
+				geXForm3d_Rotate(&xformB, &jntLocB, &rB);
 				geVec3d_Add(&offsetVecB, &rB, &tmpVec);
 				gePhysicsJoint_SetLocationBInWorldSpace(jntData, &tmpVec);
 
@@ -516,7 +516,7 @@ static geBoolean gePhysicsSystem_EnforceConstraints(gePhysicsSystem* PS, geFloat
 				// do physics setup
 
 				////////////////////////////////////////////////////////////////////////////////////////////////////
-				// for gePhysicsObject A								
+				// for gePhysicsObject A
 
 				Matrix33_MakeCrossProductMatrix33(&rA, &rStarA);
 
@@ -538,7 +538,7 @@ static geBoolean gePhysicsSystem_EnforceConstraints(gePhysicsSystem* PS, geFloat
 				Matrix33_MultiplyVec3d(&itA, &omegaA, &LA);
 
 				////////////////////////////////////////////////////////////////////////////////////////////////////
-				// for gePhysicsObject B				
+				// for gePhysicsObject B
 
 				Matrix33_MakeCrossProductMatrix33(&rB, &rStarB);
 
@@ -562,7 +562,7 @@ static geBoolean gePhysicsSystem_EnforceConstraints(gePhysicsSystem* PS, geFloat
 				////////////////////////////////////////////////////////////////////////////////////////////////////
 				// create M submatrix
 
-				Matrix33_MultiplyScalar(gePhysicsObject_GetOneOverMass(podA) + 
+				Matrix33_MultiplyScalar(gePhysicsObject_GetOneOverMass(podA) +
 					gePhysicsObject_GetOneOverMass(podB), &gePhysicsSystemIdentityMatrix, &term11);
 
 				Matrix33_Multiply(&rStarA, &itiA, &tmpMat);
@@ -572,7 +572,7 @@ static geBoolean gePhysicsSystem_EnforceConstraints(gePhysicsSystem* PS, geFloat
 				Matrix33_Multiply(&tmpMat, &rStarB, &term22);
 
 				Matrix33_Add(&term12, &term22, &term21);
-	
+
 				Matrix33_Subtract(&term11, &term21, &Mblock);
 
 				////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -592,7 +592,7 @@ static geBoolean gePhysicsSystem_EnforceConstraints(gePhysicsSystem* PS, geFloat
 				Matrix33_MultiplyVec3d(&rStarA, &tmpVec, &accA);
 
 				Matrix33_MultiplyVec3d(&itiB, &ptAccelerationB, &tmpVec);
-				Matrix33_MultiplyVec3d(&rStarB, &tmpVec, &accB);							
+				Matrix33_MultiplyVec3d(&rStarB, &tmpVec, &accB);
 
 				geVec3d_Subtract(&accA, &accB, &beta);
 
@@ -637,7 +637,7 @@ static geBoolean gePhysicsSystem_EnforceConstraints(gePhysicsSystem* PS, geFloat
 			default:
 				assert(!"Illegal joint type");
 				break;
-		}	// switch		
+		}	// switch
 	} // for
 
 	if (!gePhysicsSystem_SolveForConstraintForces(PS))
@@ -733,7 +733,7 @@ static geBoolean gePhysicsSystem_SolveForConstraintForces(gePhysicsSystem* PS)
 	geFloat* x;
 
 	assert(PS != NULL);
-	
+
 	b = PS->linsys->KVector;
 	x = PS->linsys->X;
 	M = PS->linsys->M;
@@ -759,8 +759,8 @@ static geBoolean gePhysicsSystem_SolveForConstraintForces(gePhysicsSystem* PS)
 			M[i][j] *= num;
 
 		b[i] *= num;
-		
-				
+
+
 
 		ixend1 = imin(n, i + 3);
 
@@ -776,7 +776,7 @@ static geBoolean gePhysicsSystem_SolveForConstraintForces(gePhysicsSystem* PS)
 			}
 
 			b[j] -= num * b[i];
-		}				
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////

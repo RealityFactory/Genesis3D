@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  QUATERN.C                                                                           */
+/*  Quatern.c                                                                           */
 /*                                                                                      */
 /*  Author: Mike Sandige                                                                */
 /*  Description: Quaternion mathematical system implementation                          */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <assert.h>
@@ -38,12 +38,12 @@
 	#define geQuaternion_Assert assert
 #endif
 
-#define UNIT_TOLERANCE 0.001  
-	// Quaternion magnitude must be closer than this tolerance to 1.0 to be 
+#define UNIT_TOLERANCE 0.001
+	// Quaternion magnitude must be closer than this tolerance to 1.0 to be
 	// considered a unit quaternion
 
-#define QZERO_TOLERANCE 0.00001 
-	// quaternion magnitude must be farther from this tolerance to 0.0 to be 
+#define QZERO_TOLERANCE 0.00001
+	// quaternion magnitude must be farther from this tolerance to 0.0 to be
 	// normalized
 
 #define TRACE_QZERO_TOLERANCE 0.1
@@ -51,7 +51,7 @@
 	// to a quaternion.
 
 #define AA_QZERO_TOLERANCE 0.0001
-	
+
 
 geBoolean GENESISCC geQuaternion_IsValid(const geQuaternion *Q)
 {
@@ -68,7 +68,7 @@ geBoolean GENESISCC geQuaternion_IsValid(const geQuaternion *Q)
 	return GE_TRUE;
 }
 
-void GENESISCC geQuaternion_Set( 
+void GENESISCC geQuaternion_Set(
 	geQuaternion *Q, geFloat W, geFloat X, geFloat Y, geFloat Z)
 {
 	assert( Q != NULL );
@@ -90,13 +90,13 @@ void GENESISCC geQuaternion_SetVec3d(
 	Q->X = V->X;
 	Q->Y = V->Y;
 	Q->Z = V->Z;
-}	
+}
 
-void GENESISCC geQuaternion_Get( 
-	const geQuaternion *Q, 
-	geFloat *W, 
-	geFloat *X, 
-	geFloat *Y, 
+void GENESISCC geQuaternion_Get(
+	const geQuaternion *Q,
+	geFloat *W,
+	geFloat *X,
+	geFloat *Y,
 	geFloat *Z)
 	// get quaternion components into W,X,Y,Z
 {
@@ -120,7 +120,7 @@ GENESISAPI void GENESISCC geQuaternion_SetFromAxisAngle(geQuaternion *Q, const g
 	assert( geVec3d_IsValid(Axis) != GE_FALSE);
 	assert( (Theta * Theta) >= 0.0f );
 	assert( ( fabs(geVec3d_Length(Axis)-1.0f) < AA_QZERO_TOLERANCE) );
-	
+
 	Theta = Theta * (geFloat)0.5f;
 	Q->W     = (geFloat) cos(Theta);
 	sinTheta = (geFloat) sin(Theta);
@@ -133,14 +133,14 @@ GENESISAPI void GENESISCC geQuaternion_SetFromAxisAngle(geQuaternion *Q, const g
 
 
 geBoolean GENESISCC geQuaternion_GetAxisAngle(const geQuaternion *Q, geVec3d *Axis, geFloat *Theta)
-{	
+{
 	geFloat OneOverSinTheta;
 	geFloat HalfTheta;
 	assert( Q != NULL );
 	assert( Axis != NULL );
 	assert( Theta != NULL );
 	geQuaternion_Assert( geQuaternion_IsUnit(Q) != GE_FALSE );
-	
+
 	HalfTheta  = (geFloat)acos( Q->W );
 	if (HalfTheta>QZERO_TOLERANCE)
 		{
@@ -162,16 +162,16 @@ geBoolean GENESISCC geQuaternion_GetAxisAngle(const geQuaternion *Q, geVec3d *Ax
 }
 
 
-void GENESISCC geQuaternion_GetVec3d( 
-	const geQuaternion *Q, 
-	geFloat *W, 
+void GENESISCC geQuaternion_GetVec3d(
+	const geQuaternion *Q,
+	geFloat *W,
 	geVec3d *V)
 	// get quaternion components into W and V
 {
 	assert( geQuaternion_IsValid(Q) != GE_FALSE );
 	assert( W != NULL );
 	assert( V != NULL );
-	
+
 	*W   = Q->W;
 	V->X = Q->X;
 	V->Y = Q->Y;
@@ -181,8 +181,8 @@ void GENESISCC geQuaternion_GetVec3d(
 
 void GENESISCC geQuaternion_FromMatrix(
 	const geXForm3d		*M,
-	      geQuaternion	*Q)
-	// takes upper 3 by 3 portion of matrix (rotation sub matrix) 
+		  geQuaternion	*Q)
+	// takes upper 3 by 3 portion of matrix (rotation sub matrix)
 	// and generates a quaternion
 {
 	geFloat trace,s;
@@ -209,7 +209,7 @@ void GENESISCC geQuaternion_FromMatrix(
 			if (M->AX > M->BY)
 				{
 					if (M->CZ > M->AX)
-						biggest = I;	
+						biggest = I;
 					else
 						biggest = A;
 				}
@@ -334,7 +334,7 @@ void GENESISCC geQuaternion_FromMatrix(
 }
 
 GENESISAPI void GENESISCC geQuaternion_ToMatrix(
-	const geQuaternion	*Q, 
+	const geQuaternion	*Q,
 		  geXForm3d		*M)
 	// takes a unit quaternion and fills out an equivelant rotation
 	// portion of a xform
@@ -347,8 +347,8 @@ GENESISAPI void GENESISCC geQuaternion_ToMatrix(
 	assert( geQuaternion_IsValid(Q) != GE_FALSE );
 	assert( M != NULL );
 	geQuaternion_Assert( geQuaternion_IsUnit(Q) == GE_TRUE );
-	
-	
+
+
 	X2  = 2.0f * Q->X;
 	XX2 = X2   * Q->X;
 	XY2 = X2   * Q->Y;
@@ -359,11 +359,11 @@ GENESISAPI void GENESISCC geQuaternion_ToMatrix(
 	YY2 = Y2   * Q->Y;
 	YZ2 = Y2   * Q->Z;
 	YW2 = Y2   * Q->W;
-	
+
 	Z2  = 2.0f * Q->Z;
 	ZZ2 = Z2   * Q->Z;
 	ZW2 = Z2   * Q->W;
-	
+
 	M->AX = 1.0f - YY2 - ZZ2;
 	M->AY = XY2  - ZW2;
 	M->AZ = XZ2  + YW2;
@@ -387,11 +387,11 @@ GENESISAPI void GENESISCC geQuaternion_ToMatrix(
 
 
 void GENESISCC geQuaternion_Slerp(
-	const geQuaternion		*Q0, 
-	const geQuaternion		*Q1, 
-	geFloat					T,		
+	const geQuaternion		*Q0,
+	const geQuaternion		*Q1,
+	geFloat					T,
 	geQuaternion			*QT)
-	// spherical interpolation between q0 and q1.   0<=t<=1 
+	// spherical interpolation between q0 and q1.   0<=t<=1
 	// resulting quaternion is 'between' q0 and q1
 	// with t==0 being all q0, and t==1 being all q1.
 {
@@ -404,7 +404,7 @@ void GENESISCC geQuaternion_Slerp(
 	geQuaternion_Assert( geQuaternion_IsUnit(Q0) == GE_TRUE );
 	geQuaternion_Assert( geQuaternion_IsUnit(Q1) == GE_TRUE );
 
-	cosom =		(Q0->W * Q1->W) + (Q0->X * Q1->X) 
+	cosom =		(Q0->W * Q1->W) + (Q0->X * Q1->X)
 			  + (Q0->Y * Q1->Y) + (Q0->Z * Q1->Z);
 
 	if (cosom < 0)
@@ -419,7 +419,7 @@ void GENESISCC geQuaternion_Slerp(
 		{
 			QL = *Q1;
 		}
-			
+
 
 	if ( (1.0f - cosom) > EPSILON )
 		{
@@ -432,7 +432,7 @@ void GENESISCC geQuaternion_Slerp(
 		{
 			// has numerical difficulties around cosom == 0
 			// in this case degenerate to linear interpolation
-		
+
 			Scale0 = 1.0f - T;
 			Scale1 = T;
 		}
@@ -449,11 +449,11 @@ void GENESISCC geQuaternion_Slerp(
 
 
 void GENESISCC geQuaternion_SlerpNotShortest(
-	const geQuaternion		*Q0, 
-	const geQuaternion		*Q1, 
-	geFloat					T,		
+	const geQuaternion		*Q0,
+	const geQuaternion		*Q1,
+	geFloat					T,
 	geQuaternion			*QT)
-	// spherical interpolation between q0 and q1.   0<=t<=1 
+	// spherical interpolation between q0 and q1.   0<=t<=1
 	// resulting quaternion is 'between' q0 and q1
 	// with t==0 being all q0, and t==1 being all q1.
 {
@@ -465,7 +465,7 @@ void GENESISCC geQuaternion_SlerpNotShortest(
 	geQuaternion_Assert( geQuaternion_IsUnit(Q0) == GE_TRUE );
 	geQuaternion_Assert( geQuaternion_IsUnit(Q1) == GE_TRUE );
 
-	cosom =		(Q0->W * Q1->W) + (Q0->X * Q1->X) 
+	cosom =		(Q0->W * Q1->W) + (Q0->X * Q1->X)
 			  + (Q0->Y * Q1->Y) + (Q0->Z * Q1->Z);
 	if ( (1.0f + cosom) > EPSILON )
 		{
@@ -474,12 +474,12 @@ void GENESISCC geQuaternion_SlerpNotShortest(
 					omega  = (geFloat) acos( cosom );
 					sinom  = (geFloat) sin( omega );
 					// has numerical difficulties around cosom == nPI/2
-					// in this case everything is up for grabs... 
+					// in this case everything is up for grabs...
 					//  ...degenerate to linear interpolation
 					if (sinom < EPSILON)
 						{
 							Scale0 = 1.0f - T;
-							Scale1 = T;	
+							Scale1 = T;
 						}
 					else
 						{
@@ -491,7 +491,7 @@ void GENESISCC geQuaternion_SlerpNotShortest(
 				{
 					// has numerical difficulties around cosom == 0
 					// in this case degenerate to linear interpolation
-				
+
 					Scale0 = 1.0f - T;
 					Scale1 = T;
 				}
@@ -500,12 +500,12 @@ void GENESISCC geQuaternion_SlerpNotShortest(
 			QT-> Z = Scale0 * Q0->Z + Scale1 * Q1->Z;
 			QT-> W = Scale0 * Q0->W + Scale1 * Q1->W;
 			//#pragma message (" ack:!!!!!!")
-			//geQuaternionNormalize(QT); 
+			//geQuaternionNormalize(QT);
 			geQuaternion_Assert( geQuaternion_IsUnit(QT));
 		}
 	else
 		{
-			QT->X = -Q0->Y; 
+			QT->X = -Q0->Y;
 			QT->Y =  Q0->X;
 			QT->Z = -Q0->W;
 			QT->W =  Q0->Z;
@@ -520,8 +520,8 @@ void GENESISCC geQuaternion_SlerpNotShortest(
 }
 
 void GENESISCC geQuaternion_Multiply(
-	const geQuaternion	*Q1, 
-	const geQuaternion	*Q2, 
+	const geQuaternion	*Q1,
+	const geQuaternion	*Q2,
 	geQuaternion		*Q)
 	// multiplies q1 * q2, and places the result in q.
 	// no failure. 	renormalization not automatic
@@ -534,16 +534,16 @@ void GENESISCC geQuaternion_Multiply(
 	Q1L = *Q1;
 	Q2L = *Q2;
 
-	Q->W  =	(  (Q1L.W*Q2L.W) - (Q1L.X*Q2L.X) 
+	Q->W  =	(  (Q1L.W*Q2L.W) - (Q1L.X*Q2L.X)
 			 - (Q1L.Y*Q2L.Y) - (Q1L.Z*Q2L.Z) );
 
-	Q->X  =	(  (Q1L.W*Q2L.X) + (Q1L.X*Q2L.W) 
+	Q->X  =	(  (Q1L.W*Q2L.X) + (Q1L.X*Q2L.W)
 			 + (Q1L.Y*Q2L.Z) - (Q1L.Z*Q2L.Y) );
 
-	Q->Y  =	(  (Q1L.W*Q2L.Y) - (Q1L.X*Q2L.Z) 
+	Q->Y  =	(  (Q1L.W*Q2L.Y) - (Q1L.X*Q2L.Z)
 			 + (Q1L.Y*Q2L.W) + (Q1L.Z*Q2L.X) );
 
-	Q->Z  = (  (Q1L.W*Q2L.Z) + (Q1L.X*Q2L.Y) 
+	Q->Z  = (  (Q1L.W*Q2L.Z) + (Q1L.X*Q2L.Y)
 			 - (Q1L.Y*Q2L.X) + (Q1L.Z*Q2L.W) );
 	geQuaternion_Assert( geQuaternion_IsValid(Q) != GE_FALSE );
 
@@ -551,8 +551,8 @@ void GENESISCC geQuaternion_Multiply(
 
 
 void GENESISCC geQuaternion_Rotate(
-	const geQuaternion	*Q, 
-	const geVec3d         *V, 
+	const geQuaternion	*Q,
+	const geVec3d         *V,
 	geVec3d				*VRotated)
 	// Rotates V by the quaternion Q, places the result in VRotated.
 {
@@ -581,7 +581,7 @@ geBoolean GENESISCC geQuaternion_IsUnit(const geQuaternion *Q)
 	geFloat magnitude;
 	assert( Q != NULL );
 
-	magnitude  =   (Q->W * Q->W) + (Q->X * Q->X) 
+	magnitude  =   (Q->W * Q->W) + (Q->X * Q->X)
 					  + (Q->Y * Q->Y) + (Q->Z * Q->Z);
 
 	if (( magnitude < 1.0+UNIT_TOLERANCE ) && ( magnitude > 1.0-UNIT_TOLERANCE ))
@@ -590,7 +590,7 @@ geBoolean GENESISCC geQuaternion_IsUnit(const geQuaternion *Q)
 }
 
 geFloat GENESISCC geQuaternion_Magnitude(const geQuaternion *Q)
-	// returns Magnitude of Q.  
+	// returns Magnitude of Q.
 {
 
 	assert( geQuaternion_IsValid(Q) != GE_FALSE );
@@ -603,8 +603,8 @@ GENESISAPI geFloat GENESISCC geQuaternion_Normalize(geQuaternion *Q)
 {
 	geFloat magnitude,one_over_magnitude;
 	assert( geQuaternion_IsValid(Q) != GE_FALSE );
-	
-	magnitude =   (geFloat) sqrt ((Q->W * Q->W) + (Q->X * Q->X) 
+
+	magnitude =   (geFloat) sqrt ((Q->W * Q->W) + (Q->X * Q->X)
 							  + (Q->Y * Q->Y) + (Q->Z * Q->Z));
 
 	if (( magnitude < QZERO_TOLERANCE ) && ( magnitude > -QZERO_TOLERANCE ))
@@ -631,7 +631,7 @@ GENESISAPI void GENESISCC geQuaternion_Copy(const geQuaternion *QSrc, geQuaterni
 }
 
 void GENESISCC geQuaternion_Inverse(const geQuaternion *Q, geQuaternion *QInv)
-	// sets QInv to the inverse of Q.  
+	// sets QInv to the inverse of Q.
 {
 	assert( geQuaternion_IsValid(Q) != GE_FALSE );
 	assert( QInv != NULL );
@@ -644,8 +644,8 @@ void GENESISCC geQuaternion_Inverse(const geQuaternion *Q, geQuaternion *QInv)
 
 
 void GENESISCC geQuaternion_Add(
-	const geQuaternion *Q1, 
-	const geQuaternion *Q2, 
+	const geQuaternion *Q1,
+	const geQuaternion *Q2,
 	geQuaternion *QSum)
 	// QSum = Q1 + Q2  (result is not generally a unit quaternion!)
 {
@@ -659,8 +659,8 @@ void GENESISCC geQuaternion_Add(
 }
 
 void GENESISCC geQuaternion_Subtract(
-	const geQuaternion *Q1, 
-	const geQuaternion *Q2, 
+	const geQuaternion *Q1,
+	const geQuaternion *Q2,
 	geQuaternion *QSum)
 	// QSum = Q1 - Q2  (result is not generally a unit quaternion!)
 {
@@ -678,7 +678,7 @@ void GENESISCC geQuaternion_Subtract(
 static int32 geQuaternion_XFormTable[]={1768710981,560296816};
 
 void GENESISCC geQuaternion_Ln(
-	const geQuaternion *Q, 
+	const geQuaternion *Q,
 	geQuaternion *LnQ)
 	// ln(Q) for unit quaternion only!
 {
@@ -687,7 +687,7 @@ void GENESISCC geQuaternion_Ln(
 	assert( geQuaternion_IsValid(Q) != GE_FALSE );
 	assert( LnQ != NULL );
 	geQuaternion_Assert( geQuaternion_IsUnit(Q) == GE_TRUE );
-	
+
 	if (Q->W < 0.0f)
 		{
 			QL.W = -Q->W;
@@ -718,7 +718,7 @@ void GENESISCC geQuaternion_Ln(
 			LnQ->Z = Theta_Over_sin_Theta * QL.Z;
 		}
 }
-	
+
 void GENESISCC geQuaternion_Exp(
 	const geQuaternion *Q,
 	geQuaternion *ExpQ)
@@ -745,7 +745,7 @@ void GENESISCC geQuaternion_Exp(
 	ExpQ->X   = sin_Theta_over_Theta * Q->X;
 	ExpQ->Y   = sin_Theta_over_Theta * Q->Y;
 	ExpQ->Z   = sin_Theta_over_Theta * Q->Z;
-}	
+}
 
 void GENESISCC geQuaternion_Scale(
 	const geQuaternion *Q,
@@ -768,7 +768,7 @@ void GENESISCC geQuaternion_SetNoRotation(geQuaternion *Q)
 {
 	Q->W = 1.0f;
 	Q->X = Q->Y = Q->Z = 0.0f;
-	
+
 	/* this is equivelant to:
 		{
 			geXForm3d M;
@@ -787,16 +787,16 @@ geBoolean GENESISCC geQuaternion_Compare( geQuaternion *Q1, geQuaternion *Q2, ge
 	assert ( Tolerance >= 0.0 );
 
 	if (	// they are the same but with opposite signs
-			(		(fabs(Q1->X + Q2->X) <= Tolerance )  
-				&&  (fabs(Q1->Y + Q2->Y) <= Tolerance )  
-				&&  (fabs(Q1->Z + Q2->Z) <= Tolerance )  
-				&&  (fabs(Q1->W + Q2->W) <= Tolerance )  
+			(		(fabs(Q1->X + Q2->X) <= Tolerance )
+				&&  (fabs(Q1->Y + Q2->Y) <= Tolerance )
+				&&  (fabs(Q1->Z + Q2->Z) <= Tolerance )
+				&&  (fabs(Q1->W + Q2->W) <= Tolerance )
 			)
 		  ||  // they are the same with same signs
-			(		(fabs(Q1->X - Q2->X) <= Tolerance )  
-				&&  (fabs(Q1->Y - Q2->Y) <= Tolerance )  
-				&&  (fabs(Q1->Z - Q2->Z) <= Tolerance )  
-				&&  (fabs(Q1->W - Q2->W) <= Tolerance )  
+			(		(fabs(Q1->X - Q2->X) <= Tolerance )
+				&&  (fabs(Q1->Y - Q2->Y) <= Tolerance )
+				&&  (fabs(Q1->Z - Q2->Z) <= Tolerance )
+				&&  (fabs(Q1->W - Q2->W) <= Tolerance )
 			)
 		)
 		return GE_TRUE;
@@ -804,5 +804,5 @@ geBoolean GENESISCC geQuaternion_Compare( geQuaternion *Q1, geQuaternion *Q2, ge
 		return GE_FALSE;
 
 
-	
+
 }

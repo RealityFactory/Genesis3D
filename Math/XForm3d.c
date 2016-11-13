@@ -1,11 +1,11 @@
 /****************************************************************************************/
-/*  XFORM3D.C                                                                           */
+/*  XForm3d.c                                                                           */
 /*                                                                                      */
 /*  Author:                                                                             */
 /*  Description: 3D transform implementation                                            */
 /*                                                                                      */
 /*  Edit History:                                                                       */
-/*	01/08/2004 Wendell Buckner                                                          */
+/*  01/08/2004 Wendell Buckner                                                          */
 /*    DOT3 BUMPMAPPING                                                                  */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
@@ -44,7 +44,7 @@ GENESISAPI 	void GENESISCC geXForm3d_SetMaximalAssertionMode( geBoolean Enable )
 
 
 GENESISAPI geBoolean GENESISCC geXForm3d_IsValid(const geXForm3d *M)
-	// returns GE_TRUE if M is 'valid'  
+	// returns GE_TRUE if M is 'valid'
 	// 'valid' means that M is non NULL, and there are no NAN's in the matrix.
 {
 
@@ -53,25 +53,25 @@ GENESISAPI geBoolean GENESISCC geXForm3d_IsValid(const geXForm3d *M)
 	if (geVec3d_IsValid(&(M->Translation)) == GE_FALSE)
 		return GE_FALSE;
 
-	if ((M->AX * M->AX) < 0.0f) 
+	if ((M->AX * M->AX) < 0.0f)
 		return GE_FALSE;
-	if ((M->AY * M->AY) < 0.0f) 
+	if ((M->AY * M->AY) < 0.0f)
 		return GE_FALSE;
-	if ((M->AZ * M->AZ) < 0.0f) 
+	if ((M->AZ * M->AZ) < 0.0f)
 		return GE_FALSE;
 
-	if ((M->BX * M->BX) < 0.0f) 
+	if ((M->BX * M->BX) < 0.0f)
 		return GE_FALSE;
-	if ((M->BY * M->BY) < 0.0f) 
+	if ((M->BY * M->BY) < 0.0f)
 		return GE_FALSE;
-	if ((M->BZ * M->BZ) < 0.0f) 
+	if ((M->BZ * M->BZ) < 0.0f)
 		return GE_FALSE;
-	
-	if ((M->CX * M->CX) < 0.0f) 
+
+	if ((M->CX * M->CX) < 0.0f)
 		return GE_FALSE;
-	if ((M->CY * M->CY) < 0.0f) 
+	if ((M->CY * M->CY) < 0.0f)
 		return GE_FALSE;
-	if ((M->CZ * M->CZ) < 0.0f) 
+	if ((M->CZ * M->CZ) < 0.0f)
 		return GE_FALSE;
 	return GE_TRUE;
 }
@@ -79,7 +79,7 @@ GENESISAPI geBoolean GENESISCC geXForm3d_IsValid(const geXForm3d *M)
 
 //MRB BEGIN
 GENESISAPI geBoolean GENESISCC geXForm3d_IsIdentity(const geXForm3d *M)
-	// returns GE_TRUE if M is an identity matrix 
+	// returns GE_TRUE if M is an identity matrix
 {
 	assert( M != NULL );
 
@@ -103,15 +103,15 @@ GENESISAPI geBoolean GENESISCC geXForm3d_IsIdentity(const geXForm3d *M)
 GENESISAPI void GENESISCC geXForm3d_SetIdentity(geXForm3d *M)
 	// sets M to an identity matrix (clears it)
 {
-	assert( M != NULL );			
-	
+	assert( M != NULL );
+
 	M->AX = M->BY = M->CZ = 1.0f;
 	M->AY = M->AZ = M->BX = M->BZ = M->CX = M->CY = 0.0f;
 	M->Translation.X = M->Translation.Y = M->Translation.Z = 0.0f;
 
 	geXForm3d_Assert ( geXForm3d_IsOrthonormal(M) == GE_TRUE );
 }
-	
+
 GENESISAPI void GENESISCC geXForm3d_SetXRotation(geXForm3d *M,geFloat RadianAngle)
 	// sets up a transform that rotates RadianAngle about X axis
 {
@@ -130,8 +130,8 @@ GENESISAPI void GENESISCC geXForm3d_SetXRotation(geXForm3d *M,geFloat RadianAngl
 	M->Translation.X = M->Translation.Y = M->Translation.Z = 0.0f;
 
 	geXForm3d_Assert ( geXForm3d_IsOrthonormal(M) == GE_TRUE );
-}  
-	
+}
+
 GENESISAPI void GENESISCC geXForm3d_SetYRotation(geXForm3d *M,geFloat RadianAngle)
 	// sets up a transform that rotates RadianAngle about Y axis
 {
@@ -141,7 +141,7 @@ GENESISAPI void GENESISCC geXForm3d_SetYRotation(geXForm3d *M,geFloat RadianAngl
 
 	Cos = (geFloat)cos(RadianAngle);
 	Sin = (geFloat)sin(RadianAngle);
-	
+
 	M->AX =  Cos;
 	M->AZ =  Sin;
 	M->CX = -Sin;
@@ -163,7 +163,7 @@ GENESISAPI void GENESISCC geXForm3d_SetZRotation(geXForm3d *M,geFloat RadianAngl
 
 	Cos = (geFloat)cos(RadianAngle);
 	Sin = (geFloat)sin(RadianAngle);
-	
+
 	M->AX =  Cos;
 	M->AY = -Sin;
 	M->BX =  Sin;
@@ -288,8 +288,8 @@ GENESISAPI void GENESISCC geXForm3d_Scale(geXForm3d *M,geFloat x, geFloat y, geF
 }
 
 GENESISAPI void GENESISCC geXForm3d_Multiply(
-	const geXForm3d *M1, 
-	const geXForm3d *M2, 
+	const geXForm3d *M1,
+	const geXForm3d *M2,
 	geXForm3d *MProduct)
 	// MProduct = matrix multiply of M1*M2
 {
@@ -355,15 +355,15 @@ GENESISAPI void GENESISCC geXForm3d_Multiply(
 	MProduct->Translation.Z += M1L.CY * M2L.Translation.Y;
 	MProduct->Translation.Z += M1L.CZ * M2L.Translation.Z;
 	MProduct->Translation.Z += M1L.Translation.Z;
-	
+
 	geXForm3d_Assert ( geXForm3d_IsOrthogonal(MProduct) == GE_TRUE );
 }
 
 GENESISAPI void GENESISCC geXForm3d_Transform(
 	const geXForm3d *M,
-	const geVec3d *V, 
+	const geVec3d *V,
 	geVec3d *Result)
-	// Result is Matrix M * Vector V:  V Tranformed by M 
+	// Result is Matrix M * Vector V:  V Tranformed by M
 {
 	geVec3d VL;
 	assert( M != NULL );
@@ -382,12 +382,12 @@ GENESISAPI void GENESISCC geXForm3d_Transform(
 }
 
 /*	01/08/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
+	DOT3 BUMPMAPPING */
 GENESISAPI void GENESISCC geXForm3d_RotateNoOrthogonal(
 	const geXForm3d *M,
-	const geVec3d *V, 
+	const geVec3d *V,
 	geVec3d *Result)
-	// Result is Matrix M * Vector V:  V Tranformed by M 
+	// Result is Matrix M * Vector V:  V Tranformed by M
 {
 	geVec3d VL;
 	assert( M != NULL );
@@ -406,7 +406,7 @@ GENESISAPI void GENESISCC geXForm3d_RotateNoOrthogonal(
 
 //========================================================================================
 //	geXForm3d_TransformArray
-//	Assembly version 
+//	Assembly version
 //========================================================================================
 GENESISAPI void GENESISCC geXForm3d_TransformArray(const geXForm3d *XForm, const geVec3d *Source, geVec3d *Dest, int32 Count)
 {
@@ -421,7 +421,7 @@ GENESISAPI void GENESISCC geXForm3d_TransformArray(const geXForm3d *XForm, const
 	if (Count <= 0)								// Early out if possible
 		return;
 
-	_asm 
+	_asm
 	{
 	mov     ecx,Count							// get item count
 	mov     esi,Source							// get source array pointer
@@ -431,8 +431,8 @@ GENESISAPI void GENESISCC geXForm3d_TransformArray(const geXForm3d *XForm, const
 	add     esi,ecx								// esi points to source end
 	add     ebx,ecx								// edi pointe to dest end
 	neg     ecx									// ecx ready for count-up
-          
-Again:	
+
+Again:
 	// Multiply
 	fld   dword ptr [esi+ecx+0*FSIZE]			// 1;i1
 	fmul  dword ptr [edi+(0+0*3)*FSIZE]			// 1;m11
@@ -465,15 +465,15 @@ Again:
 	faddp st(2),st								// 1;s1b s2b s3a m33
 	fxch  st(3)									// 0;m33 s2b s3a s1b
 	fadd  dword ptr [edi+(9+0)*FSIZE]			// 1;m33 s2b s3a s1c
-	fxch  st(1)									// 0;m33 s2b s1c s3a 
+	fxch  st(1)									// 0;m33 s2b s1c s3a
 	faddp st(3),st								// 1;s3b s2b s1c
 	fxch  st(1)									// 0;s3b s1c s2b
 	fadd  dword ptr [edi+(9+1)*FSIZE]			// 1;s3b s1c s2c
 	fxch  st(2)									// 0;s2c s1c s3b
 	fadd  dword ptr [edi+(9+2)*FSIZE]			// 1;s2c s1c s3c
 	fxch  st(1)									// 0;s2c s3c s1c
-	fstp  dword ptr [ebx+ecx+0*FSIZE]			// 2;s2c s3c    
-	fxch  st(1)									// 0;s3c s2c    
+	fstp  dword ptr [ebx+ecx+0*FSIZE]			// 2;s2c s3c
+	fxch  st(1)									// 0;s3c s2c
 	fstp  dword ptr [ebx+ecx+1*FSIZE]			// 2;s3c
 	fstp  dword ptr [ebx+ecx+2*FSIZE]			// 2;
 	add   ecx,3*FSIZE							// 1;
@@ -488,7 +488,7 @@ Again:
 
 GENESISAPI void GENESISCC geXForm3d_Rotate(
 	const geXForm3d *M,
-	const geVec3d *V, 
+	const geVec3d *V,
 	geVec3d *Result)
 	// Result is Matrix M * Vector V:  V Rotated by M (no translation)
 {
@@ -513,7 +513,7 @@ GENESISAPI void GENESISCC geXForm3d_GetLeft(const geXForm3d *M, geVec3d *Left)
 	assert( M     != NULL );
 	assert( Left != NULL );
 	geXForm3d_Assert ( geXForm3d_IsOrthogonal(M) == GE_TRUE );
-	
+
 	Left->X = -M->AX;
 	Left->Y = -M->BX;
 	Left->Z = -M->CX;
@@ -526,7 +526,7 @@ GENESISAPI void GENESISCC geXForm3d_GetUp(const geXForm3d *M,    geVec3d *Up)
 	assert( M  != NULL );
 	assert( Up != NULL );
 	geXForm3d_Assert ( geXForm3d_IsOrthogonal(M) == GE_TRUE );
-	
+
 	Up->X = M->AY;
 	Up->Y = M->BY;
 	Up->Z = M->CY;
@@ -579,8 +579,8 @@ GENESISAPI void GENESISCC geXForm3d_GetTranspose(const geXForm3d *M, geXForm3d *
 }
 
 GENESISAPI void GENESISCC geXForm3d_TransposeTransform(
-	const geXForm3d *M, 
-	const geVec3d *V, 
+	const geXForm3d *M,
+	const geVec3d *V,
 	geVec3d *Result)
 	// applies the Transpose transform of M to V.  Result = (M^T) * V
 {
@@ -604,15 +604,15 @@ GENESISAPI void GENESISCC geXForm3d_TransposeTransform(
 
 
 GENESISAPI void GENESISCC geXForm3d_Copy(
-	const geXForm3d *Src, 
+	const geXForm3d *Src,
 	geXForm3d *Dst)
-{	
+{
 	assert( Src != NULL );
 	assert( Dst != NULL );
 	geXForm3d_Assert ( geXForm3d_IsOrthogonal(Src) == GE_TRUE );
 
 	*Dst = *Src;
-}    
+}
 
 GENESISAPI void GENESISCC geXForm3d_GetEulerAngles(const geXForm3d *M, geVec3d *Angles)
 	// order of angles z,y,x
@@ -622,15 +622,15 @@ GENESISAPI void GENESISCC geXForm3d_GetEulerAngles(const geXForm3d *M, geVec3d *
 	assert( Angles != NULL );
 
 	geXForm3d_Assert ( geXForm3d_IsOrthonormal(M) == GE_TRUE );
-	
+
 	//ack.  due to floating point error, the value can drift away from 1.0 a bit
 	//      this will clamp it.  The _IsOrthonormal test will pass because it allows
 	//      for a tolerance.
 
 	AZ = M->AZ;
-	if (AZ > 1.0f) 
+	if (AZ > 1.0f)
 		AZ = 1.0f;
-	if (AZ < -1.0f) 
+	if (AZ < -1.0f)
 		AZ = -1.0f;
 
 	Angles->Y = -(geFloat)asin(-AZ);
@@ -652,25 +652,25 @@ GENESISAPI void GENESISCC geXForm3d_GetEulerAngles(const geXForm3d *M, geVec3d *
 GENESISAPI void GENESISCC geXForm3d_SetEulerAngles(geXForm3d *M, const geVec3d *Angles)
 	// order of angles z,y,x
 {
-	geXForm3d XM, YM, ZM;							            
+	geXForm3d XM, YM, ZM;
 
 	assert( M      != NULL );
 	assert( geVec3d_IsValid(Angles)!=GE_FALSE);
-	
+
 	geXForm3d_SetXRotation(&XM,Angles->X);
 	geXForm3d_SetYRotation(&YM,Angles->Y);
 	geXForm3d_SetZRotation(&ZM,Angles->Z);
-	
+
 	geXForm3d_Multiply(&XM, &YM, M);
 	geXForm3d_Multiply(M, &ZM, M);
-	
+
 
 	geXForm3d_Assert ( geXForm3d_IsOrthonormal(M) == GE_TRUE );
 
 }
 
 GENESISAPI geBoolean GENESISCC geXForm3d_IsOrthonormal(const geXForm3d *M)
-	// returns GE_TRUE if M is orthonormal 
+	// returns GE_TRUE if M is orthonormal
 	// (if the rows and columns are all normalized (transform has no scaling or shearing)
 	// and is orthogonal (row1 cross row2 = row3 & col1 cross col2 = col3)
 {
@@ -685,7 +685,7 @@ GENESISAPI geBoolean GENESISCC geXForm3d_IsOrthonormal(const geXForm3d *M)
 	Col1.X = M->AX;
 	Col1.Y = M->BX;
 	Col1.Z = M->CX;
-	
+
 	Col2.X = M->AY;
 	Col2.Y = M->BY;
 	Col2.Z = M->CY;
@@ -711,8 +711,8 @@ GENESISAPI geBoolean GENESISCC geXForm3d_IsOrthonormal(const geXForm3d *M)
 
 
 GENESISAPI void GENESISCC geXForm3d_Orthonormalize(geXForm3d *M)
-	// essentially removes scaling (or other distortions) from 
-	// an orthogonal (or nearly orthogonal) matrix 
+	// essentially removes scaling (or other distortions) from
+	// an orthogonal (or nearly orthogonal) matrix
 {
 	geVec3d Col1,Col2,Col3;
 	assert( M != NULL );
@@ -725,7 +725,7 @@ GENESISAPI void GENESISCC geXForm3d_Orthonormalize(geXForm3d *M)
 	M->AX = Col1.X;
 	M->BX = Col1.Y;
 	M->CX = Col1.Z;
-	
+
 	Col2.X = M->AY;
 	Col2.Y = M->BY;
 	Col2.Z = M->CY;
@@ -763,21 +763,21 @@ GENESISAPI geBoolean GENESISCC geXForm3d_IsOrthogonal(const geXForm3d *M)
 	Col1.Y = M->BX;
 	Col1.Z = M->CX;
 	//geVec3d_Normalize(&Col1);
-	
+
 	Col2.X = M->AY;
 	Col2.Y = M->BY;
 	Col2.Z = M->CY;
 	//geVec3d_Normalize(&Col2);
-	
+
 	Col3.X = M->AZ;
 	Col3.Y = M->BZ;
 	Col3.Z = M->CZ;
 	geVec3d_Normalize(&Col3);
-	
+
 	geVec3d_CrossProduct(&Col1,&Col2,&Col1CrossCol2);
-		
+
 	geVec3d_Normalize(&Col1CrossCol2);
-	
+
 	IsOrthogonal = geVec3d_Compare(&Col1CrossCol2,&Col3,ORTHOGONAL_TOLERANCE);
 	if (IsOrthogonal == GE_FALSE)
 		{
@@ -793,8 +793,8 @@ GENESISAPI geBoolean GENESISCC geXForm3d_IsOrthogonal(const geXForm3d *M)
 
 GENESISAPI void GENESISCC geXForm3d_SetFromLeftUpIn(
 	geXForm3d *M,
-	const geVec3d *Left, 
-	const geVec3d *Up, 
+	const geVec3d *Left,
+	const geVec3d *Up,
 	const geVec3d *In)
 {
 	assert(M);
@@ -822,9 +822,9 @@ GENESISAPI void GENESISCC geXForm3d_SetFromLeftUpIn(
 }
 
 GENESISAPI void GENESISCC geXForm3d_Mirror(
-	const		geXForm3d *Source, 
-	const		geVec3d *PlaneNormal, 
-	geFloat		PlaneDist, 
+	const		geXForm3d *Source,
+	const		geVec3d *PlaneNormal,
+	geFloat		PlaneDist,
 	geXForm3d	*Dest)
 {
 	geFloat			Dist;

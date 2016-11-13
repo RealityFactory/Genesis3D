@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  PHYSICSJOINT.H                                                                      */
+/*  PhysicsJoint.h                                                                      */
 /*                                                                                      */
 /*  Author: Jason Wood                                                                  */
 /*  Description: Rigid body joint interface                                             */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef	PHYSICSJOINT_H
@@ -40,7 +40,7 @@ typedef struct gePhysicsJoint gePhysicsJoint;
 // ctor / dtor
 
 //gePhysicsJoint* gePhysicsJoint_Create(ItemJoint* pItemJoint);
-GENESISAPI gePhysicsJoint * GENESISCC gePhysicsJoint_Create(gePhysicsJoint_Kind Kind, const geVec3d *Location, 
+GENESISAPI gePhysicsJoint * GENESISCC gePhysicsJoint_Create(gePhysicsJoint_Kind Kind, const geVec3d *Location,
 	geFloat assemblyRate, gePhysicsObject *PS1, gePhysicsObject *PS2, geFloat physicsScale);
 GENESISAPI geBoolean GENESISCC gePhysicsJoint_Destroy(gePhysicsJoint** ppPhysjnt);
 

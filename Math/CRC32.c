@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  CRC32.C                                                                             */
+/*  CRC32.c                                                                             */
 /*                                                                                      */
 /*  Author: Charles Bloom                                                               */
 /*  Description: CRC construction module                                                */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include "CRC32.h"
@@ -89,22 +89,22 @@ uint32 CRC32_Finish(uint32 crc)
 return (~crc);
 }
 
-uint32 CRC32_AddByte(uint32 crc,uint8 b) 
+uint32 CRC32_AddByte(uint32 crc,uint8 b)
 {
 	STEPCRC(crc,b);
-return(crc); 
+return(crc);
 }
 
-uint32 CRC32_AddWord(uint32 crc,uint16 w) 
-{ 
+uint32 CRC32_AddWord(uint32 crc,uint16 w)
+{
 uint8 *ptr;
 	ptr = (uint8 *)&w;
 	STEPCRC(crc,ptr[0]);
 	STEPCRC(crc,ptr[1]);
-return(crc); 
+return(crc);
 }
 
-uint32 CRC32_AddLong(uint32 crc,uint32 l) 
+uint32 CRC32_AddLong(uint32 crc,uint32 l)
 {
 uint8 *ptr;
 	ptr = (uint8 *)&l;
@@ -112,7 +112,7 @@ uint8 *ptr;
 	STEPCRC(crc,ptr[1]);
 	STEPCRC(crc,ptr[2]);
 	STEPCRC(crc,ptr[3]);
-return(crc); 
+return(crc);
 }
 
 uint32 CRC32_Array(const uint8 * buf,uint32 buflen)

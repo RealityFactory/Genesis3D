@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  VEC3D.C                                                                             */
+/*  Vec3d.c                                                                             */
 /*                                                                                      */
 /*  Author:                                                                             */
 /*  Description: 3D Vector implementation                                               */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <math.h>
@@ -45,11 +45,11 @@ GENESISAPI geBoolean GENESISCC geVec3d_IsValid(const geVec3d *V)
 {
 	if (V == NULL)
 		return GE_FALSE;
-	if ((V->X * V->X) < 0.0f) 
+	if ((V->X * V->X) < 0.0f)
 		return GE_FALSE;
-	if ((V->Y * V->Y) < 0.0f) 
+	if ((V->Y * V->Y) < 0.0f)
 		return GE_FALSE;
-	if ((V->Z * V->Z) < 0.0f) 
+	if ((V->Z * V->Z) < 0.0f)
 		return GE_FALSE;
 	return GE_TRUE;
 }
@@ -71,7 +71,7 @@ GENESISAPI void GENESISCC		geVec3d_Get(const geVec3d *V, geFloat *X, geFloat *Y,
 	assert ( Y != NULL );
 	assert ( Z != NULL );
 	assert( geVec3d_IsValid(V) != GE_FALSE );
-	
+
 	*X = V->X;
 	*Y = V->Y;
 	*Z = V->Z;
@@ -84,7 +84,7 @@ GENESISAPI geFloat GENESISCC	geVec3d_DotProduct(const geVec3d *V1, const geVec3d
 	assert ( V2 != NULL );
 	assert( geVec3d_IsValid(V1) != GE_FALSE );
 	assert( geVec3d_IsValid(V2) != GE_FALSE );
-	
+
 	return(V1->X*V2->X + V1->Y*V2->Y + V1->Z*V2->Z);
 }
 
@@ -98,8 +98,8 @@ GENESISAPI void GENESISCC geVec3d_CrossProduct(const geVec3d *V1, const geVec3d 
 	assert( geVec3d_IsValid(V2) != GE_FALSE );
 
 	Result.X = V1->Y*V2->Z - V1->Z*V2->Y;
-    Result.Y = V1->Z*V2->X - V1->X*V2->Z;
-    Result.Z = V1->X*V2->Y - V1->Y*V2->X;
+	Result.Y = V1->Z*V2->X - V1->X*V2->Z;
+	Result.Z = V1->X*V2->Y - V1->Y*V2->X;
 
 	*VResult = Result;
 }
@@ -128,7 +128,7 @@ GENESISAPI geFloat GENESISCC geVec3d_Normalize(geVec3d *V1)
 {
 geFloat *fPtr;
 geFloat Dist,OneOverDist;
-	
+
 	fPtr = (geFloat *)V1;
 	Dist =  (*fPtr) * (*fPtr); fPtr++;
 	Dist += (*fPtr) * (*fPtr); fPtr++;
@@ -138,7 +138,7 @@ geFloat Dist,OneOverDist;
 	// required for the clib sqrt() are taking a lot of time.
 	// hence we use asm to access the geFloat fsqrt() directly
 
-	__asm 
+	__asm
 	{
 		FLD Dist
 		FSQRT
@@ -149,7 +149,7 @@ geFloat Dist,OneOverDist;
 		return 0.0f;
 
 	OneOverDist = 1.0f/Dist;
-		
+
 	fPtr = (geFloat *)V1;
 	*fPtr *= OneOverDist; fPtr++;
 	*fPtr *= OneOverDist; fPtr++;
@@ -170,7 +170,7 @@ GENESISAPI geFloat GENESISCC geVec3d_Normalize(geVec3d *V1)
 	if (Dist == 0.0)
 		return 0.0f;
 	OneOverDist = 1.0f/Dist;
-	
+
 	V1->X *= OneOverDist;
 	V1->Y *= OneOverDist;
 	V1->Z *= OneOverDist;
@@ -204,12 +204,12 @@ GENESISAPI void GENESISCC geVec3d_Scale(const geVec3d *VSrc, geFloat Scale, geVe
 }
 
 GENESISAPI geFloat GENESISCC geVec3d_LengthSquared(const geVec3d *V1)
-{	
+{
 	return geVec3d_DotProduct(V1, V1);
 }
 
 GENESISAPI geFloat GENESISCC geVec3d_Length(const geVec3d *V1)
-{	
+{
 	assert( geVec3d_IsValid(V1) != GE_FALSE );
 
 	return (geFloat)sqrt(geVec3d_DotProduct(V1, V1));
@@ -231,7 +231,7 @@ GENESISAPI void GENESISCC geVec3d_Add(const geVec3d *V1, const geVec3d *V2, geVe
 	assert( geVec3d_IsValid(V1) != GE_FALSE );
 	assert( geVec3d_IsValid(V2) != GE_FALSE );
 	assert ( V1PlusV2 != NULL );
-	
+
 	V1PlusV2->X = V1->X + V2->X;
 	V1PlusV2->Y = V1->Y + V2->Y;
 	V1PlusV2->Z = V1->Z + V2->Z;
@@ -242,7 +242,7 @@ GENESISAPI void GENESISCC geVec3d_MA(geVec3d *V1, geFloat Scale, const geVec3d *
 	assert( geVec3d_IsValid(V1) != GE_FALSE );
 	assert( geVec3d_IsValid(V2) != GE_FALSE );
 	assert ( V1PlusV2Scaled != NULL );
-	
+
 	V1PlusV2Scaled->X = V1->X + V2->X*Scale;
 	V1PlusV2Scaled->Y = V1->Y + V2->Y*Scale;
 	V1PlusV2Scaled->Z = V1->Z + V2->Z*Scale;
@@ -253,7 +253,7 @@ GENESISAPI void GENESISCC geVec3d_AddScaled(const geVec3d *V1, const geVec3d *V2
 	assert( geVec3d_IsValid(V1) != GE_FALSE );
 	assert( geVec3d_IsValid(V2) != GE_FALSE );
 	assert ( V1PlusV2Scaled != NULL );
-	
+
 	V1PlusV2Scaled->X = V1->X + V2->X*Scale;
 	V1PlusV2Scaled->Y = V1->Y + V2->Y*Scale;
 	V1PlusV2Scaled->Z = V1->Z + V2->Z*Scale;
@@ -263,14 +263,14 @@ GENESISAPI void GENESISCC geVec3d_Copy(const geVec3d *VSrc, geVec3d *VDst)
 {
 	assert ( VDst != NULL );
 	assert( geVec3d_IsValid(VSrc) != GE_FALSE );
-	
+
 	*VDst = *VSrc;
 }
 
 GENESISAPI void GENESISCC geVec3d_Clear(geVec3d *V)
 {
 	assert ( V != NULL );
-	
+
 	V->X = 0.0f;
 	V->Y = 0.0f;
 	V->Z = 0.0f;
@@ -279,16 +279,16 @@ GENESISAPI void GENESISCC geVec3d_Clear(geVec3d *V)
 GENESISAPI void GENESISCC geVec3d_Inverse(geVec3d *V)
 {
 	assert( geVec3d_IsValid(V) != GE_FALSE );
-	
+
 	V->X = -V->X;
 	V->Y = -V->Y;
 	V->Z = -V->Z;
 }
 
-GENESISAPI geFloat GENESISCC		geVec3d_DistanceBetween(const geVec3d *V1, const geVec3d *V2)	// returns length of V1-V2	
+GENESISAPI geFloat GENESISCC		geVec3d_DistanceBetween(const geVec3d *V1, const geVec3d *V2)	// returns length of V1-V2
 {
 	geVec3d B;
-	
+
 	assert( geVec3d_IsValid(V1) != GE_FALSE );
 	assert( geVec3d_IsValid(V2) != GE_FALSE );
 

@@ -1,11 +1,11 @@
 /****************************************************************************************/
-/*  XFORM3D.H                                                                           */
+/*  XForm3d.h                                                                           */
 /*                                                                                      */
 /*  Author:                                                                             */
 /*  Description: 3D transform interface                                                 */
 /*                                                                                      */
 /*  Edit History:                                                                       */
-/*	01/08/2004 Wendell Buckner                                                          */
+/*  01/08/2004 Wendell Buckner                                                          */
 /*    DOT3 BUMPMAPPING                                                                  */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
@@ -19,8 +19,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_XFORM_H
@@ -34,7 +34,7 @@ extern "C" {
 #endif
 
 typedef struct
-{	
+{
 	geFloat AX,AY,AZ;	// e[0][0],e[0][1],e[0][2]
 	geFloat BX,BY,BZ;	// e[1][0],e[1][1],e[1][2]
 	geFloat CX,CY,CZ;	// e[2][0],e[2][1],e[2][2]
@@ -45,10 +45,10 @@ typedef struct
 /*   this is essentially a 'standard' 4x4 transform matrix,
      with the bottom row always 0,0,0,1
 
-	| AX, AY, AZ, Translation.X |  
-	| BX, BY, BZ, Translation.Y |  
-	| CX, CY, CZ, Translation.Z |  
-	|  0,  0,  0,      1        |  
+	| AX, AY, AZ, Translation.X |
+	| BX, BY, BZ, Translation.Y |
+	| CX, CY, CZ, Translation.Z |
+	|  0,  0,  0,      1        |
 */
 
 //  all geXForm3d_Set* functions return a right-handed transform.
@@ -56,28 +56,28 @@ typedef struct
 #define GEXFORM3D_MINIMUM_SCALE (0.00001f)
 
 /*	01/08/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
+	DOT3 BUMPMAPPING */
 GENESISAPI void GENESISCC geXForm3d_RotateNoOrthogonal(
 	const geXForm3d *M,
-	const geVec3d *V, 
+	const geVec3d *V,
 	geVec3d *Result);
 
 GENESISAPI void GENESISCC geXForm3d_Copy(
-	const geXForm3d *Src, 
+	const geXForm3d *Src,
 	geXForm3d *Dst);
-	// copies Src to Dst.  
+	// copies Src to Dst.
 
 GENESISAPI geBoolean GENESISCC geXForm3d_IsValid(const geXForm3d *M);
-	// returns GE_TRUE if M is 'valid'  
+	// returns GE_TRUE if M is 'valid'
 	// 'valid' means that M is non NULL, and there are no NAN's in the matrix.
 
 //MRB BEGIN
 GENESISAPI geBoolean GENESISCC geXForm3d_IsIdentity(const geXForm3d *M);
-	// returns GE_TRUE if M is an identity matrix 
+	// returns GE_TRUE if M is an identity matrix
 //MRB END
 
 GENESISAPI geBoolean GENESISCC geXForm3d_IsOrthonormal(const geXForm3d *M);
-	// returns GE_TRUE if M is orthonormal 
+	// returns GE_TRUE if M is orthonormal
 	// (if the rows and columns are all normalized (transform has no scaling or shearing)
 	// and is orthogonal (row1 cross row2 = row3 & col1 cross col2 = col3)
 	// * does not check for right-handed convention *
@@ -88,18 +88,18 @@ GENESISAPI geBoolean GENESISCC geXForm3d_IsOrthogonal(const geXForm3d *M);
 	// * does not check for right-handed convention *
 
 GENESISAPI void GENESISCC geXForm3d_Orthonormalize(geXForm3d *M);
-	// essentially removes scaling (or other distortions) from 
-	// an orthogonal (or nearly orthogonal) matrix 
+	// essentially removes scaling (or other distortions) from
+	// an orthogonal (or nearly orthogonal) matrix
 	// returns a right-handed matrix
 
 
-GENESISAPI void GENESISCC geXForm3d_SetIdentity(geXForm3d *M);			
+GENESISAPI void GENESISCC geXForm3d_SetIdentity(geXForm3d *M);
 	// sets M to an identity matrix (clears it)
-	
+
 GENESISAPI void GENESISCC geXForm3d_SetXRotation(geXForm3d *M,geFloat RadianAngle);
 	// sets up a transform that rotates RadianAngle about X axis
 	// all existing contents of M are replaced
-	
+
 GENESISAPI void GENESISCC geXForm3d_SetYRotation(geXForm3d *M,geFloat RadianAngle);
 	// sets up a transform that rotates RadianAngle about Y axis
 	// all existing contents of M are replaced
@@ -116,8 +116,8 @@ GENESISAPI void GENESISCC geXForm3d_SetScaling(geXForm3d *M,geFloat x, geFloat y
 	// sets up a transform that scales by x,y,z
 	// all existing contents of M are replaced
 
-GENESISAPI void GENESISCC geXForm3d_RotateX(geXForm3d *M,geFloat RadianAngle);  
-	// Rotates M by RadianAngle about X axis   
+GENESISAPI void GENESISCC geXForm3d_RotateX(geXForm3d *M,geFloat RadianAngle);
+	// Rotates M by RadianAngle about X axis
 	// applies the rotation to the existing contents of M
 
 GENESISAPI void GENESISCC geXForm3d_RotateY(geXForm3d *M,geFloat RadianAngle);
@@ -128,35 +128,35 @@ GENESISAPI void GENESISCC geXForm3d_RotateZ(geXForm3d *M,geFloat RadianAngle);
 	// Rotates M by RadianAngle about Z axis
 	// applies the rotation to the existing contents of M
 
-GENESISAPI void GENESISCC geXForm3d_Translate(geXForm3d *M,geFloat x, geFloat y, geFloat z);	
+GENESISAPI void GENESISCC geXForm3d_Translate(geXForm3d *M,geFloat x, geFloat y, geFloat z);
 	// Translates M by x,y,z
 	// applies the translation to the existing contents of M
 
-GENESISAPI void GENESISCC geXForm3d_Scale(geXForm3d *M,geFloat x, geFloat y, geFloat z);		
+GENESISAPI void GENESISCC geXForm3d_Scale(geXForm3d *M,geFloat x, geFloat y, geFloat z);
 	// Scales M by x,y,z
 	// applies the scale to the existing contents of M
 
 GENESISAPI void GENESISCC geXForm3d_Multiply(
-	const geXForm3d *M1, 
-	const geXForm3d *M2, 
+	const geXForm3d *M1,
+	const geXForm3d *M2,
 	geXForm3d *MProduct);
 	// MProduct = matrix multiply of M1*M2
 	// Concatenates the transformation in the M2 matrix onto the transformation in M1
 
 GENESISAPI void GENESISCC geXForm3d_Transform(
 	const geXForm3d *M,
-	const geVec3d *V, 
+	const geVec3d *V,
 	geVec3d *Result);
 	// Result is Matrix M * Vector V:  V Tranformed by M
 
-GENESISAPI void GENESISCC geXForm3d_TransformArray(	const geXForm3d *XForm, 
-								const geVec3d *Source, 
-								geVec3d *Dest, 
+GENESISAPI void GENESISCC geXForm3d_TransformArray(	const geXForm3d *XForm,
+								const geVec3d *Source,
+								geVec3d *Dest,
 								int32 Count);
 
 GENESISAPI void GENESISCC geXForm3d_Rotate(
 	const geXForm3d *M,
-	const geVec3d *V, 
+	const geVec3d *V,
 	geVec3d *Result);
 	// Result is Matrix M * Vector V:  V Rotated by M (no translation)
 
@@ -178,14 +178,14 @@ GENESISAPI void GENESISCC geXForm3d_GetIn(const geXForm3d *M,  geVec3d *In);
 	// Gets a vector that is 'in' in the frame of reference of M (facing -Z)
 
 GENESISAPI void GENESISCC geXForm3d_GetTranspose(const geXForm3d *M, geXForm3d *MTranspose);
-	// Gets the Transpose transform of M   (M^T) 
+	// Gets the Transpose transform of M   (M^T)
 	// Transpose of a matrix is the switch of the rows and columns
-	// The transpose is usefull because it is rapidly computed and is equal to the inverse 
+	// The transpose is usefull because it is rapidly computed and is equal to the inverse
 	// transform for orthonormal transforms    [inverse is (M')  where M*M' = Identity ]
 
 GENESISAPI void GENESISCC geXForm3d_TransposeTransform(
-	const geXForm3d *M, 
-	const geVec3d *V, 
+	const geXForm3d *M,
+	const geVec3d *V,
 	geVec3d *Result);
 	// applies the transpose transform of M to V.  Result = (M^T) * V
 
@@ -196,25 +196,25 @@ GENESISAPI void GENESISCC geXForm3d_TransposeTransform(
 		then by Angles->Y around the Y axis, in the newly rotate coordinates
 		then by Angles->X around the X axis
 *
-******/	
+******/
 
 GENESISAPI void GENESISCC geXForm3d_GetEulerAngles(const geXForm3d *M, geVec3d *Angles);
 	// Finds Euler angles from M and puts them into Angles
-	
+
 GENESISAPI void GENESISCC geXForm3d_SetEulerAngles(geXForm3d *M, const geVec3d *Angles);
 	// Applies Euler angles to build M
 
 GENESISAPI void GENESISCC geXForm3d_SetFromLeftUpIn(
 	geXForm3d *M,
-	const geVec3d *Left, 
-	const geVec3d *Up, 
+	const geVec3d *Left,
+	const geVec3d *Up,
 	const geVec3d *In);
 	// Builds an geXForm3d from orthonormal Left, Up and In vectors
 
 GENESISAPI void GENESISCC geXForm3d_Mirror(
-	const		geXForm3d *Source, 
-	const		geVec3d *PlaneNormal, 
-	geFloat		PlaneDist, 
+	const		geXForm3d *Source,
+	const		geVec3d *PlaneNormal,
+	geFloat		PlaneDist,
 	geXForm3d	*Dest);
 	// Mirrors a XForm3d about a plane
 
