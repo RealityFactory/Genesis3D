@@ -19,6 +19,7 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
+#ifdef USE_DPLAY
 #ifndef GE_CSNETMGR_H
 #define GE_CSNETMGR_H
 
@@ -92,6 +93,8 @@ GENESISAPI geBoolean GENESISCC		geCSNetMgr_SendToClient(geCSNetMgr *M, geCSNetMg
 // GENESIS_PRIVATE_APIS
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif

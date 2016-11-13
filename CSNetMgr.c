@@ -19,6 +19,7 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
+#ifdef USE_DPLAY
 #include <assert.h>
 
 //#define INITGUID
@@ -651,3 +652,5 @@ GENESISAPI geBoolean GENESISCC geCSNetMgr_SendToClient(geCSNetMgr *M, geCSNetMgr
 
 	return GE_TRUE;
 }
+
+#endif

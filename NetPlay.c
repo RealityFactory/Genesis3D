@@ -19,6 +19,7 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
+#ifdef USE_DPLAY
 #define IDIRECTPLAY2_OR_GREATER
 
 #include <windows.h>
@@ -861,3 +862,5 @@ static void DoDPError(HRESULT Hr)
 		break;
 	}
 }
+
+#endif

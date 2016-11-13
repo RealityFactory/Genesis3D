@@ -19,6 +19,7 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
+#ifdef USE_DPLAY
 #ifndef GE_NETPLAY_H
 #define GE_NETPLAY_H
 
@@ -71,6 +72,8 @@ BOOL			AFX_CPrintfC(char *String);
 
 #ifdef	__cplusplus
 }
+#endif
+
 #endif
 
 #endif
