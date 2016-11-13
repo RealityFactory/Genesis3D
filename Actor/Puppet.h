@@ -1,8 +1,8 @@
 /****************************************************************************************/
-/*  PUPPET.H																			*/
+/*  Puppet.h                                                                            */
 /*                                                                                      */
-/*  Author: Mike Sandige	                                                            */
-/*  Description: Puppet interface.										.				*/
+/*  Author: Mike Sandige                                                                */
+/*  Description: Puppet interface.                                                      */
 /*                                                                                      */
 /*  Edit History:                                                                       */
 /*  03/24/2004 Wendell Buckner                                                          */
@@ -45,34 +45,34 @@ gePuppet *GENESISCC gePuppet_Create(geVFile *TextureFS, const geBody *B, geWorld
 
 void GENESISCC gePuppet_Destroy(gePuppet **P);
 
-geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P, 
-					const gePose *Joints, 
-					const geExtBox *Box, 
-					geEngine *Engine, 
+geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
+					const gePose *Joints,
+					const geExtBox *Box,
+					geEngine *Engine,
 					geWorld *World,
-					const geCamera *Camera, 
+					const geCamera *Camera,
 					Frustum_Info *FInfo);
 
 // changed QD Clipping
 geBoolean GENESISCC gePuppet_Render(const gePuppet *P,
 					const gePose *Joints,
-					geEngine *Engine, 
+					geEngine *Engine,
 					geWorld *World,
-					const geCamera *Camera, 
+					const geCamera *Camera,
 					geExtBox *Box,
 					Frustum_Info *FInfo);
 
 // changed QD Shadows
 geBoolean GENESISCC gePuppet_RenderShadowVolume(gePuppet *P,
 					const gePose *Joints,
-					geEngine *Engine, 
+					geEngine *Engine,
 					geWorld *World,
 					const geCamera *Camera,
 					GFX_Plane* FPlanes,//Frustum_Info *FrustumInfo,
 					geVec3d *LightPos,
 					geFloat Radius,
-					int LightType, 
-					geVec3d* Dir, 
+					int LightType,
+					geVec3d* Dir,
 					geFloat Arc,
 					geBoolean ZPass);
 
@@ -83,18 +83,18 @@ void GENESISCC gePuppet_SetStencilShadow(gePuppet *P, geBoolean DoStencilShadow)
 // end change QD Shadows
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) */
+	BUG FIX: Rendering Transparent Polys properly (2) */
 geBoolean GENESISCC gePuppet_AddToGList ( const GE_TLVertex *Points, int NumPoints, const geBitmap *Bitmap, uint32 Flags, geBoolean Flush );
 geBoolean GENESISCC gePuppet_IsTransparent ( const geFloat OverallAlpha, const geBitmap **Bitmap, geBoolean *IsTransparent, uint32 Count );
 
 int GENESISCC gePuppet_GetMaterialCount( gePuppet *P );
 geBoolean GENESISCC gePuppet_GetMaterial( gePuppet *P, int MaterialIndex,
-									geBitmap **Bitmap, 
+									geBitmap **Bitmap,
 									geFloat *Red, geFloat *Green, geFloat *Blue);
-geBoolean GENESISCC gePuppet_SetMaterial(gePuppet *P, int MaterialIndex, geBitmap *Bitmap, 
+geBoolean GENESISCC gePuppet_SetMaterial(gePuppet *P, int MaterialIndex, geBitmap *Bitmap,
 										geFloat Red, geFloat Green, geFloat Blue);
 
-void GENESISCC gePuppet_SetShadow(gePuppet *P, geBoolean DoShadow, geFloat Scale, 
+void GENESISCC gePuppet_SetShadow(gePuppet *P, geBoolean DoShadow, geFloat Scale,
 						const geBitmap *ShadowMap,int BoneIndex);
 
 // LWM_ACTOR_RENDERING
@@ -106,20 +106,20 @@ void GENESISCC gePuppet_SetEnvironmentOptions( gePuppet *P, geEnvironmentOptions
 
 geEnvironmentOptions GENESISCC gePuppet_GetEnvironmentOptions( gePuppet *P );
 
-void GENESISCC gePuppet_GetStaticLightingOptions(const gePuppet *P,	geBoolean *AmbientLightFromStaticLights,	geBoolean *TestRayCollision,	int *MaxStaticLightsToUse	);	
+void GENESISCC gePuppet_GetStaticLightingOptions(const gePuppet *P,	geBoolean *AmbientLightFromStaticLights,	geBoolean *TestRayCollision,	int *MaxStaticLightsToUse	);
 void GENESISCC gePuppet_SetStaticLightingOptions(gePuppet *P,	geBoolean AmbientLightFromStaticLights,	geBoolean TestRayCollision,	int MaxStaticLightsToUse	);
 
 void GENESISCC gePuppet_GetLightingOptions(const gePuppet *P,
 	geBoolean *UseFillLight,
 	geVec3d *FillLightNormal,
-	geFloat *FillLightRed,				
-	geFloat *FillLightGreen,				
-	geFloat *FillLightBlue,				
-	geFloat *AmbientLightRed,			
-	geFloat *AmbientLightGreen,			
-	geFloat *AmbientLightBlue,			
+	geFloat *FillLightRed,
+	geFloat *FillLightGreen,
+	geFloat *FillLightBlue,
+	geFloat *AmbientLightRed,
+	geFloat *AmbientLightGreen,
+	geFloat *AmbientLightBlue,
 	geBoolean *UseAmbientLightFromFloor,
-	int *MaximumDynamicLightsToUse,		
+	int *MaximumDynamicLightsToUse,
 	int *LightReferenceBoneIndex,
 	geBoolean *PerBoneLighting
 	);

@@ -1,12 +1,12 @@
 /****************************************************************************************/
-/*  BODYINST.C                                                                          */
+/*  BodyInst.c                                                                          */
 /*                                                                                      */
-/*  Author: Mike Sandige	                                                            */
+/*  Author: Mike Sandige                                                                */
 /*  Description: Actor body instance implementation.                                    */
 /*                                                                                      */
 /*                                                                                      */
 /*  Edit History:                                                                       */
-/*	01/08/2004 Wendell Buckner                                                          */ 
+/*  01/08/2004 Wendell Buckner                                                          */
 /*   DOT3 BUMPMAPPING                                                                   */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
@@ -20,7 +20,7 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                                      */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
@@ -43,7 +43,7 @@ typedef struct geBodyInst
 } geBodyInst;
 
 /*	01/08/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
+	DOT3 BUMPMAPPING */
 void GENESISCC geBodyInst_SetVertexColorDot3( geVec3d LightPosition, const geXForm3d *Mdl2WldXFA, const geBodyInst *BI, int16 VertexIndex, geFloat *ColorDot3, int16 LightType, geBoolean *Reset )
 {
 	geBody_SetVertexColorDot3( LightPosition, Mdl2WldXFA, BI->BodyTemplate, VertexIndex, ColorDot3, LightType, Reset );
@@ -71,26 +71,26 @@ geBodyInst *GENESISCC geBodyInst_Create(const geBody *B)
 	geBodyInst *BI;
 	assert( B != NULL );
 	assert( geBody_IsValid(B) != GE_FALSE );
-	
+
 	BI = GE_RAM_ALLOCATE_STRUCT(geBodyInst);
 	if (BI == NULL)
 	{
 		geErrorLog_Add(ERR_BODY_ENOMEM, NULL);
 		return NULL;
 	}
-	
+
 	BI->BodyTemplate = B;
-	
+
 	{
 		geBodyInst_Geometry *G = &(BI->ExportGeometry);
 		G->SkinVertexCount =0;
 		G->SkinVertexArray = NULL;
-		
+
 		G->NormalCount = 0;
 		G->NormalArray = NULL;
-		
+
 		G->FaceCount = (geBody_Index) 0;
-		G->FaceListSize = 0; 
+		G->FaceListSize = 0;
 		G->FaceList = NULL;
 	}
 
@@ -99,7 +99,7 @@ geBodyInst *GENESISCC geBodyInst_Create(const geBody *B)
 
 	return BI;
 }
-			
+
 
 void GENESISCC geBodyInst_Destroy( geBodyInst **BI)
 {
@@ -107,25 +107,25 @@ void GENESISCC geBodyInst_Destroy( geBodyInst **BI)
 	assert( BI != NULL );
 	assert( *BI != NULL );
 	G = &( (*BI)->ExportGeometry );
-	
+
 	if (G->SkinVertexArray != NULL )
 	{
 		geRam_Free( G->SkinVertexArray );
 		G->SkinVertexArray = NULL;
 	}
-	
+
 	if (G->NormalArray != NULL )
 	{
 		geRam_Free( G->NormalArray );
 		G->NormalArray = NULL;
 	}
-	
+
 	if (G->FaceList != NULL )
 	{
 		geRam_Free( G->FaceList );
 		G->FaceList = NULL;
 	}
-	
+
 	geRam_Free( *BI );
 	*BI = NULL;
 }
@@ -134,13 +134,13 @@ void GENESISCC geBodyInst_Destroy( geBodyInst **BI)
 
 #define GE_BODYINST_FACELIST_SIZE_FOR_TRIANGLE (8)
 
-static geBodyInst_Geometry *GENESISCC geBodyInst_GetGeometryPrep(	
-	geBodyInst *BI, 
+static geBodyInst_Geometry *GENESISCC geBodyInst_GetGeometryPrep(
+	geBodyInst *BI,
 	int LevelOfDetail)
 {
 	const geBody *B;
 	geBodyInst_Geometry *G;
-	
+
 	assert( BI != NULL );
 	assert( geBody_IsValid(BI->BodyTemplate) != GE_FALSE );
 	B = BI->BodyTemplate;
@@ -154,16 +154,16 @@ static geBodyInst_Geometry *GENESISCC geBodyInst_GetGeometryPrep(
 		{
 			geRam_Free(G->SkinVertexArray);
 		}
-	
+
 		G->SkinVertexArray = GE_RAM_ALLOCATE_ARRAY(geBodyInst_SkinVertex,B->XSkinVertexCount);
-		
+
 		if(G->SkinVertexArray == NULL)
 		{
 			geErrorLog_Add(ERR_BODY_ENOMEM, NULL);
 			G->SkinVertexCount = 0;
 			return NULL;
 		}
-		
+
 		G->SkinVertexCount  = B->XSkinVertexCount;
 	}
 
@@ -173,9 +173,9 @@ static geBodyInst_Geometry *GENESISCC geBodyInst_GetGeometryPrep(
 		{
 			geRam_Free(G->NormalArray);
 		}
-	
+
 		G->NormalArray = GE_RAM_ALLOCATE_ARRAY( geVec3d,B->SkinNormalCount);
-		
+
 		if(G->NormalArray == NULL)
 		{
 			geErrorLog_Add(ERR_BODY_ENOMEM, NULL);
@@ -191,12 +191,12 @@ static geBodyInst_Geometry *GENESISCC geBodyInst_GetGeometryPrep(
 		{
 			geRam_Free(G->FaceList);
 		}
-	
-		G->FaceListSize = sizeof(geBody_Index) * 
-					B->SkinFaces[GE_BODY_HIGHEST_LOD].FaceCount * 
+
+		G->FaceListSize = sizeof(geBody_Index) *
+					B->SkinFaces[GE_BODY_HIGHEST_LOD].FaceCount *
 					GE_BODYINST_FACELIST_SIZE_FOR_TRIANGLE;
 		G->FaceList = GE_RAM_ALLOCATE_ARRAY(geBody_Index,
-							B->SkinFaces[GE_BODY_HIGHEST_LOD].FaceCount * 
+							B->SkinFaces[GE_BODY_HIGHEST_LOD].FaceCount *
 							GE_BODYINST_FACELIST_SIZE_FOR_TRIANGLE);
 		if(G->FaceList == NULL)
 		{
@@ -204,14 +204,14 @@ static geBodyInst_Geometry *GENESISCC geBodyInst_GetGeometryPrep(
 			BI->FaceCount = 0;
 			return NULL;
 		}
-	
+
 		BI->FaceCount = B->SkinFaces[GE_BODY_HIGHEST_LOD].FaceCount;
 	}
 	return G;
 }
 
 const geBodyInst_Geometry *GENESISCC geBodyInst_GetGeometry(
-	const geBodyInst *BI, 
+	const geBodyInst *BI,
 	const geVec3d *ScaleVector,
 	const geXFArray *BoneTransformArray,
 	int LevelOfDetail,
@@ -227,7 +227,7 @@ const geBodyInst_Geometry *GENESISCC geBodyInst_GetGeometry(
 	assert( BI != NULL );
 	assert( BoneTransformArray != NULL );
 	assert( geBody_IsValid(BI->BodyTemplate) != GE_FALSE );
-	
+
 	G = geBodyInst_GetGeometryPrep((geBodyInst *)BI,LevelOfDetail);
 	if(G == NULL)
 	{
@@ -244,15 +244,15 @@ const geBodyInst_Geometry *GENESISCC geBodyInst_GetGeometry(
 	}
 
 	if(BoneXFCount != B->BoneCount)
-	{	
+	{
 		geErrorLog_Add(ERR_BODY_BONEXFARRAY, NULL);
 		return NULL;
 	}
 
 
-	{	
+	{
 		int i,LevelOfDetailBit;
-	
+
 		if (Camera != NULL)
 		{
 			// transform and project all appropriate points
@@ -262,19 +262,19 @@ const geBodyInst_Geometry *GENESISCC geBodyInst_GetGeometry(
 			BoneIndex = -1;  // S->BoneIndex won't ever be this.
 			geVec3d_Set(&(G->Maxs), -GE_BODY_REALLY_BIG_NUMBER, -GE_BODY_REALLY_BIG_NUMBER, -GE_BODY_REALLY_BIG_NUMBER );
 			geVec3d_Set(&(G->Mins), GE_BODY_REALLY_BIG_NUMBER, GE_BODY_REALLY_BIG_NUMBER, GE_BODY_REALLY_BIG_NUMBER );
-		
-			for (i=B->XSkinVertexCount,S=B->XSkinVertexArray,D=G->SkinVertexArray; 
-					 i>0; 
+
+			for (i=B->XSkinVertexCount,S=B->XSkinVertexArray,D=G->SkinVertexArray;
+					 i>0;
 					 i--,S++,D++)
 			{
 				geXForm3d ObjectToCamera;
-				
+
 				if (S->BoneIndex!=BoneIndex)
-				{ 
+				{
 					//Keep XSkinVertexArray sorted by BoneIndex for best performance
 					BoneIndex = S->BoneIndex;
-				
-					geXForm3d_Multiply(	geCamera_GetCameraSpaceXForm(Camera), 
+
+					geXForm3d_Multiply(	geCamera_GetCameraSpaceXForm(Camera),
 														&(BoneXFArray[BoneIndex]),
 														&ObjectToCamera);
 					geBodyInst_PostScale(&ObjectToCamera,ScaleVector,&ObjectToCamera);
@@ -284,7 +284,7 @@ const geBodyInst_Geometry *GENESISCC geBodyInst_GetGeometry(
 					geVec3d *VecDestPtr = &(D->SVPoint);
 					geXForm3d_Transform(  &(ObjectToCamera),
 													&(S->XPoint),VecDestPtr);
-					
+
 					// changed QD Clipping
 					// projection is now done in puppet.c
 					/*
@@ -303,7 +303,7 @@ const geBodyInst_Geometry *GENESISCC geBodyInst_GetGeometry(
 					if (VecDestPtr->Z < G->Mins.Z ) G->Mins.Z = VecDestPtr->Z;
 					D->ReferenceBoneIndex=BoneIndex;
 				}
-			}			
+			}
 		}
 		else
 		{
@@ -314,13 +314,13 @@ const geBodyInst_Geometry *GENESISCC geBodyInst_GetGeometry(
 			BoneIndex = -1;  // S->BoneIndex won't ever be this.
 			geVec3d_Set(&(G->Maxs), -GE_BODY_REALLY_BIG_NUMBER, -GE_BODY_REALLY_BIG_NUMBER, -GE_BODY_REALLY_BIG_NUMBER );
 			geVec3d_Set(&(G->Mins), GE_BODY_REALLY_BIG_NUMBER, GE_BODY_REALLY_BIG_NUMBER, GE_BODY_REALLY_BIG_NUMBER );
-				
-			for (i=B->XSkinVertexCount,S=B->XSkinVertexArray,D=G->SkinVertexArray; 
-				 i>0; 
+
+			for (i=B->XSkinVertexCount,S=B->XSkinVertexArray,D=G->SkinVertexArray;
+				 i>0;
 				 i--,S++,D++)
 			{
 				geXForm3d ObjectToWorld;
-				
+
 				if (S->BoneIndex!=BoneIndex)
 				{ //Keep XSkinVertexArray sorted by BoneIndex for best performance
 					BoneIndex = S->BoneIndex;
@@ -350,7 +350,7 @@ const geBodyInst_Geometry *GENESISCC geBodyInst_GetGeometry(
 			geVec3d *D;
 			// rotate all appropriate normals
 			for (i=B->SkinNormalCount,S=B->SkinNormalArray,D=G->NormalArray;
-				 i>0; 
+				 i>0;
 				 i--,S++,D++)
 			{
 				if ( S->LevelOfDetailMask && LevelOfDetailBit )
@@ -373,7 +373,7 @@ const geBodyInst_Geometry *GENESISCC geBodyInst_GetGeometry(
 		Count = B->SkinFaces[LevelOfDetail].FaceCount;
 
 		for (i=0,T=B->SkinFaces[LevelOfDetail].FaceArray,D=G->FaceList;
-				i<Count; 
+				i<Count;
 				i++,T++,B++)
 		{
 			*D = GE_BODYINST_FACE_TRIANGLE;
@@ -394,5 +394,5 @@ const geBodyInst_Geometry *GENESISCC geBodyInst_GetGeometry(
 	}
 
 	return G;
-}	
+}
 

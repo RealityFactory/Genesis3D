@@ -1,8 +1,8 @@
 /****************************************************************************************/
-/*  STRBLOCK.C																			*/
+/*  StrBlock.c                                                                          */
 /*                                                                                      */
-/*  Author: Mike Sandige	                                                            */
-/*  Description: String block implementation.											*/
+/*  Author: Mike Sandige                                                                */
+/*  Description: String block implementation.                                           */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -15,16 +15,16 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 // strblock.c
 //   a list of strings implemented as a single block of memory for fast
-//   loading.  The 'Data' Field is interpreted as an array of integer 
+//   loading.  The 'Data' Field is interpreted as an array of integer
 //   offsets relative to the beginning of the data field.  After the int list
-//   is the packed string data.  Since no additional allocations are needed 
-//   this object can be file loaded as one block. 
+//   is the packed string data.  Since no additional allocations are needed
+//   this object can be file loaded as one block.
 #include <string.h>
 #include <assert.h>
 #include <stdio.h>
@@ -39,12 +39,12 @@ typedef struct geStrBlock
 {
 	int Count;
 	geStrBlock *SanityCheck;
-	union 
+	union
 		{
 			int IntArray[1];		// char offset into CharArray for string[n]
 			char CharArray[1];
 		} Data;
-		
+
 } geStrBlock;
 
 
@@ -75,7 +75,7 @@ int GENESISCC geStrBlock_GetChecksum(const geStrBlock *SB)
 geStrBlock *GENESISCC geStrBlock_Create(void)
 {
 	geStrBlock *SB;
-	
+
 	SB = GE_RAM_ALLOCATE_STRUCT(geStrBlock);
 
 	if ( SB == NULL )
@@ -93,7 +93,7 @@ void GENESISCC geStrBlock_Destroy(geStrBlock **SB)
 {
 	assert( (*SB)->SanityCheck == (*SB) );
 	assert(  SB != NULL );
-	assert( *SB != NULL );	
+	assert( *SB != NULL );
 	geRam_Free( *SB );
 	*SB = NULL;
 }
@@ -130,7 +130,7 @@ void GENESISCC geStrBlock_Delete(geStrBlock **ppSB,int Nth)
 	String = geStrBlock_GetString(*ppSB,Nth);
 	assert( String != NULL );
 	StringLen = strlen(String) + 1;
-		
+
 	BlockSize = geStrBlock_BlockSize(*ppSB);
 
 	{
@@ -159,11 +159,11 @@ void GENESISCC geStrBlock_Delete(geStrBlock **ppSB,int Nth)
 				BlockSize - ( sizeof(int) *  (Nth+1) ) );
 
 	}
-	
+
 	{
 		geStrBlock * NewgeStrBlock;
 
-		NewgeStrBlock = geRam_Realloc( *ppSB, 
+		NewgeStrBlock = geRam_Realloc( *ppSB,
 			BlockSize				// size of data block
 			+ sizeof(geStrBlock)		// size of strblock structure
 			- StringLen				// size of dying string
@@ -194,7 +194,7 @@ geBoolean GENESISCC geStrBlock_SetString(geStrBlock **ppSB, int Index, const cha
 			geErrorLog_Add(ERR_STRBLOCK_ENOMEM, NULL);
 			return GE_FALSE;
 		}
-			
+
 	geStrBlock_Delete(ppSB,Index);
 	return GE_TRUE;
 }
@@ -207,14 +207,14 @@ geBoolean GENESISCC geStrBlock_Insert(geStrBlock **ppSB,int InsertAfterIndex,con
 	int BlockSize;
 	int StringLen;
 	int MoveSize;
-	
+
 	assert(  ppSB  != NULL );
 	assert( *ppSB  != NULL );
 	assert( InsertAfterIndex >=-1);
 	assert( InsertAfterIndex < (*ppSB)->Count );
 	assert( (*ppSB)->SanityCheck == (*ppSB) );
 	assert( String != NULL );
-	
+
 	if (InsertAfterIndex == (*ppSB)->Count - 1)
 		{
 			if (geStrBlock_Append(ppSB,String)==GE_FALSE)
@@ -226,13 +226,13 @@ geBoolean GENESISCC geStrBlock_Insert(geStrBlock **ppSB,int InsertAfterIndex,con
 		}
 
 	StringLen = strlen(String) + 1;
-		
+
 	BlockSize = geStrBlock_BlockSize(*ppSB);
 
 	{
 		geStrBlock * NewgeStrBlock;
 
-		NewgeStrBlock = geRam_Realloc( *ppSB, 
+		NewgeStrBlock = geRam_Realloc( *ppSB,
 			BlockSize				// size of data block
 			+ sizeof(geStrBlock)	// size of strblock structure
 			+ StringLen				// size of new string
@@ -253,11 +253,11 @@ geBoolean GENESISCC geStrBlock_Insert(geStrBlock **ppSB,int InsertAfterIndex,con
 		char *MoveFrom;
 		char *MoveTo=NULL;
 		int i;
-		
+
 		MoveFrom  = &(Chars[Table[InsertAfterIndex+1]]);
-		
+
 		MoveTo = MoveFrom + StringLen;
-		
+
 		for (i=InsertAfterIndex+1,MoveSize = 0; i<B->Count ; i++)
 			{
 				MoveSize += strlen(&(Chars[Table[i]])) +1;
@@ -273,12 +273,12 @@ geBoolean GENESISCC geStrBlock_Insert(geStrBlock **ppSB,int InsertAfterIndex,con
 		memmove(&(Table[InsertAfterIndex+1]),
 				&(Table[InsertAfterIndex+2]),
 				BlockSize - ( sizeof(int) *  (InsertAfterIndex+2) ) );
-		Table[InsertAfterIndex+1] = Table[InsertAfterIndex] 
+		Table[InsertAfterIndex+1] = Table[InsertAfterIndex]
 						+ strlen(&(Chars[Table[InsertAfterIndex]])) +1;
 
 	}
-	
-	
+
+
 	(*ppSB)->Count++;
 	return GE_TRUE;
 
@@ -330,7 +330,7 @@ geBoolean GENESISCC geStrBlock_Append(geStrBlock **ppSB,const char *String)
 	{
 		geStrBlock * NewgeStrBlock;
 
-		NewgeStrBlock = geRam_Realloc( *ppSB, 
+		NewgeStrBlock = geRam_Realloc( *ppSB,
 			BlockSize				// size of data block
 			+ sizeof(geStrBlock)		// size of strblock structure
 			+ strlen(String) + 1		// size of new string
@@ -364,7 +364,7 @@ geBoolean GENESISCC geStrBlock_Append(geStrBlock **ppSB,const char *String)
 	return GE_TRUE;
 }
 
-	
+
 const char *GENESISCC geStrBlock_GetString(const geStrBlock *SB, int Index)
 {
 	assert( SB != NULL );
@@ -448,9 +448,9 @@ geStrBlock* GENESISCC geStrBlock_CreateFromFile(geVFile* pFile)
 			{
 				int i,Count;
 				if(sscanf(line + sizeof(STRBLOCK_STRINGARRAY_ID)-1, "%d", &Count) != 1)
-					{						
+					{
 						geErrorLog_Add( ERR_STRBLOCK_FILE_READ , NULL);
-						break;		 
+						break;
 					}
 				for (i=0; i<Count;i++)
 					{
@@ -477,7 +477,7 @@ geStrBlock* GENESISCC geStrBlock_CreateFromFile(geVFile* pFile)
 				NumItemsRead++;
 			}
 
-			
+
 		}
 
 		if(NumItemsNeeded == NumItemsRead)
@@ -500,7 +500,7 @@ geStrBlock* GENESISCC geStrBlock_CreateFromFile(geVFile* pFile)
 			}
 		return geStrBlock_CreateFromBinaryFile(pFile);
 	}
-			
+
 	geErrorLog_Add( ERR_STRBLOCK_FILE_PARSE , NULL);
 	return NULL;
 }
@@ -524,7 +524,7 @@ geBoolean GENESISCC geStrBlock_WriteToFile(const geStrBlock *SB,geVFile *pFile)
 	}
 
 	// Write the version
-	if	(geVFile_Printf(pFile, " %X.%.2X\n", (STRBLOCK_FILE_VERSION & 0xFF00) >> 8, 
+	if	(geVFile_Printf(pFile, " %X.%.2X\n", (STRBLOCK_FILE_VERSION & 0xFF00) >> 8,
 									STRBLOCK_FILE_VERSION & 0x00FF) == GE_FALSE)
 	{
 		geErrorLog_Add( ERR_STRBLOCK_FILE_WRITE , NULL);
@@ -567,15 +567,15 @@ static geStrBlock *GENESISCC geStrBlock_CreateFromBinaryFile(geVFile *pFile)
 			geErrorLog_Add( ERR_STRBLOCK_FILE_READ , NULL);
 			return NULL;
 		}
-	
+
 	SB = geRam_Allocate( sizeof(geStrBlock) + Header.Size );
 	if( SB == NULL )
 		{
 			geErrorLog_Add(ERR_STRBLOCK_ENOMEM, NULL);
-			return NULL;	
+			return NULL;
 		}
 	SB->SanityCheck = SB;
-	SB->Count = Header.Count; 
+	SB->Count = Header.Count;
 
 	if (geVFile_Read(pFile, &(SB->Data),Header.Size) == GE_FALSE)
 		{
@@ -584,7 +584,7 @@ static geStrBlock *GENESISCC geStrBlock_CreateFromBinaryFile(geVFile *pFile)
 		}
 	return SB;
 }
-			
+
 
 geBoolean GENESISCC geStrBlock_WriteToBinaryFile(const geStrBlock *SB,geVFile *pFile)
 {
@@ -611,12 +611,12 @@ geBoolean GENESISCC geStrBlock_WriteToBinaryFile(const geStrBlock *SB,geVFile *p
 			geErrorLog_Add( ERR_STRBLOCK_FILE_WRITE , NULL);
 			return GE_FALSE;
 		}
-	
+
 	if (geVFile_Write(pFile, &(SB->Data),Header.Size) == GE_FALSE)
 		{
 			geErrorLog_Add( ERR_STRBLOCK_FILE_WRITE , NULL);
 			return GE_FALSE;
 		}
-		
+
 	return GE_TRUE;
 }

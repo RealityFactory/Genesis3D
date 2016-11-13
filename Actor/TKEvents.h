@@ -1,8 +1,8 @@
 /****************************************************************************************/
-/*  TKARRAY.H																			*/
+/*  TKEvents.h                                                                          */
 /*                                                                                      */
-/*  Author: Stephen Balkum	                                                            */
-/*  Description: Time-keyed events interface.											*/
+/*  Author: Stephen Balkum                                                              */
+/*  Description: Time-keyed events interface.                                           */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_TKEVENTS_H
@@ -51,7 +51,7 @@ geBoolean GENESISCC geTKEvents_Insert(geTKEvents* pEvents, geTKEvents_TimeType t
 	// Inserts the new key and corresponding data.
 
 geBoolean GENESISCC geTKEvents_Delete(geTKEvents* pEvents, geTKEvents_TimeType tKey);
-	// Deletes the key 
+	// Deletes the key
 
 geTKEvents* GENESISCC geTKEvents_CreateFromFile(
 	geVFile* pFile);					// stream positioned at array data
@@ -74,7 +74,7 @@ void GENESISCC geTKEvents_SetupIterator(
 	geTKEvents_TimeType StartTime,				// Inclusive search start
 	geTKEvents_TimeType EndTime);				// Non-inclusive search stop
 	// For searching or querying the array for events between two times
-	// times are compaired [StartTime,EndTime), '[' is inclusive, ')' is 
+	// times are compaired [StartTime,EndTime), '[' is inclusive, ')' is
 	// non-inclusive.  This prepares the PathGetNextEvent() function.
 
 geBoolean GENESISCC geTKEvents_GetNextEvent(
@@ -84,7 +84,7 @@ geBoolean GENESISCC geTKEvents_GetNextEvent(
 	// Iterates from StartTime to EndTime as setup in geTKEvents_CreateIterator()
 	// and for each event between these times [StartTime,EndTime)
 	// this function will return Time and EventString returned for that event
-	// and the iterator will be positioned for the next search.  When there 
+	// and the iterator will be positioned for the next search.  When there
 	// are no more events in the range, this function will return GE_FALSE (Time
 	// will be 0 and ppEventString will be empty).
 

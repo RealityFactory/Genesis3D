@@ -1,8 +1,8 @@
 /****************************************************************************************/
-/*  POSE.C																				*/
+/*  Pose.c                                                                              */
 /*                                                                                      */
-/*  Author: Mike Sandige	                                                            */
-/*  Description: Bone hierarchy implementation.							.				*/
+/*  Author: Mike Sandige                                                                */
+/*  Description: Bone hierarchy implementation.                                         */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #pragma message ("could optimize a name binded setPose by caching the mapping from motionpath[i] to joint[j]")
@@ -34,8 +34,8 @@
 
 /* this object maintains a hierarchy of joints.
    the hierarchy is stored as an array of joints, with each joint having an number
-   that is it's parent's index in the array.  
-   This code assumes:  
+   that is it's parent's index in the array.
+   This code assumes:
    **The parent's index is always smaller than the child**
 */
 
@@ -45,13 +45,13 @@ typedef struct gePose_Joint
 	geXForm3d    *Transform;		// matrix for path	(pointer into TransformArray)
 	geQuaternion Rotation;			// quaternion representation for orientation of above Transform
 
-	geVec3d		 UnscaledAttachmentTranslation;	
+	geVec3d		 UnscaledAttachmentTranslation;
 					// point of Attachment to parent (in parent frame of ref) **Unscaled
 	geQuaternion AttachmentRotation;// rotation of attachement to parent (in parent frame of ref)
 	geXForm3d    AttachmentTransform;	//------------
 
-	geVec3d		 LocalTranslation;	// translation relative to attachment 
-	geQuaternion LocalRotation;		// rotation relative to attachment 
+	geVec3d		 LocalTranslation;	// translation relative to attachment
+	geQuaternion LocalRotation;		// rotation relative to attachment
 
 	geBoolean    Touched;			// if this joint has been touched and needs recomputation
 	geBoolean    NoAttachmentRotation; // GE_TRUE if there is no attachment rotation.
@@ -62,17 +62,17 @@ typedef struct gePose
 {
 	int				  JointCount;	// number of joints in the motion
 	int32			  NameChecksum;	// checksum based on joint names and list order
-	geBoolean		  Touched;		// if any joint has been touched & needs recomputation	
+	geBoolean		  Touched;		// if any joint has been touched & needs recomputation
 	geStrBlock		 *JointNames;
 	geVec3d			  Scale;		// current scaling. Used for scaling motion samples
 
 	geBoolean		  Slave;			// if pose is 'slaved' to parent -vs- attached.
 	int				  SlaveJointIndex;	// index of 'slaved' joint
-	gePose			 *Parent;		
-	gePose_Joint	  RootJoint;		
+	gePose			 *Parent;
+	gePose_Joint	  RootJoint;
 	geXForm3d		  ParentsLastTransform;	// Compared to parent's transform to see if it changed: recompute is needed
 	geXForm3d		  RootTransform;
-	geXFArray		 *TransformArray;	
+	geXFArray		 *TransformArray;
 	gePose_Joint	 *JointArray;
 	int				  OnlyThisJoint;		// update only this joint (and it's parents) if this is >0
 } gePose;
@@ -94,10 +94,10 @@ static void gePose_ReattachTransforms(gePose *P)
 			assert( P->TransformArray != NULL );
 
 			XForms = geXFArray_GetElements(P->TransformArray,&XFormCount);
-			
+
 			assert( XForms != NULL );
 			assert( XFormCount == JointCount );
-			
+
 			for (i=0; i<JointCount; i++)
 				{
 					P->JointArray[i].Transform=&(XForms[i]);
@@ -105,7 +105,7 @@ static void gePose_ReattachTransforms(gePose *P)
 		}
 	P->RootJoint.Transform = &(P->RootTransform);
 }
-	
+
 
 static const gePose_Joint *gePose_JointByIndex(const gePose *P, int Index)
 {
@@ -127,9 +127,9 @@ static void GENESISCC gePose_SetAttachmentRotationFlag( gePose_Joint *Joint)
 {
 	geQuaternion Q = Joint->AttachmentRotation;
 #define GE_POSE_ROTATION_THRESHOLD (0.0001)  // if the rotation is closer than this to zero for
-										     // quaterion elements X,Y,Z -> no rotation computed
-	if (     (  (Q.X<GE_POSE_ROTATION_THRESHOLD) && (Q.X>-GE_POSE_ROTATION_THRESHOLD) ) 
-		  && (  (Q.Y<GE_POSE_ROTATION_THRESHOLD) && (Q.Y>-GE_POSE_ROTATION_THRESHOLD) ) 
+											 // quaterion elements X,Y,Z -> no rotation computed
+	if (     (  (Q.X<GE_POSE_ROTATION_THRESHOLD) && (Q.X>-GE_POSE_ROTATION_THRESHOLD) )
+		  && (  (Q.Y<GE_POSE_ROTATION_THRESHOLD) && (Q.Y>-GE_POSE_ROTATION_THRESHOLD) )
 		  && (  (Q.Z<GE_POSE_ROTATION_THRESHOLD) && (Q.Z>-GE_POSE_ROTATION_THRESHOLD) )  )
 		{
 			Joint->NoAttachmentRotation = GE_TRUE;
@@ -143,7 +143,7 @@ static void GENESISCC gePose_SetAttachmentRotationFlag( gePose_Joint *Joint)
 static void GENESISCC gePose_InitializeJoint(gePose_Joint *Joint, int ParentJointIndex, const geXForm3d *Attachment)
 {
 	assert( Joint != NULL );
-	
+
 	Joint->ParentJoint = ParentJointIndex;
 	if (Attachment != NULL)
 		{
@@ -159,13 +159,13 @@ static void GENESISCC gePose_InitializeJoint(gePose_Joint *Joint, int ParentJoin
 		}
 
 	geQuaternion_SetNoRotation(&(Joint->LocalRotation));
-	
+
 	geXForm3d_SetIdentity(Joint->Transform);
 	geQuaternion_SetNoRotation(&(Joint->Rotation));
-	
+
 	geVec3d_Set( (&Joint->LocalTranslation),0.0f,0.0f,0.0f);
 	geQuaternion_SetNoRotation(&(Joint->LocalRotation));
-	Joint->Touched = GE_TRUE;		
+	Joint->Touched = GE_TRUE;
 	gePose_SetAttachmentRotationFlag(Joint);
 }
 
@@ -183,7 +183,7 @@ gePose *GENESISCC gePose_Create(void)
 			goto PoseCreateFailure;
 		}
 	P->JointCount = 0;
-	P->OnlyThisJoint = GE_POSE_ROOT_JOINT-1;		
+	P->OnlyThisJoint = GE_POSE_ROOT_JOINT-1;
 	P->JointNames = geStrBlock_Create();
 	P->Touched = GE_FALSE;
 	if ( P->JointNames == NULL )
@@ -237,13 +237,13 @@ void GENESISCC gePose_Destroy(gePose **PP)
 	*PP = NULL;
 }
 
-// uses J->LocalRotation and J->LocalTranslation to compute 
+// uses J->LocalRotation and J->LocalTranslation to compute
 //    J->Rotation,J->Translation and J->Transform
 static void GENESISCC gePose_JointRelativeToParent(
 		 const gePose_Joint *Parent,
 		 gePose_Joint *J)
 {
-	
+
 	#if 0
 		// the math in clearer (but slower) matrix form.
 		// W = PAK
@@ -255,7 +255,7 @@ static void GENESISCC gePose_JointRelativeToParent(
 
 		geXForm3d_Multiply((Parent->Transform),&(J->AttachmentTransform),&X);
 		geXForm3d_Multiply(&X,&(K),J->Transform);
-		
+
 		J->LocalTranslation = K.Translation;
 		geQuaternion_FromMatrix(J->Transform,&(J->LocalRotation));
 
@@ -269,7 +269,7 @@ static void GENESISCC gePose_JointRelativeToParent(
 			//ROTATION:
 			// concatenate local rotation to parent rotation for complete rotation
 			geQuaternion_Multiply(&(Parent->Rotation), &(J->LocalRotation), &(J->Rotation));
-			
+
 			geQuaternion_ToMatrix(&(J->Rotation), (J->Transform));
 			//TRANSLATION:
 			geVec3d_Add(&(J->LocalTranslation),&(J->AttachmentTransform.Translation),Translation);
@@ -278,7 +278,7 @@ static void GENESISCC gePose_JointRelativeToParent(
 	else
 		{
 			//  (there is an attachment rotation)
-			
+
 			geQuaternion BaseRotation; // attachement transform applied to the parent transform:
 			//ROTATION:
 			// concatenate attachment rotation to parent rotation for base rotation
@@ -296,7 +296,7 @@ static void GENESISCC gePose_JointRelativeToParent(
 
 
 geBoolean GENESISCC gePose_Attach(gePose *Slave, int SlaveBoneIndex,
-				  gePose *Master, int MasterBoneIndex, 
+				  gePose *Master, int MasterBoneIndex,
 				  const geXForm3d *Attachment)
 {
 	gePose *P;
@@ -337,7 +337,7 @@ geBoolean GENESISCC gePose_Attach(gePose *Slave, int SlaveBoneIndex,
 	gePose_InitializeJoint(&(Slave->RootJoint),MasterBoneIndex,Attachment);
 	Slave->Touched = GE_TRUE;
 	Slave->ParentsLastTransform = *(Master->RootJoint.Transform);
-	
+
 	return GE_TRUE;
 }
 
@@ -361,14 +361,14 @@ static geBoolean GENESISCC gePose_TransformCompare(const geXForm3d *T1, const ge
 	if (T1->AZ != T2->AZ) return GE_FALSE;
 	if (T1->BZ != T2->BZ) return GE_FALSE;
 	if (T1->CZ != T2->CZ) return GE_FALSE;
-	
+
 	if (T1->Translation.X != T2->Translation.X) return GE_FALSE;
 	if (T1->Translation.Y != T2->Translation.Y) return GE_FALSE;
 	if (T1->Translation.Z != T2->Translation.Z) return GE_FALSE;
 	return GE_TRUE;
 }
-	
-	
+
+
 static void GENESISCC gePose_UpdateRecursively(gePose *P,int Joint)
 {
 	gePose_Joint *J;
@@ -393,7 +393,7 @@ static void GENESISCC gePose_UpdateRelativeToParent(gePose *P)
 	gePose_Joint *J;
 	const gePose_Joint *Parent;
 	assert( P != NULL );
-	
+
 	if ( P->Parent != NULL )
 		{
 			gePose_UpdateRelativeToParent(P->Parent);
@@ -405,7 +405,7 @@ static void GENESISCC gePose_UpdateRelativeToParent(gePose *P)
 					P->RootJoint.Touched = GE_TRUE;  // bubble touched down entire hierarchy
 					P->ParentsLastTransform = *(P->Parent->RootJoint.Transform);
 				}
-				
+
 			if (P->Slave == GE_FALSE)
 				{
 					Parent = gePose_JointByIndex(P->Parent, P->RootJoint.ParentJoint);
@@ -460,7 +460,7 @@ static void GENESISCC gePose_UpdateRelativeToParent(gePose *P)
 								}
 						}
 				}
-			// touched flags don't mean anything when recursing backwards.  
+			// touched flags don't mean anything when recursing backwards.
 			P->RootJoint.Touched = GE_FALSE;
 			for (i=0, J=&(P->JointArray[0]); i<P->JointCount; i++,J++)
 				{
@@ -474,7 +474,7 @@ static void GENESISCC gePose_UpdateRelativeToParent(gePose *P)
 			geXForm3d FullSlaveTransform;
 			geXForm3d *MasterTransform;
 			geXForm3d MasterAttachment;
-			
+
 			MasterTransform = (P->Parent->JointArray[P->RootJoint.ParentJoint].Transform);
 			geXForm3d_GetTranspose((P->JointArray[P->SlaveJointIndex].Transform), &SlavedJointInverse);
 
@@ -483,9 +483,9 @@ static void GENESISCC gePose_UpdateRelativeToParent(gePose *P)
 			MasterAttachment.Translation = P->RootJoint.AttachmentTransform.Translation;
 
 			geXForm3d_Multiply(MasterTransform,&MasterAttachment,&FullSlaveTransform);
-			
+
 			*(P->RootJoint.Transform) = FullSlaveTransform;
-			
+
 			geXForm3d_Multiply(&FullSlaveTransform,&SlavedJointInverse,&FullSlaveTransform);
 
 			for (i=0, J=&(P->JointArray[0]); i<P->JointCount; i++,J++)
@@ -494,10 +494,10 @@ static void GENESISCC gePose_UpdateRelativeToParent(gePose *P)
 										(P->JointArray[i].Transform),
 										(P->JointArray[i].Transform));
 				}
-			
+
 		}
 	P->Touched = GE_FALSE;
-}	
+}
 
 
 geBoolean GENESISCC gePose_FindNamedJointIndex(const gePose *P, const char *JointName, int *Index)
@@ -517,11 +517,11 @@ geBoolean GENESISCC gePose_FindNamedJointIndex(const gePose *P, const char *Join
 				{
 					*Index = i;
 					return GE_TRUE;
-				}	
+				}
 		}
 	return GE_FALSE;
 }
-	
+
 
 geBoolean GENESISCC gePose_AddJoint(
 	gePose *P,
@@ -536,7 +536,7 @@ geBoolean GENESISCC gePose_AddJoint(
 	assert(  P != NULL );
 	assert( JointIndex != NULL );
 	assert( P->JointCount >= 0 );
-	assert( (ParentJointIndex == GE_POSE_ROOT_JOINT) || 
+	assert( (ParentJointIndex == GE_POSE_ROOT_JOINT) ||
 			((ParentJointIndex >=0) && (ParentJointIndex <P->JointCount) ) );
 
 	// Duplicate names ARE allowed
@@ -552,7 +552,7 @@ geBoolean GENESISCC gePose_AddJoint(
 			}
 		P->JointArray = NewJoints;
 	}
-	
+
 	assert( P->JointNames != NULL );
 	assert( geStrBlock_GetCount(P->JointNames) == P->JointCount );
 
@@ -561,7 +561,7 @@ geBoolean GENESISCC gePose_AddJoint(
 			geErrorLog_Add(ERR_POSE_ADDJOINT_ENOMEM, NULL);
 			return GE_FALSE;
 		}
-	
+
 
 	{
 		geXFArray *NewXFA;
@@ -580,7 +580,7 @@ geBoolean GENESISCC gePose_AddJoint(
 
 	P->JointCount = JointCount+1;
 	gePose_ReattachTransforms(P);
-	
+
 	Joint = &( P->JointArray[JointCount] );
 	gePose_InitializeJoint(Joint,ParentJointIndex, Attachment);
 	P->Touched = GE_TRUE;
@@ -603,7 +603,7 @@ void GENESISCC gePose_GetJointAttachment(const gePose *P,int JointIndex, geXForm
 }
 
 void GENESISCC gePose_SetJointAttachment(gePose *P,
-	int JointIndex, 
+	int JointIndex,
 	const geXForm3d *AttachmentTransform)
 {
 	assert( P != NULL );
@@ -621,7 +621,7 @@ void GENESISCC gePose_SetJointAttachment(gePose *P,
 }
 
 void GENESISCC gePose_SetJointGlobalAttachment(gePose *P,
-	int JointIndex, 
+	int JointIndex,
 	const geXForm3d *AttachmentTransform,
 	const geXForm3d *OffsetTransform)
 {
@@ -646,8 +646,8 @@ void GENESISCC gePose_SetJointGlobalAttachment(gePose *P,
 		geQuaternion_Inverse(&RotParent, &RotInv);
 
 		geQuaternion_Multiply(&RotInv, &RotBase, &(J->LocalRotation));
-		
-		
+
+
 		J->Touched = GE_TRUE;
 	}
 	P->Touched = GE_TRUE;
@@ -657,9 +657,9 @@ void GENESISCC gePose_GetJointTransform(const gePose *P, int JointIndex,geXForm3
 {
 	assert( P != NULL );
 	assert( Transform != NULL );
-	
+
 	gePose_UpdateRelativeToParent((gePose *)P);
-	
+
 	{
 		const gePose_Joint *J;
 		J = gePose_JointByIndex(P, JointIndex);
@@ -697,7 +697,7 @@ int GENESISCC gePose_GetJointCount(const gePose *P)
 {
 	assert( P != NULL );
 	assert( P->JointCount >= 0 );
-	
+
 	return P->JointCount;
 }
 
@@ -719,7 +719,7 @@ void GENESISCC gePose_Clear(gePose *P,const geXForm3d *Transform)
 {
 	int i;
 	gePose_Joint *J;
-	
+
 	assert( P != NULL );
 	assert( P->JointCount >= 0 );
 	P->OnlyThisJoint = GE_POSE_ROOT_JOINT-1;		// calling this function disables one-joint optimizations
@@ -732,16 +732,16 @@ void GENESISCC gePose_Clear(gePose *P,const geXForm3d *Transform)
 				}
 			P->RootJoint.Touched = GE_TRUE;
 		}
-			
+
 	for (i=0, J=&(P->JointArray[0]); i<P->JointCount; i++,J++)
 		{
 			geVec3d_Set( (&J->LocalTranslation),0.0f,0.0f,0.0f);
 			geQuaternion_SetNoRotation(&(J->LocalRotation));
 			assert( J->ParentJoint < i);
 			P->Touched = GE_TRUE;
-		}	
+		}
 	P->Touched = GE_TRUE;
-}	
+}
 
 void GENESISCC gePose_SetMotion(gePose *P, const geMotion *M, geFloat Time,
 							const geXForm3d *Transform)
@@ -750,7 +750,7 @@ void GENESISCC gePose_SetMotion(gePose *P, const geMotion *M, geFloat Time,
 	int i;
 	gePose_Joint *J;
 	geXForm3d RootTransform;
-	
+
 	assert( P != NULL );
 
 	P->OnlyThisJoint = GE_POSE_ROOT_JOINT-1;		// calling this function disables one-joint optimizations
@@ -853,7 +853,7 @@ static void GENESISCC gePose_SetMotionForABoneRecursion(gePose *P, const geMotio
 		}
 	if (J->ParentJoint != GE_POSE_ROOT_JOINT)
 		gePose_SetMotionForABoneRecursion(P,M,Time,J->ParentJoint,NameBinding);
-	
+
 }
 
 void GENESISCC gePose_SetMotionForABone(gePose *P, const geMotion *M, geFloat Time,
@@ -861,11 +861,11 @@ void GENESISCC gePose_SetMotionForABone(gePose *P, const geMotion *M, geFloat Ti
 {
 	geBoolean NameBinding;
 	geXForm3d RootTransform;
-	
+
 	assert( P != NULL );
 	//assert( M != NULL );
 	P->OnlyThisJoint = BoneIndex;		// calling this function enables single-joint optimizations
-	
+
 	if (P->Parent==NULL)
 		{
 			geBoolean SetRoot = GE_FALSE;
@@ -913,16 +913,16 @@ void GENESISCC gePose_SetMotionForABone(gePose *P, const geMotion *M, geFloat Ti
 
 	gePose_SetMotionForABoneRecursion(P, M, Time, BoneIndex, NameBinding);
 }
-	
 
 
 
-#define LINEAR_BLEND(a,b,t)  ( (t)*((b)-(a)) + (a) )	
+
+#define LINEAR_BLEND(a,b,t)  ( (t)*((b)-(a)) + (a) )
 			// linear blend of a and b  0<t<1 where  t=0 ->a and t=1 ->b
 
 
 
-void GENESISCC gePose_BlendMotion(	
+void GENESISCC gePose_BlendMotion(
 	gePose *P, const geMotion *M, geFloat Time,
 	const geXForm3d *Transform,
 	geFloat BlendAmount, gePose_BlendingType BlendingType)
@@ -933,7 +933,7 @@ void GENESISCC gePose_BlendMotion(
 	geQuaternion R1;
 	geVec3d      T1;
 	geXForm3d    RootTransform;
-	
+
 	assert( P != NULL );
 	//assert( M != NULL );  // M can be NULL
 	assert( BlendingType == GE_POSE_BLEND_HERMITE || BlendingType == GE_POSE_BLEND_LINEAR);
@@ -991,18 +991,18 @@ void GENESISCC gePose_BlendMotion(
 			return;
 		}
 
-	
+
 	if (gePose_MatchesMotionExactly(P,M)==GE_TRUE)
 		NameBinding = GE_FALSE;
 	else
 		NameBinding = GE_TRUE;
-	
+
 	P->Touched = GE_TRUE;
 
 	for (i=0, J=&(P->JointArray[0]); i<P->JointCount; i++,J++)
 		{
 			//gePath *JointPath;
-							
+
 			if (NameBinding == GE_FALSE)
 				{
 					geMotion_SampleChannels(M,i,Time,&R1,&T1);
@@ -1023,13 +1023,13 @@ void GENESISCC gePose_BlendMotion(
 			J->Touched = GE_TRUE;
 
 			//gePath_SampleChannels(JointPath,Time,&(R1),&(T1));
-			
+
 			T1.X *= P->Scale.X;
 			T1.Y *= P->Scale.Y;
 			T1.Z *= P->Scale.Z;
-			
+
 			geQuaternion_Slerp(&(J->LocalRotation),&(R1),BlendAmount,&(J->LocalRotation));
-						
+
 			{
 				geVec3d      *LT = &(J->LocalTranslation);
 				LT->X = LINEAR_BLEND(LT->X,T1.X,BlendAmount);
@@ -1058,7 +1058,7 @@ void GENESISCC gePose_GetScale(const gePose *P, geVec3d *Scale)
 	assert( Scale != NULL );
 	*Scale = P->Scale;
 }
-	
+
 
 void GENESISCC gePose_SetScale(gePose *P, const geVec3d *Scale )
 {
@@ -1073,7 +1073,7 @@ void GENESISCC gePose_SetScale(gePose *P, const geVec3d *Scale )
 		//geVec3d_Set(&(P->Scale),ScaleX,ScaleY,ScaleZ);
 
 		for (i=0, J=&(P->JointArray[0]); i<P->JointCount; i++,J++)
-			{	
+			{
 				J->AttachmentTransform.Translation.X = J->UnscaledAttachmentTranslation.X * Scale->X;
 				J->AttachmentTransform.Translation.Y = J->UnscaledAttachmentTranslation.Y * Scale->Y;
 				J->AttachmentTransform.Translation.Z = J->UnscaledAttachmentTranslation.Z * Scale->Z;
@@ -1093,7 +1093,7 @@ void GENESISCC gePose_ClearCoverage(gePose *P, int ClearTo)
 	assert( (ClearTo == GE_FALSE) || (ClearTo == GE_TRUE) );
 
 	for (i=0, J=&(P->JointArray[0]); i<P->JointCount; i++,J++)
-		{	
+		{
 			J->Covered = ClearTo;
 		}
 }
@@ -1104,7 +1104,7 @@ int GENESISCC gePose_AccumulateCoverage(gePose *P, const geMotion *M, geBoolean 
 	geBoolean NameBinding;
 	int Covers=0;
 	gePose_Joint *J;
-	
+
 	assert( P != NULL );
 	if (M==NULL)
 		{
@@ -1124,7 +1124,7 @@ int GENESISCC gePose_AccumulateCoverage(gePose *P, const geMotion *M, geBoolean 
 				}
 			return Covers;
 		}
-	
+
 	if (gePose_MatchesMotionExactly(P,M)==GE_TRUE)
 		NameBinding = GE_FALSE;
 	else
@@ -1150,4 +1150,4 @@ int GENESISCC gePose_AccumulateCoverage(gePose *P, const geMotion *M, geBoolean 
 		}
 	return Covers;
 }
-	
+

@@ -1,39 +1,39 @@
 /****************************************************************************************/
-/*  PUPPET.C																			*/
+/*  Puppet.c                                                                            */
 /*                                                                                      */
-/*  Author: Mike Sandige	                                                            */
-/*  Description: Puppet implementation.									.				*/
+/*  Author: Mike Sandige                                                                */
+/*  Description: Puppet implementation.                                                 */
 /*                                                                                      */
 /*  Edit History:                                                                       */
 /*  08/11/2004 Wendell Buckner                                                          */
 /*   BUG FIX: Rendering Transparent Polys properly (2)                                  */
-/*	 You must have at least 3 points                                                    */
-/*	 Allow processing of 5 or more verts by splitting into seperate gePolys             */
+/*   You must have at least 3 points                                                    */
+/*   Allow processing of 5 or more verts by splitting into seperate gePolys             */
 /*  08/10/2004 Wendell Buckner                                                          */
-/*   BUG FIX: Dumb copy/paste bug!                                                      */ 
+/*   BUG FIX: Dumb copy/paste bug!                                                      */
 /*  03/24/2004 Wendell Buckner                                                          */
 /*   BUG FIX: Rendering Transparent Polys properly (2)                                  */
 /*  03/10/2004 Wendell Buckner                                                          */
 /*   Ambient light is leeking into objects that should not receive light, each object   */
-/*   will have it's   own ambient property so ONLY those objects that should receive,     */
+/*   will have it's   own ambient property so ONLY those objects that should receive,   */
 /*   do receive ambient light.                                                          */
 /*  02/21/2004 Wendell Buckner                                                          */
-/*   DOT3 BUMPMAPPING                                                                   */ 
+/*   DOT3 BUMPMAPPING                                                                   */
 /*  02/17/2004 Wendell Buckner                                                          */
-/*   DOT3 BUMPMAPPING                                                                   */ 
-/*  02/12/2004 Wendell Buckner                                                          */ 
-/*   SPHEREMAPPING                                                                    */
-/*	01/08/2004 Wendell Buckner                                                          */
+/*   DOT3 BUMPMAPPING                                                                   */
+/*  02/12/2004 Wendell Buckner                                                          */
+/*   SPHEREMAPPING                                                                      */
+/*  01/08/2004 Wendell Buckner                                                          */
 /*   DOT3 BUMPMAPPING                                                                   */
 /*  08/27/2003 Wendell Buckner                                                          */
-/*   BUMPMAPPING                                                                        */   
-/*	  Remove artificial limit of only 255 bitmaps.                                      */       
+/*   BUMPMAPPING                                                                        */
+/*   Remove artificial limit of only 255 bitmaps.                                       */
 /*   Don't just look for a specific bump map pixel format, use the best available of    */
 /*   what is found...                                                                   */
 /*  08/15/2003 Wendell Buckner 	                                                        */
-/*    BUMPMAPPING                                                                       */
-/*  04/08/2003 Wendell Buckner 	                                                        */  
-/*    BUMPMAPPING                                                                       */
+/*   BUMPMAPPING                                                                        */
+/*  04/08/2003 Wendell Buckner 	                                                        */
+/*   BUMPMAPPING                                                                        */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -105,7 +105,7 @@ typedef struct gePuppet
 	gePuppet_Material	*MaterialArray;
 	int					 MaxDynamicLightsToUse;
 	int					 LightReferenceBoneIndex;
-		
+
 	geVec3d				 FillLightNormal;
 	gePuppet_Color		 FillLightColor;			// 0..255
 	geBoolean			 UseFillLight;				// use fill light normal
@@ -121,18 +121,18 @@ typedef struct gePuppet
 	const geBitmap		*ShadowMap;
 	int					 ShadowBoneIndex;
 
-    // LWM_ACTOR_RENDERING:
+	// LWM_ACTOR_RENDERING:
 	geFloat				 OverallAlpha ;
 
 		#pragma message ("this goes away!: World")
 	geWorld				*World;
-	geBoolean			 AmbientLightFromStaticLights;	// use static lights from map   
-	geBoolean			 DoTestRayCollision;			//test static light in shadow   
+	geBoolean			 AmbientLightFromStaticLights;	// use static lights from map
+	geBoolean			 DoTestRayCollision;			//test static light in shadow
 	int					 MaxStaticLightsToUse; 			//max number of light to use
 
-/*  03/10/2004 Wendell Buckner                                                            
-     Ambient light is leeking into objects that should not receive light, each object     
-     will have it's own ambient property so ONLY those objects that should receive,       
+/*  03/10/2004 Wendell Buckner
+     Ambient light is leeking into objects that should not receive light, each object
+     will have it's own ambient property so ONLY those objects that should receive,
      do receive ambient light.                                                          */
 	gePuppet_Color		 Ambient;					// 0..1
 // changed QD Shadows
@@ -150,8 +150,8 @@ typedef struct
 	geFloat			Radius;
 
 /*	01/08/2004 Wendell Buckner
-    DOT3 BUMPMAPPING  */
-	geVec3d         Position; 
+	DOT3 BUMPMAPPING  */
+	geVec3d			Position;
 
 } gePuppet_Light;
 
@@ -160,11 +160,11 @@ typedef struct
 	geBoolean		UseFillLight;
 	geVec3d			FillLightNormal;
 	gePuppet_Color	MaterialColor;
-	gePuppet_Color  FillLightColor;
+	gePuppet_Color	FillLightColor;
 	gePuppet_Color	Ambient;
 	geVec3d			SurfaceNormal;
-	gePuppet_Light StaticLights[MAX_DYNAMIC_LIGHTS];
-	int StaticLightCount;
+	gePuppet_Light	StaticLights[MAX_DYNAMIC_LIGHTS];
+	int				StaticLightCount;
 	gePuppet_Light	Lights[MAX_DYNAMIC_LIGHTS];
 	int				LightCount;
 	geBoolean		PerBoneLighting;
@@ -188,17 +188,17 @@ static geBoolean GENESISCC gePuppet_FetchTextures(gePuppet *P, const geBody *B)
 	int i;
 
 /* 08/27/2003 Wendell Buckner
-    BUMPMAPPING 
+	BUMPMAPPING
 	Remove artificial limit of only 255 bitmaps.
-/* 04/08/2003 Wendell Buckner 	
-    BUMPMAPPING               *
+/* 04/08/2003 Wendell Buckner
+	BUMPMAPPING
 	int BumpBmpNameCount = 0;
 	char *BumpBmpNames[255];  */
 
 	assert( P );
 
 /* 08/27/2003 Wendell Buckner
-    BUMPMAPPING 
+	BUMPMAPPING
 	Remove artificial limit of only 255 bitmaps...
 	memset(&BumpBmpNames,0,sizeof(const char *) * 255 );*/
 
@@ -207,14 +207,14 @@ static geBoolean GENESISCC gePuppet_FetchTextures(gePuppet *P, const geBody *B)
 	{
 		return GE_TRUE;
 	}
-	
+
 	P->MaterialArray = GE_RAM_ALLOCATE_ARRAY(gePuppet_Material, P->MaterialCount);
 	if (P->MaterialArray == NULL)
 	{
 		geErrorLog_Add(ERR_PUPPET_ENOMEM, NULL);
 		return GE_FALSE;
 	}
-	
+
 	for (i=0; i<P->MaterialCount; i++)
 	{
 		const char *Name;
@@ -248,11 +248,11 @@ static geBoolean GENESISCC gePuppet_FetchTextures(gePuppet *P, const geBody *B)
 		M->MaterialName = Name;
 
 /* 08/27/2003 Wendell Buckner
-    BUMPMAPPING 
+	BUMPMAPPING
 	Remove artificial limit of only 255 bitmaps...
-/* 04/08/2003 Wendell Buckner 	
-    BUMPMAPPING *
-	    if ( geBitmap_IsBumpmapName(Name) && (BumpBmpNameCount <255))
+/* 04/08/2003 Wendell Buckner
+	BUMPMAPPING *
+		if ( geBitmap_IsBumpmapName(Name) && (BumpBmpNameCount <255))
 		{
 		 BumpBmpNames[BumpBmpNameCount] = (char *) Name;
 		 BumpBmpNameCount++;
@@ -260,87 +260,85 @@ static geBoolean GENESISCC gePuppet_FetchTextures(gePuppet *P, const geBody *B)
 	}
 
 /* 08/27/2003 Wendell Buckner
-    BUMPMAPPING 
+	BUMPMAPPING
 	Remove artificial limit of only 255 bitmaps...
-    Don't just look for a specific bump map pixel format, use the best available of what is found...
-/* 04/08/2003 Wendell Buckner 	
-    BUMPMAPPING *
-    for(i= 0; i < BumpBmpNameCount; i++)
+	Don't just look for a specific bump map pixel format, use the best available of what is found...
+/* 04/08/2003 Wendell Buckner
+	BUMPMAPPING *
+	for(i= 0; i < BumpBmpNameCount; i++)
 	{
-	 geBitmap *BumpBmpAlt = NULL;
- 	 geBitmap *BumpmapCreated = NULL;
+		geBitmap *BumpBmpAlt = NULL;
+		geBitmap *BumpmapCreated = NULL;
 
-	 BumpmapCreated = geBody_CreateBumpmapByName(B, BumpBmpNames[i], GE_PIXELFORMAT_16BIT_556_UVL); 
-	 if(!BumpmapCreated) break;
+		BumpmapCreated = geBody_CreateBumpmapByName(B, BumpBmpNames[i], GE_PIXELFORMAT_16BIT_556_UVL);
+		if(!BumpmapCreated) break;
 
-     BumpBmpAlt = BumpmapCreated;
-	 if (BumpBmpAlt) geWorld_AddBitmap (P->World,BumpBmpAlt);
+		BumpBmpAlt = BumpmapCreated;
+		if (BumpBmpAlt) geWorld_AddBitmap (P->World,BumpBmpAlt);
 	} */
 
 	do //Create Bump-map Loop...
-	{ 
-
-     int BumpMapPixelFormatCount = 0;
-     gePixelFormat BumpMapPixelFormats[10];
-     gePixelFormat BumpFormat;
+	{
+		int BumpMapPixelFormatCount = 0;
+		gePixelFormat BumpMapPixelFormats[10];
+		gePixelFormat BumpFormat;
 
 /* 02/21/2004 Wendell Buckner
-    DOT3 BUMPMAPPING  */
-     geBoolean HasBumpDot3 = GE_FALSE;
-     HasBumpDot3 = geBitmap_GetEngineSupport(NULL, DRV_SUPPORT_DOT3 );
+	DOT3 BUMPMAPPING  */
+		geBoolean HasBumpDot3 = GE_FALSE;
+		HasBumpDot3 = geBitmap_GetEngineSupport(NULL, DRV_SUPPORT_DOT3 );
 
 	 geBitmap_GetBumpMapPixelFormats( NULL, &BumpMapPixelFormats[0],&BumpMapPixelFormatCount);
 
 /* 02/21/2004 Wendell Buckner
-    DOT3 BUMPMAPPING 
-     if (BumpMapPixelFormatCount == 0 ) break; */
-     if ((BumpMapPixelFormatCount == 0) && (!HasBumpDot3) ) break; 
-	 
-	 for (i=0; i<P->MaterialCount; i++) //Find all bump-maps by name...
-	 {
-	   const char *Name;
-	   geBitmap *Bitmap;
-	   gePuppet_Material *M = &(P->MaterialArray[i]);
-	   geBody_GetMaterial( B, i, &(Name), &(Bitmap),
+	DOT3 BUMPMAPPING
+		if (BumpMapPixelFormatCount == 0 ) break; */
+		if ((BumpMapPixelFormatCount == 0) && (!HasBumpDot3) ) break;
+
+		for (i=0; i<P->MaterialCount; i++) //Find all bump-maps by name...
+		{
+			const char *Name;
+			geBitmap *Bitmap;
+			gePuppet_Material *M = &(P->MaterialArray[i]);
+			geBody_GetMaterial( B, i, &(Name), &(Bitmap),
 						&(M->Color.Red),&(M->Color.Green),&(M->Color.Blue));
 
 /* 02/17/2004 Wendell Buckner
-    DOT3 BUMPMAPPING 
-	   if ( !geBitmap_IsBumpmapName(Name) ) continue; 
+	DOT3 BUMPMAPPING
+			if ( !geBitmap_IsBumpmapName(Name) ) continue;
 
-       if (BumpMapPixelFormatCount == 0 ) break; */
-       if ( geBitmap_IsBumpmapNameDot3(Name) && HasBumpDot3 )
-	   {
- 	    geBitmap *BumpBmpAlt = NULL;
- 	    geBoolean BumpmapCreated = GE_FALSE;
+			if (BumpMapPixelFormatCount == 0 ) break; */
+			if ( geBitmap_IsBumpmapNameDot3(Name) && HasBumpDot3 )
+			{
+				geBitmap *BumpBmpAlt = NULL;
+				geBoolean BumpmapCreated = GE_FALSE;
 
-	    BumpmapCreated = geBody_CreateBumpmapByNameDot3(B, Name); 
+				BumpmapCreated = geBody_CreateBumpmapByNameDot3(B, Name);
 
-		if (BumpmapCreated ) geBody_CreateTangentSpace(B);
-	   }
-       else if ( geBitmap_IsBumpmapName(Name) && BumpMapPixelFormatCount ) 
-	   {
- 	    geBitmap *BumpBmpAlt = NULL;
- 	    geBitmap *BumpmapCreated = NULL;
+				if (BumpmapCreated )
+					geBody_CreateTangentSpace(B);
+			}
+			else if ( geBitmap_IsBumpmapName(Name) && BumpMapPixelFormatCount )
+			{
+				geBitmap *BumpBmpAlt = NULL;
+				geBitmap *BumpmapCreated = NULL;
 
-//Get the best format...	  
-        BumpFormat = BumpMapPixelFormats[BumpMapPixelFormatCount-1];
+//Get the best format...
+				BumpFormat = BumpMapPixelFormats[BumpMapPixelFormatCount-1];
 
-	    BumpmapCreated = geBody_CreateBumpmapByName(B, Name, BumpFormat); 
+				BumpmapCreated = geBody_CreateBumpmapByName(B, Name, BumpFormat);
 
-	    if(!BumpmapCreated) continue;
+				if(!BumpmapCreated) continue;
 
-        BumpBmpAlt = BumpmapCreated;
-	    if (BumpBmpAlt) geWorld_AddBitmap (P->World,BumpBmpAlt);
-	   } //Find all bump-maps by name...
-
-	 }// Check if good pixel formats
-
+				BumpBmpAlt = BumpmapCreated;
+				if (BumpBmpAlt) geWorld_AddBitmap (P->World,BumpBmpAlt);
+			} //Find all bump-maps by name...
+		}// Check if good pixel formats
 	}
 	while(GE_FALSE); //Create Bump-map Loop...
 
 	return GE_TRUE;
-}	
+}
 
 int GENESISCC gePuppet_GetMaterialCount( gePuppet *P )
 {
@@ -349,7 +347,7 @@ int GENESISCC gePuppet_GetMaterialCount( gePuppet *P )
 }
 
 geBoolean GENESISCC gePuppet_GetMaterial( gePuppet *P, int MaterialIndex,
-									geBitmap **Bitmap, 
+									geBitmap **Bitmap,
 									geFloat *Red, geFloat *Green, geFloat *Blue)
 {
 	assert( P      );
@@ -371,7 +369,7 @@ geBoolean GENESISCC gePuppet_GetMaterial( gePuppet *P, int MaterialIndex,
 }
 
 
-geBoolean GENESISCC gePuppet_SetMaterial(gePuppet *P, int MaterialIndex, geBitmap *Bitmap, 
+geBoolean GENESISCC gePuppet_SetMaterial(gePuppet *P, int MaterialIndex, geBitmap *Bitmap,
 										geFloat Red, geFloat Green, geFloat Blue)
 {
 	assert( P );
@@ -389,21 +387,21 @@ geBoolean GENESISCC gePuppet_SetMaterial(gePuppet *P, int MaterialIndex, geBitma
 		M->Color.Green  = Green;
 		M->Color.Blue   = Blue;
 
-		if ( OldBitmap != Bitmap ) 
-		{		
+		if ( OldBitmap != Bitmap )
+		{
 			if ( OldBitmap )
 			{
-				assert( M->UseTexture );		
+				assert( M->UseTexture );
 				geWorld_RemoveBitmap( P->World, OldBitmap );
 				geBitmap_Destroy( &(OldBitmap) );
 			}
-			
+
 			M->UseTexture = GE_FALSE;
 
 			if ( Bitmap )
 			{
 				geBitmap_CreateRef(Bitmap);
-						
+
 				M->UseTexture = GE_TRUE;
 
 				if ( ! geWorld_AddBitmap(P->World,Bitmap) )
@@ -417,7 +415,7 @@ geBoolean GENESISCC gePuppet_SetMaterial(gePuppet *P, int MaterialIndex, geBitma
 
 	return GE_TRUE;
 }
-	
+
 
 gePuppet *GENESISCC gePuppet_Create(geVFile *TextureFS, const geBody *B, geWorld *World)
 {
@@ -425,15 +423,15 @@ gePuppet *GENESISCC gePuppet_Create(geVFile *TextureFS, const geBody *B, geWorld
 
 	assert( geBody_IsValid(B)!=GE_FALSE );
 	#pragma message ("Need geWorld_IsValid()")
-	
+
 	P = GE_RAM_ALLOCATE_STRUCT(gePuppet);
 	if (P==NULL)
 	{
 		geErrorLog_Add(ERR_PUPPET_ENOMEM, NULL);
 		return NULL;
 	}
-	
-	memset(P,0,sizeof(*P));	
+
+	memset(P,0,sizeof(*P));
 
 	P->BodyInstance = NULL;
 	P->MaxDynamicLightsToUse = PUPPET_DEFAULT_MAX_DYNAMIC_LIGHTS;
@@ -461,11 +459,11 @@ gePuppet *GENESISCC gePuppet_Create(geVFile *TextureFS, const geBody *B, geWorld
 	P->TextureFileContext = TextureFS;
 
 	P->World = World;
-	
-	P->AmbientLightFromStaticLights = GE_FALSE;	//BY DEFAULT DO NOTHING 
-	P->DoTestRayCollision = GE_FALSE; 
+
+	P->AmbientLightFromStaticLights = GE_FALSE;	//BY DEFAULT DO NOTHING
+	P->DoTestRayCollision = GE_FALSE;
 	P->MaxStaticLightsToUse = PUPPET_DEFAULT_MAX_DYNAMIC_LIGHTS;
- 
+
 	//Set default environment options
 	P->internal_env.PercentEnvironment = 0.0f;
 	P->internal_env.PercentPuppet = 1.0f;
@@ -515,23 +513,23 @@ void GENESISCC gePuppet_Destroy(gePuppet **P)
 		{
 			M = &((*P)->MaterialArray[i]);
 			if (M->UseTexture )
-			{	
-/* 08/15/2003 Wendell Buckner 	
-    BUMPMAPPING               */
-                geBitmap *BumpBmpAlt = NULL;
-				
+			{
+/* 08/15/2003 Wendell Buckner
+	BUMPMAPPING               */
+				geBitmap *BumpBmpAlt = NULL;
+
 				assert( M->Bitmap );
 				geWorld_RemoveBitmap( (*P)->World, M->Bitmap );
 
-/* 02/17/2003 Wendell Buckner 	
-    DOT3 BUMPMAPPING               */
-                geBitmap_DestroyBumpmapDot3 ( M->Bitmap );
+/* 02/17/2003 Wendell Buckner
+	DOT3 BUMPMAPPING               */
+				geBitmap_DestroyBumpmapDot3 ( M->Bitmap );
 
-/* 08/15/2003 Wendell Buckner 	
-    BUMPMAPPING               */
-                BumpBmpAlt = geBitmap_DestroyBumpmap ( M->Bitmap );
+/* 08/15/2003 Wendell Buckner
+	BUMPMAPPING               */
+				BumpBmpAlt = geBitmap_DestroyBumpmap ( M->Bitmap );
 
-                if ( BumpBmpAlt )
+				if ( BumpBmpAlt )
 				{
 				 geWorld_RemoveBitmap( (*P)->World, BumpBmpAlt );
 				 geBitmap_Destroy( &(BumpBmpAlt) );
@@ -554,7 +552,7 @@ void GENESISCC gePuppet_Destroy(gePuppet **P)
 
 	geRam_Free( (*P) );
 	*P = NULL;
-	
+
 	// clean up any shared resources.
 	gePuppet_StaticPuppetCount--;
 	if (gePuppet_StaticPuppetCount==0)
@@ -564,36 +562,38 @@ void GENESISCC gePuppet_Destroy(gePuppet **P)
 
 		gePuppet_StaticBoneLightArray=NULL;
 		gePuppet_StaticBoneLightArraySize = 0;
-	}	
+	}
 }
 
 void GENESISCC gePuppet_GetStaticLightingOptions(const gePuppet *P,	geBoolean *UseAmbientLightFromStaticLights,	geBoolean *TestRayCollision, int *MaxStaticLightsToUse	)
-{	assert( P != NULL);
+{
+	assert( P != NULL);
 	assert( UseAmbientLightFromStaticLights );
 	assert( MaxStaticLightsToUse );
 	*UseAmbientLightFromStaticLights = P->AmbientLightFromStaticLights;
 	*TestRayCollision = P->DoTestRayCollision;
 	*MaxStaticLightsToUse = P->MaxStaticLightsToUse;
-}	
+}
 
 void GENESISCC gePuppet_SetStaticLightingOptions(gePuppet *P, geBoolean UseAmbientLightFromStaticLights, geBoolean TestRayCollision, int MaxStaticLightsToUse	)
-{	assert( P!= NULL);
+{
+	assert( P!= NULL);
 	P->AmbientLightFromStaticLights = UseAmbientLightFromStaticLights;
 	P->DoTestRayCollision = TestRayCollision;
 	P->MaxStaticLightsToUse = MaxStaticLightsToUse;
-}	
+}
 
 void GENESISCC gePuppet_GetLightingOptions(const gePuppet *P,
 	geBoolean *UseFillLight,
 	geVec3d *FillLightNormal,
-	geFloat *FillLightRed,				
-	geFloat *FillLightGreen,				
-	geFloat *FillLightBlue,				
-	geFloat *AmbientLightRed,			
-	geFloat *AmbientLightGreen,			
-	geFloat *AmbientLightBlue,			
+	geFloat *FillLightRed,
+	geFloat *FillLightGreen,
+	geFloat *FillLightBlue,
+	geFloat *AmbientLightRed,
+	geFloat *AmbientLightGreen,
+	geFloat *AmbientLightBlue,
 	geBoolean *UseAmbientLightFromFloor,
-	int *MaximumDynamicLightsToUse,		
+	int *MaximumDynamicLightsToUse,
 	int *LightReferenceBoneIndex,
 	geBoolean *PerBoneLighting
 	)
@@ -602,34 +602,34 @@ void GENESISCC gePuppet_GetLightingOptions(const gePuppet *P,
 	assert( P != NULL);
 	assert( UseFillLight );
 	assert( FillLightNormal );
-	assert( FillLightRed );	
-	assert( FillLightGreen );	
-	assert( FillLightBlue );	
+	assert( FillLightRed );
+	assert( FillLightGreen );
+	assert( FillLightBlue );
 	assert( AmbientLightRed );
-	assert( AmbientLightGreen );			
-	assert( AmbientLightBlue );			
+	assert( AmbientLightGreen );
+	assert( AmbientLightBlue );
 	assert( UseAmbientLightFromFloor );
-	assert( MaximumDynamicLightsToUse );	
+	assert( MaximumDynamicLightsToUse );
 	assert( LightReferenceBoneIndex );
-		
+
 	*UseFillLight = P->UseFillLight;
 
 	*FillLightNormal = P->FillLightNormal;
-	
+
 	Scaler = 255.0f;
 	*FillLightRed   = P->FillLightColor.Red * Scaler;
 	*FillLightGreen = P->FillLightColor.Green * Scaler;
 	*FillLightBlue  = P->FillLightColor.Blue * Scaler;
-	
+
 	*AmbientLightRed    = P->AmbientLightIntensity.Red * Scaler;
 	*AmbientLightGreen  = P->AmbientLightIntensity.Green * Scaler;
 	*AmbientLightBlue   = P->AmbientLightIntensity.Blue * Scaler;
-	
+
 	*UseAmbientLightFromFloor  = P->AmbientLightFromFloor;
 	*MaximumDynamicLightsToUse = P->MaxDynamicLightsToUse;
 	*LightReferenceBoneIndex   = P->LightReferenceBoneIndex;
 	*PerBoneLighting		   = P->PerBoneLighting;
-}	
+}
 
 void GENESISCC gePuppet_SetLightingOptions(gePuppet *P,
 	geBoolean UseFillLight,
@@ -652,29 +652,29 @@ void GENESISCC gePuppet_SetLightingOptions(gePuppet *P,
 	assert( geVec3d_IsNormalized(FillLightNormal) );
 	assert( MaximumDynamicLightsToUse >= 0 );
 	assert( (LightReferenceBoneIndex >=0) || (LightReferenceBoneIndex==GE_POSE_ROOT_JOINT));
-		
+
 	P->UseFillLight = UseFillLight;
 
 	P->FillLightNormal = *FillLightNormal;
-	
+
 	Scaler = 1.0f/255.0f;
 
 	P->FillLightColor.Red   = FillLightRed   * Scaler;
 	P->FillLightColor.Green = FillLightGreen * Scaler;
 	P->FillLightColor.Blue  = FillLightBlue  * Scaler;
-	
+
 	P->AmbientLightIntensity.Red   = AmbientLightRed   * Scaler;
 	P->AmbientLightIntensity.Green = AmbientLightGreen * Scaler;
 	P->AmbientLightIntensity.Blue  = AmbientLightBlue  * Scaler;
-	
+
 	P->AmbientLightFromFloor =UseAmbientLightFromFloor;
 	P->MaxDynamicLightsToUse = MaximumDynamicLightsToUse;
 	P->LightReferenceBoneIndex = LightReferenceBoneIndex;
 	P->PerBoneLighting		 = 	PerBoneLighting;
-}	
+}
 
 
-static int GENESISCC gePuppet_PrepLights(const gePuppet *P, 
+static int GENESISCC gePuppet_PrepLights(const gePuppet *P,
 	geWorld *World,
 	gePuppet_Light *LP,
 	const geVec3d *ReferencePoint)
@@ -695,7 +695,7 @@ static int GENESISCC gePuppet_PrepLights(const gePuppet *P,
 
 			geVec3d_Subtract(Position,ReferencePoint,&Normal);
 
-			LP[cnt].Distance =	Normal.X * Normal.X + 
+			LP[cnt].Distance =	Normal.X * Normal.X +
 								Normal.Y * Normal.Y +
 								Normal.Z * Normal.Z;
 			if (LP[cnt].Distance < L->DynamicLights[i].Radius*L->DynamicLights[i].Radius)
@@ -707,7 +707,7 @@ static int GENESISCC gePuppet_PrepLights(const gePuppet *P,
 					if(Angle < L->DynamicLights[i].Angle)
 						continue;
 				}
-			// end change QuestOfDreams		
+			// end change QuestOfDreams
 				LP[cnt].Color.Red = L->DynamicLights[i].Color.r;
 				LP[cnt].Color.Green = L->DynamicLights[i].Color.g;
 				LP[cnt].Color.Blue = L->DynamicLights[i].Color.b;
@@ -715,8 +715,8 @@ static int GENESISCC gePuppet_PrepLights(const gePuppet *P,
 				LP[cnt].Normal = Normal;
 
 /*	01/08/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
-	            LP[cnt].Position = *Position; 
+	DOT3 BUMPMAPPING */
+				LP[cnt].Position = *Position;
 
 				cnt++;
 			}
@@ -725,7 +725,7 @@ static int GENESISCC gePuppet_PrepLights(const gePuppet *P,
 
 	// sort dynamic lights by distance (squared)
 	for(i=0; i<P->MaxDynamicLightsToUse && i<cnt; i++) //rush out    when enough lights sorted
-    {
+	{
 		for(j=i+1; j<cnt; j++)
 		{
 			if (LP[i].Distance > LP[j].Distance)
@@ -745,7 +745,7 @@ static int GENESISCC gePuppet_PrepLights(const gePuppet *P,
 		geFloat Scale;
 		if (Distance < 1.0f)
 			Distance = 1.0f;
-	
+
 		OneOverDistance = 1.0f / Distance;
 		LP[i].Normal.X *= OneOverDistance;
 		LP[i].Normal.Y *= OneOverDistance;
@@ -761,27 +761,27 @@ static int GENESISCC gePuppet_PrepLights(const gePuppet *P,
 		LP[i].Color.Green *= Scale;
 		LP[i].Color.Blue *= Scale;
 	}
-			
-	return cnt;			
+
+	return cnt;
 }
-	
+
 static int  GENESISCC gePuppet_ComputeAmbientLight(
-		const gePuppet *P, 
-		const geWorld *World, 
+		const gePuppet *P,
+		const geWorld *World,
 		gePuppet_Color *Ambient,
 		gePuppet_Light *LP, //Xing studios
 		const geVec3d *ReferencePoint)
 {
-/*  03/10/2004 Wendell Buckner                                                            
-     Ambient light is leeking into objects that should not receive light, each object     
-     will have it's own ambient property so ONLY those objects that should receive,       
-     do receive ambient light.                                                          */
+/*  03/10/2004 Wendell Buckner
+	 Ambient light is leeking into objects that should not receive light, each object
+	 will have it's own ambient property so ONLY those objects that should receive,
+	 do receive ambient light.                                                          */
 	gePuppet_Color *pcAmbient;
 
 	assert( P );
 	assert( World );
 	assert( Ambient );
-	
+
 	if (P->AmbientLightFromFloor != GE_FALSE)
 	{
 #define GE_PUPPET_MAX_AMBIENT (0.3f)
@@ -791,15 +791,15 @@ static int  GENESISCC gePuppet_ComputeAmbientLight(
 		Surf_SurfInfo	*Surf;
 		GE_RGBA			RGBA;
 		//geBoolean		Col1, Col2;
-		
+
 		GFXNodes = World->CurrentBSP->BSPData.GFXNodes;
-		
+
 		Pos1 = *ReferencePoint;
-		
+
 		Pos2 = Pos1;
-		
+
 		Pos2.Y -= 30000.0f;
-		
+
 		if(!Trace_WorldCollisionExact3((geWorld*)World, &Pos1, &Pos1, &Impact,    &Node, &Plane, NULL))		//just save one test	//xing studios
 		{
 			// Now find the color of the mesh by getting the lightmap point he is standing    on...
@@ -810,29 +810,29 @@ static int  GENESISCC gePuppet_ComputeAmbientLight(
 				{ // FIXME? surface has no light...
 					Ambient->Red = Ambient->Green = Ambient->Blue = 0.0f;
 				}
-				else 
+				else
 				{
 					for (i=0; i< GFXNodes[Node].NumFaces; i++)
 					{
 						if (Surf_InSurfBoundingBox(Surf, &Impact, 20.0f))
 						{
-							Light_SetupLightmap(&Surf->LInfo, NULL); 
-							
+							Light_SetupLightmap(&Surf->LInfo, NULL);
+
 							if (Light_GetLightmapRGB(Surf, &Impact, &RGBA))
 							{
 								geFloat Scale = 1.0f / 255.0f;
 								Ambient->Red = RGBA.r * Scale;
 								Ambient->Green = RGBA.g * Scale;
 								Ambient->Blue = RGBA.b * Scale;
-								if (Ambient->Red > GE_PUPPET_MAX_AMBIENT) 
+								if (Ambient->Red > GE_PUPPET_MAX_AMBIENT)
 								{
 									Ambient->Red = GE_PUPPET_MAX_AMBIENT;
 								}
-								if (Ambient->Green > GE_PUPPET_MAX_AMBIENT) 
+								if (Ambient->Green > GE_PUPPET_MAX_AMBIENT)
 								{
 									Ambient->Green = GE_PUPPET_MAX_AMBIENT;
 								}
-								if (Ambient->Blue > GE_PUPPET_MAX_AMBIENT) 
+								if (Ambient->Blue > GE_PUPPET_MAX_AMBIENT)
 								{
 									Ambient->Blue = GE_PUPPET_MAX_AMBIENT;
 								}
@@ -846,15 +846,15 @@ static int  GENESISCC gePuppet_ComputeAmbientLight(
 		}
 	}
 
-/*  03/10/2004 Wendell Buckner                                                            
-	Ambient light is leeking into objects that should not receive light, each object     
-    will have it's own ambient property so ONLY those objects that should receive,       
+/*  03/10/2004 Wendell Buckner
+	Ambient light is leeking into objects that should not receive light, each object
+	will have it's own ambient property so ONLY those objects that should receive,
 	do receive ambient light.                                                          */
 	pcAmbient = (gePuppet_Color *) &P->Ambient;
 	*pcAmbient = *Ambient;
-    gePuppet_StaticLightGrp.Ambient = *Ambient;
-	
-	if(P->AmbientLightFromStaticLights != GE_FALSE) 
+	gePuppet_StaticLightGrp.Ambient = *Ambient;
+
+	if(P->AmbientLightFromStaticLights != GE_FALSE)
 	{
 		int i,j,cnt;
 		geEntity_EntitySet * entitySet = NULL;
@@ -867,7 +867,7 @@ static int  GENESISCC gePuppet_ComputeAmbientLight(
 		if (entitySet != NULL)
 			entity = geEntity_EntitySetGetNextEntity(entitySet, entity);
 		cnt=0;
-		//loop through all static lights and select the ones that touch the actor, with 
+		//loop through all static lights and select the ones that touch the actor, with
 		//a max limit of MAX_DYNAMIC_LIGHTS
 		for (i=0; entity != NULL && cnt<MAX_DYNAMIC_LIGHTS; i++)
 		{
@@ -877,14 +877,14 @@ static int  GENESISCC gePuppet_ComputeAmbientLight(
 			aLight = (light*)geEntity_GetUserData(entity);
 			Position = &(aLight->origin);
 			geVec3d_Subtract(Position,ReferencePoint,&Normal);
-			LP[cnt].Distance = Normal.X * Normal.X    + 
+			LP[cnt].Distance = Normal.X * Normal.X    +
 				Normal.Y * Normal.Y +
 				Normal.Z * Normal.Z;
 			if (LP[cnt].Distance < aLight->light * aLight->light)
 			{
 				if (P->DoTestRayCollision == GE_TRUE)
 				{
-					if (!Trace_WorldCollisionExact3((geWorld*)World, ReferencePoint, Position, NULL,    NULL, NULL, NULL))
+					if (!Trace_WorldCollisionExact3((geWorld*)World, ReferencePoint, Position, NULL, NULL, NULL, NULL))
 					{
 						LP[cnt].Color.Red = aLight->color.r;
 						LP[cnt].Color.Green = aLight->color.g;
@@ -894,7 +894,7 @@ static int  GENESISCC gePuppet_ComputeAmbientLight(
 						cnt++;
 					}
 				}
-				else 
+				else
 				{
 					LP[cnt].Color.Red = aLight->color.r;
 					LP[cnt].Color.Green = aLight->color.g;
@@ -906,13 +906,13 @@ static int  GENESISCC gePuppet_ComputeAmbientLight(
 			}
 			entity = geEntity_EntitySetGetNextEntity(entitySet,    entity);
 		}
-// changed QuestOfDreams 05/02/2004	
+// changed QuestOfDreams 05/02/2004
 		// 08.05.2004 - begin change gekido
 		// made (geWorld*)World instead of just World for GetEntitySet parameter - had a warning during compile
 		entitySet = geWorld_GetEntitySet((geWorld*)World, "spotlight");
 		if (entitySet != NULL)
 			entity = geEntity_EntitySetGetNextEntity(entitySet, entity);
-		
+
 		//loop through all static lights and select the ones that touch the actor, with    a max limit of MAX_DYNAMIC_LIGHTS
 		for (i=0; entity != NULL && cnt<MAX_DYNAMIC_LIGHTS; i++)
 		{
@@ -922,17 +922,17 @@ static int  GENESISCC gePuppet_ComputeAmbientLight(
 			sLight = (spotlight*)geEntity_GetUserData(entity);
 			Position = &(sLight->origin);
 			geVec3d_Subtract(Position,ReferencePoint,&Normal);
-			LP[cnt].Distance = Normal.X * Normal.X    + 
+			LP[cnt].Distance = Normal.X * Normal.X    +
 				Normal.Y * Normal.Y +
 				Normal.Z * Normal.Z;
-			
+
 			if (LP[cnt].Distance < sLight->light * sLight->light)
 			{
 				geVec3d		LDir;
 				geXForm3d	XForm;
 				geFloat Angle;
-				geFloat		LAngle =(geFloat)cos((sLight->arc/360.0f)*GE_PI); 
-			
+				geFloat		LAngle =(geFloat)cos((sLight->arc/360.0f)*GE_PI);
+
 				LDir.X = (sLight->angles.X / 180.0f) * GE_PI;
 				LDir.Y = (sLight->angles.Y / 180.0f) * GE_PI;
 				LDir.Z = (sLight->angles.Z / 180.0f) * GE_PI;
@@ -943,7 +943,7 @@ static int  GENESISCC gePuppet_ComputeAmbientLight(
 				LDir.X = -LDir.X;
 				LDir.Y = -LDir.Y;
 				LDir.Z = -LDir.Z;
-				
+
 				Angle = -geVec3d_DotProduct(&Normal, &LDir);
 				if(Angle < LAngle)
 				{
@@ -962,13 +962,13 @@ static int  GENESISCC gePuppet_ComputeAmbientLight(
 						LP[cnt].Normal = Normal;
 
 /*	01/08/2004 Wendell Buckner
-    DOT3 BUMPMAPPING  */
-	                    LP[cnt].Position = *Position; 
+	DOT3 BUMPMAPPING  */
+						LP[cnt].Position = *Position;
 
 						cnt++;
 					}
 				}
-				else 
+				else
 				{
 					LP[cnt].Color.Red = sLight->color.r;
 					LP[cnt].Color.Green = sLight->color.g;
@@ -977,8 +977,8 @@ static int  GENESISCC gePuppet_ComputeAmbientLight(
 					LP[cnt].Normal = Normal;
 
 /*	01/08/2004 Wendell Buckner
-    DOT3 BUMPMAPPING  */
-	                LP[cnt].Position = *Position; 
+	DOT3 BUMPMAPPING  */
+					LP[cnt].Position = *Position;
 
 					cnt++;
 				}
@@ -1000,7 +1000,7 @@ static int  GENESISCC gePuppet_ComputeAmbientLight(
 				}
 			}
 		}
-		
+
 		// go back and finish setting up    closest lights
 		for (i=0; i<cnt; i++)
 		{
@@ -1020,19 +1020,19 @@ static int  GENESISCC gePuppet_ComputeAmbientLight(
 			LP[i].Color.Green *= Scale;
 			LP[i].Color.Blue *= Scale;
 		}
-		
+
 		return cnt;
-	} 
+	}
 	//if ambient light is static
 	if (P->AmbientLightFromFloor == GE_FALSE && P->AmbientLightFromStaticLights    == GE_FALSE)
 	{
 		*Ambient = P->AmbientLightIntensity;
 
-/*  03/10/2004 Wendell Buckner                                                            
-     Ambient light is leeking into objects that should not receive light, each object     
-     will have it's own ambient property so ONLY those objects that should receive,       
-     do receive ambient light.                                                          */
-	     *pcAmbient = *Ambient;
+/*  03/10/2004 Wendell Buckner
+	 Ambient light is leeking into objects that should not receive light, each object
+	 will have it's own ambient property so ONLY those objects that should receive,
+	 do receive ambient light.                                                          */
+		 *pcAmbient = *Ambient;
 		 gePuppet_StaticLightGrp.Ambient = *Ambient;
 
 	}
@@ -1043,80 +1043,80 @@ static void GENESISCC gePuppet_SetVertexColor(
 	GE_LVertex *v,int BoneIndex)
 {
 	geFloat RedIntensity,GreenIntensity,BlueIntensity;
-	geFloat Color;						
+	geFloat Color;
 	int l;
 
 	assert( v );
-	
+
 	RedIntensity   = gePuppet_StaticLightGrp.Ambient.Red;
 	GreenIntensity = gePuppet_StaticLightGrp.Ambient.Green;
 	BlueIntensity  = gePuppet_StaticLightGrp.Ambient.Blue;
 
 	if (gePuppet_StaticLightGrp.UseFillLight)
+	{
+		geFloat Intensity;
+		Intensity = gePuppet_StaticLightGrp.FillLightNormal.X * gePuppet_StaticLightGrp.SurfaceNormal.X +
+					gePuppet_StaticLightGrp.FillLightNormal.Y * gePuppet_StaticLightGrp.SurfaceNormal.Y +
+					gePuppet_StaticLightGrp.FillLightNormal.Z * gePuppet_StaticLightGrp.SurfaceNormal.Z;
+		if (Intensity > 0.0)
 		{
-			geFloat Intensity;
-			Intensity = gePuppet_StaticLightGrp.FillLightNormal.X * gePuppet_StaticLightGrp.SurfaceNormal.X + 
-						gePuppet_StaticLightGrp.FillLightNormal.Y * gePuppet_StaticLightGrp.SurfaceNormal.Y + 
-						gePuppet_StaticLightGrp.FillLightNormal.Z * gePuppet_StaticLightGrp.SurfaceNormal.Z;
-			if (Intensity > 0.0)
-				{
-					RedIntensity   += Intensity * gePuppet_StaticLightGrp.FillLightColor.Red;
-					GreenIntensity += Intensity * gePuppet_StaticLightGrp.FillLightColor.Green;
-					BlueIntensity  += Intensity * gePuppet_StaticLightGrp.FillLightColor.Blue;
-				}
+			RedIntensity   += Intensity * gePuppet_StaticLightGrp.FillLightColor.Red;
+			GreenIntensity += Intensity * gePuppet_StaticLightGrp.FillLightColor.Green;
+			BlueIntensity  += Intensity * gePuppet_StaticLightGrp.FillLightColor.Blue;
 		}
+	}
 
 	if (gePuppet_StaticLightGrp.PerBoneLighting)
+	{
+		gePuppet_BoneLight *L;
+		L=&(gePuppet_StaticBoneLightArray[BoneIndex]);
+
+		for (l=0; l<L->LightCount; l++)
 		{
-			gePuppet_BoneLight *L;
-			L=&(gePuppet_StaticBoneLightArray[BoneIndex]);
+			geVec3d *LightNormal;
+			geFloat Intensity;
 
-			for (l=0; l<L->LightCount; l++)
-				{
-					geVec3d *LightNormal;
-					geFloat Intensity;
-				
-					LightNormal = &(L->Lights[l].Normal);
+			LightNormal = &(L->Lights[l].Normal);
 
-					Intensity=	LightNormal->X * gePuppet_StaticLightGrp.SurfaceNormal.X + 
-								LightNormal->Y * gePuppet_StaticLightGrp.SurfaceNormal.Y + 
-								LightNormal->Z * gePuppet_StaticLightGrp.SurfaceNormal.Z;
-					if (Intensity > 0.0f)
-						{
-							RedIntensity   += Intensity * L->Lights[l].Color.Red;
-							GreenIntensity += Intensity * L->Lights[l].Color.Green;
-							BlueIntensity  += Intensity * L->Lights[l].Color.Blue;
-						}
-				}
+			Intensity=	LightNormal->X * gePuppet_StaticLightGrp.SurfaceNormal.X +
+						LightNormal->Y * gePuppet_StaticLightGrp.SurfaceNormal.Y +
+						LightNormal->Z * gePuppet_StaticLightGrp.SurfaceNormal.Z;
+			if (Intensity > 0.0f)
+			{
+				RedIntensity   += Intensity * L->Lights[l].Color.Red;
+				GreenIntensity += Intensity * L->Lights[l].Color.Green;
+				BlueIntensity  += Intensity * L->Lights[l].Color.Blue;
+			}
 		}
+	}
 	else
+	{
+		for (l=0; l<gePuppet_StaticLightGrp.LightCount; l++)
 		{
-			for (l=0; l<gePuppet_StaticLightGrp.LightCount; l++)
-				{
-					geVec3d *LightNormal;
-					geFloat Intensity;
-				
-					LightNormal = &(gePuppet_StaticLightGrp.Lights[l].Normal);
+			geVec3d *LightNormal;
+			geFloat Intensity;
 
-					Intensity=	LightNormal->X * gePuppet_StaticLightGrp.SurfaceNormal.X + 
-								LightNormal->Y * gePuppet_StaticLightGrp.SurfaceNormal.Y + 
-								LightNormal->Z * gePuppet_StaticLightGrp.SurfaceNormal.Z;
-					if (Intensity > 0.0f)
-						{
-							RedIntensity   += Intensity * gePuppet_StaticLightGrp.Lights[l].Color.Red;
-							GreenIntensity += Intensity * gePuppet_StaticLightGrp.Lights[l].Color.Green;
-							BlueIntensity  += Intensity * gePuppet_StaticLightGrp.Lights[l].Color.Blue;
-						}
-				}
+			LightNormal = &(gePuppet_StaticLightGrp.Lights[l].Normal);
+
+			Intensity=	LightNormal->X * gePuppet_StaticLightGrp.SurfaceNormal.X +
+						LightNormal->Y * gePuppet_StaticLightGrp.SurfaceNormal.Y +
+						LightNormal->Z * gePuppet_StaticLightGrp.SurfaceNormal.Z;
+			if (Intensity > 0.0f)
+			{
+				RedIntensity   += Intensity * gePuppet_StaticLightGrp.Lights[l].Color.Red;
+				GreenIntensity += Intensity * gePuppet_StaticLightGrp.Lights[l].Color.Green;
+				BlueIntensity  += Intensity * gePuppet_StaticLightGrp.Lights[l].Color.Blue;
+			}
 		}
+	}
 	for (l=0; l<gePuppet_StaticLightGrp.StaticLightCount; l++)
 	{
 		geVec3d *LightNormal;
 		float Intensity;
-		
+
 		LightNormal = &(gePuppet_StaticLightGrp.StaticLights[l].Normal);
-		Intensity= LightNormal->X * gePuppet_StaticLightGrp.SurfaceNormal.X + 
-			LightNormal->Y * gePuppet_StaticLightGrp.SurfaceNormal.Y + 
+		Intensity= LightNormal->X * gePuppet_StaticLightGrp.SurfaceNormal.X +
+			LightNormal->Y * gePuppet_StaticLightGrp.SurfaceNormal.Y +
 			LightNormal->Z * gePuppet_StaticLightGrp.SurfaceNormal.Z;
 		if (Intensity > 0.0f)
 		{
@@ -1125,7 +1125,7 @@ static void GENESISCC gePuppet_SetVertexColor(
 			BlueIntensity += Intensity * gePuppet_StaticLightGrp.StaticLights[l].Color.Blue;
 		}
 	}
-	
+
 	Color = gePuppet_StaticLightGrp.MaterialColor.Red * RedIntensity;
 	if (Color > 255.0f)
 		Color = 255.0f;
@@ -1150,66 +1150,66 @@ static void GENESISCC gePuppet_SetVertexColor(
 }
 
 /*	01/08/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
+	DOT3 BUMPMAPPING */
 static void GENESISCC gePuppet_SetVertexColorDot3( GE_LVertex *v, int16 VertexIndex, const geXForm3d *Mdl2WldXFA, const geBodyInst *BI, int16 LightType, geBoolean *Reset )
 {
 	geVec3d tempPosition;
 
-    geFloat d1 = gePuppet_StaticLightGrp.Lights[0].Distance;
+	geFloat d1 = gePuppet_StaticLightGrp.Lights[0].Distance;
 	geFloat d2 = gePuppet_StaticLightGrp.StaticLights[0].Distance;
 
 	assert( v );
- 
+
 	if ( !d1 || !d2 )
 	{
-	 geFloat d3;
-     d3 = d1;
-	 d1 = d2;
-	 d2 = d3;
+		geFloat d3;
+		d3 = d1;
+		d1 = d2;
+		d2 = d3;
 	}
 
 //	a. Get light position
 	if ( d1 < d2 )
-	 tempPosition = gePuppet_StaticLightGrp.Lights[0].Position;
-    else
-	 tempPosition = gePuppet_StaticLightGrp.StaticLights[0].Position;
+		tempPosition = gePuppet_StaticLightGrp.Lights[0].Position;
+	else
+		tempPosition = gePuppet_StaticLightGrp.StaticLights[0].Position;
 
-    geBodyInst_SetVertexColorDot3( tempPosition, Mdl2WldXFA, BI, VertexIndex, &v->r, LightType, Reset );
-	
-} 
+	geBodyInst_SetVertexColorDot3( tempPosition, Mdl2WldXFA, BI, VertexIndex, &v->r, LightType, Reset );
+
+}
 
 /* 02/12/2004 Wendell Buckner
-    SPHEREMAPPING */
+	SPHEREMAPPING */
 static void GENESISCC gePuppet_SetSphereMapUV (	GE_LVertex *v, geVec3d *vNormal, const geCamera *Camera )
 {
-		const geXForm3d *ObjectToCamera;
-		geVec3d SphereNormal;
+	const geXForm3d *ObjectToCamera;
+	geVec3d SphereNormal;
 
-		ObjectToCamera = geCamera_GetCameraSpaceXForm(Camera);
+	ObjectToCamera = geCamera_GetCameraSpaceXForm(Camera);
 
-		assert( ObjectToCamera );
-		
-		geXForm3d_Rotate(ObjectToCamera,vNormal,&SphereNormal);
+	assert( ObjectToCamera );
+
+	geXForm3d_Rotate(ObjectToCamera,vNormal,&SphereNormal);
 
 //but this doesn't work...
-        v->u = (SphereNormal.X/2) + 0.5f;
-        v->v = (SphereNormal.Y/2) + 0.5f;
+	v->u = (SphereNormal.X/2) + 0.5f;
+	v->v = (SphereNormal.Y/2) + 0.5f;
 
-} 
+}
 
-static void GENESISCC gePuppet_DrawShadow(const gePuppet *P, 
-						const gePose *Joints, 
-						geEngine *Engine, 
-						geWorld *World, 
+static void GENESISCC gePuppet_DrawShadow(const gePuppet *P,
+						const gePose *Joints,
+						geEngine *Engine,
+						geWorld *World,
 						const geCamera *Camera)
 {
 	GE_LVertex v[3];
-	
+
 	geVec3d Impact;
 	geBoolean GoodImpact;
 	GFX_Plane		Plane;
 	geXForm3d RootTransform;
-	
+
 	assert( P );
 	assert( World );
 	assert( Camera );
@@ -1221,36 +1221,36 @@ static void GENESISCC gePuppet_DrawShadow(const gePuppet *P,
 	gePose_GetJointTransform(Joints,P->ShadowBoneIndex,&RootTransform);
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) */
-    geTClip_SetOverallAlpha ( P->OverallAlpha );
-	
+	BUG FIX: Rendering Transparent Polys properly (2) */
+	geTClip_SetOverallAlpha ( P->OverallAlpha );
+
 	{
 		geVec3d			Pos1, Pos2;
 		GE_Collision	Collision;
 
 		Pos1 = RootTransform.Translation;
-			
+
 		Pos2 = Pos1;
 
 		Pos2.Y -= 30000.0f;
 
 		// Get shadow hit plane impact point
 		GoodImpact = Trace_GEWorldCollision(World,
-		 		NULL,
-		 		NULL,
-				&Pos1,  
-				&Pos2, 
-				GE_CONTENTS_SOLID_CLIP,  
+				NULL,
+				NULL,
+				&Pos1,
+				&Pos2,
+				GE_CONTENTS_SOLID_CLIP,
 				GE_COLLIDE_MODELS,
 				0,
 				NULL,
 				NULL,
 				&Collision);
 
-   		//if(GoodImpact) 
-	   		Impact = Collision.Impact;
-   		//else
-	   		//return;
+		//if(GoodImpact)
+			Impact = Collision.Impact;
+		//else
+			//return;
 	}
 
 	Impact.Y += 1.0f;
@@ -1267,14 +1267,14 @@ static void GENESISCC gePuppet_DrawShadow(const gePuppet *P,
 		geVec3d In,Left;
 		geVec3d Up;
 		geVec3d Zero = {0.0f,0.0f,0.0f};
-		
+
 		geVec3d_Subtract(&Impact,&(RootTransform.Translation),&Up);
 		geVec3d_Normalize(&Up);
 		geVec3d_CrossProduct(&(Plane.Normal),&Up,&Left);
 		if (geVec3d_Compare(&Left,&Zero,0.001f)!=GE_FALSE)
-			{
-				geXForm3d_GetLeft(&(RootTransform),&Left);
-			}
+		{
+			geXForm3d_GetLeft(&(RootTransform),&Left);
+		}
 		geVec3d_CrossProduct(&Left,&(Plane.Normal),&In);
 
 		geVec3d_Normalize(&Left);
@@ -1304,7 +1304,7 @@ static void GENESISCC gePuppet_DrawShadow(const gePuppet *P,
 
 		ws[2].X = RootTransform.Translation.X - Left.X + In.X;
 		ws[2].Z = RootTransform.Translation.Z - Left.Z + In.Z;
-		
+
 		ws[3].X = RootTransform.Translation.X + Left.X + In.X;
 		ws[3].Z = RootTransform.Translation.Z + Left.Z + In.Z;
 
@@ -1314,12 +1314,12 @@ static void GENESISCC gePuppet_DrawShadow(const gePuppet *P,
 			geCamera_Project(Camera,&ws[i],&ws[i]);
 		}
 
-		
+
 		s[0].X = ws[0].X; s[0].Y = ws[0].Y; s[0].Z = ws[0].Z;
 		s[1].X = ws[1].X; s[1].Y = ws[1].Y; s[1].Z = ws[1].Z;
 		s[2].X = ws[2].X; s[2].Y = ws[2].Y; s[2].Z = ws[2].Z;
 		s[3].X = ws[3].X; s[3].Y = ws[3].Y; s[3].Z = ws[3].Z;
-		
+
 		geTClip_SetTexture(P->ShadowMap);
 
 		geTClip_Triangle(s);
@@ -1329,16 +1329,16 @@ static void GENESISCC gePuppet_DrawShadow(const gePuppet *P,
 		geTClip_Triangle(s);
 	}
 #endif
-	
+
 #ifdef CIRCULAR_SHADOW
 	v[0].a = v[1].a = v[2].a = 160.0f;
 	v[0].u = v[1].u = v[2].u = 0.5f;
 	v[0].v = v[1].v = v[2].v = 0.5f;
-	
+
 	v[0].X = Impact.X;
 	v[0].Y = v[1].Y = v[2].Y = Impact.Y;
 	v[0].Z = Impact.Z;
-	
+
 	{
 		int steps = 30;
 		int i;
@@ -1365,40 +1365,40 @@ static void GENESISCC gePuppet_DrawShadow(const gePuppet *P,
 		v[1].Y = V.Y;
 		v[1].Z = V.Z;
 		for (i=0; i<steps+1; i++)
-			{
-				v[2] = v[1];
+		{
+			v[2] = v[1];
 
-				V = Impact;
-				V.X += (geFloat)(sin( Angle ) * Radius);
-				V.Z += (geFloat)(cos( Angle ) * Radius);
-				geCamera_Transform(Camera,&V,&V);
-				geCamera_Project(Camera,&V,&V);
-				v[1].X = V.X;
-				v[1].Y = V.Y;
-				v[1].Z = V.Z;
+			V = Impact;
+			V.X += (geFloat)(sin( Angle ) * Radius);
+			V.Z += (geFloat)(cos( Angle ) * Radius);
+			geCamera_Transform(Camera,&V,&V);
+			geCamera_Project(Camera,&V,&V);
+			v[1].X = V.X;
+			v[1].Y = V.Y;
+			v[1].Z = V.Z;
 
-				Angle = Angle + DAngleDStep;
-				geEngine_RenderPoly(Engine, (GE_TLVertex *)v, 3, P->ShadowMap, 0 );
-				//geTClip_Triangle(v);
-			}
+			Angle = Angle + DAngleDStep;
+			geEngine_RenderPoly(Engine, (GE_TLVertex *)v, 3, P->ShadowMap, 0 );
+			//geTClip_Triangle(v);
+		}
 	}
 #endif
 
-#ifdef PROJECTED_SHADOW			
+#ifdef PROJECTED_SHADOW
 	{
 		int i,j,Count;
 		geBodyInst_Index *List;
 		geBodyInst_Index Command;
 		geBody_SkinVertex *SV;
-		
+
 		G = geBodyInst_GetShadowGeometry(P->BodyInstance,
 						gePose_GetAllJointTransforms(Joints),0,Camera,&Impact);
 
 		if ( G == NULL )
-			{
-				geErrorLog_Add(ERR_PUPPET_RENDER, NULL);
-				return GE_FALSE;
-			}
+		{
+			geErrorLog_Add(ERR_PUPPET_RENDER, NULL);
+			return GE_FALSE;
+		}
 
 		geTClip_SetTexture(NULL);
 
@@ -1406,96 +1406,96 @@ static void GENESISCC gePuppet_DrawShadow(const gePuppet *P,
 		List  = G->FaceList;
 
 		for (i=0; i<Count; i++)
-			{	
-				Command = *List;
-				List ++;
-				//Material = *List;
-				List ++;
+		{
+			Command = *List;
+			List ++;
+			//Material = *List;
+			List ++;
 
-				assert( Command == GE_BODY_FACE_TRIANGLE );
+			assert( Command == GE_BODY_FACE_TRIANGLE );
 
+			{
+				geFloat AX,AY,BXMinusAX,BYMinusAY,CYMinusAY,CXMinusAX;
+				geBodyInst_Index *List2;
+
+				List2 = List;
+				SV = &(G->SkinVertexArray[ *List2 ]);
+				AX = SV->SVPoint.X;
+				AY = SV->SVPoint.Y;
+				List2++;
+				List2++;
+
+				SV = &(G->SkinVertexArray[ *List2 ]);
+				BXMinusAX = SV->SVPoint.X - AX;
+				BYMinusAY = SV->SVPoint.Y - AY;
+				List2++;
+				List2++;
+
+				SV = &(G->SkinVertexArray[ *List2 ]);
+				CXMinusAX = SV->SVPoint.X - AX;
+				CYMinusAY = SV->SVPoint.Y - AY;
+				List2++;
+				List2++;
+
+				// ZCROSS is z the component of a 2d vector cross product of ABxAC
+				//#define ZCROSS(Ax,Ay,Bx,By,Cx,Cy)  ((((Bx)-(Ax))*((Cy)-(Ay))) - (((By)-(Ay))*((Cx)-(Ax))))
+
+				// 2d cross product of AB cross AC   (A is vtx[0], B is vtx[1], C is vtx[2]
+				if ( ((BXMinusAX * CYMinusAY) - (BYMinusAY * CXMinusAX)) > 0.0f )
 				{
-					geFloat AX,AY,BXMinusAX,BYMinusAY,CYMinusAY,CXMinusAX;
-					geBodyInst_Index *List2;
-					
-					List2 = List;
-					SV = &(G->SkinVertexArray[ *List2 ]);
-					AX = SV->SVPoint.X;
-					AY = SV->SVPoint.Y;
-					List2++;
-					List2++;
-					
-					SV = &(G->SkinVertexArray[ *List2 ]);
-					BXMinusAX = SV->SVPoint.X - AX;
-					BYMinusAY = SV->SVPoint.Y - AY;
-					List2++;
-					List2++;
-
-					SV = &(G->SkinVertexArray[ *List2 ]);
-					CXMinusAX = SV->SVPoint.X - AX;
-					CYMinusAY = SV->SVPoint.Y - AY;
-					List2++;
-					List2++;
-
-					// ZCROSS is z the component of a 2d vector cross product of ABxAC
-					//#define ZCROSS(Ax,Ay,Bx,By,Cx,Cy)  ((((Bx)-(Ax))*((Cy)-(Ay))) - (((By)-(Ay))*((Cx)-(Ax))))
-
-					// 2d cross product of AB cross AC   (A is vtx[0], B is vtx[1], C is vtx[2]
-					if ( ((BXMinusAX * CYMinusAY) - (BYMinusAY * CXMinusAX)) > 0.0f )
-						{
-							List = List2;
-							continue;
-						}
-				}						
-
-			#define SOME_SCALE (  255.0f / 40.0f )
-				for (j=0; j<3; j++)
-					{
-						SV = &(G->SkinVertexArray[ *List ]);
-						List++;
-
-						v[j].X = SV->SVPoint.X;
-						v[j].Y = SV->SVPoint.Y;
-						
-						v[j].Z = SV->SVPoint.Z;
-						//Environment mapping code
-						if( P->internal_env.UseEnvironmentMapping )
-						{
-							v[j].u = ( SV->SVU * P->internal_env.PercentPuppet );
-							v[j].v = ( SV->SVV * P->internal_env.PercentPuppet );
-							
-							if( P->internal_env.Supercede && !strncmp(PM->MaterialName,"env_", 4))
-							{
-								v[j].u += ( (G->NormalArray[ *List ]).X * P->internal_env.PercentMaterial);
-								v[j].v += ( (G->NormalArray[ *List ]).Y * P->internal_env.PercentMaterial);
-							}
-							else
-							{
-								v[j].u += ( (G->NormalArray[ *List ]).X * P->internal_env.PercentEnvironment);
-								v[j].v += ( (G->NormalArray[ *List ]).Y * P->internal_env.PercentEnvironment);
-							}
-						}
-						else
-						{
-							v[j].u = SV->SVU;
-							v[j].v = SV->SVV;
-							
-							if( P->internal_env.Supercede && !strncmp(PM->MaterialName,"env_", 4))
-							{
-								v[j].u += ( (G->NormalArray[ *List ]).X * P->internal_env.PercentMaterial);
-								v[j].v += ( (G->NormalArray[ *List ]).Y * P->internal_env.PercentMaterial);
-							}
-						}
-						
-						List++;
-						v[j].a = (255.0f- (SV->SVU * SOME_SCALE));
-					}
-			
-				if ((v[0].a > 0) && (v[1].a > 0) && (v[2].a > 0))
-					{
-						geTClip_Triangle(v);
-					}
+					List = List2;
+					continue;
+				}
 			}
+
+		#define SOME_SCALE (  255.0f / 40.0f )
+			for (j=0; j<3; j++)
+			{
+				SV = &(G->SkinVertexArray[ *List ]);
+				List++;
+
+				v[j].X = SV->SVPoint.X;
+				v[j].Y = SV->SVPoint.Y;
+
+				v[j].Z = SV->SVPoint.Z;
+				//Environment mapping code
+				if( P->internal_env.UseEnvironmentMapping )
+				{
+					v[j].u = ( SV->SVU * P->internal_env.PercentPuppet );
+					v[j].v = ( SV->SVV * P->internal_env.PercentPuppet );
+
+					if( P->internal_env.Supercede && !strncmp(PM->MaterialName,"env_", 4))
+					{
+						v[j].u += ( (G->NormalArray[ *List ]).X * P->internal_env.PercentMaterial);
+						v[j].v += ( (G->NormalArray[ *List ]).Y * P->internal_env.PercentMaterial);
+					}
+					else
+					{
+						v[j].u += ( (G->NormalArray[ *List ]).X * P->internal_env.PercentEnvironment);
+						v[j].v += ( (G->NormalArray[ *List ]).Y * P->internal_env.PercentEnvironment);
+					}
+				}
+				else
+				{
+					v[j].u = SV->SVU;
+					v[j].v = SV->SVV;
+
+					if( P->internal_env.Supercede && !strncmp(PM->MaterialName,"env_", 4))
+					{
+						v[j].u += ( (G->NormalArray[ *List ]).X * P->internal_env.PercentMaterial);
+						v[j].v += ( (G->NormalArray[ *List ]).Y * P->internal_env.PercentMaterial);
+					}
+				}
+
+				List++;
+				v[j].a = (255.0f- (SV->SVU * SOME_SCALE));
+			}
+
+			if ((v[0].a > 0) && (v[1].a > 0) && (v[2].a > 0))
+			{
+				geTClip_Triangle(v);
+			}
+		}
 		assert( ((uint32)List) - ((uint32)G->FaceList) == (uint32)(G->FaceListSize) );
 	}
 #endif
@@ -1527,43 +1527,43 @@ geEnvironmentOptions GENESISCC gePuppet_GetEnvironmentOptions( gePuppet *P )
 }
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) */
-	
+	BUG FIX: Rendering Transparent Polys properly (2) */
+
 geBoolean GENESISCC gePuppet_AddToGList ( const GE_TLVertex *Points, int NumPoints, const geBitmap *Bitmap, uint32 Flags, geBoolean Flush )
 {
 	static gePoly *PuppetTransPolyList = NULL;
 	static gePoly *CurrentPuppetTransPoly = NULL;
 	gePoly *PuppetTransPoly = NULL;
-    geBoolean AddedToGList = GE_FALSE;
+	geBoolean AddedToGList = GE_FALSE;
 	int i = 0;
 
 /* 08/11/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2)
+	BUG FIX: Rendering Transparent Polys properly (2)
 	 Allow processing of 5 or more verts by splitting int seperate gePolys */
 	int j = 0;
-    int StartPoint = 0;
-    int EndPoint = 0;
+	int StartPoint = 0;
+	int EndPoint = 0;
 	int AddPoints = 0;
-    int NewPoints = 0;
+	int NewPoints = 0;
 
 	do
 	{
 		if ( !Points ) break;
 
 /* 08/11/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2)
-	 You must have at least 3 points 
+	BUG FIX: Rendering Transparent Polys properly (2)
+	 You must have at least 3 points
 		if ( NumPoints < 2 ) break; */
 		if ( NumPoints < 3 ) break;
 
 		PuppetTransPoly = GE_RAM_ALLOCATE_STRUCT(gePoly);
 
 		if ( !PuppetTransPoly ) break;
-	
-		PuppetTransPoly->AddOnceNext = NULL;	
+
+		PuppetTransPoly->AddOnceNext = NULL;
 		PuppetTransPoly->LeafData = NULL;
-		PuppetTransPoly->Next = NULL;	
-		PuppetTransPoly->Prev = NULL;    
+		PuppetTransPoly->Next = NULL;
+		PuppetTransPoly->Prev = NULL;
 		PuppetTransPoly->Scale = 1.0f;
 
 		#ifdef _DEBUG
@@ -1578,53 +1578,53 @@ geBoolean GENESISCC gePuppet_AddToGList ( const GE_TLVertex *Points, int NumPoin
 
 		PuppetTransPoly->World = NULL;
 		PuppetTransPoly->ZOrder = 0.0f;
-    
+
 		PuppetTransPoly->Bitmap = (geBitmap*) Bitmap;
 
 /* 08/11/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2)
+	BUG FIX: Rendering Transparent Polys properly (2)
 	 Allow processing of 5 or more verts by splitting int seperate gePolys
-		if ( NumPoints > 4 ) NumPoints = 4; 
+		if ( NumPoints > 4 ) NumPoints = 4;
 		PuppetTransPoly->NumVerts = NumPoints; */
 
 		PuppetTransPoly->RenderFlags = Flags | GE_RENDER_DEPTH_SORT_BF;
 
 /* 08/11/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2)
+	BUG FIX: Rendering Transparent Polys properly (2)
 	 Allow processing of 5 or more verts by splitting int seperate gePolys *
 		for ( i=0; i < NumPoints; i++)
 		{
-			PuppetTransPoly->Verts[i].a = Points[i].a; 
-			PuppetTransPoly->Verts[i].b = Points[i].b; 
-			PuppetTransPoly->Verts[i].g = Points[i].g; 
+			PuppetTransPoly->Verts[i].a = Points[i].a;
+			PuppetTransPoly->Verts[i].b = Points[i].b;
+			PuppetTransPoly->Verts[i].g = Points[i].g;
 			PuppetTransPoly->Verts[i].r = Points[i].r;
-			PuppetTransPoly->Verts[i].u = Points[i].u;  
-			PuppetTransPoly->Verts[i].v = Points[i].v; 
-			PuppetTransPoly->Verts[i].X = Points[i].x; 
-			PuppetTransPoly->Verts[i].Y = Points[i].y; 
-			PuppetTransPoly->Verts[i].Z = Points[i].z; 
+			PuppetTransPoly->Verts[i].u = Points[i].u;
+			PuppetTransPoly->Verts[i].v = Points[i].v;
+			PuppetTransPoly->Verts[i].X = Points[i].x;
+			PuppetTransPoly->Verts[i].Y = Points[i].y;
+			PuppetTransPoly->Verts[i].Z = Points[i].z;
 		} */
 		if ( StartPoint >= 4 )
 		{
-			PuppetTransPoly->Verts[0].a = Points[0].a; 
-			PuppetTransPoly->Verts[0].b = Points[0].b; 
-			PuppetTransPoly->Verts[0].g = Points[0].g; 
+			PuppetTransPoly->Verts[0].a = Points[0].a;
+			PuppetTransPoly->Verts[0].b = Points[0].b;
+			PuppetTransPoly->Verts[0].g = Points[0].g;
 			PuppetTransPoly->Verts[0].r = Points[0].r;
-			PuppetTransPoly->Verts[0].u = Points[0].u;  
-			PuppetTransPoly->Verts[0].v = Points[0].v; 
-			PuppetTransPoly->Verts[0].X = Points[0].x; 
-			PuppetTransPoly->Verts[0].Y = Points[0].y; 
-			PuppetTransPoly->Verts[0].Z = Points[0].z; 
+			PuppetTransPoly->Verts[0].u = Points[0].u;
+			PuppetTransPoly->Verts[0].v = Points[0].v;
+			PuppetTransPoly->Verts[0].X = Points[0].x;
+			PuppetTransPoly->Verts[0].Y = Points[0].y;
+			PuppetTransPoly->Verts[0].Z = Points[0].z;
 
-			PuppetTransPoly->Verts[1].a = Points[StartPoint-1].a; 
-			PuppetTransPoly->Verts[1].b = Points[StartPoint-1].b; 
-			PuppetTransPoly->Verts[1].g = Points[StartPoint-1].g; 
+			PuppetTransPoly->Verts[1].a = Points[StartPoint-1].a;
+			PuppetTransPoly->Verts[1].b = Points[StartPoint-1].b;
+			PuppetTransPoly->Verts[1].g = Points[StartPoint-1].g;
 			PuppetTransPoly->Verts[1].r = Points[StartPoint-1].r;
-			PuppetTransPoly->Verts[1].u = Points[StartPoint-1].u;  
-			PuppetTransPoly->Verts[1].v = Points[StartPoint-1].v; 
-			PuppetTransPoly->Verts[1].X = Points[StartPoint-1].x; 
-			PuppetTransPoly->Verts[1].Y = Points[StartPoint-1].y; 
-			PuppetTransPoly->Verts[1].Z = Points[StartPoint-1].z; 
+			PuppetTransPoly->Verts[1].u = Points[StartPoint-1].u;
+			PuppetTransPoly->Verts[1].v = Points[StartPoint-1].v;
+			PuppetTransPoly->Verts[1].X = Points[StartPoint-1].x;
+			PuppetTransPoly->Verts[1].Y = Points[StartPoint-1].y;
+			PuppetTransPoly->Verts[1].Z = Points[StartPoint-1].z;
 
 			j = 2;
 			NewPoints = 2;
@@ -1653,18 +1653,18 @@ geBoolean GENESISCC gePuppet_AddToGList ( const GE_TLVertex *Points, int NumPoin
 
 		for ( i = StartPoint; i < EndPoint; i++, j++ )
 		{
-			PuppetTransPoly->Verts[j].a = Points[i].a; 
-			PuppetTransPoly->Verts[j].b = Points[i].b; 
-			PuppetTransPoly->Verts[j].g = Points[i].g; 
+			PuppetTransPoly->Verts[j].a = Points[i].a;
+			PuppetTransPoly->Verts[j].b = Points[i].b;
+			PuppetTransPoly->Verts[j].g = Points[i].g;
 			PuppetTransPoly->Verts[j].r = Points[i].r;
-			PuppetTransPoly->Verts[j].u = Points[i].u;  
-			PuppetTransPoly->Verts[j].v = Points[i].v; 
-			PuppetTransPoly->Verts[j].X = Points[i].x; 
-			PuppetTransPoly->Verts[j].Y = Points[i].y; 
-			PuppetTransPoly->Verts[j].Z = Points[i].z; 
+			PuppetTransPoly->Verts[j].u = Points[i].u;
+			PuppetTransPoly->Verts[j].v = Points[i].v;
+			PuppetTransPoly->Verts[j].X = Points[i].x;
+			PuppetTransPoly->Verts[j].Y = Points[i].y;
+			PuppetTransPoly->Verts[j].Z = Points[i].z;
 		}
 
-		if ( !PuppetTransPolyList ) 
+		if ( !PuppetTransPolyList )
 			PuppetTransPolyList = PuppetTransPoly;
 
 		if ( CurrentPuppetTransPoly )
@@ -1672,7 +1672,7 @@ geBoolean GENESISCC gePuppet_AddToGList ( const GE_TLVertex *Points, int NumPoin
 			PuppetTransPoly->Prev = CurrentPuppetTransPoly;
 			CurrentPuppetTransPoly->Next = PuppetTransPoly;
 		}
-			
+
 		CurrentPuppetTransPoly = PuppetTransPoly;
 
 		PuppetTransPolyList->Prev = CurrentPuppetTransPoly;
@@ -1680,17 +1680,17 @@ geBoolean GENESISCC gePuppet_AddToGList ( const GE_TLVertex *Points, int NumPoin
 		AddedToGList = GE_TRUE;
 
 /* 08/11/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2)
+	BUG FIX: Rendering Transparent Polys properly (2)
 	 Allow processing of 5 or more verts by splitting int seperate gePolys */
 		StartPoint += NewPoints;
 
 		if ( StartPoint >= NumPoints ) break;
-	
+
 	} while (GE_TRUE);
 
 	if ( Flush )
 	{
-	    if ( PuppetTransPolyList )
+		if ( PuppetTransPolyList )
 			GList_AddOperation ( 2, (uint32) PuppetTransPolyList );
 
 		PuppetTransPolyList = NULL;
@@ -1699,7 +1699,7 @@ geBoolean GENESISCC gePuppet_AddToGList ( const GE_TLVertex *Points, int NumPoin
 	}
 
 	return AddedToGList;
-} 
+}
 
 geBoolean GENESISCC gePuppet_IsTransparent ( const geFloat OverallAlpha, const geBitmap **Bitmap, geBoolean *IsTransparent, uint32 Count )
 {
@@ -1717,23 +1717,23 @@ geBoolean GENESISCC gePuppet_IsTransparent ( const geFloat OverallAlpha, const g
 		if ( PuppetIsTransparent ) break;
 
 		for ( i = 0; i < Count; i++ )
-		{	
+		{
 			if ( !Bitmap[i] ) continue;
 
-			IsTransparent[i] = geBitmap_HasAlpha(Bitmap[i]); 
+			IsTransparent[i] = geBitmap_HasAlpha(Bitmap[i]);
 
 			if ( !PuppetIsTransparent && IsTransparent[i])
 				PuppetIsTransparent = GE_TRUE;
 
 			if ( IsTransparent[i] ) continue;
 
-			IsTransparent[i] = geBitmap_UsesColorKey(Bitmap[i]); 
+			IsTransparent[i] = geBitmap_UsesColorKey(Bitmap[i]);
 		}
 
 	} while ( GE_FALSE );
 
 	return PuppetIsTransparent;
-}  
+}
 
 //****
 //changed QD Clipping
@@ -1754,12 +1754,12 @@ void GENESISCC gePuppet_SetAlpha( gePuppet *P, geFloat Alpha )
 }
 
 // LWM_ACTOR_RENDERING
-geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P, 
-						const gePose *Joints, 
-						const geExtBox *Box, 
-						geEngine *Engine, 
-						geWorld *World, 
-						const geCamera *Camera, 
+geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
+						const gePose *Joints,
+						const geExtBox *Box,
+						geEngine *Engine,
+						geWorld *World,
+						const geCamera *Camera,
 						Frustum_Info *FInfo)
 {
 	int32		ClipFlags;
@@ -1769,23 +1769,23 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 
 
 /*	01/08/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
+	DOT3 BUMPMAPPING */
 	int BoneCount;
 	const geXForm3d *XFA;
 	geBoolean ResetDot3 = GE_TRUE;
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) */
+	BUG FIX: Rendering Transparent Polys properly (2) */
 	geBoolean *MaterialIsTransparent = NULL;
 	geBitmap **MaterialArray = NULL;
 	int32    MaterialCount = 0;
-    int32    i = 0;
+	int32    i = 0;
 
 // changed QD Performance
 	if(P->OverallAlpha==0.0f)
 		return GE_TRUE;
 // end change
-	
+
 	JointTransforms = gePose_GetAllJointTransforms(Joints);
 	XFA = geXFArray_GetElements(JointTransforms, &BoneCount);
 
@@ -1814,7 +1814,7 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 	// Setup clip flags...
 	ClipFlags = 0xffff;
 
-// changed QD Clipping 
+// changed QD Clipping
 	{
 		//geExtBox	MinMaxs;
 		//geVec3d		d1, d2, d3;
@@ -1826,15 +1826,15 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 		//OriginalClips = NumClips;
 
 		//MinMaxs = *Box;
-			
+
 		Planes = FInfo->Planes;
 
 		for (k=0; k< FInfo->NumPlanes; k++, Planes++)
 		{
 			int32		Side;
-			
+
 			Planes->Type = PLANE_ANY;
-			
+
 			//Side = Trace_BoxOnPlaneSide(&MinMaxs.Min, &MinMaxs.Max, Planes);
 			Side = Trace_BoxOnPlaneSide(&(G->Mins), &(G->Maxs), Planes);
 
@@ -1843,23 +1843,23 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 				//NumClips = OriginalClips;
 				return GE_TRUE;
 			}
-			
+
 			if (Side == PSIDE_FRONT)
 			{
 				ClipFlags &= ~(1<<k);
 			}
 			//else
-			//	NumClips++;			
+			//	NumClips++;
 		}
 	}
 // end change
 
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2)*/
+	BUG FIX: Rendering Transparent Polys properly (2)*/
 	MaterialCount = P->MaterialCount;
 	MaterialArray = GE_RAM_ALLOCATE_ARRAY ( geBitmap *, MaterialCount );
-    MaterialIsTransparent = GE_RAM_ALLOCATE_ARRAY ( geBoolean, MaterialCount );
+	MaterialIsTransparent = GE_RAM_ALLOCATE_ARRAY ( geBoolean, MaterialCount );
 
 	for ( i = 0; i < MaterialCount; i++ )
 	{
@@ -1884,7 +1884,7 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 
 		gePose_GetJointTransform(Joints,P->LightReferenceBoneIndex,&(RootTransform));
 
-		// LWM_OPTIMIZATION: It seems that if you know that there are 
+		// LWM_OPTIMIZATION: It seems that if you know that there are
 		// no dynamic lights anywhere you could skip this test easily
 		if (P->MaxDynamicLightsToUse > 0)
 		{
@@ -1897,7 +1897,7 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 					if (gePuppet_StaticBoneLightArraySize < BoneCount)
 					{
 						gePuppet_BoneLight *LG;
-						
+
 						LG = geRam_Realloc(gePuppet_StaticBoneLightArray, sizeof(gePuppet_BoneLight) * BoneCount);
 						if (LG==NULL)
 						{
@@ -1927,16 +1927,16 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 
 		//XING Studios code
 
-/*  03/10/2004 Wendell Buckner                                                            
-     Ambient light is leeking into objects that should not receive light, each object     
-     will have it's own ambient property so ONLY those objects that should receive,       
-     do receive ambient light.                                                          
+/*  03/10/2004 Wendell Buckner
+	 Ambient light is leeking into objects that should not receive light, each object
+	 will have it's own ambient property so ONLY those objects that should receive,
+	 do receive ambient light.
 		gePuppet_StaticLightGrp.StaticLightCount = gePuppet_ComputeAmbientLight(P,World,&(gePuppet_StaticLightGrp.Ambient),gePuppet_StaticLightGrp.StaticLights,&(RootTransform.Translation)); */
 		gePuppet_StaticLightGrp.StaticLightCount = gePuppet_ComputeAmbientLight(P,World,(gePuppet_Color *) &(P->Ambient),gePuppet_StaticLightGrp.StaticLights,&(RootTransform.Translation));
 
-	 	NumFaces	= G->FaceCount;
+		NumFaces	= G->FaceCount;
 		List		= G->FaceList;
-		
+
 		// For each face, clip it to the view frustum supplied...
 		for (i=0; i<NumFaces; i++)
 		{
@@ -1947,7 +1947,7 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 			geVec3d				Dest2[MAX_TEMP_VERTS], *pDest2;
 			geVec3d				Verts[MAX_TEMP_VERTS], *pVerts, v1, v2, v3;
 			Surf_TexVert		TexVerts[MAX_TEMP_VERTS], Tex1[MAX_TEMP_VERTS], *pTexVerts;
-			Surf_TexVert		Tex2[MAX_TEMP_VERTS], *pTex1, *pTex2;			
+			Surf_TexVert		Tex2[MAX_TEMP_VERTS], *pTex1, *pTex2;
 			Surf_TLVertex		ScreenPts[MAX_TEMP_VERTS];
 			GFX_Plane			*FPlanes;
 			geBodyInst_Index		Command, Material;
@@ -1959,7 +1959,7 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 			List++;
 			Material = *List;
 			List ++;
-			
+
 			assert( Command == GE_BODYINST_FACE_TRIANGLE );
 			assert( Material>=0 );
 			assert( Material<P->MaterialCount);
@@ -1971,9 +1971,9 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 			// backface culling
 			{
 				geBodyInst_Index *List2;
-				
+
 				List2 = List;
-		
+
 				geVec3d_Copy(&(G->SkinVertexArray[*List2].SVPoint), &Verts[0]);
 				List2++;
 				List2++;
@@ -1984,7 +1984,7 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 				geVec3d_Subtract(&(G->SkinVertexArray[*List2].SVPoint), &Verts[1], &v1);
 				List2++;
 				List2++;
-			
+
 				geVec3d_Subtract(&Verts[0], &Verts[1], &v2);
 				geVec3d_CrossProduct(&v1, &v2, &v3);
 				geVec3d_Normalize(&v3);
@@ -2009,11 +2009,11 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 				GE_LVertex lvert;
 
 /*	01/08/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
+	DOT3 BUMPMAPPING */
 				geBodyInst_Index vIndex = *List;
 
 /*	03/15/2004 Wendell Buckner
-    SPHEREMAPPING */
+	SPHEREMAPPING */
 // changed QD bug fix
 				//	geBodyInst_Index nIndex;
 
@@ -2055,18 +2055,18 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 
 // changed QD bug fix
 /*	03/15/2004 Wendell Buckner
-    SPHEREMAPPING */
+	SPHEREMAPPING */
 			//	nIndex = *List;
 				gePuppet_StaticLightGrp.SurfaceNormal = (G->NormalArray[ *List ]);
-									
+
 			//	List++;
 
 				//gePuppet_SetVertexColor2(P,PM,&Ambient,SurfaceNormal, Lights,LightCount, pTexVerts);
 				gePuppet_SetVertexColor(&lvert, SVert->ReferenceBoneIndex);
 
 /*	01/08/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
-				if(geBitmap_IsBumpmapNameDot3(PM->MaterialName)) 
+	DOT3 BUMPMAPPING */
+				if(geBitmap_IsBumpmapNameDot3(PM->MaterialName))
 					gePuppet_SetVertexColorDot3(&lvert, vIndex, XFA, P->BodyInstance, 0, &ResetDot3);
 
 				pTexVerts->r = lvert.r;
@@ -2074,8 +2074,8 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 				pTexVerts->b = lvert.b;
 				pTexVerts->a = P->OverallAlpha;
 /*	03/15/2004 Wendell Buckner
-    SPHEREMAPPING */
-				if( geBitmap_IsSphereMapName ( PM->MaterialName ) ) 
+	SPHEREMAPPING */
+				if( geBitmap_IsSphereMapName ( PM->MaterialName ) )
 				{
 					gePuppet_SetSphereMapUV ( &lvert, &G->NormalArray[ *List ], Camera );
 					pTexVerts->u = lvert.u;
@@ -2083,9 +2083,9 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 				}
 
 				List++;
-// end change	
+// end change
 			}
-			
+
 			pDest1 = Verts;
 			pDest2 = Dest2;
 			pTex1 = TexVerts;
@@ -2104,7 +2104,7 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 					break;
 
 				assert(Length2 < MAX_TEMP_VERTS);
-				
+
 				if (pDest1 == Dest2)
 				{
 					pDest1 = Dest1;
@@ -2121,15 +2121,15 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 				}
 				Length1 = Length2;
 			}
-			
+
 			assert(Length1 < MAX_TEMP_VERTS);
-	  
+
 			if (p != FInfo->NumPlanes)
 				continue;				// Can't possibly be visible
 
 			if (Length1 < 3)
 				continue;				// Can't possibly be visible
-			
+
 // changed QD Clipping
 // is already in cameraspace
 			//for (v=0; v<Length1; v++)
@@ -2147,11 +2147,11 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 			#endif
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) *
-             geEngine_RenderPoly(Engine, (GE_TLVertex*)ScreenPts, Length1, PM->Bitmap, 0 );*/
+	BUG FIX: Rendering Transparent Polys properly (2) *
+			 geEngine_RenderPoly(Engine, (GE_TLVertex*)ScreenPts, Length1, PM->Bitmap, 0 );*/
 			if ( MaterialIsTransparent[Material] )
 /* 08/10/2004 Wendell Buckner
-    BUG FIX: Dumb copy/paste bug! 
+	BUG FIX: Dumb copy/paste bug!
 				gePuppet_AddToGList ( (GE_TLVertex *)v, 3, PM->Bitmap, 0, GE_FALSE ); */
 				gePuppet_AddToGList ( (GE_TLVertex *)ScreenPts, Length1, PM->Bitmap, 0, GE_FALSE );
 			else
@@ -2168,10 +2168,10 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 	*/
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) */
-	gePuppet_AddToGList ( NULL, 0, NULL, 0, GE_TRUE ); 
+	BUG FIX: Rendering Transparent Polys properly (2) */
+	gePuppet_AddToGList ( NULL, 0, NULL, 0, GE_TRUE );
 	geRam_Free ( MaterialArray );
-    geRam_Free ( MaterialIsTransparent );
+	geRam_Free ( MaterialIsTransparent );
 
 	return GE_TRUE;
 }
@@ -2189,12 +2189,12 @@ int Puppet_AverageIndex = 0;
 #endif
 
 
-geBoolean GENESISCC gePuppet_Render(	const gePuppet *P, 
+geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 							const gePose *Joints,
-							geEngine *Engine, 
-							geWorld *World, 
-							const geCamera *Camera, 
-							geExtBox *TestBox, 
+							geEngine *Engine,
+							geWorld *World,
+							const geCamera *Camera,
+							geExtBox *TestBox,
 							Frustum_Info *FInfo)
 {
 	const geXFArray *JointTransforms;
@@ -2217,18 +2217,18 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 // end change
 
 /*	01/08/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
+	DOT3 BUMPMAPPING */
 	int BoneCount;
 	const geXForm3d *XFA;
 	geBoolean ResetDot3 = GE_TRUE;
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) */
+	BUG FIX: Rendering Transparent Polys properly (2) */
 	geBoolean *MaterialIsTransparent = NULL;
 	geBitmap **MaterialArray = NULL;
 	int32    MaterialCount = 0;
 
-// changed QD 
+// changed QD
 	((gePuppet*)P)->BodyG = NULL;
 // changed QD Performance
 	if(P->OverallAlpha==0.0f)
@@ -2245,7 +2245,7 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 
 	#ifdef PROFILE
 	rdtsc_read(&RDTSCStart);
-    rdtsc_zero(&RDTSCEnd);
+	rdtsc_zero(&RDTSCEnd);
 	#endif
 
 // changed QD Clipping
@@ -2261,9 +2261,9 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 		}
 	}*/
 // end change
-	
+
 	geCamera_GetClippingRect(Camera,&ClippingRect);
-	
+
 	if (TestBox != NULL)
 	{
 		// see if the test box is visible on the screen.  If not: don't draw actor.
@@ -2272,7 +2272,7 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 		geVec3d BoxCorners[8];
 		const geXForm3d *ObjectToCamera;
 		geVec3d Maxs,Mins;
-		#define BIG_NUMBER (99e9f)  
+		#define BIG_NUMBER (99e9f)
 		int i;
 		geBoolean ZFarEnable;
 		geFloat ZFar;
@@ -2303,16 +2303,16 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 			if (V.Z > Maxs.Z ) Maxs.Z = V.Z;
 			if (V.Z < Mins.Z ) Mins.Z = V.Z;
 		}
-		
+
 		// Reject against ZFar clipplane if enabled...
 		geCamera_GetFarClipPlane(Camera, &ZFarEnable, &ZFar);
-		if (ZFarEnable) 
+		if (ZFarEnable)
 		{
-			if ( (Maxs.X < ClippingRect.Left) 
+			if ( (Maxs.X < ClippingRect.Left)
 				|| (Mins.X > ClippingRect.Right)
 				|| (Maxs.Z < BACK_EDGE) 				//Test X and Z first, and Y
 				|| (Mins.Z > ZFar)
-				|| (Maxs.Y < ClippingRect.Top) 
+				|| (Maxs.Y < ClippingRect.Top)
 				|| (Mins.Y > ClippingRect.Bottom))
 			{
 				// not gonna draw: box is not visible.
@@ -2322,13 +2322,13 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 				// end change
 				return GE_TRUE;
 			}
-			
-		} 
-		else 
+
+		}
+		else
 		{
-			if ( (Maxs.X < ClippingRect.Left) 
+			if ( (Maxs.X < ClippingRect.Left)
 				|| (Mins.X > ClippingRect.Right)
-				|| (Maxs.Y < ClippingRect.Top) 
+				|| (Maxs.Y < ClippingRect.Top)
 				|| (Mins.Y > ClippingRect.Bottom)
 				|| (Maxs.Z < BACK_EDGE))
 			{
@@ -2339,8 +2339,8 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 				// end change
 				return GE_TRUE;
 			}
-		} 
-	} 
+		}
+	}
 
 	Engine->DebugInfo.NumActors++;
 // changed QD Clipping
@@ -2351,7 +2351,7 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 						(geFloat)ClippingRect.Top,
 						(geFloat)ClippingRect.Bottom,
 						BACK_EDGE);
-*/	
+*/
 // end change
 	JointTransforms = gePose_GetAllJointTransforms(Joints);
 
@@ -2361,7 +2361,7 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 // changed QD Shadows
 	//G = geBodyInst_GetGeometry(P->BodyInstance, &Scale, JointTransforms, 0,Camera);
 	((gePuppet*)P)->BodyG = geBodyInst_GetGeometry(P->BodyInstance, &Scale, JointTransforms, 0, Camera);
-	
+
 	//if(G == NULL)
 	if(P->BodyG == NULL)
 	{
@@ -2375,30 +2375,30 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 // changed QD Clipping
 /*
 #ifdef ONE_OVER_Z_PIPELINE
-#define TEST_Z_OUT(zzz, edge) 		((zzz) > (edge)) 
-#define TEST_Z_IN(zzz, edge) 		((zzz) < (edge)) 
+#define TEST_Z_OUT(zzz, edge) 		((zzz) > (edge))
+#define TEST_Z_IN(zzz, edge) 		((zzz) < (edge))
 #pragma message ("test this! this is untested")
 #else
-#define TEST_Z_OUT(zzz, edge) 		((zzz) < (edge)) 
-#define TEST_Z_IN(zzz, edge) 		((zzz) > (edge)) 
+#define TEST_Z_OUT(zzz, edge) 		((zzz) < (edge))
+#define TEST_Z_IN(zzz, edge) 		((zzz) > (edge))
 #endif
 
 
 	// check for trivial rejection:
 	{
-		if( (G->Maxs.X < ClippingRect.Left) 
+		if( (G->Maxs.X < ClippingRect.Left)
 			|| (G->Mins.X > ClippingRect.Right)
 			|| ( TEST_Z_OUT( G->Maxs.Z, BACK_EDGE) )		//test Y last
-			|| (G->Maxs.Y < ClippingRect.Top) 
+			|| (G->Maxs.Y < ClippingRect.Top)
 			|| (G->Mins.Y > ClippingRect.Bottom) )
 		{
 			// not gonna draw
 			return GE_TRUE;
 		}
 
-		if (   (G->Maxs.X < ClippingRect.Right) 
+		if (   (G->Maxs.X < ClippingRect.Right)
 			&& (G->Mins.X > ClippingRect.Left)
-			&& (G->Maxs.Y < ClippingRect.Bottom) 
+			&& (G->Maxs.Y < ClippingRect.Bottom)
 			&& (G->Mins.Y > ClippingRect.Top)
 			&& ( TEST_Z_IN( G->Mins.Z, BACK_EDGE) ) )
 		{
@@ -2408,25 +2408,25 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 		else
 		{
 			Clipping = GE_TRUE;
-		} 
+		}
 	}
 */
 	// Setup clip flags...
 	ClipFlags = 0xffff;
 
-	{		
+	{
 		GFX_Plane	*Planes;
 		int32		k;
-		
-		
+
+
 		Planes = FInfo->Planes;
 
 		for (k=0; k< FInfo->NumPlanes; k++, Planes++)
 		{
 			int32		Side;
-			
+
 			Planes->Type = PLANE_ANY;
-		
+
 			//Side = Trace_BoxOnPlaneSide(&(G->Mins), &(G->Maxs), Planes);
 			Side = Trace_BoxOnPlaneSide(&(P->BodyG->Mins), &(P->BodyG->Maxs), Planes);
 
@@ -2434,7 +2434,7 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 			{
 				return GE_TRUE;
 			}
-			
+
 			if (Side == PSIDE_FRONT)
 			{
 				ClipFlags &= ~(1<<k);
@@ -2444,14 +2444,14 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 // end change
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) */
+	BUG FIX: Rendering Transparent Polys properly (2) */
 	MaterialCount = P->MaterialCount;
 	MaterialArray = GE_RAM_ALLOCATE_ARRAY ( geBitmap *, MaterialCount );
-    MaterialIsTransparent = GE_RAM_ALLOCATE_ARRAY ( geBoolean, MaterialCount );
+	MaterialIsTransparent = GE_RAM_ALLOCATE_ARRAY ( geBoolean, MaterialCount );
 
 	for ( i = 0; i < MaterialCount; i++ )
 	{
-		gePuppet_Material *PM = &(P->MaterialArray[i]);				 
+		gePuppet_Material *PM = &(P->MaterialArray[i]);
 		MaterialArray[i] = PM->Bitmap;
 	}
 
@@ -2477,7 +2477,7 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 		gePuppet_StaticLightGrp.FillLightColor.Green = P->FillLightColor.Green;
 		gePuppet_StaticLightGrp.FillLightColor.Blue  = P->FillLightColor.Blue;
 		gePuppet_StaticLightGrp.PerBoneLighting		 = P->PerBoneLighting;
-		
+
 		gePose_GetJointTransform(Joints,P->LightReferenceBoneIndex,&(RootTransform));
 
 		if (P->MaxDynamicLightsToUse > 0)
@@ -2491,7 +2491,7 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 					if (gePuppet_StaticBoneLightArraySize < BoneCount)
 					{
 						gePuppet_BoneLight *LG;
-							
+
 						LG = geRam_Realloc(gePuppet_StaticBoneLightArray, sizeof(gePuppet_BoneLight) * BoneCount);
 						if (LG==NULL)
 						{
@@ -2519,18 +2519,18 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 			gePuppet_StaticLightGrp.LightCount = 0;
 		}
 
-		
+
    //XING Studios code
 
-/*  03/10/2004 Wendell Buckner                                                            
-     Ambient light is leeking into objects that should not receive light, each object     
-     will have it's own ambient property so ONLY those objects that should receive,       
-     do receive ambient light.                                                          
+/*  03/10/2004 Wendell Buckner
+	 Ambient light is leeking into objects that should not receive light, each object
+	 will have it's own ambient property so ONLY those objects that should receive,
+	 do receive ambient light.
 		gePuppet_StaticLightGrp.StaticLightCount = gePuppet_ComputeAmbientLight(P,World,&(gePuppet_StaticLightGrp.Ambient),gePuppet_StaticLightGrp.StaticLights ,&(RootTransform.Translation)); */
 		gePuppet_StaticLightGrp.StaticLightCount = gePuppet_ComputeAmbientLight(P,World,(gePuppet_Color *)&(P->Ambient),gePuppet_StaticLightGrp.StaticLights ,&(RootTransform.Translation));
 
 // changed QD Shadows
-   		//Count = G->FaceCount;
+		//Count = G->FaceCount;
 		//List  = G->FaceList;
 		Count = P->BodyG->FaceCount;
 		List  = P->BodyG->FaceList;
@@ -2553,13 +2553,13 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 			geVec3d				Dest2[MAX_TEMP_VERTS], *pDest2;
 			geVec3d				Verts[MAX_TEMP_VERTS], *pVerts, v1, v2, v3;
 			Surf_TexVert		TexVerts[MAX_TEMP_VERTS], Tex1[MAX_TEMP_VERTS], *pTexVerts;
-			Surf_TexVert		Tex2[MAX_TEMP_VERTS], *pTex1, *pTex2;			
+			Surf_TexVert		Tex2[MAX_TEMP_VERTS], *pTex1, *pTex2;
 			Surf_TLVertex		ScreenPts[MAX_TEMP_VERTS];
 			GFX_Plane			*FPlanes;
 			geBodyInst_Index	Command, Material;
 			gePuppet_Material	*PM;
 // end change
-			
+
 			Command = *List;
 			List ++;
 			Material = *List;
@@ -2569,13 +2569,13 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 			assert( Material>=0 );
 			assert( Material<P->MaterialCount);
 
-// changed QD Clipping			
+// changed QD Clipping
 			// facing the camera?
 			{
 				geBodyInst_Index *List2;
-				
+
 				List2 = List;
-		
+
 				//geVec3d_Copy(&(G->SkinVertexArray[*List2].SVPoint), &Verts[0]);
 				geVec3d_Copy(&(P->BodyG->SkinVertexArray[*List2].SVPoint), &Verts[0]);
 				List2++;
@@ -2618,16 +2618,16 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 			//for(j=0; j<3; j++)
 			for(j=0; j<3; j++, pVerts++, pTexVerts++)
 			{
-								
+
 				GE_LVertex lvert;
 // end change
 /*	01/08/2004 Wende
 ll Buckner
-    DOT3 BUMPMAPPING */
+	DOT3 BUMPMAPPING */
 				geBodyInst_Index vIndex = *List;
 
 /*	03/15/2004 Wendell Buckner
-    SPHEREMAPPING */
+	SPHEREMAPPING */
 			//	geBodyInst_Index nIndex;
 
 				//SV = &(G->SkinVertexArray[ *List ]);
@@ -2642,10 +2642,10 @@ ll Buckner
 				pTexVerts->v = SV->SVV;
 
 				if( P->internal_env.UseEnvironmentMapping )
-				{					
+				{
 					pTexVerts->u *= (P->internal_env.PercentPuppet);//= SV->SVU*P->internal_env.PercentPuppet;
 					pTexVerts->v *= (P->internal_env.PercentPuppet);//= SV->SVV*P->internal_env.PercentPuppet;
-					
+
 					if( P->internal_env.Supercede)
 					{
 						if(!strncmp(PM->MaterialName,"env_", 4))
@@ -2669,21 +2669,21 @@ ll Buckner
 						pTexVerts->v += ( (P->BodyG->NormalArray[ *List ]).Y * P->internal_env.PercentEnvironment);
 					}
 				}
-			
+
 /*	03/15/2004 Wendell Buckner
-    SPHEREMAPPING */
+	SPHEREMAPPING */
 			//	nIndex = *List;
 				//gePuppet_StaticLightGrp.SurfaceNormal = (G->NormalArray[ *List ]);
 				gePuppet_StaticLightGrp.SurfaceNormal = (P->BodyG->NormalArray[ *List ]);
-							
+
 			//	List++;
 
 				//gePuppet_SetVertexColor2(P,PM,&Ambient,SurfaceNormal, Lights,LightCount, pTexVerts);
 				gePuppet_SetVertexColor(&lvert,SV->ReferenceBoneIndex);
 
 /*	01/08/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
-				if(geBitmap_IsBumpmapNameDot3(PM->MaterialName)) 
+	DOT3 BUMPMAPPING */
+				if(geBitmap_IsBumpmapNameDot3(PM->MaterialName))
 					gePuppet_SetVertexColorDot3(&lvert, vIndex, XFA, P->BodyInstance, 0, &ResetDot3);
 
 				pTexVerts->r = lvert.r;
@@ -2692,8 +2692,8 @@ ll Buckner
 				pTexVerts->a = P->OverallAlpha;
 
 /*	03/15/2004 Wendell Buckner
-    SPHEREMAPPING */
-				if( geBitmap_IsSphereMapName( PM->MaterialName ) ) 
+	SPHEREMAPPING */
+				if( geBitmap_IsSphereMapName( PM->MaterialName ) )
 				{
 					//gePuppet_SetSphereMapUV(&lvert, &G->NormalArray[*List], Camera);
 					gePuppet_SetSphereMapUV(&lvert, &(P->BodyG->NormalArray[*List]), Camera);
@@ -2723,7 +2723,7 @@ ll Buckner
 					break;
 
 				assert(Length2 < MAX_TEMP_VERTS);
-				
+
 				if (pDest1 == Dest2)
 				{
 					pDest1 = Dest1;
@@ -2740,23 +2740,23 @@ ll Buckner
 				}
 				Length1 = Length2;
 			}
-			
+
 			assert(Length1 < MAX_TEMP_VERTS);
-	  
+
 			if (p != FInfo->NumPlanes)
 				continue;				// Can't possibly be visible
 
 			if (Length1 < 3)
 				continue;				// Can't possibly be visible
-						
-			// Project the face, and combine tex coords into one structure 
+
+			// Project the face, and combine tex coords into one structure
 			Frustum_ProjectRGBA(pDest1, pTex1, (DRV_TLVertex*)ScreenPts, Length1, Camera);
 
 			ScreenPts[0].a = P->OverallAlpha ;
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) *
-             geEngine_RenderPoly(Engine, (GE_TLVertex*)ScreenPts, Length1, PM->Bitmap, 0 );*/
+	BUG FIX: Rendering Transparent Polys properly (2) *
+			 geEngine_RenderPoly(Engine, (GE_TLVertex*)ScreenPts, Length1, PM->Bitmap, 0 );*/
 			if ( MaterialIsTransparent[Material] )
 /* 08/10/2004 Wendell Buckner*/
 				gePuppet_AddToGList ( (GE_TLVertex *)ScreenPts, Length1, PM->Bitmap, 0, GE_FALSE );
@@ -2786,7 +2786,7 @@ ll Buckner
 		#if 1
 		Puppet_AverageCount[(Puppet_AverageIndex++)%PUPPET_AVERAGE_ACROSS] = rdtsc_cycles(&RDTSCEnd);
 		for (i=0; i<PUPPET_AVERAGE_ACROSS; i++)
-			{	
+			{
 				Count+=Puppet_AverageCount[i];
 			}
 		Count /= (double)PUPPET_AVERAGE_ACROSS;
@@ -2794,57 +2794,57 @@ ll Buckner
 		geEngine_Printf(Engine, 320,60,"Puppet AVG Render Time=%f",(double)(Count/200000000.0));
 		geEngine_Printf(Engine, 320,90,"Puppet AVG Render Cycles=%f",(double)(Count));
 		#endif
-				
+
 	}
 	#endif
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) */
-	gePuppet_AddToGList ( NULL, 0, NULL, 0, GE_TRUE ); 
+	BUG FIX: Rendering Transparent Polys properly (2) */
+	gePuppet_AddToGList ( NULL, 0, NULL, 0, GE_TRUE );
 	geRam_Free ( MaterialArray );
-    geRam_Free ( MaterialIsTransparent );
+	geRam_Free ( MaterialIsTransparent );
 
 	return GE_TRUE;
 }
 
 // changed QD Shadows
-static void GENESISCC AddEdge(geBodyInst_Index *pEdges, int *NumEdges, 
+static void GENESISCC AddEdge(geBodyInst_Index *pEdges, int *NumEdges,
 							  geBodyInst_Index v0, geBodyInst_Index v1, const geBodyInst_Geometry *G)
 {
 	int i;
-    // Remove interior edges (which appear in the list twice)
-    for(i=0;i<*NumEdges;i++)
-    {
-        if((pEdges[2*i]==v1) && (pEdges[2*i+1]==v0))
+	// Remove interior edges (which appear in the list twice)
+	for(i=0;i<*NumEdges;i++)
+	{
+		if((pEdges[2*i]==v1) && (pEdges[2*i+1]==v0))
 		{
-            if(*NumEdges > 1)
-            {
-                pEdges[2*i] = pEdges[2*(*NumEdges-1)];
-                pEdges[2*i+1] = pEdges[2*(*NumEdges-1)+1];
-            }
-            (*NumEdges)--;
-            return;
-        }
-    }
+			if(*NumEdges > 1)
+			{
+				pEdges[2*i] = pEdges[2*(*NumEdges-1)];
+				pEdges[2*i+1] = pEdges[2*(*NumEdges-1)+1];
+			}
+			(*NumEdges)--;
+			return;
+		}
+	}
 
-    pEdges[2*(*NumEdges)] = v0;
-    pEdges[2*(*NumEdges)+1] = v1;
-    (*NumEdges)++;
+	pEdges[2*(*NumEdges)] = v0;
+	pEdges[2*(*NumEdges)+1] = v1;
+	(*NumEdges)++;
 }
 
 geBoolean GENESISCC gePuppet_RenderShadowVolume(gePuppet *P,
 					const gePose *Joints,
-					geEngine *Engine, 
+					geEngine *Engine,
 					geWorld *World,
 					const geCamera *Camera,
 					GFX_Plane* FPlanes,
 					geVec3d *LightPos,
 					geFloat Radius,
 					int LightType,
-					geVec3d* Dir, 
+					geVec3d* Dir,
 					geFloat Arc,
 					geBoolean ZPass)
-{	
+{
 	geXForm3d	RootTransform;
 	geVec3d		Dest1[30], Dest2[30], *pDest1, *pDest2, Pos1;
 	int32		Length1, Length2;
@@ -2852,7 +2852,7 @@ geBoolean GENESISCC gePuppet_RenderShadowVolume(gePuppet *P,
 	int32		p;
 	geFloat		SVLength;
 	geVec3d		LPos;
-	
+
 	assert(P);
 	assert(World);
 	assert(Camera);
@@ -2888,7 +2888,7 @@ geBoolean GENESISCC gePuppet_RenderShadowVolume(gePuppet *P,
 		}
 
 		SVLength = Radius - geVec3d_Length(&Pos1);
-	}	
+	}
 
 	pFPlanes = FPlanes;
 
@@ -2903,14 +2903,14 @@ geBoolean GENESISCC gePuppet_RenderShadowVolume(gePuppet *P,
 		geBodyInst_Index *pEdges;
 
 
-		gePose_GetScale(Joints, &Scale);		
+		gePose_GetScale(Joints, &Scale);
 
 		if(P->BodyG == NULL || P->UpdateBodyG)
 		{
 			P->BodyG = geBodyInst_GetGeometry(P->BodyInstance,&Scale,gePose_GetAllJointTransforms(Joints),0,Camera);
 			P->UpdateBodyG = GE_FALSE;
 		}
-			
+
 		if(P->BodyG == NULL)
 		{
 			geErrorLog_Add(ERR_PUPPET_RENDER, NULL);
@@ -2919,10 +2919,10 @@ geBoolean GENESISCC gePuppet_RenderShadowVolume(gePuppet *P,
 
 		Count = P->BodyG->FaceCount;
 		List  = P->BodyG->FaceList;
-		
+
 		NumEdges = 0;
 		pEdges = GE_RAM_ALLOCATE_ARRAY(geBodyInst_Index, Count*6);
-		
+
 		if ( pEdges == NULL )
 		{
 			geErrorLog_Add(ERR_BODY_ENOMEM, NULL);
@@ -2930,9 +2930,9 @@ geBoolean GENESISCC gePuppet_RenderShadowVolume(gePuppet *P,
 			return GE_FALSE;
 		}
 
-// determine lit faces 
+// determine lit faces
 		for (i=0; i<Count; i++)
-		{	
+		{
 
 			Command = *List;
 			List++;
@@ -2947,23 +2947,23 @@ geBoolean GENESISCC gePuppet_RenderShadowVolume(gePuppet *P,
 				geVec3d cross2;
 				geVec3d FaceNormal;
 				geFloat pDist;
-								
+
 				geBodyInst_Index *List2;
-						
+
 				List2 = List;
 
 				for(j=0;j<3;j++)
-				{				
+				{
 					vert[j]=&(P->BodyG->SkinVertexArray[ *List2 ].SVPoint);
 					List2++;
 					List2++;
 				}
-			
+
 				geVec3d_Subtract(vert[1], vert[0], &cross1);
 				geVec3d_Subtract(vert[2], vert[0], &cross2);
-				
+
 				geVec3d_CrossProduct(&cross1, &cross2, &FaceNormal);
-								
+
 				geVec3d_Normalize(&FaceNormal);
 				pDist = geVec3d_DotProduct(vert[0], &FaceNormal);
 
@@ -2971,14 +2971,14 @@ geBoolean GENESISCC gePuppet_RenderShadowVolume(gePuppet *P,
 				// the direction for extruding for 1 cap
 				// using the unlit faces for the caps gives better results...
 				if((geVec3d_DotProduct(&LPos, &FaceNormal)) < pDist)
-        		{	
+				{
 					geBodyInst_Index Index1, Index2, Index3;
-								
+
 					Index1 = *List;
-					List++;	
+					List++;
 					List++;
 					Index2 = *List;
-					List++;	
+					List++;
 					List++;
 					Index3 = *List;
 
@@ -2986,20 +2986,20 @@ geBoolean GENESISCC gePuppet_RenderShadowVolume(gePuppet *P,
 					AddEdge(pEdges, &NumEdges, Index2, Index3, P->BodyG);
 					AddEdge(pEdges, &NumEdges, Index3, Index1, P->BodyG);
 
-					
+
 					{
 						// prepare back cap
-						// need to render back cap even if using zpass method, since the shadow volume is 
+						// need to render back cap even if using zpass method, since the shadow volume is
 						// not extruded to infinity (or far enough to be offscreen)
 						for(j=0;j<3;j++)
-						{		
-							geVec3d_Subtract(vert[j], &LPos, &help[j]);							
+						{
+							geVec3d_Subtract(vert[j], &LPos, &help[j]);
 							geVec3d_Normalize(&help[j]);
 
 							geVec3d_AddScaled(vert[j], &help[j], SVLength, &Dest1[j]);
-					
-						}					
-				
+
+						}
+
 						pDest1 = Dest1;
 						pDest2 = Dest2;
 						Length1 = 3;
@@ -3008,7 +3008,7 @@ geBoolean GENESISCC gePuppet_RenderShadowVolume(gePuppet *P,
 						{
 							if(Frustum_ClipToPlane(&pFPlanes[p], pDest1, pDest2, Length1, &Length2)==GE_FALSE)
 								break;
-			
+
 							if (pDest1 == Dest2)
 							{
 								pDest1 = Dest1;
@@ -3028,16 +3028,16 @@ geBoolean GENESISCC gePuppet_RenderShadowVolume(gePuppet *P,
 							{
 								geCamera_Project(Camera, &pDest1[j], &pDest1[j]);
 							}
-								
+
 							geEngine_RenderPolyStencil(Engine, pDest1, Length1, 0);
 						}
-	
+
 						if(!ZPass) // need front cap for zfail method
 						{
 							// prepare front cap
 							// bah!!! have to shift 0.2f to avoid z-fighting
 							for(j=0;j<3;j++)
-							{						
+							{
 								geVec3d_AddScaled(vert[j], &help[j], -0.2f, &Dest1[j]);
 							}
 
@@ -3054,7 +3054,7 @@ geBoolean GENESISCC gePuppet_RenderShadowVolume(gePuppet *P,
 							{
 								if(Frustum_ClipToPlane(&pFPlanes[p], pDest1, pDest2, Length1, &Length2)==GE_FALSE)
 									break;
-			
+
 								if (pDest1 == Dest2)
 								{
 									pDest1 = Dest1;
@@ -3073,38 +3073,38 @@ geBoolean GENESISCC gePuppet_RenderShadowVolume(gePuppet *P,
 								for (j=0; j< Length1; j++)
 								{
 									geCamera_Project(Camera, &pDest1[j], &pDest1[j]);
-								}	
-				
+								}
+
 								geEngine_RenderPolyStencil(Engine, pDest1, Length1, 0);
 							}
 						}
 					}
 				}
-				
-				List = List2;	
-				
+
+				List = List2;
+
 			}
 		}
 
 // extrude and render the silhouette edges
 		for(i=0;i<NumEdges;i++)
-		{				
+		{
 			geVec3d help;
-			
+
 			// point1
 			geVec3d_Copy(&(P->BodyG->SkinVertexArray[pEdges[2*i+1]].SVPoint),&Dest1[0]);
-		
+
 			geVec3d_Subtract(&Dest1[0], &LPos, &help);
 			geVec3d_Normalize(&help);
 
 			geVec3d_AddScaled(&Dest1[0], &help, -0.2f, &Dest1[0]);
-	
+
 			// point2
 			geVec3d_AddScaled(&(P->BodyG->SkinVertexArray[pEdges[2*i+1]].SVPoint), &help, SVLength, &Dest1[1]);
-					
+
 			// point3
 			geVec3d_Copy(&(P->BodyG->SkinVertexArray[pEdges[2*i]].SVPoint),&Dest1[2]);
-		
+
 			geVec3d_Subtract( &Dest1[2], &LPos, &help);
 			geVec3d_Normalize(&help);
 
@@ -3113,7 +3113,7 @@ geBoolean GENESISCC gePuppet_RenderShadowVolume(gePuppet *P,
 			// point4
 			geVec3d_AddScaled(&(P->BodyG->SkinVertexArray[pEdges[2*i]].SVPoint), &help, -0.2f, &Dest1[3]);
 
-			
+
 			pDest1 = Dest1;
 			pDest2 = Dest2;
 			Length1 = 4; //quad
@@ -3122,7 +3122,7 @@ geBoolean GENESISCC gePuppet_RenderShadowVolume(gePuppet *P,
 			{
 				if(Frustum_ClipToPlane(&pFPlanes[p], pDest1, pDest2, Length1, &Length2)==GE_FALSE)
 					break;
-			
+
 				if (pDest1 == Dest2)
 				{
 					pDest1 = Dest1;
@@ -3143,7 +3143,7 @@ geBoolean GENESISCC gePuppet_RenderShadowVolume(gePuppet *P,
 			{
 				geCamera_Project(Camera, &pDest1[j], &pDest1[j]);
 			}
-			
+
 			geEngine_RenderPolyStencil(Engine, pDest1, Length1, 0 );
 		}
 
@@ -3169,9 +3169,9 @@ void GENESISCC gePuppet_SetStencilShadow(gePuppet *P, geBoolean DoStencilShadow)
 
 	P->DoStencilShadow = DoStencilShadow;
 }
-// end change 
+// end change
 
-void GENESISCC gePuppet_SetShadow(gePuppet *P, geBoolean DoShadow, 
+void GENESISCC gePuppet_SetShadow(gePuppet *P, geBoolean DoShadow,
 		geFloat Scale, const geBitmap *ShadowMap,
 		int BoneIndex)
 {

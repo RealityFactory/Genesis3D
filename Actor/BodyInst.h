@@ -1,11 +1,11 @@
 /****************************************************************************************/
-/*  BODYINST.H                                                                          */
+/*  BodyInst.h                                                                          */
 /*                                                                                      */
-/*  Author: Mike Sandige	                                                            */
-/*  Description: Actor body instance interface.		                                    */
+/*  Author: Mike Sandige                                                                */
+/*  Description: Actor body instance interface.                                         */
 /*                                                                                      */
 /*  Edit History:                                                                       */
-/*	01/08/2004 Wendell Buckner                                                          */ 
+/*  01/08/2004 Wendell Buckner                                                          */
 /*   DOT3 BUMPMAPPING                                                                   */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
@@ -24,13 +24,13 @@
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_BODYINST_H
-#define GE_BODYINST_H 
+#define GE_BODYINST_H
 
 /* This object is for accessing and retrieving an 'instance' of the geometry
-   for a body.  
-   
-   The retrieval is a list of drawing commands in world space or 
-   in camera space.  
+   for a body.
+
+   The retrieval is a list of drawing commands in world space or
+   in camera space.
 
    An array of transforms that corresponds to the bones in the body is needed.
  */
@@ -52,7 +52,7 @@ typedef struct geBodyInst geBodyInst;
 
 typedef int16 geBodyInst_Index;
 
-typedef enum 
+typedef enum
 {
 	GE_BODYINST_FACE_TRIANGLE,
 	GE_BODYINST_FACE_TRISTRIP,
@@ -67,7 +67,7 @@ typedef struct geBodyInst_SkinVertex
 	int	ReferenceBoneIndex;
 } geBodyInst_SkinVertex;
 
-typedef struct geBodyInst_Geometry 
+typedef struct geBodyInst_Geometry
 {
 	geBodyInst_Index		 SkinVertexCount;
 	geBodyInst_SkinVertex	*SkinVertexArray;
@@ -86,7 +86,7 @@ typedef struct geBodyInst_Geometry
 	primitive type (GE_BODY_FACE_TRIANGLE,	  GE_BODY_FACE_TRISTRIP,  GE_BODY_FACE_TRIFAN )
 	followed by material index
 	followed by...
-	case primitive 
+	case primitive
 		GE_BODY_FACE_TRIANGLE:
 		  vertex index 1, normal index 1
 		  vertex index 2, normal index 2
@@ -116,7 +116,7 @@ typedef struct geBodyInst_Geometry
 geBodyInst *GENESISCC geBodyInst_Create( const geBody *B );
 void GENESISCC geBodyInst_Destroy(geBodyInst **BI);
 
-const geBodyInst_Geometry *GENESISCC geBodyInst_GetGeometry( 
+const geBodyInst_Geometry *GENESISCC geBodyInst_GetGeometry(
 								const geBodyInst *BI,
 								const geVec3d *Scale,
 								const geXFArray *BoneXformArray,
@@ -124,7 +124,7 @@ const geBodyInst_Geometry *GENESISCC geBodyInst_GetGeometry(
 								const geCamera *Camera);
 
 /*	01/08/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
+	DOT3 BUMPMAPPING */
 void GENESISCC geBodyInst_SetVertexColorDot3( geVec3d LightPosition, const geXForm3d *Mdl2WldXFA, const geBodyInst *BI, int16 VertexIndex, geFloat *ColorDot3, int16 LightType, geBoolean *Reset );
 
 #ifdef __cplusplus
@@ -132,4 +132,3 @@ void GENESISCC geBodyInst_SetVertexColorDot3( geVec3d LightPosition, const geXFo
 #endif
 
 #endif
-		

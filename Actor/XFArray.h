@@ -1,8 +1,8 @@
 /****************************************************************************************/
-/*  XFARRAY.H																			*/
+/*  XFArray.h                                                                           */
 /*                                                                                      */
-/*  Author: Mike Sandige	                                                            */
-/*  Description: Array of transforms interface.											*/
+/*  Author: Mike Sandige                                                                */
+/*  Description: Array of transforms interface.                                         */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_XFARRAY_H
@@ -29,7 +29,7 @@
    This object exports data (allows external access to one of it's data members)
    This is dangerous - no checking can be done on the use of that data, and no
    checking can be done on array boundry conditions.  This is on purpose.
-   
+
    ...In the name of optimal access to the array.
 */
 
@@ -42,7 +42,7 @@ extern "C" {
 
 typedef struct geXFArray geXFArray;
 
-	// Create the object.  Creates an array of Size elements.  
+	// Create the object.  Creates an array of Size elements.
 	// All elements are initialized to the identity transform
 geXFArray *GENESISCC geXFArray_Create(int Size);
 
@@ -50,7 +50,7 @@ geXFArray *GENESISCC geXFArray_Create(int Size);
 	// after destroying the ojbect!
 void GENESISCC geXFArray_Destroy( geXFArray **XFA );
 
-	// Get a pointer to the array.  For external iteration.  The size of the 
+	// Get a pointer to the array.  For external iteration.  The size of the
 	// array is returned in Size.  Valid array indicies are (0..Size-1)
 geXForm3d *GENESISCC geXFArray_GetElements(const geXFArray *XFA, int *Size);
 

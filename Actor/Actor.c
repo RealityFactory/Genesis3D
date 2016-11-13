@@ -1,13 +1,13 @@
 /****************************************************************************************/
-/*  ACTOR.C                                                                             */
+/*  Actor.c                                                                             */
 /*                                                                                      */
-/*  Author: Mike Sandige	                                                            */
+/*  Author: Mike Sandige                                                                */
 /*  Description:  Actor implementation                                                  */
 /*                                                                                      */
-/*  Edit History:                                                                       */  
-/*	02/21/2004 Wendell Buckner                                                          */  
+/*  Edit History:                                                                       */
+/*  02/21/2004 Wendell Buckner                                                          */
 /*   DOT3 BUMPMAPPING                                                                   */
-/*	01/13/2004 Wendell Buckner                                                          */
+/*  01/13/2004 Wendell Buckner                                                          */
 /*   DOT3 BUMPMAPPING                                                                   */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
@@ -28,12 +28,12 @@
 /*
 
 	TODO:
-	  make cued motions keyed to a 'root' bone.  Register the root bone, and then 
+	  make cued motions keyed to a 'root' bone.  Register the root bone, and then
 	  all requests are relative to that bone, rather than the current 'anchor' point.
 	  actually, this doesn't really change much, just _AnimationCue() - and it allows
 	  a more efficient _TestStep()
 
-	
+
 */
 #include <assert.h>
 #include <string.h>  //strnicmp		memmove()
@@ -59,7 +59,7 @@
 */
 
 #define ACTOR_MOTIONS_MAX 0x0FFFF		// really arbitrary. just for sanity checking
-#define ACTOR_CUES_MAX    0x0FFFF		// arbitrary. 
+#define ACTOR_CUES_MAX    0x0FFFF		// arbitrary.
 
 typedef struct geActor
 {
@@ -68,7 +68,7 @@ typedef struct geActor
 	gePose				*Pose;
 	geActor_BlendingType BlendingType;
 	geActor_Def			*ActorDefinition;		// actor definition this is an instance of
-	
+
 	geMotion			*CueMotion;
 	geVec3d				BoundingBoxMinCorner;
 	geVec3d				BoundingBoxMaxCorner;
@@ -86,7 +86,7 @@ typedef struct geActor_Def
 {
 	geBody				*Body;
 	geVFile *			 TextureFileContext;
-	
+
 	int32				 MotionCount;
 	geMotion		   **MotionArray;
 
@@ -102,16 +102,16 @@ int geActor_DefCount    = 0;
 int geActor_DefRefCount = 0;
 
 /*	01/13/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
+	DOT3 BUMPMAPPING */
 GENESISAPI geBoolean GENESISCC geActor_CreateTangentSpace(const geActor *A)
-{	
+{
 	return geBody_CreateTangentSpace( A->ActorDefinition->Body );
 }
 
 /*	02/21/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
+	DOT3 BUMPMAPPING */
 GENESISAPI void GENESISCC geActor_DestroyTangentSpace(const geActor *A)
-{	
+{
 	geBody_DestroyTangentSpace( A->ActorDefinition->Body );
 }
 
@@ -136,14 +136,14 @@ GENESISAPI geBoolean GENESISCC geActor_IsValid(const geActor *A)
 
 	return GE_TRUE;
 }
-	
+
 
 //MRB BEGIN
 GENESISAPI void GENESISCC geActor_GetNonWorldExtBox(const geActor *A, geExtBox *ExtBox)
 {
 	assert( geActor_IsValid(A) != GE_FALSE);
 	assert( ExtBox != NULL );
-	
+
 	geVec3d_Copy(&(A->BoundingBoxMinCorner), &(ExtBox->Min));
 	geVec3d_Copy(&(A->BoundingBoxMaxCorner), &(ExtBox->Max));
 }
@@ -154,7 +154,7 @@ GENESISAPI void GENESISCC geActor_GetPosition(const geActor *A, geVec3d *Pos)
 	assert( Pos != NULL );
 	gePose_GetJointTransform( A->Pose,
 		A->BoundingBoxCenterBoneIndex,
-		&Transform); 
+		&Transform);
 	assert ( geXForm3d_IsOrthonormal(&Transform) != GE_FALSE );
 	geVec3d_Copy(&(Transform.Translation), Pos);
 }
@@ -202,7 +202,7 @@ static geBoolean GENESISCC geActor_GetBoneIndex(const geActor *A, const char *Bo
 				{
 					geErrorLog_AddString(-1,"Named bone not found:", BoneName);
 					//geErrorLog_AppendString(BoneName);
-					return GE_FALSE;			
+					return GE_FALSE;
 				}
 		}
 	else
@@ -257,7 +257,7 @@ GENESISAPI geActor *GENESISCC geActor_Create(geActor_Def *ActorDefinition)
 {
 	geActor *A;
 	assert( geActor_DefIsValid(ActorDefinition)      != GE_FALSE );
-	
+
 	if (ActorDefinition->Body == NULL)
 		{
 			geErrorLog_AddString(-1,"geActor_Def must have a body before Actors can be created", NULL);
@@ -281,7 +281,7 @@ GENESISAPI geActor *GENESISCC geActor_Create(geActor_Def *ActorDefinition)
 			geErrorLog_Add(ERR_ACTOR_ENOMEM, NULL);
 			goto ActorCreateFailure;
 		}
-	
+
 	A->RefCount          = 0;
 	A->BlendingType		 = GE_ACTOR_BLEND_HERMITE;
 	A->ActorDefinition   = ActorDefinition;
@@ -299,7 +299,7 @@ GENESISAPI geActor *GENESISCC geActor_Create(geActor_Def *ActorDefinition)
 
 
 	{
-		int i; 
+		int i;
 		int BoneCount;
 
 		BoneCount = geBody_GetBoneCount(A->ActorDefinition->Body);
@@ -337,7 +337,7 @@ GENESISAPI geActor *GENESISCC geActor_Create(geActor_Def *ActorDefinition)
 			geRam_Free( A );
 		}
 	return NULL;
-}	
+}
 
 GENESISAPI geBoolean GENESISCC geActor_DefDestroy(geActor_Def **pActorDefinition)
 {
@@ -360,8 +360,8 @@ GENESISAPI geBoolean GENESISCC geActor_DefDestroy(geActor_Def **pActorDefinition
 		{
 
 /*	02/21/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
-		    geBody_DestroyTangentSpace( Ad->Body );
+	DOT3 BUMPMAPPING */
+			geBody_DestroyTangentSpace( Ad->Body );
 
 			geBody_Destroy( &(Ad->Body) );
 			Ad->Body = NULL;
@@ -376,7 +376,7 @@ GENESISAPI geBoolean GENESISCC geActor_DefDestroy(geActor_Def **pActorDefinition
 			geRam_Free( Ad->MotionArray );
 			Ad->MotionArray = NULL;
 		}
-				
+
 	Ad->MotionCount = 0;
 
 	geRam_Free(*pActorDefinition);
@@ -392,7 +392,7 @@ GENESISAPI geBoolean GENESISCC geActor_Destroy(geActor **pA)
 	assert(  pA != NULL );
 	assert( *pA != NULL );
 	assert( geActor_IsValid(*pA) != GE_FALSE );
-	
+
 	A = *pA;
 	if (A->RefCount > 0)
 		{
@@ -451,7 +451,7 @@ GENESISAPI geBoolean GENESISCC geActor_DestroyDirect(geActor **pA)
 			{
 
 /*	02/21/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
+	DOT3 BUMPMAPPING */
 			geBody_DestroyTangentSpace( CurrentActor->ActorDefinition->Body );
 
 			geBody_Destroy( &(CurrentActor->ActorDefinition->Body) );
@@ -467,14 +467,14 @@ GENESISAPI geBoolean GENESISCC geActor_DestroyDirect(geActor **pA)
 				geRam_Free( CurrentActor->ActorDefinition->MotionArray );
 				CurrentActor->ActorDefinition->MotionArray = NULL;
 			}
-					
+
 		CurrentActor->ActorDefinition->TextureFileContext=NULL;
 		CurrentActor->ActorDefinition->ValidityCheck = NULL;
-		
+
 		//free the def
 		geRam_Free(CurrentActor->ActorDefinition);
 		CurrentActor->ActorDefinition = NULL;
-		
+
 		}
 
 		CurrentActor->UserData = NULL;
@@ -489,9 +489,9 @@ return GE_TRUE;
 GENESISAPI geBoolean GENESISCC geActor_SetBody( geActor_Def *ActorDefinition, geBody *BodyGeometry)
 {
 	assert( geBody_IsValid(BodyGeometry) != GE_FALSE );
-	
+
 	if (ActorDefinition->RefCount > 0)
-		{	
+		{
 			geErrorLog_Add(-1, NULL);  // ActorDef already used by a body. cant change now
 			return GE_FALSE;
 		}
@@ -499,12 +499,12 @@ GENESISAPI geBoolean GENESISCC geActor_SetBody( geActor_Def *ActorDefinition, ge
 	if (ActorDefinition->Body != NULL)
 		{
 /*	02/21/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
-		    geBody_DestroyTangentSpace( ActorDefinition->Body );
+	DOT3 BUMPMAPPING */
+			geBody_DestroyTangentSpace( ActorDefinition->Body );
 
 			geBody_Destroy( &(ActorDefinition->Body) );
 		}
-	
+
 	ActorDefinition->Body          = BodyGeometry;
 	return GE_TRUE;
 }
@@ -515,7 +515,7 @@ GENESISAPI void GENESISCC geActor_SetBlendingType( geActor *A, geActor_BlendingT
 {
 	assert( geActor_IsValid(A) != GE_FALSE );
 
-	assert( (BlendingType == GE_ACTOR_BLEND_LINEAR) || 
+	assert( (BlendingType == GE_ACTOR_BLEND_LINEAR) ||
 			(BlendingType == GE_ACTOR_BLEND_HERMITE) );
 
 	if (BlendingType == GE_ACTOR_BLEND_LINEAR)
@@ -570,7 +570,7 @@ GENESISAPI void GENESISCC geActor_ClearPose(geActor *A, const geXForm3d *Transfo
 	gePose_Clear( A->Pose ,Transform);
 }
 
-GENESISAPI void GENESISCC geActor_SetPose(geActor *A, const geMotion *M, 
+GENESISAPI void GENESISCC geActor_SetPose(geActor *A, const geMotion *M,
 								geFloat Time, const geXForm3d *Transform)
 {
 	assert( geActor_IsValid(A) != GE_FALSE );
@@ -580,8 +580,8 @@ GENESISAPI void GENESISCC geActor_SetPose(geActor *A, const geMotion *M,
 	gePose_SetMotion( A->Pose,M,Time,Transform);
 }
 
-GENESISAPI void GENESISCC geActor_BlendPose(geActor *A, const geMotion *M, 
-								geFloat Time,  
+GENESISAPI void GENESISCC geActor_BlendPose(geActor *A, const geMotion *M,
+								geFloat Time,
 								const geXForm3d *Transform,
 								geFloat BlendAmount)
 {
@@ -599,7 +599,7 @@ GENESISAPI int GENESISCC geActor_GetMotionCount(const geActor_Def *Ad)
 	assert( geActor_DefIsValid(Ad) != GE_FALSE );
 	return Ad->MotionCount;
 }
-	
+
 
 GENESISAPI geMotion *GENESISCC geActor_GetMotionByIndex(const geActor_Def *Ad, int Index )
 {
@@ -638,13 +638,13 @@ GENESISAPI const char *GENESISCC geActor_GetMotionName(const geActor_Def *Ad, in
 	assert( Ad->MotionArray != NULL );
 	return geMotion_GetName(Ad->MotionArray[Index]);
 }
-	
+
 GENESISAPI geBody *GENESISCC geActor_GetBody(const geActor_Def *Ad)
 {
 	assert( geActor_DefIsValid(Ad) != GE_FALSE );
 	return Ad->Body;
 }
-	
+
 #pragma message ("Keep this function: geActor_DefHasBoneNamed()?")
 // Returns GE_TRUE if the actor definition has a bone named 'Name'
 GENESISAPI geBoolean GENESISCC geActor_DefHasBoneNamed(const geActor_Def *Ad, const char *Name )
@@ -712,7 +712,7 @@ static geBoolean GENESISCC geActor_DefWriteHeader(const geActor_Def *Ad, geVFile
 {
 	uint32 u;
 	geBoolean Flag;
-	
+
 	assert( geActor_DefIsValid(Ad) != GE_FALSE );
 	assert( pFile != NULL );
 
@@ -728,7 +728,7 @@ static geBoolean GENESISCC geActor_DefWriteHeader(const geActor_Def *Ad, geVFile
 
 	if (Ad->Body != NULL)
 		Flag = GE_TRUE;
-	else 
+	else
 		Flag = GE_FALSE;
 
 	if(geVFile_Write(pFile, &Flag, sizeof(Flag)) == GE_FALSE)
@@ -739,7 +739,7 @@ static geBoolean GENESISCC geActor_DefWriteHeader(const geActor_Def *Ad, geVFile
 
 	return GE_TRUE;
 }
-	
+
 
 
 GENESISAPI geActor_Def *GENESISCC geActor_DefCreateFromFile(geVFile *pFile)
@@ -748,17 +748,17 @@ GENESISAPI geActor_Def *GENESISCC geActor_DefCreateFromFile(geVFile *pFile)
 	geActor_Def *Ad   = NULL;
 	geVFile *VFile    = NULL;
 	geVFile *SubFile  = NULL;
-	geVFile *MotionDirectory = NULL;	
+	geVFile *MotionDirectory = NULL;
 	geBoolean HasBody = GE_FALSE;
 	geBody * Body     = NULL;
-			
+
 	assert( pFile != NULL );
 
-	VFile = geVFile_OpenNewSystem(pFile,GE_VFILE_TYPE_VIRTUAL, NULL, 
+	VFile = geVFile_OpenNewSystem(pFile,GE_VFILE_TYPE_VIRTUAL, NULL,
 									NULL, GE_VFILE_OPEN_DIRECTORY | GE_VFILE_OPEN_READONLY);
 	if (VFile == NULL)
 		{	geErrorLog_Add( ERR_ACTOR_FILE_READ , NULL);	goto CreateError;}
-	
+
 	SubFile = geVFile_Open(VFile,GE_ACTOR_HEADER_NAME,GE_VFILE_OPEN_READONLY);
 	if (SubFile == NULL)
 		{	geErrorLog_Add( ERR_ACTOR_FILE_READ , NULL);	goto CreateError;}
@@ -783,7 +783,7 @@ GENESISAPI geActor_Def *GENESISCC geActor_DefCreateFromFile(geVFile *pFile)
 			geVFile_Close(SubFile);
 		}
 
-	MotionDirectory = geVFile_Open(VFile,GE_MOTION_DIRECTORY_NAME, 
+	MotionDirectory = geVFile_Open(VFile,GE_MOTION_DIRECTORY_NAME,
 									GE_VFILE_OPEN_DIRECTORY | GE_VFILE_OPEN_READONLY);
 	if (MotionDirectory == NULL)
 		{	geErrorLog_Add( ERR_ACTOR_FILE_READ , NULL);	return NULL;}
@@ -793,7 +793,7 @@ GENESISAPI geActor_Def *GENESISCC geActor_DefCreateFromFile(geVFile *pFile)
 			Ad->MotionArray = GE_RAM_ALLOCATE_ARRAY( geMotion*, Ad->MotionCount);
 			for (i=0; i<Ad->MotionCount; i++)
 				Ad->MotionArray[i] = NULL;
-	
+
 			for (i=0; i<Ad->MotionCount; i++)
 				{
 					char FName[1000];
@@ -839,11 +839,11 @@ GENESISAPI geBoolean GENESISCC geActor_DefWriteToFile(const geActor_Def *Ad, geV
 	assert( geActor_DefIsValid(Ad) != GE_FALSE );
 	assert( pFile != NULL );
 
-	VFile = geVFile_OpenNewSystem(pFile,GE_VFILE_TYPE_VIRTUAL, NULL, 
+	VFile = geVFile_OpenNewSystem(pFile,GE_VFILE_TYPE_VIRTUAL, NULL,
 									NULL, GE_VFILE_OPEN_DIRECTORY | GE_VFILE_OPEN_CREATE);
 	if (VFile == NULL)
 		{	geErrorLog_Add( ERR_ACTOR_FILE_WRITE , NULL);	goto WriteError;}
-	
+
 	SubFile = geVFile_Open(VFile,GE_ACTOR_HEADER_NAME,GE_VFILE_OPEN_CREATE);
 	if (SubFile == NULL)
 		{	geErrorLog_Add( ERR_ACTOR_FILE_WRITE , NULL);	goto WriteError;}
@@ -864,11 +864,11 @@ GENESISAPI geBoolean GENESISCC geActor_DefWriteToFile(const geActor_Def *Ad, geV
 				{	geErrorLog_Add( ERR_ACTOR_FILE_WRITE , NULL);	goto WriteError;}
 		}
 
-	MotionDirectory = geVFile_Open(VFile,GE_MOTION_DIRECTORY_NAME, 
+	MotionDirectory = geVFile_Open(VFile,GE_MOTION_DIRECTORY_NAME,
 									GE_VFILE_OPEN_DIRECTORY | GE_VFILE_OPEN_CREATE);
 	if (MotionDirectory == NULL)
 		{	geErrorLog_Add( ERR_ACTOR_FILE_WRITE , NULL);	goto WriteError;}
-	
+
 	for (i=0; i<Ad->MotionCount; i++)
 		{
 			char FName[1000];
@@ -887,7 +887,7 @@ GENESISAPI geBoolean GENESISCC geActor_DefWriteToFile(const geActor_Def *Ad, geV
 		{	geErrorLog_Add( ERR_ACTOR_FILE_WRITE , NULL);	goto WriteError;}
 	if (geVFile_Close(VFile)==GE_FALSE)
 		{	geErrorLog_Add( ERR_ACTOR_FILE_WRITE , NULL);	goto WriteError;}
-	
+
 	return GE_TRUE;
 	WriteError:
 		return GE_FALSE;
@@ -899,7 +899,7 @@ GENESISAPI geBoolean GENESISCC geActor_GetBoneTransform(const geActor *A, const 
 
 	assert( geActor_IsValid(A)!=GE_FALSE );
 	assert( Transform!= NULL );
-	
+
 	if (geActor_GetBoneIndex(A,BoneName,&BoneIndex)==GE_FALSE)
 		{
 			geErrorLog_AddString(-1,"Named bone not found", BoneName);
@@ -917,7 +917,7 @@ GENESISAPI geBoolean GENESISCC geActor_GetBoneTransformByIndex(const geActor *A,
 {
 	assert( geActor_IsValid(A)!=GE_FALSE );
 	assert( Transform!= NULL );
-	
+
 	gePose_GetJointTransform(   A->Pose, BoneIndex,	Transform);
 	assert ( geXForm3d_IsOrthonormal(Transform) != GE_FALSE );
 
@@ -930,7 +930,7 @@ static void GENESISCC geActor_AccumulateMinMax(
 	assert( geVec3d_IsValid( P  ) != GE_FALSE );
 	assert( geVec3d_IsValid(Mins) != GE_FALSE );
 	assert( geVec3d_IsValid(Maxs) != GE_FALSE );
-	
+
 	if (P->X < Mins->X) Mins->X = P->X;
 	if (P->Y < Mins->Y) Mins->Y = P->Y;
 	if (P->Z < Mins->Z) Mins->Z = P->Z;
@@ -942,7 +942,7 @@ static void GENESISCC geActor_AccumulateMinMax(
 
 
 static geBoolean GENESISCC geActor_GetBoneBoundingBoxByIndex(
-	const geActor *A, 
+	const geActor *A,
 	int BoneIndex,
 	geVec3d   *Corner,
 	geVec3d   *DX,
@@ -952,8 +952,8 @@ static geBoolean GENESISCC geActor_GetBoneBoundingBoxByIndex(
 	geVec3d Min,Max;
 	geVec3d Orientation;
 	geXForm3d Transform;
-	
-	assert( geActor_IsValid(A) != GE_FALSE );	
+
+	assert( geActor_IsValid(A) != GE_FALSE );
 	assert( geActor_DefIsValid(A->ActorDefinition) != GE_FALSE );
 	assert( A->ActorDefinition->Body   != NULL );
 
@@ -963,7 +963,7 @@ static geBoolean GENESISCC geActor_GetBoneBoundingBoxByIndex(
 	assert( DZ          );
 	assert( (BoneIndex < gePose_GetJointCount(A->Pose)) || (BoneIndex ==GE_POSE_ROOT_JOINT));
 	assert( (BoneIndex >=0)                             || (BoneIndex ==GE_POSE_ROOT_JOINT));
-	
+
 	if (geBody_GetBoundingBox( A->ActorDefinition->Body, BoneIndex, &Min, &Max )==GE_FALSE)
 		{
 			return GE_FALSE;
@@ -978,7 +978,7 @@ static geBoolean GENESISCC geActor_GetBoneBoundingBoxByIndex(
 		Min.X *= Scale.X;
 		Min.Y *= Scale.Y;
 		Min.Z *= Scale.Z;
-		
+
 		Max.X *= Scale.X;
 		Max.Y *= Scale.Y;
 		Max.Z *= Scale.Z;
@@ -988,11 +988,11 @@ static geBoolean GENESISCC geActor_GetBoneBoundingBoxByIndex(
 	gePose_GetJointTransform(A->Pose,BoneIndex,&(Transform));
 
 	geVec3d_Subtract(&Max,&Min,&Orientation);
-			
+
 	DX->X = Orientation.X;	DX->Y = DX->Z = 0.0f;
 	DY->Y = Orientation.Y;	DY->X = DY->Z = 0.0f;
 	DZ->Z = Orientation.Z;	DZ->X = DZ->Y = 0.0f;
-			
+
 	// transform into world space
 	geXForm3d_Transform(&(Transform),&Min,&Min);
 	geXForm3d_Rotate(&(Transform),DX,DX);
@@ -1006,7 +1006,7 @@ static geBoolean GENESISCC geActor_GetBoneBoundingBoxByIndex(
 
 
 GENESISAPI geBoolean GENESISCC geActor_GetBoneExtBoxByIndex(
-	const geActor *A, 
+	const geActor *A,
 	int BoneIndex,
 	geExtBox *ExtBox)
 {
@@ -1014,7 +1014,7 @@ GENESISAPI geBoolean GENESISCC geActor_GetBoneExtBoxByIndex(
 	geVec3d DX,DY,DZ,Corner;
 
 	assert( ExtBox );
-		
+
 	if (geActor_GetBoneBoundingBoxByIndex(A,BoneIndex,&Min,&DX,&DY,&DZ)==GE_FALSE)
 		{
 			return GE_FALSE;
@@ -1049,7 +1049,7 @@ GENESISAPI geBoolean GENESISCC geActor_GetBoneExtBox(const geActor *A,
 	int BoneIndex;
 	assert( geActor_IsValid(A) != GE_FALSE);
 	assert( ExtBox != NULL );
-	
+
 	if (geActor_GetBoneIndex(A,BoneName,&BoneIndex)==GE_FALSE)
 		{
 			geErrorLog_AddString(-1,"Named bone for bounding box not found", BoneName);
@@ -1092,13 +1092,13 @@ GENESISAPI geBoolean GENESISCC geActor_GetBoneBoundingBox(const geActor *A,
 GENESISAPI geBoolean GENESISCC geActor_GetExtBox(const geActor *A, geExtBox *ExtBox)
 {
 	geXForm3d Transform;
-	
+
 	assert( geActor_IsValid(A) != GE_FALSE);
 	assert( ExtBox != NULL );
-	
+
 	gePose_GetJointTransform(   A->Pose,
 								A->BoundingBoxCenterBoneIndex,
-								&Transform);	
+								&Transform);
 	assert ( geXForm3d_IsOrthonormal(&Transform) != GE_FALSE );
 	geVec3d_Add( &(Transform.Translation), &(A->BoundingBoxMinCorner), &(ExtBox->Min));
 	geVec3d_Add( &(Transform.Translation), &(A->BoundingBoxMaxCorner), &(ExtBox->Max));
@@ -1110,19 +1110,19 @@ GENESISAPI geBoolean GENESISCC geActor_SetExtBox(geActor *A,
 												 const geExtBox *ExtBox,
 												 const char *CenterOnThisNamedBone)
 {
-	
+
 	assert( geActor_IsValid(A) != GE_FALSE);
 	assert( geExtBox_IsValid(ExtBox) != GE_FALSE);
-	
+
 	A->BoundingBoxMinCorner = ExtBox->Min;
 	A->BoundingBoxMaxCorner = ExtBox->Max;
-	
+
 	if (geActor_GetBoneIndex(A,CenterOnThisNamedBone,&(A->BoundingBoxCenterBoneIndex))==GE_FALSE)
 		{
 			geErrorLog_AddString(-1,"Named bone for bounding box not found", CenterOnThisNamedBone);
 			return GE_FALSE;
 		}
-	
+
 	return GE_TRUE;
 }
 
@@ -1138,20 +1138,20 @@ GENESISAPI geBoolean GENESISCC geActor_GetRenderHintExtBox(const geActor *A, geE
 
 	gePose_GetJointTransform( A->Pose,
 								A->RenderHintExtBoxCenterBoneIndex,
-								&Transform);	
+								&Transform);
 	assert ( geXForm3d_IsOrthonormal(&Transform) != GE_FALSE );
 
 	*Box = A->RenderHintExtBox;
 	geExtBox_Translate ( Box, Transform.Translation.X,
 							  Transform.Translation.Y,
 							  Transform.Translation.Z );
-	
+
 	*Enabled = A->RenderHintExtBoxEnabled;
 	return GE_TRUE;
 }
 
 	// Sets a rendering hint bounding box from the actor
-GENESISAPI geBoolean GENESISCC geActor_SetRenderHintExtBox(geActor *A, const geExtBox *Box, 
+GENESISAPI geBoolean GENESISCC geActor_SetRenderHintExtBox(geActor *A, const geExtBox *Box,
 												const char *CenterOnThisNamedBone)
 {
 	assert( geActor_IsValid(A) != GE_FALSE);
@@ -1159,16 +1159,16 @@ GENESISAPI geBoolean GENESISCC geActor_SetRenderHintExtBox(geActor *A, const geE
 	assert( Box->Max.X >= Box->Min.X );
 	assert( Box->Max.Y >= Box->Min.Y );
 	assert( Box->Max.Z >= Box->Min.Z );
-	
+
 	if (geActor_GetBoneIndex(A,CenterOnThisNamedBone,&(A->RenderHintExtBoxCenterBoneIndex))==GE_FALSE)
 		{
 			geErrorLog_AddString(-1,"Named bone for render hint box not found", CenterOnThisNamedBone);
 			return GE_FALSE;
 		}
-		
+
 	A->RenderHintExtBox = *Box;
 	if (   (Box->Min.X == 0.0f) && (Box->Max.X == 0.0f)
-		&& (Box->Min.Y == 0.0f) && (Box->Max.Y == 0.0f) 
+		&& (Box->Min.Y == 0.0f) && (Box->Max.Y == 0.0f)
 		&& (Box->Min.Z == 0.0f) && (Box->Max.Z == 0.0f) )
 		{
 			A->RenderHintExtBoxEnabled = GE_FALSE;
@@ -1198,7 +1198,7 @@ GENESISAPI void GENESISCC geActor_SetUserData(geActor *A, void *UserData)
 #define MIN(aa,bb)   ( (aa)<(bb)?(aa):(bb) )
 
 static void GENESISCC geActor_StretchBoundingBox( geVec3d *Min, geVec3d *Max,
-							const geVec3d *Corner, 
+							const geVec3d *Corner,
 							const geVec3d *DX, const geVec3d *DY, const geVec3d *DZ)
 {
 	geVec3d P;
@@ -1260,7 +1260,7 @@ GENESISAPI geBoolean GENESISCC geActor_GetDynamicExtBox( const geActor *A, geExt
 			GE_ACTOR_REALLY_BIG_NUMBER,GE_ACTOR_REALLY_BIG_NUMBER,GE_ACTOR_REALLY_BIG_NUMBER);
 	geVec3d_Set(&(ExtBox->Max),
 			-GE_ACTOR_REALLY_BIG_NUMBER,-GE_ACTOR_REALLY_BIG_NUMBER,-GE_ACTOR_REALLY_BIG_NUMBER);
-		
+
 	BCount = 0;
 	Count = geBody_GetBoneCount( A->ActorDefinition->Body );
 	for (i=0; i< Count; i++)
@@ -1282,7 +1282,7 @@ GENESISAPI geBoolean GENESISCC geActor_GetDynamicExtBox( const geActor *A, geExt
 
 
 GENESISAPI geBoolean GENESISCC geActor_Attach( geActor *Slave,  const char *SlaveBoneName,
-						const geActor *Master, const char *MasterBoneName, 
+						const geActor *Master, const char *MasterBoneName,
 						const geXForm3d *Attachment)
 {
 	int SlaveBoneIndex,MasterBoneIndex;
@@ -1290,26 +1290,26 @@ GENESISAPI geBoolean GENESISCC geActor_Attach( geActor *Slave,  const char *Slav
 	assert( geActor_IsValid(Slave) != GE_FALSE);
 	assert( geActor_IsValid(Master) != GE_FALSE);
 	assert( geXForm3d_IsOrthonormal(Attachment) != GE_FALSE );
-	
+
 	assert( MasterBoneName != NULL );		// might this be possible?
-	
+
 	if (geActor_GetBoneIndex(Slave,SlaveBoneName,&(SlaveBoneIndex))==GE_FALSE)
 		{
 			geErrorLog_AddString(-1,"Named bone for slave not found", SlaveBoneName);
 			return GE_FALSE;
 		}
-	
+
 	if (geActor_GetBoneIndex(Master,MasterBoneName,&(MasterBoneIndex))==GE_FALSE)
 		{
 			geErrorLog_AddString(-1,"Named bone for master not found", MasterBoneName);
 			return GE_FALSE;
 		}
 
-	
+
 	return gePose_Attach(   Slave->Pose,   SlaveBoneIndex,
-							Master->Pose, MasterBoneIndex, 
+							Master->Pose, MasterBoneIndex,
 							Attachment);
-} 							
+}
 
 
 GENESISAPI void GENESISCC geActor_Detach(geActor *A)
@@ -1329,13 +1329,13 @@ GENESISAPI geBoolean GENESISCC geActor_GetBoneAttachment(const geActor *A,
 	int BoneIndex;
 	assert( geActor_IsValid(A) != GE_FALSE);
 	assert( Attachment != NULL );
-	
+
 	if (geActor_GetBoneIndex(A,BoneName,&(BoneIndex))==GE_FALSE)
 		{
 			geErrorLog_AddString(-1,"Named bone not found", BoneName);
 			return GE_FALSE;
 		}
-	
+
 	gePose_GetJointAttachment(A->Pose,BoneIndex, Attachment);
 	assert ( geXForm3d_IsOrthonormal(Attachment) != GE_FALSE );
 
@@ -1351,13 +1351,13 @@ GENESISAPI geBoolean GENESISCC geActor_SetBoneAttachment(geActor *A,
 
 	assert( geActor_IsValid(A) != GE_FALSE);
 	assert( geXForm3d_IsOrthonormal(Attachment) != GE_FALSE );
-	
+
 	if (geActor_GetBoneIndex(A,BoneName,&(BoneIndex))==GE_FALSE)
 		{
 			geErrorLog_AddString(-1,"Named bone not found", BoneName);
 			return GE_FALSE;
 		}
-	
+
 	gePose_SetJointAttachment(A->Pose,BoneIndex, Attachment);
 
 	return GE_TRUE;
@@ -1373,13 +1373,13 @@ GENESISAPI geBoolean GENESISCC geActor_SetBoneGlobalAttachment(geActor *A,
 
 	assert( geActor_IsValid(A) != GE_FALSE);
 	assert( geXForm3d_IsOrthonormal(Attachment) != GE_FALSE );
-	
+
 	if (geActor_GetBoneIndex(A,BoneName,&(BoneIndex))==GE_FALSE)
 		{
 			geErrorLog_AddString(-1,"Named bone not found", BoneName);
 			return GE_FALSE;
 		}
-	
+
 	gePose_SetJointGlobalAttachment(A->Pose,BoneIndex, Attachment, OffsetTransform);
 
 	return GE_TRUE;
@@ -1406,7 +1406,7 @@ static geBoolean GENESISCC geActor_IsAnimationCueDead(geActor *A, int Index)
 	if (BlendAmount <= ACTOR_CUE_MINIMUM_BLEND)
 		{
 			int KeyCount;
-			gePath *P; 
+			gePath *P;
 			geFloat KeyTime;
 
 			P = geMotion_GetBlendPath(M,Index);
@@ -1417,7 +1417,7 @@ static geBoolean GENESISCC geActor_IsAnimationCueDead(geActor *A, int Index)
 					geXForm3d Dummy;
 					geFloat TimeOffset = -geMotion_GetTimeOffset( M, Index);
 					gePath_GetKeyframe( P, KeyCount-1, GE_PATH_TRANSLATION_CHANNEL, &KeyTime, &Dummy );
-	
+
 					if ( KeyTime <= TimeOffset )
 						{
 							Kill = GE_TRUE;
@@ -1448,8 +1448,8 @@ GENESISAPI geBoolean GENESISCC geActor_AnimationNudge(geActor *A, geXForm3d *Off
 	assert( geXForm3d_IsOrthonormal(Offset) != GE_FALSE );
 	M = A->CueMotion;
 	Count = geMotion_GetSubMotionCount(M);
-	
-	for (i=Count-1; i>=0; i--)	
+
+	for (i=Count-1; i>=0; i--)
 		{
 			geXForm3d Transform;
 			const geXForm3d *pTransform;
@@ -1457,7 +1457,7 @@ GENESISAPI geBoolean GENESISCC geActor_AnimationNudge(geActor *A, geXForm3d *Off
 			if ( pTransform != NULL )
 				{
 					Transform = *pTransform;
-			
+
 					geXForm3d_Multiply(Offset,&Transform,&Transform);
 					geXForm3d_Orthonormalize(&Transform);
 
@@ -1480,12 +1480,12 @@ GENESISAPI geBoolean GENESISCC geActor_AnimationRemoveLastCue( geActor *A )
 	return GE_FALSE;
 }
 
-GENESISAPI geBoolean GENESISCC geActor_AnimationCue( geActor *A, 
+GENESISAPI geBoolean GENESISCC geActor_AnimationCue( geActor *A,
 								geMotion *Motion,
 								geFloat TimeScaleFactor,
 								geFloat TimeIntoMotion,
-								geFloat BlendTime, 
-								geFloat BlendFromAmount, 
+								geFloat BlendTime,
+								geFloat BlendFromAmount,
 								geFloat BlendToAmount,
 								const geXForm3d *MotionTransform)
 {
@@ -1498,7 +1498,7 @@ GENESISAPI geBoolean GENESISCC geActor_AnimationCue( geActor *A,
 	assert( (MotionTransform==NULL) || (geXForm3d_IsOrthonormal(MotionTransform)) != GE_FALSE );
 
 	assert( Motion != NULL );
-	
+
 	assert( BlendTime >= 0.0f);
 	if (BlendTime==0.0f)
 		{
@@ -1506,14 +1506,14 @@ GENESISAPI geBoolean GENESISCC geActor_AnimationCue( geActor *A,
 			BlendTime = 1.0f;	// anything that is > GE_TKA_TIME_TOLERANCE
 		}
 
-	if (geMotion_AddSubMotion( A->CueMotion, TimeScaleFactor, -TimeIntoMotion, Motion, 
-							TimeIntoMotion, BlendFromAmount, 
-							TimeIntoMotion + BlendTime, BlendToAmount, 
+	if (geMotion_AddSubMotion( A->CueMotion, TimeScaleFactor, -TimeIntoMotion, Motion,
+							TimeIntoMotion, BlendFromAmount,
+							TimeIntoMotion + BlendTime, BlendToAmount,
 							MotionTransform, &Index )==GE_FALSE)
-		{	
+		{
 			return GE_FALSE;
 		}
-		
+
 	return GE_TRUE;
 }
 
@@ -1523,17 +1523,17 @@ GENESISAPI geBoolean GENESISCC geActor_AnimationStep(geActor *A, geFloat DeltaTi
 	int i,Coverage,Count;
 	geMotion *M;
 	geMotion *SubM;
-	
+
 	assert( geActor_IsValid(A) != GE_FALSE);
 	assert( DeltaTime >= 0.0f );
-	
+
 	gePose_ClearCoverage(A->Pose,0);
 
 	M = A->CueMotion;
 
 	Count = geMotion_GetSubMotionCount(M);
 
-	for (i=Count-1; i>=0; i--)	
+	for (i=Count-1; i>=0; i--)
 		{
 			geFloat TimeOffset = geMotion_GetTimeOffset( M, i );
 			TimeOffset = TimeOffset - DeltaTime;
@@ -1547,12 +1547,12 @@ GENESISAPI geBoolean GENESISCC geActor_AnimationStep(geActor *A, geFloat DeltaTi
 				{
 					geBoolean SetWithBlending= GE_TRUE;
 					geFloat BlendAmount;
-					
+
 					SubM = geMotion_GetSubMotion(M,i);
 					assert( SubM != NULL );
-					
+
 					BlendAmount = geMotion_GetBlendAmount( M,i,0.0f );
-					
+
 					if (BlendAmount >= ACTOR_CUE_MAXIMUM_BLEND)
 						{
 							SetWithBlending = GE_FALSE;
@@ -1577,10 +1577,10 @@ GENESISAPI geBoolean GENESISCC geActor_AnimationStepBoneOptimized(geActor *A, ge
 	int i,Coverage,Count;
 	geMotion *M;
 	geMotion *SubM;
-	
+
 	assert( geActor_IsValid(A) != GE_FALSE);
 	assert( DeltaTime >= 0.0f );
-	
+
 	if (BoneName == NULL)
 		{
 			A->StepBoneIndex = GE_POSE_ROOT_JOINT;
@@ -1595,7 +1595,7 @@ GENESISAPI geBoolean GENESISCC geActor_AnimationStepBoneOptimized(geActor *A, ge
 				{
 					geBody_GetBone(	A->ActorDefinition->Body,A->StepBoneIndex,&LastBoneName,&Attachment,&LastParentBoneIndex);
 					if (  (LastBoneName != NULL) )
-						if (strcmp(LastBoneName,BoneName)==0) 
+						if (strcmp(LastBoneName,BoneName)==0)
 							LookupBoneName = GE_FALSE;
 				}
 			if (LookupBoneName != GE_FALSE)
@@ -1607,7 +1607,7 @@ GENESISAPI geBoolean GENESISCC geActor_AnimationStepBoneOptimized(geActor *A, ge
 						}
 				}
 		}
-			
+
 
 	gePose_ClearCoverage(A->Pose,0);
 
@@ -1615,7 +1615,7 @@ GENESISAPI geBoolean GENESISCC geActor_AnimationStepBoneOptimized(geActor *A, ge
 
 	Count = geMotion_GetSubMotionCount(M);
 
-	for (i=Count-1; i>=0; i--)	
+	for (i=Count-1; i>=0; i--)
 		{
 			geFloat TimeOffset = geMotion_GetTimeOffset( M, i );
 			TimeOffset = TimeOffset - DeltaTime;
@@ -1629,12 +1629,12 @@ GENESISAPI geBoolean GENESISCC geActor_AnimationStepBoneOptimized(geActor *A, ge
 				{
 					geBoolean SetWithBlending= GE_TRUE;
 					geFloat BlendAmount;
-					
+
 					SubM = geMotion_GetSubMotion(M,i);
 					assert( SubM != NULL );
-					
+
 					BlendAmount = geMotion_GetBlendAmount( M,i,0.0f );
-					
+
 					if (BlendAmount >= ACTOR_CUE_MAXIMUM_BLEND)
 						{
 							SetWithBlending = GE_FALSE;
@@ -1654,7 +1654,7 @@ GENESISAPI geBoolean GENESISCC geActor_AnimationStepBoneOptimized(geActor *A, ge
 }
 
 
-		
+
 GENESISAPI geBoolean GENESISCC geActor_AnimationTestStep(geActor *A, geFloat DeltaTime)
 {
 	assert( geActor_IsValid(A) != GE_FALSE);
@@ -1684,7 +1684,7 @@ GENESISAPI geBoolean GENESISCC geActor_AnimationTestStepBoneOptimized(geActor *A
 				{
 					geBody_GetBone(	A->ActorDefinition->Body,A->StepBoneIndex,&LastBoneName,&Attachment,&LastParentBoneIndex);
 					if (  (LastBoneName != NULL) )
-						if (strcmp(LastBoneName,BoneName)==0) 
+						if (strcmp(LastBoneName,BoneName)==0)
 							LookupBoneName = GE_FALSE;
 				}
 			if (LookupBoneName != GE_FALSE)
@@ -1704,9 +1704,9 @@ GENESISAPI geBoolean GENESISCC geActor_AnimationTestStepBoneOptimized(geActor *A
 
 
 GENESISAPI geBoolean GENESISCC geActor_GetAnimationEvent(
-	geActor *A,						
+	geActor *A,
 	const char **ppEventString)		// Return data, if found
-	// returns the event string for the 'next' event that occured during the last 
+	// returns the event string for the 'next' event that occured during the last
 	// animation step time delta.
 	// if the return value is GE_FALSE, there are no more events, and ppEventString will be Empty
 {
@@ -1730,7 +1730,7 @@ static geBoolean GENESISCC geActor_TransformCompare(const geXForm3d *T1, const g
 	if (fabs(T1->AZ - T2->AZ)>SINGLE_TERM_ERROR_THRESHOLD) return GE_FALSE;
 	if (fabs(T1->BZ - T2->BZ)>SINGLE_TERM_ERROR_THRESHOLD) return GE_FALSE;
 	if (fabs(T1->CZ - T2->CZ)>SINGLE_TERM_ERROR_THRESHOLD) return GE_FALSE;
-	
+
 	if (fabs(T1->Translation.X - T2->Translation.X)>SINGLE_TERM_ERROR_THRESHOLD) return GE_FALSE;
 	if (fabs(T1->Translation.Y - T2->Translation.Y)>SINGLE_TERM_ERROR_THRESHOLD) return GE_FALSE;
 	if (fabs(T1->Translation.Z - T2->Translation.Z)>SINGLE_TERM_ERROR_THRESHOLD) return GE_FALSE;
@@ -1743,14 +1743,14 @@ static geBoolean GENESISCC geActor_TransformCompare(const geXForm3d *T1, const g
 GENESISAPI geBoolean GENESISCC geActor_GetLightingOptions(const geActor *Actor,
 	geBoolean *UseFillLight,
 	geVec3d *FillLightNormal,
-	geFloat *FillLightRed,				
-	geFloat *FillLightGreen,				
-	geFloat *FillLightBlue,				
-	geFloat *AmbientLightRed,			
-	geFloat *AmbientLightGreen,			
-	geFloat *AmbientLightBlue,			
+	geFloat *FillLightRed,
+	geFloat *FillLightGreen,
+	geFloat *FillLightBlue,
+	geFloat *AmbientLightRed,
+	geFloat *AmbientLightGreen,
+	geFloat *AmbientLightBlue,
 	geBoolean *UseAmbientLightFromFloor,
-	int *MaximumDynamicLightsToUse,		
+	int *MaximumDynamicLightsToUse,
 	const char **LightReferenceBoneName,
 	geBoolean *PerBoneLighting)
 {
@@ -1759,14 +1759,14 @@ GENESISAPI geBoolean GENESISCC geActor_GetLightingOptions(const geActor *Actor,
 
 	assert( UseFillLight != NULL );
 	assert( FillLightNormal != NULL );
-	assert( FillLightRed != NULL );	
-	assert( FillLightGreen != NULL );	
-	assert( FillLightBlue != NULL );	
+	assert( FillLightRed != NULL );
+	assert( FillLightGreen != NULL );
+	assert( FillLightBlue != NULL );
 	assert( AmbientLightRed != NULL );
-	assert( AmbientLightGreen != NULL );			
-	assert( AmbientLightBlue != NULL );			
+	assert( AmbientLightGreen != NULL );
+	assert( AmbientLightBlue != NULL );
 	assert( UseAmbientLightFromFloor != NULL );
-	assert( MaximumDynamicLightsToUse != NULL );	
+	assert( MaximumDynamicLightsToUse != NULL );
 	assert( LightReferenceBoneName != NULL );
 
 	if (Actor->Puppet == NULL)
@@ -1774,16 +1774,16 @@ GENESISAPI geBoolean GENESISCC geActor_GetLightingOptions(const geActor *Actor,
 			geErrorLog_AddString(-1,"Can't set lighting options until actor is prepared for rendering", NULL);
 			return GE_FALSE;
 		}
-	
+
 	gePuppet_GetLightingOptions(	Actor->Puppet,
 									UseFillLight,
 									FillLightNormal,
-									FillLightRed,	
-									FillLightGreen,	
-									FillLightBlue,	
+									FillLightRed,
+									FillLightGreen,
+									FillLightBlue,
 									AmbientLightRed,
-									AmbientLightGreen,		
-									AmbientLightBlue,		
+									AmbientLightGreen,
+									AmbientLightBlue,
 									UseAmbientLightFromFloor,
 									MaximumDynamicLightsToUse,
 									&BoneIndex,
@@ -1840,7 +1840,7 @@ GENESISAPI geBoolean GENESISCC geActor_SetLightingOptions(geActor *A,
 
 	assert( geActor_IsValid(A)!=GE_FALSE );
 	assert( FillLightNormal != NULL );
-	
+
 	if (A->Puppet == NULL)
 		{
 			geErrorLog_AddString(-1,"Can't set lighting options until actor is prepared for rendering", NULL);
@@ -1855,12 +1855,12 @@ GENESISAPI geBoolean GENESISCC geActor_SetLightingOptions(geActor *A,
 	gePuppet_SetLightingOptions(	A->Puppet,
 									UseFillLight,
 									FillLightNormal,
-									FillLightRed,	
-									FillLightGreen,	
-									FillLightBlue,	
+									FillLightRed,
+									FillLightGreen,
+									FillLightBlue,
 									AmbientLightRed,
-									AmbientLightGreen,		
-									AmbientLightBlue,		
+									AmbientLightGreen,
+									AmbientLightBlue,
 									AmbientLightFromFloor,
 									MaximumDynamicLightsToUse,
 									BoneIndex,
@@ -1872,15 +1872,15 @@ GENESISAPI void GENESISCC geActor_SetScale(geActor *A, geFloat ScaleX,geFloat Sc
 {
 	geVec3d S;
 	assert( A != NULL );
-		
+
 	geVec3d_Set(&S,ScaleX,ScaleY,ScaleZ);
 	gePose_SetScale(A->Pose,&S);
 }
 
 
 
-GENESISAPI geBoolean GENESISCC geActor_SetShadow(geActor *A, 
-		geBoolean DoShadow, 
+GENESISAPI geBoolean GENESISCC geActor_SetShadow(geActor *A,
+		geBoolean DoShadow,
 		geFloat Radius,
 		const geBitmap *ShadowMap,
 		const char *BoneName)
@@ -1890,13 +1890,13 @@ GENESISAPI geBoolean GENESISCC geActor_SetShadow(geActor *A,
 	assert( geActor_IsValid(A)!=GE_FALSE );
 	assert( (DoShadow==GE_FALSE) || (DoShadow==GE_TRUE));
 	assert( Radius >= 0.0f);
-	
+
 	if (A->Puppet == GE_FALSE)
 		{
 			geErrorLog_AddString(-1,"Can't set shadow options until actor is prepared for rendering", NULL);
 			return GE_FALSE;
 		}
-	
+
 	if (geActor_GetBoneIndex(A,BoneName,&BoneIndex)==GE_FALSE)
 		{
 			geErrorLog_AddString(-1,"Named bone for shadow not found", BoneName);
@@ -1909,18 +1909,18 @@ GENESISAPI geBoolean GENESISCC geActor_SetShadow(geActor *A,
 }
 
 // changed QD Shadows
-GENESISAPI geBoolean GENESISCC geActor_SetStencilShadow(geActor *A, 
+GENESISAPI geBoolean GENESISCC geActor_SetStencilShadow(geActor *A,
 						geBoolean DoStencilShadow)
 {
 	assert( geActor_IsValid(A)!=GE_FALSE );
 	assert( (DoStencilShadow==GE_FALSE) || (DoStencilShadow==GE_TRUE));
-	
+
 	if(A->Puppet == GE_FALSE)
 	{
 		geErrorLog_AddString(-1,"Can't set shadow options until actor is prepared for rendering", NULL);
 		return GE_FALSE;
 	}
-	
+
 	gePuppet_SetStencilShadow(A->Puppet,DoStencilShadow);
 
 	return GE_TRUE;
@@ -1940,7 +1940,7 @@ geBoolean GENESISCC geActor_RenderPrep( geActor *A, geWorld *World)
 			gePuppet_Destroy(&(A->Puppet));
 			A->Puppet =NULL;
 		}
-		
+
 	A->Puppet = gePuppet_Create(A->ActorDefinition->TextureFileContext, A->ActorDefinition->Body,World);
 	if ( A->Puppet == NULL )
 		{
@@ -1950,18 +1950,18 @@ geBoolean GENESISCC geActor_RenderPrep( geActor *A, geWorld *World)
 	{
 		geExtBox EB;
 		//initialize body bounding box
-   		geActor_GetDynamicExtBox(A, &EB);
-   		geBody_SetBoundingBox(A->ActorDefinition->Body, GE_BODY_ROOT, &EB.Min,    &EB.Max);
+		geActor_GetDynamicExtBox(A, &EB);
+		geBody_SetBoundingBox(A->ActorDefinition->Body, GE_BODY_ROOT, &EB.Min,    &EB.Max);
 		if (geActor_GetBoneExtBoxByIndex(A,GE_POSE_ROOT_JOINT,&EB) == GE_FALSE)
 			{
 				geErrorLog_AddString(-1,"Failure to get Root Bounding box from puppet", NULL);
-				return GE_FALSE;			
+				return GE_FALSE;
 			}
-		
+
 		A->BoundingBoxMinCorner = EB.Min;
 		A->BoundingBoxMaxCorner = EB.Max;
 	}
-	
+
 	return GE_TRUE;
 }
 
@@ -2020,15 +2020,15 @@ geBoolean GENESISCC geActor_Render(const geActor *A, geEngine *Engine, geWorld *
 // end change
 
 // changed QD Shadows
-geBoolean GENESISCC geActor_RenderShadowVolume(const geActor *A, geEngine *Engine, geWorld *World, geCamera *Camera, 
-											   GFX_Plane *FPlanes, geVec3d *Light, geFloat Radius, 
+geBoolean GENESISCC geActor_RenderShadowVolume(const geActor *A, geEngine *Engine, geWorld *World, geCamera *Camera,
+											   GFX_Plane *FPlanes, geVec3d *Light, geFloat Radius,
 											   int LightType, geVec3d* Dir, geFloat Arc, geBoolean ZPass)
 {
 	assert( geActor_IsValid(A) != GE_FALSE );
 	assert( A->Puppet != NULL );
 
 	{
-		if (gePuppet_RenderShadowVolume( A->Puppet, A->Pose, Engine,World, Camera, 
+		if (gePuppet_RenderShadowVolume( A->Puppet, A->Pose, Engine,World, Camera,
 			FPlanes, Light, Radius, LightType, Dir, Arc, ZPass)==GE_FALSE)
 		{
 			geErrorLog_Add( ERR_ACTOR_RENDER_FAILED , NULL);
@@ -2074,9 +2074,9 @@ GENESISAPI geBoolean GENESISCC geActor_SetMaterial(geActor *A, int MaterialIndex
 GENESISAPI geBoolean GENESISCC geActor_SetStaticLightingOptions(geActor *A,	geBoolean AmbientLightFromStaticLights,	geBoolean TestRayCollision,	int MaxStaticLightsToUse	)
 {	assert( geActor_IsValid(A)!=GE_FALSE );
 		if (A->Puppet == NULL)
-		{			
+		{
 			geErrorLog_AddString(-1,"Can't set lighting options until actor is prepared for rendering", NULL);
-			return GE_FALSE;		
+			return GE_FALSE;
 		}
 // changed QD bug fix
 /*		gePuppet_SetStaticLightingOptions( A->Puppet,

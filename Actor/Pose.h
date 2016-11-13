@@ -1,8 +1,8 @@
 /****************************************************************************************/
-/*  POSE.H																				*/
+/*  Pose.h                                                                              */
 /*                                                                                      */
-/*  Author: Mike Sandige	                                                            */
-/*  Description: Bone hierarchy interface.								.				*/
+/*  Author: Mike Sandige                                                                */
+/*  Description: Bone hierarchy interface.                                              */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_POSE_H
@@ -32,15 +32,15 @@
 	to determine each joint's change and applies them to the hierarchy.  Each joint can
 	then be queried for it's world transform (for drawing, etc.)
 
-	Additional motions can modify or be blended into the pose.  A motion that describes 
+	Additional motions can modify or be blended into the pose.  A motion that describes
 	only a few joint changes can be applied to only those joints, or a motion can be
-	blended with the current pose. 
+	blended with the current pose.
 
 	Something to watch for:  since setting the pose by applying a motion is powerful
-	enough to resolve intentionally mismatched motion-pose sets, this can lead to 
-	problems if the motion UNintentionally does not match the pose.  Use 
+	enough to resolve intentionally mismatched motion-pose sets, this can lead to
+	problems if the motion UNintentionally does not match the pose.  Use
 	gePose_MatchesgeMotionExactly() to test for an exact name-based match.
-	
+
 
 */
 
@@ -55,7 +55,7 @@ extern "C" {
 
 #define GE_POSE_ROOT_JOINT (-1)
 
-typedef enum 
+typedef enum
 {
 		GE_POSE_BLEND_LINEAR,
 		GE_POSE_BLEND_HERMITE
@@ -117,7 +117,7 @@ void GENESISCC gePose_SetMotionForABone(gePose *P, const geMotion *M, geFloat Ti
 	// will be used to decide which motion to attach to which joints.
 	// joints that are unaffected are unchanged.
 	// if Transform is non-NULL, it is applied to the Motion prior to blending
-void GENESISCC gePose_BlendMotion(gePose *P, const geMotion *M, geFloat Time, 
+void GENESISCC gePose_BlendMotion(gePose *P, const geMotion *M, geFloat Time,
 					const geXForm3d *Transform,
 					geFloat BlendAmount, gePose_BlendingType BlendingType);
 
@@ -132,7 +132,7 @@ void GENESISCC gePose_GetJointLocalTransform(const gePose *P, int JointIndex,geX
 
 	// adjust a joint's current transform relative to it's attachment to it's parent.
 	//   this is like setting a mini-motion into this joint only:  this will only affect
-	//   the current pose 
+	//   the current pose
 void GENESISCC gePose_SetJointLocalTransform(gePose *P, int JointIndex,const geXForm3d *Transform);
 
 	// query how a joint is attached to it's parent. (it's base attachment)
@@ -146,17 +146,17 @@ void GENESISCC gePose_SetJointGlobalAttachment(gePose *P,int JointIndex,const ge
 const char* GENESISCC gePose_GetJointName(const gePose* P, int JointIndex);
 
 geBoolean GENESISCC gePose_Attach(gePose *Slave, int SlaveBoneIndex,
-				  gePose *Master, int MasterBoneIndex, 
+				  gePose *Master, int MasterBoneIndex,
 				  const geXForm3d *Attachment);
 
 void GENESISCC gePose_Detach(gePose *P);
 
 	// a pose can also maintain a record of which joints are touched by a given motion.
 	// these funtions set,clear and query the record.
-	// ClearCoverage clears the coverage flag for all joints 
+	// ClearCoverage clears the coverage flag for all joints
 void GENESISCC gePose_ClearCoverage(gePose *P, int ClearTo);
-	// AccumulateCoverage returns the number of joints that are not already 'covered' 
-	// that will be affected by a motion M,  
+	// AccumulateCoverage returns the number of joints that are not already 'covered'
+	// that will be affected by a motion M,
 	// if QueryOnly is GE_FALSE, affected joints are tagged as 'covered', otherwise no changes
 	// are made to the joint coverage flags.
 int GENESISCC gePose_AccumulateCoverage(gePose *P, const geMotion *M, geBoolean QueryOnly);

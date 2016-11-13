@@ -1,8 +1,8 @@
 /****************************************************************************************/
-/*  XFARRAY.C																			*/
+/*  XFArray.c                                                                           */
 /*                                                                                      */
-/*  Author: Mike Sandige	                                                            */
-/*  Description: Array of transforms implementation.									*/
+/*  Author: Mike Sandige                                                                */
+/*  Description: Array of transforms implementation.                                    */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <assert.h>
@@ -65,7 +65,7 @@ void GENESISCC geXFArray_Destroy( geXFArray **XFA )
 	assert( *XFA != NULL );
 	assert( (*XFA)->TransformCount > 0 );
 	assert( (*XFA)->TransformArray != NULL );
-	
+
 	(*XFA)->TransformCount = -1;
 	geRam_Free( (*XFA)->TransformArray);
 	(*XFA)->TransformArray = NULL;

@@ -1,8 +1,8 @@
 /****************************************************************************************/
-/*  PATH.H																				*/
+/*  Path.h                                                                              */
 /*                                                                                      */
-/*  Author: Mike Sandige	                                                            */
-/*  Description: Time-indexed keyframe creation, maintenance, and sampling.				*/
+/*  Author: Mike Sandige                                                                */
+/*  Description: Time-indexed keyframe creation, maintenance, and sampling.             */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_PATH_H
@@ -42,7 +42,7 @@ typedef struct _gePath gePath;
 
 #ifndef GE_PATH_ENUMS
 	#define GE_PATH_ENUMS
-	typedef enum 
+	typedef enum
 	{
 		GE_PATH_INTERPOLATE_LINEAR  = 0,	// linear blend for translation or rotation channel
 		GE_PATH_INTERPOLATE_HERMITE,		// hermite cubic spline for translation channel
@@ -61,31 +61,31 @@ GENESISAPI gePath *GENESISCC gePath_Create(
 	geBoolean Looped);				// True if end of path is connected to head
 	// creates new gePath
 	//  A looping path should have the same first & last point.  The path
-	//  generator will choose arbitrarily between these points for a 
+	//  generator will choose arbitrarily between these points for a
 	//  sample exactly at the end of the loop.
 
 GENESISAPI gePath *GENESISCC gePath_CreateCopy( const gePath *P );
-	
-GENESISAPI void GENESISCC gePath_Destroy(gePath **PP);		
+
+GENESISAPI void GENESISCC gePath_Destroy(gePath **PP);
 	// destroys path *PP
 
 //------------------ time based keyframe operations
 GENESISAPI geBoolean GENESISCC gePath_InsertKeyframe(
-	gePath *P, 
-	int ChannelMask, 
-	geFloat Time, 
-	const geXForm3d *Matrix); 
+	gePath *P,
+	int ChannelMask,
+	geFloat Time,
+	const geXForm3d *Matrix);
 	// inserts a keyframe at a specific time.
-	
+
 GENESISAPI geBoolean GENESISCC gePath_DeleteKeyframe(
 	gePath *P,
 	int Index,
-	int ChannelMask); 
+	int ChannelMask);
 	// deletes the nth keyframe
 
 GENESISAPI geBoolean GENESISCC gePath_GetTimeExtents(
 	const gePath *P,
-	geFloat *StartTime, 
+	geFloat *StartTime,
 	geFloat *EndTime);
 	// gets the time for the first and last keys in the path (ignoring looping)
 	// if there are no keys, return GE_FALSE and times are not set.
@@ -93,7 +93,7 @@ GENESISAPI geBoolean GENESISCC gePath_GetTimeExtents(
 
 //----------------- index based keyframe operations
 GENESISAPI void GENESISCC gePath_GetKeyframe(
-	const gePath *P, 
+	const gePath *P,
 	int Index,				// gets keyframe[index]
 	int Channel,			// for this channel
 	geFloat *Time,			// returns the time of the keyframe
@@ -113,14 +113,14 @@ GENESISAPI void GENESISCC gePath_Sample(const gePath *P, geFloat Time,geXForm3d 
 
 // GENESIS_PRIVATE_APIS
 void GENESISCC gePath_SampleChannels(
-	const gePath *P, 
-	geFloat Time, 
-	geQuaternion *Rotation, 
+	const gePath *P,
+	geFloat Time,
+	geQuaternion *Rotation,
 	geVec3d *Translation);
 	// returns a rotation and a translation for the path at 'Time'
 	// p is not const because information is cached in p for next sample
 
-GENESISAPI geBoolean GENESISCC gePath_OffsetTimes(gePath *P, 
+GENESISAPI geBoolean GENESISCC gePath_OffsetTimes(gePath *P,
 	int StartingIndex, int ChannelMask, geFloat TimeOffset );
 		// slides all samples in path starting with StartingIndex down by TimeOffset
 
@@ -129,7 +129,7 @@ GENESISAPI geBoolean GENESISCC gePath_ModifyKeyframe(
 	int Index,
 	int ChannelMask,
 	const geXForm3d *Matrix);
-	
+
 
 // GENESIS_PUBLIC_APIS
 
@@ -138,7 +138,7 @@ GENESISAPI gePath* GENESISCC gePath_CreateFromFile(geVFile *F);
 	// loads a file  (binary or ascii)
 
 GENESISAPI geBoolean GENESISCC gePath_WriteToFile(const gePath *P, geVFile *F);
-	// dumps formatted ascii to the file.  
+	// dumps formatted ascii to the file.
 
 GENESISAPI geBoolean GENESISCC gePath_WriteToBinaryFile(const gePath *P, geVFile *F);
 	// dumps a minimal binary image for fastest reading

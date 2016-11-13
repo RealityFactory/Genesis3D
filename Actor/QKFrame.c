@@ -1,8 +1,8 @@
 /****************************************************************************************/
-/*  QKFRAME.H																			*/
+/*  QKFrame.c                                                                           */
 /*                                                                                      */
-/*  Author: Mike Sandige	                                                            */
-/*  Description: Quaternion keyframe implementation.									*/
+/*  Author: Mike Sandige                                                                */
+/*  Description: Quaternion keyframe implementation.                                    */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 /* geQKFrame   (geQuaternion - Keyframe)
@@ -26,16 +26,16 @@
 	that support to include the specific time-keyed arrays:
 	  An array of geQuaternion interpolated linearly
 	  An array of geQuaternion with spherical linear interpolation (SLERP)
-	  An array of geQuaternion with spherical quadrangle 
+	  An array of geQuaternion with spherical quadrangle
 		interpolation (SQUAD) as defined by:
-	    Advanced Animation and Rendering Techniques by Alan Watt and Mark Watt
+		Advanced Animation and Rendering Techniques by Alan Watt and Mark Watt
 
 	These are phycially separated and have different base structures because
 	the different interpolation techniques requre different additional data.
-	
+
 	The two lists are created with different creation calls,
 	interpolated with different calls, but insertion and queries share a call.
-	
+
 	Quadrangle interpolation requires additional computation after changes are
 	made to the keyframe list.  Call geQKFrame_SquadRecompute() to update the
 	calculations.
@@ -49,14 +49,14 @@
 #include "ErrorLog.h"
 #include "Ram.h"
 
-#define LINEAR_BLEND(a,b,t)  ( (t)*((b)-(a)) + (a) )	
+#define LINEAR_BLEND(a,b,t)  ( (t)*((b)-(a)) + (a) )
 			// linear blend of a and b  0<t<1 where  t=0 ->a and t=1 ->b
 
 typedef struct
 {
 	geTKArray_TimeType	Time;				// Time for this keyframe
 	geQuaternion	Q;					// quaternion for this keyframe
-}  QKeyframe;		
+}  QKeyframe;
 	// This is the root structure that geQKFrame supports
 	// all keyframe types must begin with this structure.  Time is first, so
 	// that this structure can be manipulated by geTKArray
@@ -78,7 +78,7 @@ typedef struct
 typedef struct
 {
 	QKeyframe Key;				// key values for this keyframe
-	geQuaternion  QuadrangleCorner;	
+	geQuaternion  QuadrangleCorner;
 }	geQKFrame_Squad;
 	// keyframe data for spherical quadratic interpolation
 
@@ -91,13 +91,13 @@ geTKArray *GENESISCC geQKFrame_LinearCreate()
 
 
 geTKArray *GENESISCC geQKFrame_SlerpCreate()
-	// creates a frame list for spherical linear interpolation	
+	// creates a frame list for spherical linear interpolation
 {
 	return geTKArray_Create(sizeof(geQKFrame_Slerp) );
 }
 
 geTKArray *GENESISCC geQKFrame_SquadCreate()
-	// creates a frame list for spherical linear interpolation	
+	// creates a frame list for spherical linear interpolation
 {
 	return geTKArray_Create(sizeof(geQKFrame_Squad) );
 }
@@ -113,8 +113,8 @@ geBoolean GENESISCC geQKFrame_Insert(
 	assert( KeyList != NULL );
 	assert( *KeyList != NULL );
 	assert( Q != NULL );
-	assert(   sizeof(geQKFrame_Squad) == geTKArray_ElementSize(*KeyList) 
-	       || sizeof(geQKFrame_Slerp) == geTKArray_ElementSize(*KeyList) 
+	assert(   sizeof(geQKFrame_Squad) == geTKArray_ElementSize(*KeyList)
+		   || sizeof(geQKFrame_Slerp) == geTKArray_ElementSize(*KeyList)
 		   || sizeof(geQKFrame_Linear) == geTKArray_ElementSize(*KeyList) );
 
 	if (geTKArray_Insert(KeyList, Time, Index) == GE_FALSE)
@@ -136,7 +136,7 @@ void GENESISCC geQKFrame_Query(
 	int Index,						// index of frame to return
 	geTKArray_TimeType *Time,		// time of the frame is returned
 	geQuaternion *Q)					// vector from the frame is returned
-	// returns the vector and the time at keyframe[index] 
+	// returns the vector and the time at keyframe[index]
 {
 	QKeyframe *KF;
 	assert( KeyList != NULL );
@@ -144,10 +144,10 @@ void GENESISCC geQKFrame_Query(
 	assert( Q != NULL );
 	assert( Index < geTKArray_NumElements(KeyList) );
 	assert( Index >= 0 );
-	assert(   sizeof(geQKFrame_Squad) == geTKArray_ElementSize(KeyList) 
-	       || sizeof(geQKFrame_Slerp) == geTKArray_ElementSize(KeyList) 
+	assert(   sizeof(geQKFrame_Squad) == geTKArray_ElementSize(KeyList)
+		   || sizeof(geQKFrame_Slerp) == geTKArray_ElementSize(KeyList)
 		   || sizeof(geQKFrame_Linear) == geTKArray_ElementSize(KeyList) );
-	
+
 	KF = (QKeyframe *)geTKArray_Element(KeyList,Index);
 	*Time = KF->Time;
 	*Q    = KF->Q;
@@ -163,10 +163,10 @@ void GENESISCC geQKFrame_Modify(
 	assert( Q != NULL );
 	assert( Index < geTKArray_NumElements(KeyList) );
 	assert( Index >= 0 );
-	assert(   sizeof(geQKFrame_Squad) == geTKArray_ElementSize(KeyList) 
-	       || sizeof(geQKFrame_Slerp) == geTKArray_ElementSize(KeyList) 
+	assert(   sizeof(geQKFrame_Squad) == geTKArray_ElementSize(KeyList)
+		   || sizeof(geQKFrame_Slerp) == geTKArray_ElementSize(KeyList)
 		   || sizeof(geQKFrame_Linear) == geTKArray_ElementSize(KeyList) );
-	
+
 	KF = (QKeyframe *)geTKArray_Element(KeyList,Index);
 	KF->Q  = *Q;
 }
@@ -179,20 +179,20 @@ void GENESISCC geQKFrame_LinearInterpolation(
 	geFloat T,				// 0 <= T <= 1   blending parameter
 	void *Result)			// put the result in here (geQuaternion)
 		// interpolates to get a vector between the two vectors at the two
-		// keyframes where T==0 returns the vector for KF1 
+		// keyframes where T==0 returns the vector for KF1
 		// and T==1 returns the vector for KF2
 		// interpolates linearly
 {
 	geQuaternion *Q1,*Q2;
 	geQuaternion *QNew = (geQuaternion *)Result;
-	
+
 	assert( Result != NULL );
 	assert( KF1 != NULL );
 	assert( KF2 != NULL );
-	
+
 	assert( T >= (geFloat)0.0f );
 	assert( T <= (geFloat)1.0f );
-	
+
 	if ( KF1 == KF2 )
 		{
 			*QNew = ((geQKFrame_Linear *)KF1)->Key.Q;
@@ -201,7 +201,7 @@ void GENESISCC geQKFrame_LinearInterpolation(
 
 	Q1 = &( ((geQKFrame_Linear *)KF1)->Key.Q);
 	Q2 = &( ((geQKFrame_Linear *)KF2)->Key.Q);
-	
+
 	QNew->X = LINEAR_BLEND(Q1->X,Q2->X,T);
 	QNew->Y = LINEAR_BLEND(Q1->Y,Q2->Y,T);
 	QNew->Z = LINEAR_BLEND(Q1->Z,Q2->Z,T);
@@ -221,26 +221,26 @@ void GENESISCC geQKFrame_SlerpInterpolation(
 	geFloat T,				// 0 <= T <= 1   blending parameter
 	void *Result)			// put the result in here (geQuaternion)
 		// interpolates to get a vector between the two vectors at the two
-		// keyframes where T==0 returns the vector for KF1 
+		// keyframes where T==0 returns the vector for KF1
 		// and T==1 returns the vector for KF2
 		// interpolates using spherical linear blending
 {
 	geQuaternion *Q1,*Q2;
 	geQuaternion *QNew = (geQuaternion *)Result;
-	
+
 	assert( Result != NULL );
 	assert( KF1 != NULL );
 	assert( KF2 != NULL );
-	
+
 	assert( T >= (geFloat)0.0f );
 	assert( T <= (geFloat)1.0f );
-	
+
 	if ( KF1 == KF2 )
 		{
 			*QNew = ((geQKFrame_Slerp *)KF1)->Key.Q;
 			return;
 		}
- 
+
 	Q1 = &( ((geQKFrame_Slerp *)KF1)->Key.Q);
 	Q2 = &( ((geQKFrame_Slerp *)KF2)->Key.Q);
 	geQuaternion_SlerpNotShortest(Q1,Q2,T,QNew);
@@ -255,20 +255,20 @@ void GENESISCC geQKFrame_SquadInterpolation(
 	geFloat T,				// 0 <= T <= 1   blending parameter
 	void *Result)			// put the result in here (geQuaternion)
 		// interpolates to get a vector between the two vectors at the two
-		// keyframes where T==0 returns the vector for KF1 
+		// keyframes where T==0 returns the vector for KF1
 		// and T==1 returns the vector for KF2
 		// interpolates using spherical quadratic blending
 {
 	geQuaternion *Q1,*Q2;
 	geQuaternion *QNew = (geQuaternion *)Result;
-	
+
 	assert( Result != NULL );
 	assert( KF1 != NULL );
 	assert( KF2 != NULL );
-	
+
 	assert( T >= (geFloat)0.0f );
 	assert( T <= (geFloat)1.0f );
-	
+
 	if ( KF1 == KF2 )
 		{
 			*QNew = ((geQKFrame_Squad *)KF1)->Key.Q;
@@ -277,11 +277,11 @@ void GENESISCC geQKFrame_SquadInterpolation(
 
 	Q1 = &( ((geQKFrame_Squad *)KF1)->Key.Q);
 	Q2 = &( ((geQKFrame_Squad *)KF2)->Key.Q);
-	
+
 	{
 		geQuaternion *A1,*B2;
 		geQuaternion SL1,SL2;
-				
+
 		A1 = &( ((geQKFrame_Squad *)KF1)->QuadrangleCorner);
 		B2 = &( ((geQKFrame_Squad *)KF2)->QuadrangleCorner);
 
@@ -301,7 +301,7 @@ static void GENESISCC geQKFrame_QuadrangleCorner(
 	const geQuaternion *Q2,
 	geQuaternion *Corner)
 	// compute quadrangle corner for a keyframe containing Q1.
-	//  Q0 and Q2 are the quaternions for the previous and next keyframes 
+	//  Q0 and Q2 are the quaternions for the previous and next keyframes
 	// corner is the newly computed quaternion
 {
 	geQuaternion Q1Inv,LnSum;
@@ -317,7 +317,7 @@ static void GENESISCC geQKFrame_QuadrangleCorner(
 	Q1Inv.X = -Q1->X;
 	Q1Inv.Y = -Q1->Y;
 	Q1Inv.Z = -Q1->Z;
-				
+
 	{
 		geQuaternion Q1InvQ2, Q1InvQ0;
 		geQuaternion Ln1,Ln2;
@@ -343,17 +343,17 @@ static void GENESISCC geQKFrame_ChooseBestQuat(const geQuaternion *Q0,geQuaterni
 
 	assert( Q0 != NULL );
 	assert( Q1 != NULL );
-	
+
 	geQuaternion_Add(Q0,Q1,&pPlusQ);
 	geQuaternion_Subtract(Q0,Q1,&pLessQ);
-		
+
 	geQuaternion_Multiply(&pPlusQ,&pPlusQ,&pPlusQ);
 	geQuaternion_Multiply(&pLessQ,&pLessQ,&pLessQ);
 
-	MagpLessQ=   (pLessQ.W * pLessQ.W) + (pLessQ.X * pLessQ.X) 
+	MagpLessQ=   (pLessQ.W * pLessQ.W) + (pLessQ.X * pLessQ.X)
 					  + (pLessQ.Y * pLessQ.Y) + (pLessQ.Z * pLessQ.Z);
 
-	MagpPlusQ=   (pPlusQ.W * pPlusQ.W) + (pPlusQ.X * pPlusQ.X) 
+	MagpPlusQ=   (pPlusQ.W * pPlusQ.W) + (pPlusQ.X * pPlusQ.X)
 					  + (pPlusQ.Y * pPlusQ.Y) + (pPlusQ.Z * pPlusQ.Z);
 
 	if (MagpLessQ >= MagpPlusQ)
@@ -375,7 +375,7 @@ void GENESISCC geQKFrame_SquadRecompute(
 {
 
 	// compute the extra interpolation points at each keyframe
-	// see Advanced Animation and Rendering Techniques 
+	// see Advanced Animation and Rendering Techniques
 	//     by Alan Watt and Mark Watt, pg 366
 	int i;
 	geQKFrame_Squad *QList=NULL;
@@ -399,7 +399,7 @@ void GENESISCC geQKFrame_SquadRecompute(
 	if (count<3)
 		{
 			Looped = 0;
-			// cant compute 'slopes' without enough points to loop. 
+			// cant compute 'slopes' without enough points to loop.
 			// so treat path as non-looped.
 		}
 	for (i =0; i< count; i++)
@@ -446,15 +446,15 @@ void GENESISCC geQKFrame_SquadRecompute(
 				}
 			else
 			{
-				geQKFrame_QuadrangleCorner( 
+				geQKFrame_QuadrangleCorner(
 					&(QList[Index0].Key.Q),
 					&(QList[Index1].Key.Q),
 					&(QList[Index2].Key.Q),
 					&(QList[i].QuadrangleCorner) );
-	
+
 			}
-		}	
-}					
+		}
+}
 
 
 
@@ -623,13 +623,13 @@ static geBoolean GENESISCC geQKFrame_PathIsHinged(geTKArray *KeyList, geFloat To
 	int i,Count;
 	geVec3d Axis;
 	geVec3d NextAxis;
-	geFloat Angle; 
+	geFloat Angle;
 	geQKFrame_Linear* pLinear;
 
 	assert( KeyList != NULL );
 
 	Count = geTKArray_NumElements(KeyList);
-	
+
 	if (Count<2)
 		return GE_FALSE;
 	pLinear = (geQKFrame_Linear*)geTKArray_Element(KeyList, 0);
@@ -637,7 +637,7 @@ static geBoolean GENESISCC geQKFrame_PathIsHinged(geTKArray *KeyList, geFloat To
 		{
 			return GE_FALSE;
 		}
-		
+
 	for (i=1; i<Count; i++)
 		{
 			pLinear = (geQKFrame_Linear*)geTKArray_Element(KeyList, i);
@@ -645,9 +645,9 @@ static geBoolean GENESISCC geQKFrame_PathIsHinged(geTKArray *KeyList, geFloat To
 				{
 					return GE_FALSE;
 				}
-				
+
 			if (geVec3d_Compare(&Axis,&NextAxis,Tolerance) == GE_FALSE)
-				{	
+				{
 					return GE_FALSE;
 				}
 		}
@@ -686,7 +686,7 @@ static int GENESISCC geQKFrame_DetermineCompressionType(geTKArray *KeyList)
 
 
 
-geBoolean GENESISCC geQKFrame_WriteToFile(geVFile *pFile, geTKArray *KeyList, 
+geBoolean GENESISCC geQKFrame_WriteToFile(geVFile *pFile, geTKArray *KeyList,
 		geQKFrame_InterpolationType InterpolationType, int Looping)
 {
 	int NumElements,i;
@@ -697,7 +697,7 @@ geBoolean GENESISCC geQKFrame_WriteToFile(geVFile *pFile, geTKArray *KeyList,
 	assert( KeyList != NULL );
 
 	NumElements = geTKArray_NumElements(KeyList);
-	
+
 	Compression = geQKFrame_DetermineCompressionType(KeyList);
 
 	if	(geVFile_Printf(pFile,
@@ -740,7 +740,7 @@ geBoolean GENESISCC geQKFrame_WriteToFile(geVFile *pFile, geTKArray *KeyList,
 										}
 								}
 							if	(geVFile_Printf(pFile,
-											  "%f %f %f %f\n",	pLinear->Key.Q.W,  pLinear->Key.Q.X,  
+											  "%f %f %f %f\n",	pLinear->Key.Q.W,  pLinear->Key.Q.X,
 																pLinear->Key.Q.Y,  pLinear->Key.Q.Z) == GE_FALSE)
 								{
 									geErrorLog_Add(ERR_PATH_FILE_WRITE, NULL);
@@ -806,22 +806,22 @@ geTKArray *GENESISCC geQKFrame_CreateFromFile(geVFile *pFile, int *Interpolation
 
 	assert( pFile != NULL );
 	assert( InterpolationType != NULL );
-	
+
 	if(geVFile_GetS(pFile, line, LINE_LENGTH) == GE_FALSE)
 		ERROREXIT;
 	if(strnicmp(line, QKFRAME_KEYLIST_ID, sizeof(QKFRAME_KEYLIST_ID)-1) != 0)
 		ERROREXIT;
 
-	if(sscanf(line + sizeof(QKFRAME_KEYLIST_ID)-1, "%d %d %d %d", 
+	if(sscanf(line + sizeof(QKFRAME_KEYLIST_ID)-1, "%d %d %d %d",
 					&NumElements,InterpolationType,&Compression,Looping) != 4)
 		ERROREXIT;
 
 	if (!( (*InterpolationType == QKFRAME_LINEAR) || (*InterpolationType == QKFRAME_SLERP) || (*InterpolationType == QKFRAME_SQUAD) ))
 		ERROREXIT;
-	
+
 	if ( Compression > 0xFF)
 		ERROREXIT;
-		
+
 
 
 	switch (*InterpolationType)
@@ -922,7 +922,7 @@ geTKArray *GENESISCC geQKFrame_CreateFromFile(geVFile *pFile, int *Interpolation
 			default:
 				assert(0);
 		}
-	return KeyList;	
+	return KeyList;
 
 }
 
@@ -932,7 +932,7 @@ uint32 GENESISCC geQKFrame_ComputeBlockSize(geTKArray *KeyList, int Compression)
 	int Count;
 	assert( KeyList != NULL );
 	assert( Compression < 0xFF);
-	
+
 	Count = geTKArray_NumElements(KeyList);
 
 	Size += sizeof(uint32);		// flags
@@ -957,7 +957,7 @@ uint32 GENESISCC geQKFrame_ComputeBlockSize(geTKArray *KeyList, int Compression)
 				break;
 			default:
 				assert(0);
-		}	
+		}
 	return Size;
 }
 
@@ -977,7 +977,7 @@ geTKArray *GENESISCC geQKFrame_CreateFromBinaryFile(geVFile *pFile, int *Interpo
 	assert( pFile != NULL );
 	assert( InterpolationType != NULL );
 	assert( Looping != NULL );
-	
+
 	if (geVFile_Read(pFile, &BlockSize, sizeof(int)) == GE_FALSE)
 		{
 			geErrorLog_AddString(-1,"Failure to read binary QKFrame header", NULL);
@@ -988,7 +988,7 @@ geTKArray *GENESISCC geQKFrame_CreateFromBinaryFile(geVFile *pFile, int *Interpo
 			geErrorLog_AddString(-1,"Bad Blocksize", NULL);
 			return NULL;
 		}
-			
+
 	Block = geRam_Allocate(BlockSize);
 	if(geVFile_Read(pFile, Block, BlockSize) == GE_FALSE)
 		{
@@ -998,12 +998,12 @@ geTKArray *GENESISCC geQKFrame_CreateFromBinaryFile(geVFile *pFile, int *Interpo
 	u = *(uint32 *)Block;
 	*InterpolationType = (u>>16)& 0xFF;
 	Compression = (u>>8) & 0xFF;
-	*Looping           = (u & 0x1);		
+	*Looping           = (u & 0x1);
 	Count = *(((uint32 *)Block)+1);
-	
+
 	if (Compression > 0xFF)
 		{
-			geRam_Free(Block);	
+			geRam_Free(Block);
 			geErrorLog_AddString(-1,"Bad Compression Flag", NULL);
 			return NULL;
 		}
@@ -1023,17 +1023,17 @@ geTKArray *GENESISCC geQKFrame_CreateFromBinaryFile(geVFile *pFile, int *Interpo
 				geErrorLog_AddString(-1,"Bad InterpolationType", NULL);
 				return NULL;
 		}
-	
+
 	KeyList = geTKArray_CreateEmpty(FieldSize,Count);
 	if (KeyList == NULL)
 		{
-			geRam_Free(Block);	
+			geRam_Free(Block);
 			geErrorLog_AddString(-1,"Failed to allocate tkarray", NULL);
 			return NULL;
 		}
 
 	Data = (geFloat *)(Block + sizeof(uint32)*2);
-			
+
 	pLinear0 = (geQKFrame_Linear*)geTKArray_Element(KeyList, 0);
 
 	pLinear = pLinear0;
@@ -1084,7 +1084,7 @@ geTKArray *GENESISCC geQKFrame_CreateFromBinaryFile(geVFile *pFile, int *Interpo
 					pLinear = (geQKFrame_Linear *)  ( ((char *)pLinear) + FieldSize );
 				}
 		}
-	
+
 	switch (*InterpolationType)
 		{
 			case (QKFRAME_LINEAR):
@@ -1098,11 +1098,11 @@ geTKArray *GENESISCC geQKFrame_CreateFromBinaryFile(geVFile *pFile, int *Interpo
 			default:
 				assert(0);
 		}
-	geRam_Free(Block);	
-	return KeyList;						
+	geRam_Free(Block);
+	return KeyList;
 }
 
-geBoolean GENESISCC geQKFrame_WriteToBinaryFile(geVFile *pFile, geTKArray *KeyList, 
+geBoolean GENESISCC geQKFrame_WriteToBinaryFile(geVFile *pFile, geTKArray *KeyList,
 		geQKFrame_InterpolationType InterpolationType, int Looping)
 {
 	#define WBERREXIT  {geErrorLog_AddString( ERR_PATH_FILE_WRITE,"Failure to write binary key data", NULL);return GE_FALSE;}
@@ -1117,19 +1117,19 @@ geBoolean GENESISCC geQKFrame_WriteToBinaryFile(geVFile *pFile, geTKArray *KeyLi
 
 	Compression = geQKFrame_DetermineCompressionType(KeyList);
 	u = (InterpolationType << 16) | (Compression << 8) |  Looping;
-	
+
 	BlockSize = geQKFrame_ComputeBlockSize(KeyList,Compression);
 
 	if (geVFile_Write(pFile, &BlockSize,sizeof(uint32)) == GE_FALSE)
 		WBERREXIT;
-	
+
 	if (geVFile_Write(pFile, &u, sizeof(uint32)) == GE_FALSE)
 		WBERREXIT;
-	
+
 	Count = geTKArray_NumElements(KeyList);
 	if (geVFile_Write(pFile, &Count, sizeof(uint32)) == GE_FALSE)
 		WBERREXIT;
-	
+
 	if (Compression & QKFRAME_LINEARTIME_COMPRESSION)
 		{
 			Time = geTKArray_ElementTime(KeyList, 0);
@@ -1177,6 +1177,6 @@ geBoolean GENESISCC geQKFrame_WriteToBinaryFile(geVFile *pFile, geTKArray *KeyLi
 						WBERREXIT;
 				}
 		}
-		
+
 	return GE_TRUE;
 }

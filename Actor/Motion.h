@@ -1,8 +1,8 @@
 /****************************************************************************************/
-/*  MOTION.H	                                                                        */
+/*  Motion.h                                                                            */
 /*                                                                                      */
-/*  Author: Mike Sandige	                                                            */
-/*  Description: Motion interface.					                                    */
+/*  Author: Mike Sandige                                                                */
+/*  Description: Motion interface.                                                      */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_MOTION_H
@@ -62,9 +62,9 @@ GENESISAPI geBoolean GENESISCC geMotion_SampleChannelsNamed(const geMotion *M, c
 GENESISAPI void GENESISCC geMotion_Sample(const geMotion *M, int PathIndex, geFloat Time, geXForm3d *Transform);
 GENESISAPI geBoolean GENESISCC geMotion_SampleNamed(const geMotion *M, const char *PathName, geFloat Time, geXForm3d *Transform);
 
-	// the returned Paths from _Get functions should not be destroyed.  
-	// if ownership is desired, call gePath_CreateRef() to create another owner. 
-	// an 'owner' has access to the object regardless of the number of other owners, and 
+	// the returned Paths from _Get functions should not be destroyed.
+	// if ownership is desired, call gePath_CreateRef() to create another owner.
+	// an 'owner' has access to the object regardless of the number of other owners, and
 	// an owner must call the object's destroy method to relinquish ownership
 GENESISAPI gePath *GENESISCC geMotion_GetPathNamed(const geMotion *M,const char *Name);
 GENESISAPI const char *GENESISCC geMotion_GetNameOfPath(const geMotion *M, int Index);
@@ -83,9 +83,9 @@ GENESISAPI const char *GENESISCC geMotion_GetName(const geMotion *M);
 	// these functions support motions that have sub-motions.
 GENESISAPI int GENESISCC geMotion_GetSubMotionCount(const geMotion*M);
 
-	// the returned motions from these _Get functions should not be destroyed.  
-	// if ownership is desired, call geMotion_CreateRef() to create another owner. 
-	// an 'owner' has access to the object regardless of the number of other owners, and 
+	// the returned motions from these _Get functions should not be destroyed.
+	// if ownership is desired, call geMotion_CreateRef() to create another owner.
+	// an 'owner' has access to the object regardless of the number of other owners, and
 	// an owner must call the object's destroy method to relinquish ownership
 GENESISAPI geMotion *GENESISCC geMotion_GetSubMotion(const geMotion *M,int Index);
 GENESISAPI geMotion *GENESISCC geMotion_GetSubMotionNamed(const geMotion *M,const char *Name);
@@ -103,7 +103,7 @@ GENESISAPI geBoolean GENESISCC geMotion_AddSubMotion(
 
 GENESISAPI geMotion *GENESISCC  geMotion_RemoveSubMotion(geMotion *ParentMotion, int SubMotionIndex);
 
-// Get/Set submotion time offset.  The time offset is the offset into the 
+// Get/Set submotion time offset.  The time offset is the offset into the
 // compound (parent) motion at which the submotion should start.
 GENESISAPI geFloat   GENESISCC  geMotion_GetTimeOffset( const geMotion *M,int SubMotionIndex );
 GENESISAPI geBoolean  GENESISCC geMotion_SetTimeOffset( geMotion *M,int SubMotionIndex,geFloat TimeOffset );
@@ -146,7 +146,7 @@ GENESISAPI void GENESISCC geMotion_SetupEventIterator(
 	geFloat StartTime,				// Inclusive search start
 	geFloat EndTime);				// Non-inclusive search stop
 	// For searching or querying the array for events between two times
-	// times are compaired [StartTime,EndTime), '[' is inclusive, ')' is 
+	// times are compaired [StartTime,EndTime), '[' is inclusive, ')' is
 	// non-inclusive.  This prepares the geMotion_GetNextEvent() function.
 
 GENESISAPI geBoolean GENESISCC geMotion_GetNextEvent(
@@ -156,14 +156,14 @@ GENESISAPI geBoolean GENESISCC geMotion_GetNextEvent(
 	// Iterates from StartTime to EndTime as setup in geMotion_SetupEventIterator()
 	// and for each event between these times [StartTime,EndTime)
 	// this function will return Time and EventString returned for that event
-	// and the iterator will be positioned for the next search.  When there 
+	// and the iterator will be positioned for the next search.  When there
 	// are no more events in the range, this function will return GE_FALSE (Time
 	// will be 0 and ppEventString will be empty).
 
 GENESISAPI geBoolean GENESISCC geMotion_GetEventExtents(const geMotion *M,
 			geFloat *FirstEventTime,
 			geFloat *LastEventTime);
-	// returns the time associated with the first and last events 
+	// returns the time associated with the first and last events
 	// returns GE_FALSE if there are no events (and Times are not set)
 
 

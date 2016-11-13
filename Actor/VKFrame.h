@@ -1,8 +1,8 @@
 /****************************************************************************************/
-/*  VKFRAME.H																			*/
+/*  VKFrame.h                                                                           */
 /*                                                                                      */
-/*  Author: Mike Sandige	                                                            */
-/*  Description: Vector keyframe interface.												*/
+/*  Author: Mike Sandige                                                                */
+/*  Description: Vector keyframe interface.                                             */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 /* VKFrame (Vector-Keyframe)
@@ -73,13 +73,13 @@ void GENESISCC geVKFrame_Query(
 	int Index,						// index of frame to return
 	geTKArray_TimeType *Time,		// time of the frame is returned
 	geVec3d *V);						// vector from the frame is returned
-	// returns the vector and the time at keyframe[index] 
+	// returns the vector and the time at keyframe[index]
 
 void GENESISCC geVKFrame_Modify(
 	geTKArray *KeyList,				// keyframe list
 	int Index,						// index of frame to change
 	const geVec3d *V);				// vector for the key
-	// chganes the vector at keyframe[index] 
+	// chganes the vector at keyframe[index]
 
 void GENESISCC geVKFrame_LinearInterpolation(
 	const void *KF1,		// pointer to first keyframe
@@ -87,7 +87,7 @@ void GENESISCC geVKFrame_LinearInterpolation(
 	geFloat T,				// 0 <= T <= 1   blending parameter
 	void *Result);			// put the result in here (geVec3d)
 		// interpolates to get a vector between the two vectors at the two
-		// keyframes where T==0 returns the vector for KF1 
+		// keyframes where T==0 returns the vector for KF1
 		// and T==1 returns the vector for KF2
 		// interpolates linearly
 
@@ -97,7 +97,7 @@ void GENESISCC geVKFrame_HermiteInterpolation(
 	geFloat T,				// 0 <= T <= 1   blending parameter
 	void *Result);			// put the result in here (geVec3d)
 		// interpolates to get a vector between the two vectors at the two
-		// keyframes where T==0 returns the vector for KF1 
+		// keyframes where T==0 returns the vector for KF1
 		// and T==1 returns the vector for KF2
 		// interpolates using 'hermite' blending
 
@@ -112,10 +112,10 @@ void GENESISCC geVKFrame_HermiteRecompute(
 geBoolean GENESISCC geVKFrame_LinearRead(geVFile* pFile, void* geVKFrame);
 geBoolean GENESISCC geVKFrame_HermiteRead(geVFile* pFile, void* geVKFrame);
 
-geBoolean GENESISCC geVKFrame_WriteToFile(geVFile *pFile, void *geVKFrame, 
+geBoolean GENESISCC geVKFrame_WriteToFile(geVFile *pFile, void *geVKFrame,
 								geVKFrame_InterpolationType InterpolationType,int Looping);
 geTKArray *GENESISCC geVKFrame_CreateFromFile(geVFile *pFile, geVKFrame_InterpolationType *InterpolationType, int *Looping);
-geBoolean GENESISCC geVKFrame_WriteToBinaryFile(geVFile *pFile, void *geVKFrame, 
+geBoolean GENESISCC geVKFrame_WriteToBinaryFile(geVFile *pFile, void *geVKFrame,
 								geVKFrame_InterpolationType InterpolationType, int Looping);
 geTKArray *GENESISCC geVKFrame_CreateFromBinaryFile(geVFile *pFile, geVKFrame_InterpolationType *InterpolationType, int *Looping);
 

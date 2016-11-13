@@ -1,8 +1,8 @@
 /****************************************************************************************/
-/*  TKARRAY.C																			*/
+/*  TKArray.c                                                                           */
 /*                                                                                      */
-/*  Author: Mike Sandige	                                                            */
-/*  Description: Time-keyed array implementation.										*/
+/*  Author: Mike Sandige                                                                */
+/*  Description: Time-keyed array implementation.                                       */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 /*TKArray
@@ -24,7 +24,7 @@
 	This module is designed primarily to support path.c
 
 	The idea is that there are these packed arrays of elements,
-	sorted by a geTKArray_TimeType key.  The key is assumed to be the 
+	sorted by a geTKArray_TimeType key.  The key is assumed to be the
 	first field in each element.
 
 	the geTKArray functions operate on this very specific array type.
@@ -47,7 +47,7 @@ typedef struct geTKArray
 							// the allocated size of the entire geTKArray object
 }	geTKArray;
 
-typedef struct 
+typedef struct
 {
 	int32 NumElements;		// number of elements in use
 	int32 ElementSize;		// size of each element
@@ -83,7 +83,7 @@ static void GENESISCC geTKArray_Asserts(const geTKArray* A)
 #endif // _DEBUG
 
 
-geTKArray *GENESISCC geTKArray_Create(				
+geTKArray *GENESISCC geTKArray_Create(
 	int ElementSize)				// element size
 	// Creates new array with given attributes.  The first field of the element
 	// is assumed to be the geTKArray_TimeType key.
@@ -105,10 +105,10 @@ geTKArray *GENESISCC geTKArray_Create(
 
 	TK_ASSERT_VALID(A);
 
-	return A;	
+	return A;
 }
 
-geTKArray *GENESISCC geTKArray_CreateEmpty(				
+geTKArray *GENESISCC geTKArray_CreateEmpty(
 	int ElementSize,int ElementCount)				// element size
 	// Creates new array with given size and count.  The first field of the element
 	// is assumed to be the geTKArray_TimeType key.
@@ -126,7 +126,7 @@ geTKArray *GENESISCC geTKArray_CreateEmpty(
 
 	TK_ASSERT_VALID(A);
 
-	return A;	
+	return A;
 }
 
 geTKArray* GENESISCC geTKArray_CreateFromBinaryFile(
@@ -171,7 +171,7 @@ geBoolean GENESISCC geTKArray_SamplesAreTimeLinear(const geTKArray *Array,geFloa
 	int i;
 
 	geTKArray_TimeType Delta,Nth,LastNth,NthDelta;
-			
+
 	if (Array->NumElements < 2)
 		return GE_TRUE;
 
@@ -179,7 +179,7 @@ geBoolean GENESISCC geTKArray_SamplesAreTimeLinear(const geTKArray *Array,geFloa
 	Nth     = geTKArray_ElementTime(Array, 1);
 	Delta   =  Nth - LastNth;
 	LastNth = Nth;
-	
+
 	for (i=2; i< Array->NumElements; i++)
 		{
 			Nth = geTKArray_ElementTime(Array, i);
@@ -200,7 +200,7 @@ geBoolean GENESISCC geTKArray_WriteToBinaryFile(
 	// Writes the array to the given stream.
 {
 	int size;
-	
+
 	size = TK_ARRAYSIZE + Array->NumElements * Array->ElementSize;
 	if(geVFile_Write(pFile, Array, size) == GE_FALSE)
 	{
@@ -226,7 +226,7 @@ int GENESISCC geTKArray_BSearch(
 	geTKArray_TimeType Key)			// searching for this key
 	// Searches for key in the Array.   A is assumed to be sorted
 	// if key is found (within +-tolarance), the index to that element is returned.
-	// if key is not found, the index to the key just smaller than the 
+	// if key is not found, the index to the key just smaller than the
 	// given key is returned.  (-1 if the key is smaller than the first element)
 {
 	int low,hi,mid;
@@ -235,12 +235,12 @@ int GENESISCC geTKArray_BSearch(
 	geTKArray_TimeType test;
 
 	TK_ASSERT_VALID(A);
-	
+
 	low = 0;
 	hi = A->NumElements - 1;
 	Array = A->Elements;
 	ElementSize = A->ElementSize;
-	
+
 	while ( low<=hi )
 		{
 			mid = (low+hi)/2;
@@ -272,10 +272,10 @@ geBoolean GENESISCC geTKArray_Insert(
 	// inserts a new element into Array.
 	// sets only the key for the new element - the rest is junk
 	// returns GE_TRUE if the insertion was successful.
-	// returns GE_FALSE if the insertion failed. 
-	// if Array is empty (no elements, NULL pointer) it is allocated and filled 
+	// returns GE_FALSE if the insertion failed.
+	// if Array is empty (no elements, NULL pointer) it is allocated and filled
 	// with the one Key element
-	// Index is the index of the new element 
+	// Index is the index of the new element
 {
 	int n;
 	geTKArray *ChangedA;
@@ -309,11 +309,11 @@ geBoolean GENESISCC geTKArray_Insert(
 		return GE_FALSE;
 	}
 
-	ChangedA = (geTKArray *)geRam_Realloc(A, 
+	ChangedA = (geTKArray *)geRam_Realloc(A,
 				TK_ARRAYSIZE + (A->NumElements + 1) * A->ElementSize);
 
 	if ( ChangedA == NULL )
-	{	
+	{
 		geErrorLog_Add(ERR_TKARRAY_INSERT_ENOMEM, NULL);
 		return GE_FALSE;
 	}
@@ -321,7 +321,7 @@ geBoolean GENESISCC geTKArray_Insert(
 
 	// advance n to new element's position
 	n++;
-	
+
 	// move elements as necessary
 	if(n < A->NumElements)
 	{
@@ -342,27 +342,27 @@ geBoolean GENESISCC geTKArray_DeleteElement(
 	geTKArray **PtrA,				// sorted array to delete from
 	int N)							// element to delete
 	// deletes an element from Array.
-	// returns GE_TRUE if the deletion was successful. 
+	// returns GE_TRUE if the deletion was successful.
 	// returns GE_FALSE if the deletion failed. (key not found or realloc failed)
 {
 	geTKArray *A;
 	geTKArray *ChangedA;
-	
+
 	assert( PtrA != NULL);
 	A = *PtrA;
 	TK_ASSERT_VALID(A);
 	assert(N >= 0);
 	assert(N < A->NumElements);
-	
+
 	memmove( (A->Elements) + (N) * (A->ElementSize),  //dest
 			 (A->Elements) + (N+1) * (A->ElementSize),  //src
 			 ((A->NumElements) - (N+1))* (A->ElementSize) );
 
 	A->NumElements--;
-	ChangedA = (geTKArray *)geRam_Realloc(A, 
+	ChangedA = (geTKArray *)geRam_Realloc(A,
 				TK_ARRAYSIZE + A->NumElements * A->ElementSize);
-	if ( ChangedA != NULL ) 
-	{	
+	if ( ChangedA != NULL )
+	{
 		// if realloc fails to shrink block. no real error.
 		A = ChangedA;
 	}
@@ -374,7 +374,7 @@ geBoolean GENESISCC geTKArray_DeleteElement(
 
 
 void *GENESISCC geTKArray_Element(const geTKArray *A, int N)
-	// returns the Nth element 
+	// returns the Nth element
 {
 	TK_ASSERT_VALID(A);
 	assert(N >= 0);
@@ -385,12 +385,12 @@ void *GENESISCC geTKArray_Element(const geTKArray *A, int N)
 
 
 geTKArray_TimeType GENESISCC geTKArray_ElementTime(const geTKArray *A, int N)
-	// returns the time key for the Nth element 
+	// returns the time key for the Nth element
 {
 	TK_ASSERT_VALID(A);
 	assert(N >= 0);
 	assert(N < A->NumElements);
-	
+
 	return *(geTKArray_TimeType *)((A->Elements) + (N * (A->ElementSize)) );
 }
 

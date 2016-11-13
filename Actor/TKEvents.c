@@ -1,8 +1,8 @@
 /****************************************************************************************/
-/*  TKARRAY.C																			*/
+/*  TKEvents.c                                                                          */
 /*                                                                                      */
-/*  Author: Stephen Balkum	                                                            */
-/*  Description: Time-keyed events implementation.										*/
+/*  Author: Stephen Balkum                                                              */
+/*  Description: Time-keyed events implementation.                                      */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 /* geTKEvents
@@ -42,7 +42,7 @@ typedef struct
 	uint32 DataOffset;
 }	EventType;
 
-typedef struct geTKEventsIterator 
+typedef struct geTKEventsIterator
 {
 	geTKEvents_TimeType EndTime;
 	int CurrentIndex;
@@ -111,7 +111,7 @@ geTKEvents* GENESISCC geTKEvents_Create(void)
 
 	pEvents->Iterator.CurrentIndex = 0;
 	pEvents->Iterator.EndTime = -99e33f;	// you could sample here I suppose...
-	
+
 	return pEvents;
 }
 
@@ -129,7 +129,7 @@ void GENESISCC geTKEvents_Destroy(geTKEvents** ppEvents)
 		{
 			geRam_Free(pE->pEventData);
 		}
-	
+
 	if (pE->pTimeKeys != NULL)
 		{
 			geTKArray_Destroy(&pE->pTimeKeys);
@@ -278,7 +278,7 @@ geBoolean GENESISCC geTKEvents_Delete(geTKEvents* pEvents, geTKEvents_TimeType t
 	else
 	{
 		pNewData = geRam_Realloc(pEvents->pEventData, pEvents->DataSize);
-		// If the reallocation failed, it doesn't really hurt.  However, it is a 
+		// If the reallocation failed, it doesn't really hurt.  However, it is a
 		// sign of problems ahead.
 		if(pNewData)
 		{
@@ -430,7 +430,7 @@ geTKEvents* GENESISCC geTKEvents_CreateFromFile(
 						}
 				}
 			strcpy(pEvents->pEventData + v, pTextLine);
-			
+
 			i--;
 		}
 
@@ -605,7 +605,7 @@ GENESISAPI geBoolean GENESISCC geTKEvents_GetExtents(geTKEvents *Events,
 {
 	int Count;
 	assert( Events != NULL );
-	
+
 	Count = geTKArray_NumElements(Events->pTimeKeys);
 	if (Count<0)
 		{
@@ -622,8 +622,8 @@ void GENESISCC geTKEvents_SetupIterator(
 	geTKEvents_TimeType StartTime,				// Inclusive search start
 	geTKEvents_TimeType EndTime)				// Non-inclusive search stop
 	// For searching or querying the array for events between two times
-	// times are compaired [StartTime,EndTime), '[' is inclusive, ')' is 
-	// non-inclusive.  This prepares the PathGetNextEvent() function.  
+	// times are compaired [StartTime,EndTime), '[' is inclusive, ')' is
+	// non-inclusive.  This prepares the PathGetNextEvent() function.
 {
 	geTKEventsIterator* pTKEI;
 
@@ -635,7 +635,7 @@ void GENESISCC geTKEvents_SetupIterator(
 
 	// Initialize search with first index before StartTime
 	pTKEI->CurrentIndex = geTKArray_BSearch(pEvents->pTimeKeys, StartTime - GE_TKA_TIME_TOLERANCE);
-	while( (pTKEI->CurrentIndex > -1) && 
+	while( (pTKEI->CurrentIndex > -1) &&
 		(geTKArray_ElementTime(pEvents->pTimeKeys, pTKEI->CurrentIndex) >= StartTime - GE_TKA_TIME_TOLERANCE) )
 	{
 		pTKEI->CurrentIndex--;
@@ -650,7 +650,7 @@ geBoolean GENESISCC geTKEvents_GetNextEvent(
 	// Iterates from StartTime to EndTime as setup in geTKEvents_CreateIterator()
 	// and for each event between these times [StartTime,EndTime)
 	// this function will return Time and EventString returned for that event
-	// and the iterator will be positioned for the next search.  When there 
+	// and the iterator will be positioned for the next search.  When there
 	// are no more events in the range, this function will return NULL (Time
 	// will be 0 and ppEventString will be empty).
 {

@@ -1,8 +1,8 @@
 /****************************************************************************************/
-/*  VKFRAME.C																			*/
+/*  VKFrame.c                                                                           */
 /*                                                                                      */
-/*  Author: Mike Sandige	                                                            */
-/*  Description: Vector keyframe implementation.										*/
+/*  Author: Mike Sandige                                                                */
+/*  Description: Vector keyframe implementation.                                        */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 /* geVKFrame  (Vector-Keyframe)
@@ -31,7 +31,7 @@
 		future blending might require more data.
 	The two types of lists are created with different creation calls,
 	interpolated with different calls, but insertion and queries share a call.
-	
+
 	Hermite interpolation requires additional computation after changes are
 	made to the keyframe list.  Call geVKFrame_HermiteRecompute() to update the
 	calculations.
@@ -45,14 +45,14 @@
 #include "ErrorLog.h"
 #include "Ram.h"
 
-#define LINEAR_BLEND(a,b,t)  ( (t)*((b)-(a)) + (a) )	
+#define LINEAR_BLEND(a,b,t)  ( (t)*((b)-(a)) + (a) )
 			// linear blend of a and b  0<t<1 where  t=0 ->a and t=1 ->b
 
 typedef struct
 {
 	geTKArray_TimeType	Time;		// Time for this keyframe
 	geVec3d		V;					// vector for this keyframe
-}  geVKFrame;		
+}  geVKFrame;
 	// This is the root structure that geVKFrame supports
 	// all keyframe types must begin with this structure.  Time is first, so
 	// that this structure can be manipulated by geTKArray
@@ -60,11 +60,11 @@ typedef struct
 typedef struct
 {
 	geVKFrame Key;					// key values for this keyframe
-	geVec3d		SDerivative;		// Hermite Derivative (Incoming) 
-	geVec3d		DDerivative;		// Hermite Derivative (Outgoing) 
+	geVec3d		SDerivative;		// Hermite Derivative (Incoming)
+	geVec3d		DDerivative;		// Hermite Derivative (Outgoing)
 }	geVKFrame_Hermite;
 	// keyframe data for hermite blending
-	// The structure includes computed derivative information.  
+	// The structure includes computed derivative information.
 
 typedef struct
 {
@@ -81,7 +81,7 @@ geTKArray *GENESISCC geVKFrame_LinearCreate(void)
 
 
 geTKArray *GENESISCC geVKFrame_HermiteCreate(void)
-	// creates a frame list for hermite interpolation	
+	// creates a frame list for hermite interpolation
 {
 	return geTKArray_Create(sizeof(geVKFrame_Hermite) );
 }
@@ -97,8 +97,8 @@ geBoolean GENESISCC geVKFrame_Insert(
 	assert( KeyList != NULL );
 	assert( *KeyList != NULL );
 	assert( V != NULL );
-	assert(   sizeof(geVKFrame_Hermite) == geTKArray_ElementSize(*KeyList) 
-	       || sizeof(geVKFrame_Linear) == geTKArray_ElementSize(*KeyList) );
+	assert(   sizeof(geVKFrame_Hermite) == geTKArray_ElementSize(*KeyList)
+		   || sizeof(geVKFrame_Linear) == geTKArray_ElementSize(*KeyList) );
 
 	if (geTKArray_Insert(KeyList, Time, Index) == GE_FALSE)
 		{
@@ -119,7 +119,7 @@ void GENESISCC geVKFrame_Query(
 	int Index,						// index of frame to return
 	geTKArray_TimeType *Time,		// time of the frame is returned
 	geVec3d *V)						// vector from the frame is returned
-	// returns the vector and the time at keyframe[index] 
+	// returns the vector and the time at keyframe[index]
 {
 	geVKFrame *KF;
 	assert( KeyList != NULL );
@@ -127,9 +127,9 @@ void GENESISCC geVKFrame_Query(
 	assert( V != NULL );
 	assert( Index < geTKArray_NumElements(KeyList) );
 	assert( Index >= 0 );
-	assert(   sizeof(geVKFrame_Hermite) == geTKArray_ElementSize(KeyList) 
-	       || sizeof(geVKFrame_Linear) == geTKArray_ElementSize(KeyList) );
-		
+	assert(   sizeof(geVKFrame_Hermite) == geTKArray_ElementSize(KeyList)
+		   || sizeof(geVKFrame_Linear) == geTKArray_ElementSize(KeyList) );
+
 	KF = (geVKFrame *)geTKArray_Element(KeyList,Index);
 	*Time = KF->Time;
 	*V    = KF->V;
@@ -140,16 +140,16 @@ void GENESISCC geVKFrame_Modify(
 	geTKArray *KeyList,				// keyframe list
 	int Index,						// index of frame to change
 	const geVec3d *V)				// vector for the key
-	// chganes the vector at keyframe[index] 
+	// chganes the vector at keyframe[index]
 {
 	geVKFrame *KF;
 	assert( KeyList != NULL );
 	assert( V != NULL );
 	assert( Index < geTKArray_NumElements(KeyList) );
 	assert( Index >= 0 );
-	assert(   sizeof(geVKFrame_Hermite) == geTKArray_ElementSize(KeyList) 
-	       || sizeof(geVKFrame_Linear) == geTKArray_ElementSize(KeyList) );
-		
+	assert(   sizeof(geVKFrame_Hermite) == geTKArray_ElementSize(KeyList)
+		   || sizeof(geVKFrame_Linear) == geTKArray_ElementSize(KeyList) );
+
 	KF = (geVKFrame *)geTKArray_Element(KeyList,Index);
 	KF->V = *V;
 }
@@ -161,20 +161,20 @@ void GENESISCC geVKFrame_LinearInterpolation(
 	geFloat T,				// 0 <= T <= 1   blending parameter
 	void *Result)			// put the result in here (geVec3d)
 		// interpolates to get a vector between the two vectors at the two
-		// keyframes where T==0 returns the vector for KF1 
+		// keyframes where T==0 returns the vector for KF1
 		// and T==1 returns the vector for KF2
 		// interpolates linearly
 {
 	geVec3d *Vec1,*Vec2;
 	geVec3d *VNew = (geVec3d *)Result;
-	
+
 	assert( Result != NULL );
 	assert( KF1 != NULL );
 	assert( KF2 != NULL );
-	
+
 	assert( T >= (geFloat)0.0f );
 	assert( T <= (geFloat)1.0f );
-	
+
 	if ( KF1 == KF2 )
 		{
 			*VNew = ((geVKFrame_Linear *)KF1)->Key.V;
@@ -183,7 +183,7 @@ void GENESISCC geVKFrame_LinearInterpolation(
 
 	Vec1 = &( ((geVKFrame_Linear *)KF1)->Key.V);
 	Vec2 = &( ((geVKFrame_Linear *)KF2)->Key.V);
-	
+
 	VNew->X = LINEAR_BLEND(Vec1->X,Vec2->X,T);
 	VNew->Y = LINEAR_BLEND(Vec1->Y,Vec2->Y,T);
 	VNew->Z = LINEAR_BLEND(Vec1->Z,Vec2->Z,T);
@@ -197,20 +197,20 @@ void GENESISCC geVKFrame_HermiteInterpolation(
 	geFloat T,				// 0 <= T <= 1   blending parameter
 	void *Result)			// put the result in here (geVec3d)
 		// interpolates to get a vector between the two vectors at the two
-		// keyframes where T==0 returns the vector for KF1 
+		// keyframes where T==0 returns the vector for KF1
 		// and T==1 returns the vector for KF2
 		// interpolates using 'hermite' blending
 {
 	geVec3d *Vec1,*Vec2;
 	geVec3d *VNew = (geVec3d *)Result;
-	
+
 	assert( Result != NULL );
 	assert( KF1 != NULL );
 	assert( KF2 != NULL );
-	
+
 	assert( T >= (geFloat)0.0f );
 	assert( T <= (geFloat)1.0f );
-	
+
 	if ( KF1 == KF2 )
 		{
 			*VNew = ((geVKFrame_Hermite *)KF1)->Key.V;
@@ -227,12 +227,12 @@ void GENESISCC geVKFrame_HermiteInterpolation(
 
 		t2 = T * T;
 		t3 = t2 * T;
-	
+
 		H2 = -(t3 + t3) + t2*3.0f;
 		H1 = 1.0f - H2;
 		H4 = t3 - t2;
 		H3 = H4 - t2 + T;   //t3 - 2.0f * t2 + t;
-		
+
 		geVec3d_Scale(Vec1,H1,VNew);
 		geVec3d_AddScaled(VNew,Vec2,H2,VNew);
 		geVec3d_AddScaled(VNew,&( ((geVKFrame_Hermite *)KF1)->DDerivative),H3,VNew);
@@ -258,20 +258,20 @@ void GENESISCC geVKFrame_HermiteRecompute(
 
 	assert( KeyList != NULL );
 	assert( sizeof(geVKFrame_Hermite) == geTKArray_ElementSize(KeyList) );
-	
-			
+
+
 	// Compute derivatives at the keyframe points:
 	// The derivative is the average of the source chord p[i]-p[i-1]
 	// and the destination chord p[i+1]-p[i]
 	//     (where i is Index1 in this function)
 	//  D = 1/2 * ( p[i+1]-p[i-1] ) = 1/2 *( (p[i+1]-p[i]) + (p[i]-p[i-1]) )
-	//  The very first and last chords are simply the 
+	//  The very first and last chords are simply the
 	// destination and source derivative.
 	//   These 'averaged' D's are adjusted for variences in the time scale
 	// between the Keyframes.  To do this, the derivative at each keyframe
-	// is split into two parts, an incoming ('source' DS) 
+	// is split into two parts, an incoming ('source' DS)
 	// and an outgoing ('destination' DD) derivative.
-	// DD[i] = DD[i] * 2 * N[i]  / ( N[i-1] + N[i] )   
+	// DD[i] = DD[i] * 2 * N[i]  / ( N[i-1] + N[i] )
 	// DS[i] = DS[i] * 2 * N[i-1]/ ( N[i-1] + N[i] )
 	//    where N[i] is time between keyframes i and i+1
 	// Since the chord dealt with on a given chord between key[i] and key[i+1], only
@@ -295,10 +295,10 @@ void GENESISCC geVKFrame_HermiteRecompute(
 			return;
 		}
 
-	if (count < 3)			
+	if (count < 3)
 		{
-			Looped = GE_FALSE;	
-			// cant compute slopes without a closed loop: 
+			Looped = GE_FALSE;
+			// cant compute slopes without a closed loop:
 			// so compute slopes as if it is not closed.
 		}
 	for (i =0; i< count; i++)
@@ -313,7 +313,7 @@ void GENESISCC geVKFrame_HermiteRecompute(
 				{
 					if (Looped != GE_TRUE)
 						{
-							Index0 = 0;			
+							Index0 = 0;
 							Time0 = Vector[Index0].Key.Time;
 						}
 					else
@@ -371,8 +371,8 @@ void GENESISCC geVKFrame_HermiteRecompute(
 				geVec3d_Scale(&Slope, (N1 / N0N1), &(TK->DDerivative));
 				geVec3d_Scale(&Slope, (N0 / N0N1), &(TK->SDerivative));
 			}
-		}	
-}		
+		}
+}
 
 
 #define VKFRAME_LINEAR_ASCII_FILE 0x4C464B56	// 'VKFL'
@@ -472,7 +472,7 @@ geBoolean GENESISCC geVKFrame_HermiteRead(geVFile* pFile, void* geVKFrame)
 
 
 
-geBoolean GENESISCC geVKFrame_WriteToFile(geVFile *pFile, geTKArray *KeyList, 
+geBoolean GENESISCC geVKFrame_WriteToFile(geVFile *pFile, geTKArray *KeyList,
 		geVKFrame_InterpolationType InterpolationType, int Looping)
 {
 	int NumElements,i;
@@ -500,7 +500,7 @@ geBoolean GENESISCC geVKFrame_WriteToFile(geVFile *pFile, geTKArray *KeyList,
 					  InterpolationType,
 					  Compression,
 					  Looping) == GE_FALSE)
-    {
+	{
 		geErrorLog_Add(ERR_PATH_FILE_WRITE, NULL);
 		return GE_FALSE;
 	}
@@ -559,11 +559,11 @@ geTKArray *GENESISCC geVKFrame_CreateFromFile(geVFile *pFile, int *Interpolation
 
 	if(geVFile_GetS(pFile, line, LINE_LENGTH) == GE_FALSE)
 		ERROREXIT;
-		
+
 	if(strnicmp(line, VKFRAME_KEYLIST_ID, sizeof(VKFRAME_KEYLIST_ID)-1) != 0)
 		ERROREXIT;
 
-	if(sscanf(line + sizeof(VKFRAME_KEYLIST_ID)-1, "%d %d %d %d", 
+	if(sscanf(line + sizeof(VKFRAME_KEYLIST_ID)-1, "%d %d %d %d",
 					&NumElements,InterpolationType,&Compression,Looping) != 4)
 		ERROREXIT;
 
@@ -627,7 +627,7 @@ geTKArray *GENESISCC geVKFrame_CreateFromFile(geVFile *pFile, int *Interpolation
 				assert(0);
 		}
 
-	return KeyList;	
+	return KeyList;
 }
 
 uint32 GENESISCC geVKFrame_ComputeBlockSize(geTKArray *KeyList, int Compression)
@@ -637,7 +637,7 @@ uint32 GENESISCC geVKFrame_ComputeBlockSize(geTKArray *KeyList, int Compression)
 
 	assert( KeyList != NULL );
 	assert( Compression < 0xFF);
-	
+
 	Count = geTKArray_NumElements(KeyList);
 
 	Size += sizeof(uint32);		// flags
@@ -669,11 +669,11 @@ geTKArray *GENESISCC geVKFrame_CreateFromBinaryFile(geVFile *pFile, int *Interpo
 	geTKArray *KeyList;
 	geVKFrame_Linear* pLinear0;
 	geVKFrame_Linear* pLinear;
-	
+
 	assert( pFile != NULL );
 	assert( InterpolationType != NULL );
 	assert( Looping != NULL );
-	
+
 	if (geVFile_Read(pFile, &BlockSize, sizeof(int)) == GE_FALSE)
 		{
 			geErrorLog_AddString(-1,"Failure to read binary VKFrame header", NULL);
@@ -684,7 +684,7 @@ geTKArray *GENESISCC geVKFrame_CreateFromBinaryFile(geVFile *pFile, int *Interpo
 			geErrorLog_AddString(-1,"Bad Blocksize", NULL);
 			return NULL;
 		}
-			
+
 	Block = geRam_Allocate(BlockSize);
 	if(geVFile_Read(pFile, Block, BlockSize) == GE_FALSE)
 		{
@@ -694,12 +694,12 @@ geTKArray *GENESISCC geVKFrame_CreateFromBinaryFile(geVFile *pFile, int *Interpo
 	u = *(uint32 *)Block;
 	*InterpolationType = (u>>16)& 0xFF;
 	Compression = (u>>8) & 0xFF;
-	*Looping           = (u & 0x1);		
+	*Looping           = (u & 0x1);
 	Count = *(((uint32 *)Block)+1);
-	
+
 	if (Compression > 0xFF)
 		{
-			geRam_Free(Block);	
+			geRam_Free(Block);
 			geErrorLog_AddString(-1,"Bad Compression Flag", NULL);
 			return NULL;
 		}
@@ -713,7 +713,7 @@ geTKArray *GENESISCC geVKFrame_CreateFromBinaryFile(geVFile *pFile, int *Interpo
 					FieldSize = sizeof(geVKFrame_Hermite);
 					break;
 			default:
-					geRam_Free(Block);	
+					geRam_Free(Block);
 					geErrorLog_AddString(-1,"Bad InterpolationType", NULL);
 					return NULL;
 		}
@@ -721,13 +721,13 @@ geTKArray *GENESISCC geVKFrame_CreateFromBinaryFile(geVFile *pFile, int *Interpo
 	KeyList = geTKArray_CreateEmpty(FieldSize,Count);
 	if (KeyList == NULL)
 		{
-			geRam_Free(Block);	
+			geRam_Free(Block);
 			geErrorLog_AddString(-1,"Failed to allocate tkarray", NULL);
 			return NULL;
 		}
 
 	Data = (geFloat *)(Block + sizeof(uint32)*2);
-			
+
 	pLinear0 = (geVKFrame_Linear*)geTKArray_Element(KeyList, 0);
 
 	pLinear = pLinear0;
@@ -776,11 +776,11 @@ geTKArray *GENESISCC geVKFrame_CreateFromBinaryFile(geVFile *pFile, int *Interpo
 				assert(0);
 		}
 	geRam_Free(Block);
-	return KeyList;	
+	return KeyList;
 
 }
 
-geBoolean GENESISCC geVKFrame_WriteToBinaryFile(geVFile *pFile, geTKArray *KeyList, 
+geBoolean GENESISCC geVKFrame_WriteToBinaryFile(geVFile *pFile, geTKArray *KeyList,
 		geVKFrame_InterpolationType InterpolationType, int Looping)
 {
 	#define WBERREXIT  {geErrorLog_AddString( ERR_PATH_FILE_WRITE,"Failure to write binary key data", NULL);return GE_FALSE;}
@@ -802,15 +802,15 @@ geBoolean GENESISCC geVKFrame_WriteToBinaryFile(geVFile *pFile, geTKArray *KeyLi
 		}
 
 	u = (InterpolationType << 16) |  (Compression << 8) |  Looping;
-	
+
 	BlockSize = geVKFrame_ComputeBlockSize(KeyList,Compression);
 
 	if (geVFile_Write(pFile, &BlockSize,sizeof(uint32)) == GE_FALSE)
 		WBERREXIT;
-	
+
 	if (geVFile_Write(pFile, &u, sizeof(uint32)) == GE_FALSE)
 		WBERREXIT;
-	
+
 	Count = geTKArray_NumElements(KeyList);
 	if (geVFile_Write(pFile, &Count, sizeof(uint32)) == GE_FALSE)
 		WBERREXIT;

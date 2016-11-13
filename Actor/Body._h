@@ -1,11 +1,11 @@
 /****************************************************************************************/
-/*  BODY._H                                                                             */
+/*  Body._h                                                                             */
 /*                                                                                      */
-/*  Author: Mike Sandige	                                                            */
-/*  Description:  Exports private BODY data structures for "friends".					*/
+/*  Author: Mike Sandige                                                                */
+/*  Description:  Exports private BODY data structures for "friends".                   */
 /*                                                                                      */
 /*  Edit History                                                                        */
-/*	 01/12/2004 Wendell Buckner                                                         */ 
+/*   01/12/2004 Wendell Buckner                                                         */
 /*    DOT3 BUMPMAPPING                                                                  */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
@@ -24,7 +24,7 @@
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_BODY__H
-#define GE_BODY__H 
+#define GE_BODY__H
 
 #include "BaseType.h"
 #include "XForm3d.h"
@@ -54,7 +54,7 @@ typedef struct geBody_TangentSpace
  geVec3d T;
  geVec3d B;
  geVec3d N;
-} geBody_TangentSpace; 
+} geBody_TangentSpace;
 
 typedef struct geBody_XSkinVertex
 {
@@ -75,18 +75,18 @@ typedef struct geBody_Bone
 {
 	geVec3d			BoundingBoxMin;
 	geVec3d			BoundingBoxMax;
-	geXForm3d       AttachmentMatrix;
+	geXForm3d		AttachmentMatrix;
 	geBody_Index	ParentBoneIndex;
 } geBody_Bone;
-		
+
 typedef struct geBody_Triangle
 {
 	geBody_Index	VtxIndex[3];
 	geBody_Index	NormalIndex[3];
 	geBody_Index	MaterialIndex;
-	//geBody_Index    FaceNormal;
+	//geBody_Index	FaceNormal;
 } geBody_Triangle;
-			
+
 typedef struct geBody_TriangleList
 {
 	geBody_Index	  FaceCount;
@@ -116,17 +116,17 @@ typedef struct geBody
 
 	geBody_Index		  MaterialCount;
 	geBody_Material		 *MaterialArray;
-	geStrBlock			 *MaterialNames;		
+	geStrBlock			 *MaterialNames;
 
 	int					  LevelsOfDetail;
 	geBody_TriangleList	  SkinFaces[GE_BODY_NUMBER_OF_LOD];
-	
+
 	geBody				 *IsValid;
 
 /* 01/12/2004 Wendell Buckner
     DOT3 BUMPMAPPING */
 	geBody_TangentSpace  *XSkinTangentSpace;
-	 
+
 } geBody;
 
 #if defined(DEBUG) || !defined(NDEBUG)

@@ -1,8 +1,8 @@
 /****************************************************************************************/
-/*  MOTION.C	                                                                        */
+/*  Motion.c                                                                            */
 /*                                                                                      */
-/*  Author: Mike Sandige	                                                            */
-/*  Description: Motion implementation.				                                    */
+/*  Author: Mike Sandige                                                                */
+/*  Description: Motion implementation.                                                 */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -15,17 +15,17 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 /*	motion.c
 
-	This object is a list of (named) gePath objects, 
-	and an associated event list 
+	This object is a list of (named) gePath objects,
+	and an associated event list
 
 */
- 
+
 #include <assert.h>
 #include <string.h>		// strcmp, strnicmp
 
@@ -45,13 +45,13 @@
 
 typedef enum { MOTION_NODE_UNDECIDED, MOTION_NODE_BRANCH, MOTION_NODE_LEAF } geMotion_NodeType;
 
-#define MOTION_BLEND_PART_OF_TRANSFORM(TForm)  ((TForm).Translation.X)						
-#define MOTION_BLEND_PART_OF_VECTOR(Vec)  ((Vec).X)						
+#define MOTION_BLEND_PART_OF_TRANSFORM(TForm)  ((TForm).Translation.X)
+#define MOTION_BLEND_PART_OF_VECTOR(Vec)  ((Vec).X)
 
 
 typedef struct geMotion_Leaf
 {
-	int			PathCount;		
+	int			PathCount;
 	int32		NameChecksum;	// checksum based on names and list order
 	geTKEvents *Events;
 	geStrBlock *NameArray;
@@ -63,10 +63,10 @@ typedef struct geMotion_Mixer
 {
 	geFloat   TimeScale;		// multipler for time
 	geFloat   TimeOffset;		// already scaled.
-	gePath   *Blend;			// path used to interpolate blending amounts. 
+	gePath   *Blend;			// path used to interpolate blending amounts.
 	geXForm3d Transform;		// base transform for this motion (if TransformUsed==GE_TRUE)
 	geBoolean TransformUsed;	// GE_FALSE if there is no base transform.
-	geMotion *Motion;			
+	geMotion *Motion;
 } geMotion_Mixer;
 
 typedef struct geMotion_Branch
@@ -81,9 +81,9 @@ typedef struct geMotion
 {
 	char			 *Name;
 	int				  CloneCount;
-	geBoolean		  MaintainNames;		
+	geBoolean		  MaintainNames;
 	geMotion_NodeType NodeType;
-	union 
+	union
 		{
 			geMotion_Leaf   Leaf;
 			geMotion_Branch Branch;
@@ -129,7 +129,7 @@ GENESISAPI const char * GENESISCC geMotion_GetName(const geMotion *M)
 	assert( geMotion_IsValid(M) != GE_FALSE );
 	return M->Name;
 }
-		
+
 static geBoolean GENESISCC geMotion_InitNodeAsLeaf(geMotion *M,geBoolean SetupStringBlock)
 {
 	assert( M != NULL );
@@ -137,7 +137,7 @@ static geBoolean GENESISCC geMotion_InitNodeAsLeaf(geMotion *M,geBoolean SetupSt
 	assert( M->NodeType == MOTION_NODE_UNDECIDED );
 
 	M->NodeType = MOTION_NODE_LEAF;
-	
+
 	M->Leaf.PathCount     = 0;
 	M->Leaf.Events        = NULL;
 	M->Leaf.PathArray     = NULL;
@@ -145,7 +145,7 @@ static geBoolean GENESISCC geMotion_InitNodeAsLeaf(geMotion *M,geBoolean SetupSt
 	if ((M->MaintainNames != GE_FALSE) && (SetupStringBlock!=GE_FALSE))
 		{
 			M->Leaf.NameArray = geStrBlock_Create();
-			if (M->Leaf.NameArray == NULL)	
+			if (M->Leaf.NameArray == NULL)
 				{
 					geErrorLog_Add(ERR_MOTION_CREATE_ENOMEM, NULL);
 					return GE_FALSE;
@@ -165,7 +165,7 @@ static geBoolean GENESISCC geMotion_InitNodeAsBranch(geMotion *M)
 	assert( M->NodeType == MOTION_NODE_UNDECIDED );
 
 	M->NodeType = MOTION_NODE_BRANCH;
-	
+
 	M->Branch.MixerCount           = 0;
 	M->Branch.CurrentEventIterator = 0;
 	M->Branch.MixerArray           = NULL;
@@ -216,9 +216,9 @@ GENESISAPI geBoolean GENESISCC geMotion_RemoveNames(geMotion *M)
 				break;
 			case (MOTION_NODE_LEAF):
 				assert( M->Leaf.PathCount >= 0 );
-				
+
 				if ( M->Leaf.NameArray != NULL )
-					{	
+					{
 						geStrBlock_Destroy(&(M->Leaf.NameArray));
 					}
 				M->Leaf.NameArray = NULL;
@@ -237,7 +237,7 @@ GENESISAPI void GENESISCC geMotion_Destroy(geMotion **PM)
 {
 	int i;
 	geMotion *M;
-	
+
 	assert(PM   != NULL );
 	assert(*PM  != NULL );
 	M = *PM;
@@ -271,7 +271,7 @@ GENESISAPI void GENESISCC geMotion_Destroy(geMotion **PM)
 								gePath_Destroy( &(M->Branch.MixerArray[i].Blend));
 								M->Branch.MixerArray[i].Blend = NULL;
 							}
-						
+
 					}
 				if (M->Branch.MixerArray != NULL)
 					{
@@ -283,7 +283,7 @@ GENESISAPI void GENESISCC geMotion_Destroy(geMotion **PM)
 				break;
 			case (MOTION_NODE_LEAF):
 				if (M->MaintainNames == GE_TRUE)
-					{	
+					{
 						geBoolean Test=	geMotion_RemoveNames(M);
 						assert( Test != GE_FALSE );
 						Test;
@@ -357,7 +357,7 @@ GENESISAPI geBoolean GENESISCC geMotion_AddPath(geMotion *M,
 		NewPathArray = geRam_Realloc(M->Leaf.PathArray, (1+PathCount) * sizeof(gePath*) );
 
 		if ( NewPathArray == NULL )
-			{	
+			{
 				geErrorLog_Add(ERR_MOTION_ADDPATH_ENOMEM, NULL);
 				return GE_FALSE;
 			}
@@ -368,7 +368,7 @@ GENESISAPI geBoolean GENESISCC geMotion_AddPath(geMotion *M,
 
 	if ( M->MaintainNames == GE_TRUE )
 		{
-			
+
 			assert (M->Leaf.NameArray != NULL);
 			if (geStrBlock_Append(&(M->Leaf.NameArray),Name)==GE_FALSE)
 				{
@@ -378,8 +378,8 @@ GENESISAPI geBoolean GENESISCC geMotion_AddPath(geMotion *M,
 					return GE_FALSE;
 				}
 			M->Leaf.NameChecksum = geStrBlock_GetChecksum(M->Leaf.NameArray);
-		}						
-															
+		}
+
 	M->Leaf.PathCount = PathCount+1;
 	*PathIndex = PathCount;
 	gePath_CreateRef(P);
@@ -404,7 +404,7 @@ GENESISAPI int32 GENESISCC geMotion_GetNameChecksum(const geMotion *M)
 						return 0;
 					assert( M->Branch.MixerArray[0].Motion );
 					FirstChecksum = geMotion_GetNameChecksum( M->Branch.MixerArray[0].Motion );
-					
+
 					for (i=1; i<M->Branch.MixerCount; i++)
 						{
 							assert( M->Branch.MixerArray[i].Motion );
@@ -420,14 +420,14 @@ GENESISAPI int32 GENESISCC geMotion_GetNameChecksum(const geMotion *M)
 				assert(0);
 		}
 	return 0;
-}	
+}
 
 GENESISAPI geBoolean GENESISCC geMotion_HasNames(const geMotion *M)
 {
 	assert( M != NULL );
 	assert( geMotion_IsValid(M) != GE_FALSE );
 	assert( (M->MaintainNames == GE_TRUE) || (M->MaintainNames == GE_FALSE) );
-	// if M has names, all children of M have names. 
+	// if M has names, all children of M have names.
 	return M->MaintainNames;
 }
 
@@ -437,15 +437,15 @@ GENESISAPI gePath * GENESISCC geMotion_GetPathNamed(const geMotion *M,const char
 
 	assert( M != NULL );
 	assert( geMotion_IsValid(M) != GE_FALSE );
-	
+
 	if (M->NodeType != MOTION_NODE_LEAF)
 		{	// not an error condition.
 			return NULL;
 		}
-			
+
 	assert( M->Leaf.PathCount >=0 );
-	
-	if (Name != NULL)	
+
+	if (Name != NULL)
 		{
 			if ( M->MaintainNames == GE_TRUE )
 				{
@@ -460,9 +460,9 @@ GENESISAPI gePath * GENESISCC geMotion_GetPathNamed(const geMotion *M,const char
 		}
 	return NULL;
 }
-			
 
-#define LINEAR_BLEND(a,b,t)  ( (t)*((b)-(a)) + (a) )	
+
+#define LINEAR_BLEND(a,b,t)  ( (t)*((b)-(a)) + (a) )
 			// linear blend of a and b  0<t<1 where  t=0 ->a and t=1 ->b
 
 
@@ -509,12 +509,12 @@ GENESISAPI void GENESISCC geMotion_SampleChannels(const geMotion *M, int PathInd
 
 					assert( M->Branch.MixerCount > 0);
 					Mixer = &(M->Branch.MixerArray[0]);
-					
+
 					assert(Mixer->Motion != NULL );
 					geMotion_SampleChannels(Mixer->Motion,PathIndex,
 											(Time - Mixer->TimeOffset) * Mixer->TimeScale,
 											Rotation,Translation);
-				
+
 					for (i=1; i<M->Branch.MixerCount; i++)
 						{
 							geFloat BlendAmount;
@@ -553,7 +553,7 @@ GENESISAPI void GENESISCC geMotion_SampleChannels(const geMotion *M, int PathInd
 			default:
 				assert(0);
 		}
-}		
+}
 
 GENESISAPI geBoolean GENESISCC geMotion_SampleNamed(const geMotion *M, const char *PathName, gePath_TimeType Time, geXForm3d *Transform)
 {
@@ -659,19 +659,19 @@ GENESISAPI geBoolean GENESISCC geMotion_SampleChannelsNamed(const geMotion *M, c
 				assert(0);
 		}
 	return AnyChannels;
-}		
+}
 
 
 GENESISAPI gePath * GENESISCC geMotion_GetPath(const geMotion *M,int Index)
 {
 	assert( M != NULL );
 	assert( geMotion_IsValid(M) != GE_FALSE );
- 	
+
 	if (M->NodeType != MOTION_NODE_LEAF)
 		{	// not an error condition.
 			return NULL;
 		}
-			
+
 	assert( M->Leaf.PathCount >=0 );
 	assert( Index <= M->Leaf.PathCount );
 	assert( Index >= 0 );
@@ -703,8 +703,8 @@ GENESISAPI const char * GENESISCC geMotion_GetNameOfPath(const geMotion *M, int 
 	return geStrBlock_GetString(M->Leaf.NameArray,Index);
 
 }
-			
-	
+
+
 
 GENESISAPI int GENESISCC geMotion_GetPathCount(const geMotion *M)
 {
@@ -765,8 +765,8 @@ GENESISAPI geBoolean GENESISCC geMotion_GetTimeExtents(const geMotion *M,gePath_
 										*EndTime   = MAX(*EndTime,End);
 									}
 							}
-					}										
-				break;			
+					}
+				break;
 			case (MOTION_NODE_LEAF):
 				found = 0;
 				for (i=0; i<M->Leaf.PathCount; i++)
@@ -795,7 +795,7 @@ GENESISAPI geBoolean GENESISCC geMotion_GetTimeExtents(const geMotion *M,gePath_
 			return GE_TRUE;
 		}
 	return GE_FALSE;
-}			
+}
 
 
 GENESISAPI int GENESISCC geMotion_GetSubMotionCount(const geMotion *M)
@@ -828,7 +828,7 @@ GENESISAPI geMotion * GENESISCC geMotion_GetSubMotion(const geMotion *M,int SubM
 GENESISAPI geMotion * GENESISCC geMotion_GetSubMotionNamed(const geMotion *M,const char *Name)
 {
 	int i;
-	assert( M != NULL);	
+	assert( M != NULL);
 	assert( Name != NULL );
 	assert( geMotion_IsValid(M) != GE_FALSE );
 
@@ -877,10 +877,10 @@ static geBoolean GENESISCC geMotion_SearchForSubMotion(const geMotion *Parent, c
 	return GE_FALSE;
 }
 
-GENESISAPI geBoolean GENESISCC geMotion_AddSubMotion(geMotion *ParentMotion, 
-								geFloat TimeScale, 
+GENESISAPI geBoolean GENESISCC geMotion_AddSubMotion(geMotion *ParentMotion,
+								geFloat TimeScale,
 								geFloat TimeOffset,
-								geMotion *SubMotion, 
+								geMotion *SubMotion,
 								geFloat StartTime, geFloat StartMagnitude,
 								geFloat EndTime,   geFloat EndMagnitude,
 								const geXForm3d *Transform,
@@ -925,34 +925,34 @@ GENESISAPI geBoolean GENESISCC geMotion_AddSubMotion(geMotion *ParentMotion,
 			geErrorLog_Add(-1, NULL);  //?
 			return GE_FALSE;
 		}
-		
+
 	if (geMotion_SearchForSubMotion(SubMotion,ParentMotion)!=GE_FALSE)
 		{
 			geErrorLog_Add(-1, NULL);
 			return GE_FALSE;
 		}
-			
+
 	Count = ParentMotion->Branch.MixerCount;
 	NewMixerArray = geRam_Realloc(ParentMotion->Branch.MixerArray, (1+Count) * sizeof(geMotion_Mixer) );
 	if ( NewMixerArray == NULL )
-		{	
+		{
 			geErrorLog_Add(-1, NULL);
 			return GE_FALSE;
 		}
-		
+
 	ParentMotion->Branch.MixerArray = NewMixerArray;
 	{
 		geMotion_Mixer *Mixer;
 		geXForm3d BlendKeyTransform;
 		Mixer = &(ParentMotion->Branch.MixerArray[Count]);
-	
+
 		Mixer->Motion     = SubMotion;
 		Mixer->TimeScale  = TimeScale;
 		Mixer->TimeOffset = TimeOffset;
-		
+
 		Mixer->Blend = gePath_Create(GE_PATH_INTERPOLATE_HERMITE_ZERO_DERIV,GE_PATH_INTERPOLATE_SLERP,GE_FALSE);
 		if (Mixer->Blend==NULL)
-			{	
+			{
 				geErrorLog_Add(-1, NULL);
 				return GE_FALSE;
 			}
@@ -983,7 +983,7 @@ GENESISAPI geBoolean GENESISCC geMotion_AddSubMotion(geMotion *ParentMotion,
 				Mixer->Transform = *Transform;
 			}
 	}
-	
+
 	*Index = Count;
 	SubMotion->CloneCount++;
 	ParentMotion->Branch.MixerCount++;
@@ -1002,14 +1002,14 @@ GENESISAPI geMotion * GENESISCC geMotion_RemoveSubMotion(geMotion *ParentMotion,
 		{
 			return NULL;
 		}
-	
+
 	Count = ParentMotion->Branch.MixerCount;
 	assert( (SubMotionIndex>=0) && (SubMotionIndex<Count));
-	
+
 	M = ParentMotion->Branch.MixerArray[SubMotionIndex].Motion;
 	assert( ParentMotion->Branch.MixerArray[SubMotionIndex].Blend != NULL );
 	gePath_Destroy( &(ParentMotion->Branch.MixerArray[SubMotionIndex].Blend) );
-	
+
 	if (Count>1)
 		{
 			memcpy( &(ParentMotion->Branch.MixerArray[SubMotionIndex]),
@@ -1027,10 +1027,10 @@ GENESISAPI geMotion * GENESISCC geMotion_RemoveSubMotion(geMotion *ParentMotion,
 			}
 		else
 			{
-				NewMixerArray = geRam_Realloc(ParentMotion->Branch.MixerArray, 
+				NewMixerArray = geRam_Realloc(ParentMotion->Branch.MixerArray,
 									(ParentMotion->Branch.MixerCount) * sizeof(geMotion_Mixer) );
 				if ( NewMixerArray != NULL )
-					{	
+					{
 						ParentMotion->Branch.MixerArray = NewMixerArray;
 					}
 			}
@@ -1038,7 +1038,7 @@ GENESISAPI geMotion * GENESISCC geMotion_RemoveSubMotion(geMotion *ParentMotion,
 	geMotion_Destroy( &M );
 	return M;
 }
-	
+
 
 
 GENESISAPI geFloat   GENESISCC geMotion_GetTimeOffset( const geMotion *M,int SubMotionIndex )
@@ -1114,7 +1114,7 @@ GENESISAPI geFloat    GENESISCC geMotion_GetBlendAmount( const geMotion *M, int 
 			assert( M->Branch.MixerArray[SubMotionIndex].Blend != NULL );
 			gePath_SampleChannels(M->Branch.MixerArray[SubMotionIndex].Blend,
 								  ( Time - M->Branch.MixerArray[SubMotionIndex].TimeOffset )
-								    * M->Branch.MixerArray[SubMotionIndex].TimeScale,
+									* M->Branch.MixerArray[SubMotionIndex].TimeScale,
 								   &Dummy,&BlendVector);
 			BlendAmount = MOTION_BLEND_PART_OF_VECTOR(BlendVector);
 			return BlendAmount;
@@ -1199,7 +1199,7 @@ GENESISAPI geBoolean  GENESISCC geMotion_SetBaseTransform( geMotion *M,int SubMo
 				{
 					M->Branch.MixerArray[SubMotionIndex].TransformUsed = GE_FALSE;
 				}
-					
+
 			return GE_TRUE;
 		}
 	return GE_FALSE;
@@ -1243,7 +1243,7 @@ GENESISAPI geBoolean GENESISCC geMotion_GetTransform( const geMotion *M, geFloat
 
 							assert( Mixer->Motion != NULL );
 							assert( Mixer->Blend  != NULL );
-							
+
 							MixTime = (Time - Mixer->TimeOffset) * Mixer->TimeScale;
 							if (geMotion_GetTransform(Mixer->Motion,MixTime,Transform)!=GE_FALSE)
 								{
@@ -1283,7 +1283,7 @@ GENESISAPI geBoolean GENESISCC geMotion_GetTransform( const geMotion *M, geFloat
 											Translation.Y = LINEAR_BLEND(Translation.Y,T.Y,BlendAmount);
 											Translation.Z = LINEAR_BLEND(Translation.Z,T.Z,BlendAmount);
 										}
-									
+
 									MixCount++;
 								}
 						}
@@ -1306,7 +1306,7 @@ GENESISAPI geBoolean GENESISCC geMotion_GetTransform( const geMotion *M, geFloat
 		}
 	return GE_FALSE;
 }
-#pragma warning( default : 4701)	
+#pragma warning( default : 4701)
 
 
 //--------------------------------------------------------------------------------------------
@@ -1320,7 +1320,7 @@ GENESISAPI geBoolean GENESISCC geMotion_GetEventExtents(const geMotion *M,geFloa
 	assert( LastEventTime != NULL );
 
 	return geTKEvents_GetExtents(M->Leaf.Events,FirstEventTime,LastEventTime);
-}	
+}
 
 
 	// Inserts the new event and corresponding string.
@@ -1352,9 +1352,9 @@ GENESISAPI geBoolean GENESISCC geMotion_InsertEvent(geMotion *M, gePath_TimeType
 		};
 	return GE_TRUE;
 }
-	
 
-			
+
+
 	// Deletes the event
 GENESISAPI geBoolean GENESISCC geMotion_DeleteEvent(geMotion *M, gePath_TimeType tKey)
 {
@@ -1384,7 +1384,7 @@ GENESISAPI void GENESISCC geMotion_SetupEventIterator(
 	gePath_TimeType StartTime,				// Inclusive search start
 	gePath_TimeType EndTime)				// Non-inclusive search stop
 	// For searching or querying the array for events between two times
-	// times are compaired [StartTime,EndTime), '[' is inclusive, ')' is 
+	// times are compaired [StartTime,EndTime), '[' is inclusive, ')' is
 	// non-inclusive.  This prepares the geMotion_GetNextEvent() function.
 {
 	int i;
@@ -1399,13 +1399,13 @@ GENESISAPI void GENESISCC geMotion_SetupEventIterator(
 				if ( M->Leaf.Events != NULL )
 					{
 						geTKEvents_SetupIterator(M->Leaf.Events,StartTime,EndTime);
-					}	
+					}
 				break;
 			case (MOTION_NODE_BRANCH):
 				for (i=0; i<M->Branch.MixerCount; i++)
 					{
 						geMotion_Mixer *Mixer;
-				
+
 						Mixer = &(M->Branch.MixerArray[i]);
 
 						geMotion_SetupEventIterator(Mixer->Motion,
@@ -1417,7 +1417,7 @@ GENESISAPI void GENESISCC geMotion_SetupEventIterator(
 			default:
 				assert(0);
 		}
-}		
+}
 
 
 GENESISAPI geBoolean GENESISCC geMotion_GetNextEvent(
@@ -1427,7 +1427,7 @@ GENESISAPI geBoolean GENESISCC geMotion_GetNextEvent(
 	// Iterates from StartTime to EndTime as setup in geMotion_SetupEventIterator()
 	// and for each event between these times [StartTime,EndTime)
 	// this function will return Time and EventString returned for that event
-	// and the iterator will be positioned for the next search.  When there 
+	// and the iterator will be positioned for the next search.  When there
 	// are no more events in the range, this function will return GE_FALSE (Time
 	// will be 0 and ppEventString will be empty).
 {
@@ -1448,7 +1448,7 @@ GENESISAPI geBoolean GENESISCC geMotion_GetNextEvent(
 				if ( M->Leaf.Events != NULL )
 					{
 						return geTKEvents_GetNextEvent(M->Leaf.Events,pTime,ppEventString);
-					}	
+					}
 				break;
 			case (MOTION_NODE_BRANCH):
 				while (M->Branch.CurrentEventIterator < M->Branch.MixerCount)
@@ -1466,7 +1466,7 @@ GENESISAPI geBoolean GENESISCC geMotion_GetNextEvent(
 
 	return GE_FALSE;
 }
-	
+
 //------------------------------------------------------------------------------------------------------
 //    Read/Write support
 
@@ -1524,7 +1524,7 @@ GENESISAPI geMotion* GENESISCC geMotion_CreateFromFile(geVFile* pFile)
 			geErrorLog_Add(-1, NULL);
 			return NULL;		// error logged already in geMotion_Create
 		}
-	
+
 		// Read and build the version.  Then determine the number of items to read.
 		if	(geVFile_GetS(pFile, line, LINE_LENGTH) == GE_FALSE)
 			{
@@ -1573,18 +1573,18 @@ GENESISAPI geMotion* GENESISCC geMotion_CreateFromFile(geVFile* pFile)
 				if (strlen(line) > sizeof(MOTION_NAME_ID))
 					{
 						if (geMotion_SetName(M,line+sizeof(MOTION_NAME_ID))==GE_FALSE)
-							{						
+							{
 								geErrorLog_Add( ERR_MOTION_FILE_READ , NULL);
-								break;		 
+								break;
 							}
 					}
 				//NumItemsRead++;
 			}
-			
+
 			else if(strnicmp(line, MOTION_MAINTAINNAMES_ID, sizeof(MOTION_MAINTAINNAMES_ID)-1) == 0)
 			{
 				if(sscanf(line + sizeof(MOTION_MAINTAINNAMES_ID)-1, "%d", &M->MaintainNames) != 1)
-					{						
+					{
 						geErrorLog_Add( ERR_MOTION_FILE_READ , NULL);
 						break;
 					}
@@ -1593,16 +1593,16 @@ GENESISAPI geMotion* GENESISCC geMotion_CreateFromFile(geVFile* pFile)
 			else if(strnicmp(line, MOTION_PATHCOUNT_ID, sizeof(MOTION_PATHCOUNT_ID)-1) == 0)
 			{
 				if(sscanf(line + sizeof(MOTION_PATHCOUNT_ID)-1, "%d", &M->Leaf.PathCount) != 1)
-					{						
+					{
 						geErrorLog_Add( ERR_MOTION_FILE_READ , NULL);
-						break;		 
+						break;
 					}
 				NumItemsRead++;
 			}
 			else if(strnicmp(line, MOTION_NAMECHECKSUM_ID, sizeof(MOTION_NAMECHECKSUM_ID)-1) == 0)
 			{
 				if(sscanf(line + sizeof(MOTION_NAMECHECKSUM_ID)-1, "%d", &M->Leaf.NameChecksum) != 1)
-					{						
+					{
 						geErrorLog_Add( ERR_MOTION_FILE_READ , NULL);
 						break;
 					}
@@ -1612,7 +1612,7 @@ GENESISAPI geMotion* GENESISCC geMotion_CreateFromFile(geVFile* pFile)
 			{
 				int flag;
 				if(sscanf(line + sizeof(MOTION_EVENTS_ID)-1, "%d", &flag) != 1)
-					{						
+					{
 						geErrorLog_Add( ERR_MOTION_FILE_READ , NULL);
 						break;
 					}
@@ -1620,7 +1620,7 @@ GENESISAPI geMotion* GENESISCC geMotion_CreateFromFile(geVFile* pFile)
 					{
 						M->Leaf.Events = geTKEvents_CreateFromFile(pFile);
 						if (M->Leaf.Events == NULL)
-							{						
+							{
 								geErrorLog_Add( ERR_MOTION_FILE_READ , NULL);
 								break;
 							}
@@ -1631,7 +1631,7 @@ GENESISAPI geMotion* GENESISCC geMotion_CreateFromFile(geVFile* pFile)
 			{
 				int flag;
 				if(sscanf(line + sizeof(MOTION_NAMEARRAY_ID)-1, "%d", &flag) != 1)
-					{						
+					{
 						geErrorLog_Add( ERR_MOTION_FILE_READ , NULL);
 						break;
 					}
@@ -1639,7 +1639,7 @@ GENESISAPI geMotion* GENESISCC geMotion_CreateFromFile(geVFile* pFile)
 					{
 						M->Leaf.NameArray = geStrBlock_CreateFromFile(pFile);
 						if (M->Leaf.NameArray == NULL)
-							{						
+							{
 								geErrorLog_Add( ERR_MOTION_FILE_READ , NULL);
 								break;
 							}
@@ -1650,7 +1650,7 @@ GENESISAPI geMotion* GENESISCC geMotion_CreateFromFile(geVFile* pFile)
 			{
 				int i,count;
 				if(sscanf(line + sizeof(MOTION_PATHARRAY_ID)-1, "%d", &count) != 1)
-					{						
+					{
 						geErrorLog_Add( ERR_MOTION_FILE_READ , NULL);
 						break;
 					}
@@ -1658,28 +1658,28 @@ GENESISAPI geMotion* GENESISCC geMotion_CreateFromFile(geVFile* pFile)
 				M->Leaf.PathArray = geRam_Allocate( count * sizeof(gePath*) );
 
 				if ( M->Leaf.PathArray == NULL )
-					{	
+					{
 						geErrorLog_Add(ERR_MOTION_ADDPATH_ENOMEM, NULL);
 						break;
 					}
 
 				for (i=0; i<count; i++)
 					{
-							
+
 						M->Leaf.PathArray[i] = gePath_CreateFromFile(pFile);
 						if (M->Leaf.PathArray[i] == NULL )
 							{
 								geErrorLog_Add(ERR_MOTION_FILE_READ, NULL);
 								break;
 							}
-	
+
 					}
 				NumItemsRead++;
 			}
 
 
 		}
-		
+
 		if(NumItemsNeeded == NumItemsRead)
 			{
 				return M;
@@ -1720,27 +1720,27 @@ static geBoolean GENESISCC geMotion_WriteLeaf(const geMotion *M, geVFile *pFile)
 
 	if	(geVFile_Printf(pFile, "%s %d\n", MOTION_PATHCOUNT_ID,M->Leaf.PathCount) == GE_FALSE)
 		{
-			geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL); 
-			return GE_FALSE; 
+			geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL);
+			return GE_FALSE;
 		}
 	if	(geVFile_Printf(pFile, "%s %d\n", MOTION_NAMECHECKSUM_ID,M->Leaf.NameChecksum) == GE_FALSE)
 		{
-			geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL); 
-			return GE_FALSE; 
+			geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL);
+			return GE_FALSE;
 		}
 
 	if	(geVFile_Printf(pFile, "%s %d\n", MOTION_EVENTS_ID, flag) == GE_FALSE)
 		{
-			geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL); 
-			return GE_FALSE; 
+			geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL);
+			return GE_FALSE;
 		}
 
 	if (flag != GE_FALSE)
 		{
 			if (geTKEvents_WriteToFile(M->Leaf.Events,pFile)==GE_FALSE)
 				{
-					geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL); 
-					return GE_FALSE; 
+					geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL);
+					return GE_FALSE;
 				}
 		}
 
@@ -1750,29 +1750,29 @@ static geBoolean GENESISCC geMotion_WriteLeaf(const geMotion *M, geVFile *pFile)
 		flag = GE_TRUE;
 	if	(geVFile_Printf(pFile, "%s %d\n", MOTION_NAMEARRAY_ID, flag) == GE_FALSE)
 		{
-			geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL); 
-			return GE_FALSE; 
+			geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL);
+			return GE_FALSE;
 		}
 	if (flag != GE_FALSE)
 		{
 			if (geStrBlock_WriteToFile(M->Leaf.NameArray,pFile)==GE_FALSE)
 				{
-					geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL); 
-					return GE_FALSE; 
+					geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL);
+					return GE_FALSE;
 				}
 		}
 
 	if	(geVFile_Printf(pFile, "%s %d\n", MOTION_PATHARRAY_ID, M->Leaf.PathCount) == GE_FALSE)
 		{
-			geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL); 
-			return GE_FALSE; 
+			geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL);
+			return GE_FALSE;
 		}
 	for (i=0; i<M->Leaf.PathCount; i++)
 		{
 			if (gePath_WriteToFile(M->Leaf.PathArray[i],pFile) == GE_FALSE)
 				{
-					geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL); 
-					return GE_FALSE; 
+					geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL);
+					return GE_FALSE;
 				}
 		}
 	return GE_TRUE;
@@ -1808,7 +1808,7 @@ GENESISAPI geBoolean GENESISCC geMotion_WriteToFile(const geMotion *M, geVFile *
 
 
 	// Write the version
-	if	(geVFile_Printf(pFile, " %X.%.2X\n", (MOTION_FILE_VERSION & 0xFF00) >> 8, 
+	if	(geVFile_Printf(pFile, " %X.%.2X\n", (MOTION_FILE_VERSION & 0xFF00) >> 8,
 									MOTION_FILE_VERSION & 0x00FF) == GE_FALSE)
 		{
 			geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL);
@@ -1889,18 +1889,18 @@ static geBoolean GENESISCC geMotion_ReadBinaryLeaf(geMotion *M, geVFile *pFile)
 
 	if (geVFile_Read(pFile, &Header, sizeof(geMotion_BinaryFileLeafHeader)) == GE_FALSE)
 		{
-			geErrorLog_Add( ERR_MOTION_FILE_READ , NULL); 
-			return GE_FALSE; 
+			geErrorLog_Add( ERR_MOTION_FILE_READ , NULL);
+			return GE_FALSE;
 		}
 	M->Leaf.NameChecksum = Header.NameChecksum;
-	
+
 	if (Header.Flags & 0x1)
 		{
 			M->Leaf.Events = geTKEvents_CreateFromFile(pFile);
 			if (M->Leaf.Events == NULL )
 				{
-					geErrorLog_Add( ERR_MOTION_FILE_READ , NULL); 
-					return GE_FALSE; 
+					geErrorLog_Add( ERR_MOTION_FILE_READ , NULL);
+					return GE_FALSE;
 				}
 		}
 	else
@@ -1913,8 +1913,8 @@ static geBoolean GENESISCC geMotion_ReadBinaryLeaf(geMotion *M, geVFile *pFile)
 			M->Leaf.NameArray = geStrBlock_CreateFromFile(pFile);
 			if (M->Leaf.NameArray == NULL)
 				{
-					geErrorLog_Add( ERR_MOTION_FILE_READ , NULL); 
-					return GE_FALSE; 
+					geErrorLog_Add( ERR_MOTION_FILE_READ , NULL);
+					return GE_FALSE;
 				}
 		}
 	else
@@ -1926,7 +1926,7 @@ static geBoolean GENESISCC geMotion_ReadBinaryLeaf(geMotion *M, geVFile *pFile)
 	M->Leaf.PathArray = geRam_Allocate( Header.PathCount * sizeof(gePath*) );
 
 	if ( M->Leaf.PathArray == NULL )
-		{	
+		{
 			geErrorLog_Add(ERR_MOTION_CREATE_ENOMEM, NULL);
 			return GE_TRUE;
 		}
@@ -1936,8 +1936,8 @@ static geBoolean GENESISCC geMotion_ReadBinaryLeaf(geMotion *M, geVFile *pFile)
 			M->Leaf.PathArray[i] = gePath_CreateFromFile(pFile);
 			if (M->Leaf.PathArray[i] == NULL )
 				{
-					geErrorLog_Add( ERR_MOTION_FILE_READ , NULL); 
-					return GE_FALSE; 
+					geErrorLog_Add( ERR_MOTION_FILE_READ , NULL);
+					return GE_FALSE;
 				}
 			M->Leaf.PathCount++;
 		}
@@ -1946,7 +1946,7 @@ static geBoolean GENESISCC geMotion_ReadBinaryLeaf(geMotion *M, geVFile *pFile)
 
 static geMotion *GENESISCC geMotion_CreateFromBinaryFile(geVFile *pFile)
 {
-	uint32 u;	
+	uint32 u;
 	geBoolean MaintainNames;
 	int NodeType;
 	int NameLength;
@@ -1970,7 +1970,7 @@ static geMotion *GENESISCC geMotion_CreateFromBinaryFile(geVFile *pFile)
 			return NULL;
 		}
 
-	if (u & (1<<16)) 
+	if (u & (1<<16))
 		{
 			MaintainNames = GE_TRUE;
 		}
@@ -1996,7 +1996,7 @@ static geMotion *GENESISCC geMotion_CreateFromBinaryFile(geVFile *pFile)
 					geMotion_Destroy(&M);
 					return NULL;
 				}
- 			if ( geVFile_Read (pFile, M->Name, NameLength ) == GE_FALSE )
+			if ( geVFile_Read (pFile, M->Name, NameLength ) == GE_FALSE )
 				{
 					geErrorLog_Add( ERR_MOTION_FILE_READ , NULL);
 					geMotion_Destroy(&M);
@@ -2061,31 +2061,31 @@ static geBoolean GENESISCC geMotion_WriteBinaryLeaf(const geMotion *M, geVFile *
 		{
 			Header.Flags |= MOTION_LEAF_NAMEARRAY_FLAG;
 		}
-		
-		
+
+
 	if (geVFile_Write(pFile, &Header, sizeof(geMotion_BinaryFileLeafHeader)) == GE_FALSE)
 		{
-			geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL); 
-			return GE_FALSE; 
+			geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL);
+			return GE_FALSE;
 		}
-			
+
 
 	if (Header.Flags & MOTION_LEAF_EVENTS_FLAG)
 		{
 			if (geTKEvents_WriteToBinaryFile(M->Leaf.Events,pFile)==GE_FALSE)
 				{
-					geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL); 
-					return GE_FALSE; 
+					geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL);
+					return GE_FALSE;
 				}
 		}
 
-	
+
 	if (Header.Flags & MOTION_LEAF_NAMEARRAY_FLAG)
 		{
 			if (geStrBlock_WriteToBinaryFile(M->Leaf.NameArray,pFile)==GE_FALSE)
 				{
-					geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL); 
-					return GE_FALSE; 
+					geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL);
+					return GE_FALSE;
 				}
 		}
 
@@ -2093,8 +2093,8 @@ static geBoolean GENESISCC geMotion_WriteBinaryLeaf(const geMotion *M, geVFile *
 		{
 			if (gePath_WriteToBinaryFile(M->Leaf.PathArray[i],pFile) == GE_FALSE)
 				{
-					geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL); 
-					return GE_FALSE; 
+					geErrorLog_Add( ERR_MOTION_FILE_WRITE , NULL);
+					return GE_FALSE;
 				}
 		}
 	return GE_TRUE;
@@ -2143,7 +2143,7 @@ GENESISAPI geBoolean GENESISCC geMotion_WriteToBinaryFile(const geMotion *M,geVF
 			u = 0;
 		}
 	assert( u < 0xFFFF );
-	
+
 	if (M->MaintainNames != GE_FALSE)
 		{
 			u |= (1<<16);

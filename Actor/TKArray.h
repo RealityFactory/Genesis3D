@@ -1,8 +1,8 @@
 /****************************************************************************************/
-/*  TKARRAY.H																			*/
+/*  TKArray.h                                                                           */
 /*                                                                                      */
-/*  Author: Mike Sandige	                                                            */
-/*  Description: Time-keyed array interface.											*/
+/*  Author: Mike Sandige                                                                */
+/*  Description: Time-keyed array interface.                                            */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_TKARRAY_H
@@ -26,7 +26,7 @@
 	This module is designed primarily to support path.c
 
 	The idea is that there are these packed arrays of elements,
-	sorted by a geTKArray_TimeType key.  The key is assumed to be the 
+	sorted by a geTKArray_TimeType key.  The key is assumed to be the
 	first field in each element.
 
 	the TKArray functions operate on this very specific array type.
@@ -66,11 +66,11 @@ geBoolean GENESISCC geTKArray_WriteToBinaryFile(
 int GENESISCC geTKArray_BSearch(
 	const geTKArray *Array,			// sorted array to search
 	geTKArray_TimeType Key);		// searching for this time
-	// Searches for key in the Array. (assumes array is sorted) 
+	// Searches for key in the Array. (assumes array is sorted)
 	// if key is found (within +-tolerance), the index to that element is returned.
-	// if key is not found, the index to the key just smaller than the 
+	// if key is not found, the index to the key just smaller than the
 	// given key is returned.  (-1 if the key is smaller than the first element)
-	// search is only accurate to 2*TKA_TIME_TOLERANCE.  
+	// search is only accurate to 2*TKA_TIME_TOLERANCE.
 	// if multiple keys exist within 2*TKA_TIME_TOLERANCE, this will find an arbitrary one of them.
 
 geBoolean GENESISCC geTKArray_Insert(
@@ -80,20 +80,20 @@ geBoolean GENESISCC geTKArray_Insert(
 	// inserts a new element into Array.
 	// sets only the key for the new element - the rest is junk
 	// returns TRUE if the insertion was successful.
-	// returns FALSE if the insertion failed. 
-	// if Array is empty (no elements, NULL pointer) it is allocated and filled 
+	// returns FALSE if the insertion failed.
+	// if Array is empty (no elements, NULL pointer) it is allocated and filled
 	// with the one Key element
-	// Index is the index of the new element 
+	// Index is the index of the new element
 
 geBoolean GENESISCC geTKArray_DeleteElement(
 	geTKArray **Array,
 	int N);							// element to delete
 	// deletes an element from Array.
-	// returns TRUE if the deletion was successful. 
+	// returns TRUE if the deletion was successful.
 	// returns FALSE if the deletion failed. (key not found or realloc failed)
 
 void GENESISCC geTKArray_Destroy(
-	geTKArray **Array);	
+	geTKArray **Array);
 	// destroys array
 
 void *GENESISCC geTKArray_Element(
@@ -106,7 +106,7 @@ int GENESISCC geTKArray_NumElements(
 	// returns the number of elements in the array
 
 geTKArray_TimeType GENESISCC geTKArray_ElementTime(
-	const geTKArray *Array, 
+	const geTKArray *Array,
 	int N);
 	// returns the Time associated with the Nth element of the array
 
