@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_TRACE_H
@@ -51,11 +51,11 @@ geBoolean Trace_BBoxInVisibleLeaf(geWorld *World, geVec3d *Mins, geVec3d *Maxs);
 //=====================================================================================
 
 
-geBoolean Trace_GEWorldCollision(	geWorld *World, 
-									const		geVec3d *Mins, 
-									const		geVec3d *Maxs, 
-									const		geVec3d *Front, 
-									const		geVec3d *Back, 
+geBoolean Trace_GEWorldCollision(	geWorld *World,
+									const		geVec3d *Mins,
+									const		geVec3d *Maxs,
+									const		geVec3d *Front,
+									const		geVec3d *Back,
 									uint32		Contents,			// Contents to collide with
 									uint32		CollideFlags,		// GE_COLLIDE_ALL, etc...
 									uint32		UserFlags,			// Flags to mask against actors
@@ -63,19 +63,19 @@ geBoolean Trace_GEWorldCollision(	geWorld *World,
 									void		*Context,
 									GE_Collision *Col);
 
-geBoolean Trace_WorldCollisionBNode(geWorld *World, 
-									geVec3d *Front, 
-									geVec3d *Back, 
+geBoolean Trace_WorldCollisionBNode(geWorld *World,
+									geVec3d *Front,
+									geVec3d *Back,
 									int32 *ModelNum,
 									geVec3d *Impact,
 									int32 *Node,
 									int32 *Plane,
 									int32 *Side);
 
-geBoolean Trace_WorldCollisionExact(geWorld *World, 
-									const geVec3d *Front, 
-									const geVec3d *Back, 
-									uint32 Flags, 
+geBoolean Trace_WorldCollisionExact(geWorld *World,
+									const geVec3d *Front,
+									const geVec3d *Back,
+									uint32 Flags,
 									geVec3d *Impact,
 									GFX_Plane *Plane,
 									geWorld_Model **Model,
@@ -86,9 +86,9 @@ geBoolean Trace_WorldCollisionExact(geWorld *World,
 									void *Context);
 
 // Internal only/ does not chek meshes/ returns index numbers into bsp structures for models
-geBoolean Trace_WorldCollisionExact2(geWorld *World, 
-									const geVec3d *Front, 
-									const geVec3d *Back, 
+geBoolean Trace_WorldCollisionExact2(geWorld *World,
+									const geVec3d *Front,
+									const geVec3d *Back,
 									geVec3d *Impact,
 									int32 *Node,
 									int32 *Plane,
@@ -96,8 +96,8 @@ geBoolean Trace_WorldCollisionExact2(geWorld *World,
 
 // changed QD Shadows
 // Internal only doesn't check meshes or actors, and ignores translucent contents (CLIP, WINDOW...)
-geBoolean Trace_WorldCollisionExact3(geWorld *World, 
-									const geVec3d *Front, 
+geBoolean Trace_WorldCollisionExact3(geWorld *World,
+									const geVec3d *Front,
 									const geVec3d *Back,
 									geVec3d *Impact,
 									int32 *Node,
@@ -109,7 +109,7 @@ geBoolean Trace_MiscCollision(GFX_BNode *BNodes, GFX_Plane *Planes, const geVec3
 geBoolean Trace_MiscCollision2(GFX_BNode *BNodes, GFX_Plane *Planes, const geVec3d *Front, const geVec3d *Back, geVec3d *I, int32 *P);
 
 geBoolean Trace_WorldCollisionBBox(	geWorld	*World,
-									const geVec3d *Mins, const geVec3d *Maxs, 
+									const geVec3d *Mins, const geVec3d *Maxs,
 									const geVec3d *Front, const geVec3d *Back,
 									uint32 Flags,
 									geVec3d *I, GFX_Plane *P,
@@ -120,14 +120,14 @@ geBoolean Trace_WorldCollisionBBox(	geWorld	*World,
 									GE_CollisionCB *CollisionCB,
 									void *Context);
 
-geBoolean Trace_TestModelMove(	geWorld		*World, 
-								geWorld_Model		*Model, 
-								const geXForm3d	*DXForm, 
+geBoolean Trace_TestModelMove(	geWorld		*World,
+								geWorld_Model		*Model,
+								const geXForm3d	*DXForm,
 								const geVec3d		*Mins, const geVec3d *Maxs,
 								const geVec3d		*In, geVec3d *Out);
 
-geBoolean Trace_ModelCollision(geWorld		*World, 
-								geWorld_Model		*Model, 
+geBoolean Trace_ModelCollision(geWorld		*World,
+								geWorld_Model		*Model,
 								const geXForm3d	*DXForm,
 								GE_Collision    *Collision,
 								//Mesh_RenderQ	**ImpactedMesh,

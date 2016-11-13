@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <assert.h>
@@ -34,7 +34,7 @@
 //=====================================================================================
 //	static local globals
 //=====================================================================================
-static	geEngine		*CEngine;		
+static	geEngine		*CEngine;
 static	geWorld			*CWorld;
 static	GBSP_BSPData	*BSPData;		// This is in globals, but is also kept here for speed
 
@@ -59,7 +59,7 @@ geBoolean GENESISCC Plane_SetEngine(geEngine *Engine)
 geBoolean GENESISCC Plane_SetWorld(geWorld *World)
 {
 	assert(World != NULL);
-	
+
 	CWorld = World;
 
 	return GE_TRUE;
@@ -83,7 +83,7 @@ geBoolean GENESISCC Plane_SetGBSP(World_BSP *BSP)
 //=====================================================================================
 int32 GENESISCC Plane_FindLeaf(const geWorld *World, int32 Node, const geVec3d *POV)
 {
-    geFloat		Dist;
+	geFloat		Dist;
 	GFX_Node	*GFXNodes;
 	GFX_Plane	*GFXPlanes;
 	int32		Leaf;
@@ -91,23 +91,23 @@ int32 GENESISCC Plane_FindLeaf(const geWorld *World, int32 Node, const geVec3d *
 	GFXNodes = World->CurrentBSP->BSPData.GFXNodes;
 	GFXPlanes = World->CurrentBSP->BSPData.GFXPlanes;
 
-    while (Node >= 0) 
+	while (Node >= 0)
 	{
 		assert(Node >= 0 && Node < World->CurrentBSP->BSPData.NumGFXNodes);
-	
+
 		Dist = Plane_PlaneDistanceFast(&GFXPlanes[GFXNodes[Node].PlaneNum], POV);
-        
-		if (Dist < 0) 
-            Node = GFXNodes[Node].Children[1];
+
+		if (Dist < 0)
+			Node = GFXNodes[Node].Children[1];
 		else
-            Node = GFXNodes[Node].Children[0];
-    }
-	
+			Node = GFXNodes[Node].Children[0];
+	}
+
 	// We are now in a leaf
 	Leaf = -(Node+1);
 
 	assert(Leaf >=0 && Leaf < World->CurrentBSP->BSPData.NumGFXLeafs);
-	
+
 	return Leaf;
 }
 
@@ -135,7 +135,7 @@ geFloat GENESISCC Plane_PlaneDistanceFast(const GFX_Plane *Plane, const geVec3d 
 		case PLANE_Z:
 			Dist = (Point->Z - PDist);
 			break;
-	      
+
 		default:
 			Dist = geVec3d_DotProduct(Point, &Plane->Normal) - PDist;
 			break;
@@ -174,7 +174,7 @@ geFloat GENESISCC Plane_FaceDistanceFast(const GFX_Face *Face, const geVec3d *Po
 
 	assert(BSPData != NULL);
 	assert(BSPData->GFXPlanes != NULL);
-	
+
 	Plane = &BSPData->GFXPlanes[Face->PlaneNum];
 	PDist = Plane->Dist;
 
@@ -189,7 +189,7 @@ geFloat GENESISCC Plane_FaceDistanceFast(const GFX_Face *Face, const geVec3d *Po
 		case PLANE_Z:
 			Dist = (Point->Z - PDist);
 			break;
-	      
+
 		default:
 			Dist = geVec3d_DotProduct(Point, &Plane->Normal) - PDist;
 			break;
@@ -207,11 +207,11 @@ geFloat GENESISCC Plane_FaceDistanceFast(const GFX_Face *Face, const geVec3d *Po
 void gePlane_SetFromVerts(GFX_Plane *Plane, const geVec3d *V1, const geVec3d *V2, const geVec3d *V3)
 {
 	geVec3d		Vect1, Vect2;
-	
+
 	// Get the 2 vectors to derive the normal
 	geVec3d_Subtract(V1, V2, &Vect1);
 	geVec3d_Subtract(V3, V2, &Vect2);
-	
+
 	// The normal is the cross between these 2 vectors
 	geVec3d_CrossProduct(&Vect1, &Vect2, &Plane->Normal);
 	geVec3d_Normalize(&Plane->Normal);

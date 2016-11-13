@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <assert.h>
@@ -44,43 +44,43 @@ int Frustum_Seed2=560296816;
 //================================================================================
 void Frustum_SetFromCamera(Frustum_Info *Info, geCamera *Camera)
 {
-    geFloat		s, c, ZFar;
+	geFloat		s, c, ZFar;
 	geBoolean	ZFarEnable;
-    geVec3d		Normal;
+	geVec3d		Normal;
 	int32		i;
 // changed QD Clipping
-	geFloat		ZScale; 
+	geFloat		ZScale;
 
-    geCamera_GetViewAngleXSinCos(Camera,&s,&c);
+	geCamera_GetViewAngleXSinCos(Camera,&s,&c);
 
-    // Left clip plane
-    Normal.X = s;
-    Normal.Y = 0.0f;
-    Normal.Z = -c;
+	// Left clip plane
+	Normal.X = s;
+	Normal.Y = 0.0f;
+	Normal.Z = -c;
 	geVec3d_Normalize(&Normal);
 	Info->Planes[0].Normal = Normal;
 
-    // Right clip plane
-    Normal.X = -s;
+	// Right clip plane
+	Normal.X = -s;
 	geVec3d_Normalize(&Normal);
 	Info->Planes[1].Normal = Normal;
 
-    geCamera_GetViewAngleYSinCos(Camera,&s,&c);
+	geCamera_GetViewAngleYSinCos(Camera,&s,&c);
 
-    // Bottom clip plane
-    Normal.X = 0.0f;
-    Normal.Y = s;
-    Normal.Z = -c;
+	// Bottom clip plane
+	Normal.X = 0.0f;
+	Normal.Y = s;
+	Normal.Z = -c;
 	geVec3d_Normalize(&Normal);
 	Info->Planes[2].Normal = Normal;
 
-    // Top clip plane
-    Normal.Y = -s;
+	// Top clip plane
+	Normal.Y = -s;
 	geVec3d_Normalize(&Normal);
 	Info->Planes[3].Normal = Normal;
 
 // changed QD Clipping
-	
+
 /*	Info->NumPlanes = 4;
 
 	// Clear all distances
@@ -90,7 +90,7 @@ void Frustum_SetFromCamera(Frustum_Info *Info, geCamera *Camera)
 		Info->Planes[i].Type = PLANE_ANY;
 	}
 
-    // Check to see if we need to use a far clip plane
+	// Check to see if we need to use a far clip plane
 	geCamera_GetFarClipPlane(Camera, &ZFarEnable, &ZFar);
 
 	if (ZFarEnable)
@@ -129,7 +129,7 @@ void Frustum_SetFromCamera(Frustum_Info *Info, geCamera *Camera)
 	ZScale = geCamera_GetZScale(Camera);
 	Info->Planes[4].Dist = (2.0f/ZScale);
 
-    // Check to see if we need to use a far clip plane
+	// Check to see if we need to use a far clip plane
 	geCamera_GetFarClipPlane(Camera, &ZFarEnable, &ZFar);
 
 	if(ZFarEnable)
@@ -166,7 +166,7 @@ geBoolean Frustum_SetFromPoly(Frustum_Info *Info, geVec3d *Verts, int32 NumVerts
 
 	if (NumVerts >= MAX_FCP)
 		return GE_FALSE;		// Too many planes!!!
-	
+
 	Planes = Info->Planes;
 
 	Info->NumPlanes = 0;
@@ -179,11 +179,11 @@ geBoolean Frustum_SetFromPoly(Frustum_Info *Info, geVec3d *Verts, int32 NumVerts
 		pVert2 = &Verts[NextVert];
 
 		if (geVec3d_Compare(pVert1, pVert2, 0.1f))	// Coplanar edge...
-			continue;	// Coplanar edges will cause a plane to be duplicated, skip it or it will screw up 
+			continue;	// Coplanar edges will cause a plane to be duplicated, skip it or it will screw up
 						// the clipping stage of the frustum created from this poly...
 
 		geVec3d_Subtract(pVert1, pVert2, &Vect);
-		
+
 		if (Flip)
 			geVec3d_CrossProduct(pVert2, &Vect, &Planes->Normal);
 		else
@@ -208,7 +208,7 @@ return GE_TRUE;
 //================================================================================
 void Frustum_RotateToWorldSpace(Frustum_Info *In, geCamera *Camera, Frustum_Info *Out)
 {
-    int32		i;
+	int32		i;
 	GFX_Plane	*pPlane1, *pPlane2;
 
 	assert(In != Out);
@@ -220,7 +220,7 @@ void Frustum_RotateToWorldSpace(Frustum_Info *In, geCamera *Camera, Frustum_Info
 	for (i=0; i<In->NumPlanes; i++, pPlane1++, pPlane2++)
 	{
 		pPlane2->Type = pPlane1->Type;
-		
+
 		SetWorldspaceClipPlane(pPlane1, Camera, pPlane2);
 		pPlane2->Dist = 0.0f;		// We are just rotating, so set dist to 0
 
@@ -248,7 +248,7 @@ void Frustum_RotateToWorldSpace(Frustum_Info *In, geCamera *Camera, Frustum_Info
 //================================================================================
 void Frustum_TransformToWorldSpace(const Frustum_Info *In, const geCamera *Camera, Frustum_Info *Out)
 {
-    int32		i;
+	int32		i;
 	GFX_Plane	*pPlane1, *pPlane2;
 
 	assert(In != Out);
@@ -260,7 +260,7 @@ void Frustum_TransformToWorldSpace(const Frustum_Info *In, const geCamera *Camer
 	for (i=0; i<In->NumPlanes; i++, pPlane1++, pPlane2++)
 	{
 		pPlane2->Type = pPlane1->Type;
-		
+
 		SetWorldspaceClipPlane(pPlane1, Camera, pPlane2);
 		pPlane2->Dist = geVec3d_DotProduct(geCamera_GetPov(Camera), &pPlane2->Normal) - CLIP_PLANE_EPSILON;
 
@@ -288,7 +288,7 @@ void Frustum_TransformToWorldSpace(const Frustum_Info *In, const geCamera *Camer
 static void SetWorldspaceClipPlane(const GFX_Plane *In, const geCamera *Camera, GFX_Plane *Out)
 {
 	// Rotate the plane normal into worldspace
-    BackRotateVector(&In->Normal, &Out->Normal, geCamera_GetCameraSpaceXForm(Camera));
+	BackRotateVector(&In->Normal, &Out->Normal, geCamera_GetCameraSpaceXForm(Camera));
 }
 
 //================================================================================
@@ -297,18 +297,18 @@ static void SetWorldspaceClipPlane(const GFX_Plane *In, const geCamera *Camera, 
 //================================================================================
 static void BackRotateVector(const geVec3d *In, geVec3d *Out, const geXForm3d *XForm)
 {
-    geVec3d	VRight, VUp, VIn, InCopy;
+	geVec3d	VRight, VUp, VIn, InCopy;
 
 	InCopy = *In;
-	
-	//	Get the 3 vectors that make up the Xform axis 
+
+	//	Get the 3 vectors that make up the Xform axis
 	VRight.X = XForm->AX; VRight.Y = XForm->AY; VRight.Z = XForm->AZ;
 	VUp.X    = XForm->BX; VUp.Y    = XForm->BY; VUp.Z    = XForm->BZ;
 	VIn.X    = XForm->CX; VIn.Y    = XForm->CY; VIn.Z    = XForm->CZ;
 
-    Out->X = (InCopy.X * VRight.X) + (InCopy.Y * VUp.X) + (InCopy.Z * VIn.X);
-    Out->Y = (InCopy.X * VRight.Y) + (InCopy.Y * VUp.Y) + (InCopy.Z * VIn.Y);
-    Out->Z = (InCopy.X * VRight.Z) + (InCopy.Y * VUp.Z) + (InCopy.Z * VIn.Z);
+	Out->X = (InCopy.X * VRight.X) + (InCopy.Y * VUp.X) + (InCopy.Z * VIn.X);
+	Out->Y = (InCopy.X * VRight.Y) + (InCopy.Y * VUp.Y) + (InCopy.Z * VIn.Y);
+	Out->Z = (InCopy.X * VRight.Z) + (InCopy.Y * VUp.Z) + (InCopy.Z * VIn.Z);
 }
 
 //================================================================================
@@ -363,8 +363,8 @@ static void SetUpFrustumBBox(Frustum_Info *Info)
 //	gePlane_ClipVertsFanned
 //	Clips and adds fanned verts (does not fan though the poly out though...)
 //================================================================================
-geBoolean gePlane_ClipVertsFanned(	const geVec3d *In, int32 NumIn, 
-									const GFX_Plane *Plane, 
+geBoolean gePlane_ClipVertsFanned(	const geVec3d *In, int32 NumIn,
+									const GFX_Plane *Plane,
 									geVec3d *Out, int32 *NumOut)
 {
 	#define MAX_VERT		128
@@ -376,7 +376,7 @@ geBoolean gePlane_ClipVertsFanned(	const geVec3d *In, int32 NumIn,
 	geFloat		CurDist, FirstDist, PlaneDist, NextDist;
 
 	assert(NumIn < MAX_VERT);
-	
+
 	PlaneDist = Plane->Dist;
 
 	pIn = (geVec3d*)In;
@@ -396,16 +396,16 @@ geBoolean gePlane_ClipVertsFanned(	const geVec3d *In, int32 NumIn,
 
 	if (!Count[0])
 		return GE_FALSE;		// Poly totally clipped away
-	else if (!Count[1])	
+	else if (!Count[1])
 	{
 		// Poly was totally in the ViewFrustum so...
 		// Copy the poly to the out list
-		memcpy((void*)In, Out, sizeof(geVec3d)*NumIn);	
+		memcpy((void*)In, Out, sizeof(geVec3d)*NumIn);
 		*NumOut = NumIn;
 		return GE_TRUE;
 	}
 
-    FirstDist = Dist[0];
+	FirstDist = Dist[0];
 	FirstIn = (FirstDist >= 0.0f);		// Save the first one off for when we are fanning...
 
 	CurDist = FirstDist;				// Save first as current
@@ -436,12 +436,12 @@ geBoolean gePlane_ClipVertsFanned(	const geVec3d *In, int32 NumIn,
 
 			Scale = (PlaneDist - CurDist) / (NextDist - CurDist);
 
-            pOut->X = pIn->X + (pNext->X - pIn->X) * Scale;
-            pOut->Y = pIn->Y + (pNext->Y - pIn->Y) * Scale;
-            pOut->Z = pIn->Z + (pNext->Z - pIn->Z) * Scale;
+			pOut->X = pIn->X + (pNext->X - pIn->X) * Scale;
+			pOut->Y = pIn->Y + (pNext->Y - pIn->Y) * Scale;
+			pOut->Z = pIn->Z + (pNext->Z - pIn->Z) * Scale;
 
-            pOut++;
-        }
+			pOut++;
+		}
 
 		// Start clipping the fanned edges after we get past the first edge
 		if (NextVert >= 2)
@@ -460,7 +460,7 @@ geBoolean gePlane_ClipVertsFanned(	const geVec3d *In, int32 NumIn,
 			}
 		}
 
-        CurIn = NextIn;
+		CurIn = NextIn;
 		CurDist = NextDist;
 	}
 
@@ -473,8 +473,8 @@ geBoolean gePlane_ClipVertsFanned(	const geVec3d *In, int32 NumIn,
 //	gePlane_ClipVertsFanned
 //	Clips and adds fanned verts (does not fan though the poly out though...)
 //================================================================================
-geBoolean gePlane_ClipVertsFannedUVRGB(	const geVec3d *In, const Surf_TexVert *TIn, int32 NumIn, 
-										const GFX_Plane *Plane, 
+geBoolean gePlane_ClipVertsFannedUVRGB(	const geVec3d *In, const Surf_TexVert *TIn, int32 NumIn,
+										const GFX_Plane *Plane,
 										geVec3d *Out, Surf_TexVert *TOut, int32 *NumOut)
 {
 	#define MAX_VERT		128
@@ -488,7 +488,7 @@ geBoolean gePlane_ClipVertsFannedUVRGB(	const geVec3d *In, const Surf_TexVert *T
 	int32			Temp;
 
 	assert(NumIn < MAX_VERT);
-	
+
 	PlaneDist = Plane->Dist;
 
 	pIn = (geVec3d*)In;
@@ -499,7 +499,7 @@ geBoolean gePlane_ClipVertsFannedUVRGB(	const geVec3d *In, const Surf_TexVert *T
 	for (i=0; i< NumIn; i++, pIn++)
 	{
 		Dist[i] = geVec3d_DotProduct(&Plane->Normal, pIn);
-		
+
 		if (Dist[i] >= PlaneDist)
 		{
 			Count[0]++;			// Front side
@@ -507,22 +507,22 @@ geBoolean gePlane_ClipVertsFannedUVRGB(	const geVec3d *In, const Surf_TexVert *T
 		}
 		else
 			Count[1]++;			// Back side
-		
+
 	}
 
 	if (!Count[0])				// Nothing on the front
-		return GE_FALSE;		
+		return GE_FALSE;
 	else if (!Count[1])			// Nothing on the back
 	{
 		// Poly was totally in the ViewFrustum so...
 		// Copy the poly to the out list
-		memcpy(Out, In, sizeof(geVec3d)*NumIn);	
-		memcpy(TOut, TIn, sizeof(Surf_TexVert)*NumIn);	
+		memcpy(Out, In, sizeof(geVec3d)*NumIn);
+		memcpy(TOut, TIn, sizeof(Surf_TexVert)*NumIn);
 		*NumOut = NumIn;
 		return GE_TRUE;
 	}
 
-    FirstDist = Dist[FirstVert];
+	FirstDist = Dist[FirstVert];
 	FirstIn = (FirstDist >= PlaneDist);	// Save the first one off for when we are fanning...
 
 	CurDist = FirstDist;				// Save first as current
@@ -568,9 +568,9 @@ geBoolean gePlane_ClipVertsFannedUVRGB(	const geVec3d *In, const Surf_TexVert *T
 
 			Scale = (PlaneDist - CurDist) / (NextDist - CurDist);
 
-            pOut->X = pIn->X + (pNext->X - pIn->X) * Scale;
-            pOut->Y = pIn->Y + (pNext->Y - pIn->Y) * Scale;
-            pOut->Z = pIn->Z + (pNext->Z - pIn->Z) * Scale;
+			pOut->X = pIn->X + (pNext->X - pIn->X) * Scale;
+			pOut->Y = pIn->Y + (pNext->Y - pIn->Y) * Scale;
+			pOut->Z = pIn->Z + (pNext->Z - pIn->Z) * Scale;
 
 			pTOut->u = pTIn->u + (pTNext->u - pTIn->u) * Scale;
 			pTOut->v = pTIn->v + (pTNext->v - pTIn->v) * Scale;
@@ -579,10 +579,10 @@ geBoolean gePlane_ClipVertsFannedUVRGB(	const geVec3d *In, const Surf_TexVert *T
 			pTOut->g = pTIn->g + (pTNext->g - pTIn->g) * Scale;
 			pTOut->b = pTIn->b + (pTNext->b - pTIn->b) * Scale;
 
-            pOut++;
+			pOut++;
 			pTOut++;
-        }
-		
+		}
+
 		// Start clipping the fanned edges after we get past the first edge
 		if (Temp >= 1 && Temp+2 < NumIn)
 		{
@@ -607,8 +607,8 @@ geBoolean gePlane_ClipVertsFannedUVRGB(	const geVec3d *In, const Surf_TexVert *T
 				pTOut++;
 			}
 		}
-		
-        CurIn = NextIn;
+
+		CurIn = NextIn;
 		CurDist = NextDist;
 	}
 
@@ -621,98 +621,98 @@ geBoolean gePlane_ClipVertsFannedUVRGB(	const geVec3d *In, const Surf_TexVert *T
 //	Frustum_ClipToPlane
 //	Clips X, Y only
 //================================================================================
-geBoolean Frustum_ClipToPlane(	GFX_Plane *pPlane, 
+geBoolean Frustum_ClipToPlane(	GFX_Plane *pPlane,
 								geVec3d *pIn, geVec3d *pOut,
 								int32 NumVerts, int32 *OutVerts)
 {
-    int32	i, NextVert, CurIn, NextIn;
-    geFloat	CurDot, NextDot, Scale;
-    geVec3d	*pInVert, *pOutVert, *pNext;
+	int32	i, NextVert, CurIn, NextIn;
+	geFloat	CurDot, NextDot, Scale;
+	geVec3d	*pInVert, *pOutVert, *pNext;
 	geVec3d	*pNormal;
 
-    pNormal = &pPlane->Normal;
+	pNormal = &pPlane->Normal;
 	pInVert = pIn;
-    pOutVert = pOut;
+	pOutVert = pOut;
 
 	CurDot = (pInVert->X * pNormal->X) + (pInVert->Y * pNormal->Y) + (pInVert->Z * pNormal->Z);
-    CurIn = (CurDot >= pPlane->Dist);
+	CurIn = (CurDot >= pPlane->Dist);
 
-    for (i=0 ; i<NumVerts ; i++)
-    {
-        NextVert = (i + 1);
+	for (i=0 ; i<NumVerts ; i++)
+	{
+		NextVert = (i + 1);
 		if (NextVert == NumVerts)
 			NextVert = 0;
 
-        // Keep the current vertex if it's inside the plane
-        if (CurIn) 
-            *pOutVert++ = *pInVert;
+		// Keep the current vertex if it's inside the plane
+		if (CurIn)
+			*pOutVert++ = *pInVert;
 
 		pNext = &pIn[NextVert];
-		
+
 		NextDot = (pNext->X * pNormal->X) + (pNext->Y * pNormal->Y) + (pNext->Z * pNormal->Z);
 		NextIn = (NextDot >= pPlane->Dist);
 
-        // Add a clipped vertex if one end of the current edge is
-        // inside the plane and the other is outside
-        if (CurIn != NextIn)
-        {
+		// Add a clipped vertex if one end of the current edge is
+		// inside the plane and the other is outside
+		if (CurIn != NextIn)
+		{
 			Scale = (pPlane->Dist - CurDot) / (NextDot - CurDot);
 
-            pOutVert->X = pInVert->X + (pNext->X - pInVert->X) * Scale;
-            pOutVert->Y = pInVert->Y + (pNext->Y - pInVert->Y) * Scale;
-            pOutVert->Z = pInVert->Z + (pNext->Z - pInVert->Z) * Scale;
+			pOutVert->X = pInVert->X + (pNext->X - pInVert->X) * Scale;
+			pOutVert->Y = pInVert->Y + (pNext->Y - pInVert->Y) * Scale;
+			pOutVert->Z = pInVert->Z + (pNext->Z - pInVert->Z) * Scale;
 
-            pOutVert++;
-        }
+			pOutVert++;
+		}
 
-        CurDot = NextDot;
-        CurIn = NextIn;
-        pInVert++;
-    }
+		CurDot = NextDot;
+		CurIn = NextIn;
+		pInVert++;
+	}
 
-    *OutVerts = pOutVert - pOut;
+	*OutVerts = pOutVert - pOut;
 
-    if (*OutVerts < 3)
-        return GE_FALSE;
+	if (*OutVerts < 3)
+		return GE_FALSE;
 
-    return GE_TRUE;
+	return GE_TRUE;
 }
 
 //================================================================================
 //	Frustum_ClipToPlaneUV
 //	Clips X, Y, u, v
 //================================================================================
-geBoolean Frustum_ClipToPlaneUV(	GFX_Plane *pPlane, 
+geBoolean Frustum_ClipToPlaneUV(	GFX_Plane *pPlane,
 									geVec3d *pIn, geVec3d *pOut,
 									Surf_TexVert *pTIn, Surf_TexVert *pTOut,
 									int32 NumVerts, int32 *OutVerts)
 {
-    int32		i, NextVert, CurIn, NextIn;
-    geFloat		CurDot, NextDot, Scale;
-    geVec3d		*pInVert, *pOutVert, *pNext;
-    Surf_TexVert *pTInVert, *pTOutVert, *pTNext;
+	int32		i, NextVert, CurIn, NextIn;
+	geFloat		CurDot, NextDot, Scale;
+	geVec3d		*pInVert, *pOutVert, *pNext;
+	Surf_TexVert *pTInVert, *pTOutVert, *pTNext;
 	geVec3d		*pNormal;
 
-    pNormal = &pPlane->Normal;
+	pNormal = &pPlane->Normal;
 	pInVert = pIn;
-    pOutVert = pOut;
+	pOutVert = pOut;
 	pTInVert = pTIn;
-    pTOutVert = pTOut;
+	pTOutVert = pTOut;
 
 	CurDot = (pInVert->X * pNormal->X) + (pInVert->Y * pNormal->Y) + (pInVert->Z * pNormal->Z);
-    CurIn = (CurDot >= pPlane->Dist);
+	CurIn = (CurDot >= pPlane->Dist);
 
-    for (i=0 ; i<NumVerts ; i++)
-    {
-        NextVert = (i + 1);
+	for (i=0 ; i<NumVerts ; i++)
+	{
+		NextVert = (i + 1);
 		if (NextVert == NumVerts)
 			NextVert = 0;
 
-        // Keep the current vertex if it's inside the plane
-        if (CurIn) 
+		// Keep the current vertex if it's inside the plane
+		if (CurIn)
 		{
-            *pOutVert++ = *pInVert;
-            // VTune reports this entire copy of this structure is taking alot of time (JP)
+			*pOutVert++ = *pInVert;
+			// VTune reports this entire copy of this structure is taking alot of time (JP)
 			//*pTOutVert++ = *pTInVert;
 			pTOutVert->u = pTInVert->u;
 			pTOutVert->v = pTInVert->v;
@@ -721,284 +721,284 @@ geBoolean Frustum_ClipToPlaneUV(	GFX_Plane *pPlane,
 
 		pNext = &pIn[NextVert];
 		pTNext = &pTIn[NextVert];
-		
+
 		NextDot = (pNext->X * pNormal->X) + (pNext->Y * pNormal->Y) + (pNext->Z * pNormal->Z);
 		NextIn = (NextDot >= pPlane->Dist);
 
-        // Add a clipped vertex if one end of the current edge is
-        // inside the plane and the other is outside
-        if (CurIn != NextIn)
-        {
+		// Add a clipped vertex if one end of the current edge is
+		// inside the plane and the other is outside
+		if (CurIn != NextIn)
+		{
 			Scale = (pPlane->Dist - CurDot) / (NextDot - CurDot);
 
-            pOutVert->X = pInVert->X + (pNext->X - pInVert->X) * Scale;
-            pOutVert->Y = pInVert->Y + (pNext->Y - pInVert->Y) * Scale;
-            pOutVert->Z = pInVert->Z + (pNext->Z - pInVert->Z) * Scale;
+			pOutVert->X = pInVert->X + (pNext->X - pInVert->X) * Scale;
+			pOutVert->Y = pInVert->Y + (pNext->Y - pInVert->Y) * Scale;
+			pOutVert->Z = pInVert->Z + (pNext->Z - pInVert->Z) * Scale;
 
-            pTOutVert->u = pTInVert->u + (pTNext->u - pTInVert->u) * Scale;
-            pTOutVert->v = pTInVert->v + (pTNext->v - pTInVert->v) * Scale;
+			pTOutVert->u = pTInVert->u + (pTNext->u - pTInVert->u) * Scale;
+			pTOutVert->v = pTInVert->v + (pTNext->v - pTInVert->v) * Scale;
 
-            pOutVert++;
-            pTOutVert++;
-        }
+			pOutVert++;
+			pTOutVert++;
+		}
 
-        CurDot = NextDot;
-        CurIn = NextIn;
-        pInVert++;
-        pTInVert++;
-    }
+		CurDot = NextDot;
+		CurIn = NextIn;
+		pInVert++;
+		pTInVert++;
+	}
 
-    *OutVerts = pOutVert - pOut;
+	*OutVerts = pOutVert - pOut;
 
-    if (*OutVerts < 3)
-        return GE_FALSE;
+	if (*OutVerts < 3)
+		return GE_FALSE;
 
-    return GE_TRUE;
+	return GE_TRUE;
 }
 
 //================================================================================
 //	Frustum_ClipToPlaneUVTGB
 //	Clips X, Y, u, v, r, g, b
 //================================================================================
-geBoolean Frustum_ClipToPlaneUVRGB(GFX_Plane *pPlane, 
+geBoolean Frustum_ClipToPlaneUVRGB(GFX_Plane *pPlane,
 									geVec3d *pIn, geVec3d *pOut,
 									Surf_TexVert *pTIn, Surf_TexVert *pTOut,
 									int32 NumVerts, int32 *OutVerts)
 {
-    int32		i, NextVert, CurIn, NextIn;
-    geFloat		CurDot, NextDot, Scale;
-    geVec3d		*pInVert, *pOutVert, *pNext;
-    Surf_TexVert *pTInVert, *pTOutVert, *pTNext;
+	int32		i, NextVert, CurIn, NextIn;
+	geFloat		CurDot, NextDot, Scale;
+	geVec3d		*pInVert, *pOutVert, *pNext;
+	Surf_TexVert *pTInVert, *pTOutVert, *pTNext;
 	geVec3d		*pNormal;
 
-    pNormal = &pPlane->Normal;
+	pNormal = &pPlane->Normal;
 	pInVert = pIn;
-    pOutVert = pOut;
+	pOutVert = pOut;
 	pTInVert = pTIn;
-    pTOutVert = pTOut;
+	pTOutVert = pTOut;
 
 	CurDot = (pInVert->X * pNormal->X) + (pInVert->Y * pNormal->Y) + (pInVert->Z * pNormal->Z);
-    CurIn = (CurDot >= pPlane->Dist);
+	CurIn = (CurDot >= pPlane->Dist);
 
-    for (i=0 ; i<NumVerts ; i++)
-    {
-        NextVert = (i + 1);
+	for (i=0 ; i<NumVerts ; i++)
+	{
+		NextVert = (i + 1);
 		if (NextVert == NumVerts)
 			NextVert = 0;
 
-        // Keep the current vertex if it's inside the plane
-        if (CurIn) 
+		// Keep the current vertex if it's inside the plane
+		if (CurIn)
 		{
-            *pOutVert++ = *pInVert;
-            *pTOutVert++ = *pTInVert;
+			*pOutVert++ = *pInVert;
+			*pTOutVert++ = *pTInVert;
 		}
 
 		pNext = &pIn[NextVert];
 		pTNext = &pTIn[NextVert];
-		
+
 		NextDot = (pNext->X * pNormal->X) + (pNext->Y * pNormal->Y) + (pNext->Z * pNormal->Z);
 		NextIn = (NextDot >= pPlane->Dist);
 
-        // Add a clipped vertex if one end of the current edge is
-        // inside the plane and the other is outside
-        if (CurIn != NextIn)
-        {
+		// Add a clipped vertex if one end of the current edge is
+		// inside the plane and the other is outside
+		if (CurIn != NextIn)
+		{
 			Scale = (pPlane->Dist - CurDot) / (NextDot - CurDot);
 
-            pOutVert->X = pInVert->X + (pNext->X - pInVert->X) * Scale;
-            pOutVert->Y = pInVert->Y + (pNext->Y - pInVert->Y) * Scale;
-            pOutVert->Z = pInVert->Z + (pNext->Z - pInVert->Z) * Scale;
+			pOutVert->X = pInVert->X + (pNext->X - pInVert->X) * Scale;
+			pOutVert->Y = pInVert->Y + (pNext->Y - pInVert->Y) * Scale;
+			pOutVert->Z = pInVert->Z + (pNext->Z - pInVert->Z) * Scale;
 
-            pTOutVert->u = pTInVert->u + (pTNext->u - pTInVert->u) * Scale;
-            pTOutVert->v = pTInVert->v + (pTNext->v - pTInVert->v) * Scale;
+			pTOutVert->u = pTInVert->u + (pTNext->u - pTInVert->u) * Scale;
+			pTOutVert->v = pTInVert->v + (pTNext->v - pTInVert->v) * Scale;
 
-            pTOutVert->r = pTInVert->r + (pTNext->r - pTInVert->r) * Scale;
-            pTOutVert->g = pTInVert->g + (pTNext->g - pTInVert->g) * Scale;
-            pTOutVert->b = pTInVert->b + (pTNext->b - pTInVert->b) * Scale;
+			pTOutVert->r = pTInVert->r + (pTNext->r - pTInVert->r) * Scale;
+			pTOutVert->g = pTInVert->g + (pTNext->g - pTInVert->g) * Scale;
+			pTOutVert->b = pTInVert->b + (pTNext->b - pTInVert->b) * Scale;
 
-            pOutVert++;
-            pTOutVert++;
-        }
+			pOutVert++;
+			pTOutVert++;
+		}
 
-        CurDot = NextDot;
-        CurIn = NextIn;
-        pInVert++;
-        pTInVert++;
-    }
+		CurDot = NextDot;
+		CurIn = NextIn;
+		pInVert++;
+		pTInVert++;
+	}
 
-    *OutVerts = pOutVert - pOut;
+	*OutVerts = pOutVert - pOut;
 
-    if (*OutVerts < 3)
-        return GE_FALSE;
+	if (*OutVerts < 3)
+		return GE_FALSE;
 
-    return GE_TRUE;
+	return GE_TRUE;
 }
 
 //================================================================================
 //	Frustum_ClipToPlaneUVTGB
 //	Clips X, Y, u, v, r, g, b, a
 //================================================================================
-geBoolean Frustum_ClipToPlaneUVRGBA(GFX_Plane *pPlane, 
+geBoolean Frustum_ClipToPlaneUVRGBA(GFX_Plane *pPlane,
 									geVec3d *pIn, geVec3d *pOut,
 									Surf_TexVert *pTIn, Surf_TexVert *pTOut,
 									int32 NumVerts, int32 *OutVerts)
 {
-    int32		i, NextVert, CurIn, NextIn;
-    geFloat		CurDot, NextDot, Scale;
-    geVec3d		*pInVert, *pOutVert, *pNext;
-    Surf_TexVert *pTInVert, *pTOutVert, *pTNext;
+	int32		i, NextVert, CurIn, NextIn;
+	geFloat		CurDot, NextDot, Scale;
+	geVec3d		*pInVert, *pOutVert, *pNext;
+	Surf_TexVert *pTInVert, *pTOutVert, *pTNext;
 	geVec3d		*pNormal;
 
-    pNormal = &pPlane->Normal;
+	pNormal = &pPlane->Normal;
 	pInVert = pIn;
-    pOutVert = pOut;
+	pOutVert = pOut;
 	pTInVert = pTIn;
-    pTOutVert = pTOut;
+	pTOutVert = pTOut;
 
 	CurDot = (pInVert->X * pNormal->X) + (pInVert->Y * pNormal->Y) + (pInVert->Z * pNormal->Z);
-    CurIn = (CurDot >= pPlane->Dist);
+	CurIn = (CurDot >= pPlane->Dist);
 
-    for (i=0 ; i<NumVerts ; i++)
-    {
-        NextVert = (i + 1);
+	for (i=0 ; i<NumVerts ; i++)
+	{
+		NextVert = (i + 1);
 		if (NextVert == NumVerts)
 			NextVert = 0;
 
-        // Keep the current vertex if it's inside the plane
-        if (CurIn) 
+		// Keep the current vertex if it's inside the plane
+		if (CurIn)
 		{
-            *pOutVert++ = *pInVert;
-            *pTOutVert++ = *pTInVert;
+			*pOutVert++ = *pInVert;
+			*pTOutVert++ = *pTInVert;
 		}
 
 		pNext = &pIn[NextVert];
 		pTNext = &pTIn[NextVert];
-		
+
 		NextDot = (pNext->X * pNormal->X) + (pNext->Y * pNormal->Y) + (pNext->Z * pNormal->Z);
 		NextIn = (NextDot >= pPlane->Dist);
 
-        // Add a clipped vertex if one end of the current edge is
-        // inside the plane and the other is outside
-        if (CurIn != NextIn)
-        {
+		// Add a clipped vertex if one end of the current edge is
+		// inside the plane and the other is outside
+		if (CurIn != NextIn)
+		{
 			Scale = (pPlane->Dist - CurDot) / (NextDot - CurDot);
 
-            pOutVert->X = pInVert->X + (pNext->X - pInVert->X) * Scale;
-            pOutVert->Y = pInVert->Y + (pNext->Y - pInVert->Y) * Scale;
-            pOutVert->Z = pInVert->Z + (pNext->Z - pInVert->Z) * Scale;
+			pOutVert->X = pInVert->X + (pNext->X - pInVert->X) * Scale;
+			pOutVert->Y = pInVert->Y + (pNext->Y - pInVert->Y) * Scale;
+			pOutVert->Z = pInVert->Z + (pNext->Z - pInVert->Z) * Scale;
 
-            pTOutVert->u = pTInVert->u + (pTNext->u - pTInVert->u) * Scale;
-            pTOutVert->v = pTInVert->v + (pTNext->v - pTInVert->v) * Scale;
+			pTOutVert->u = pTInVert->u + (pTNext->u - pTInVert->u) * Scale;
+			pTOutVert->v = pTInVert->v + (pTNext->v - pTInVert->v) * Scale;
 
-            pTOutVert->r = pTInVert->r + (pTNext->r - pTInVert->r) * Scale;
-            pTOutVert->g = pTInVert->g + (pTNext->g - pTInVert->g) * Scale;
-            pTOutVert->b = pTInVert->b + (pTNext->b - pTInVert->b) * Scale;
-            pTOutVert->a = pTInVert->a + (pTNext->a - pTInVert->a) * Scale;
+			pTOutVert->r = pTInVert->r + (pTNext->r - pTInVert->r) * Scale;
+			pTOutVert->g = pTInVert->g + (pTNext->g - pTInVert->g) * Scale;
+			pTOutVert->b = pTInVert->b + (pTNext->b - pTInVert->b) * Scale;
+			pTOutVert->a = pTInVert->a + (pTNext->a - pTInVert->a) * Scale;
 
-            pOutVert++;
-            pTOutVert++;
-        }
+			pOutVert++;
+			pTOutVert++;
+		}
 
-        CurDot = NextDot;
-        CurIn = NextIn;
-        pInVert++;
-        pTInVert++;
-    }
+		CurDot = NextDot;
+		CurIn = NextIn;
+		pInVert++;
+		pTInVert++;
+	}
 
-    *OutVerts = pOutVert - pOut;
+	*OutVerts = pOutVert - pOut;
 
-    if (*OutVerts < 3)
-        return GE_FALSE;
+	if (*OutVerts < 3)
+		return GE_FALSE;
 
-    return GE_TRUE;
+	return GE_TRUE;
 }
 
 //================================================================================
 //	Frustum_ClipToPlaneRGB
 //	Clips X, Y, r, g, b
 //================================================================================
-geBoolean Frustum_ClipToPlaneRGB(	GFX_Plane *pPlane, 
+geBoolean Frustum_ClipToPlaneRGB(	GFX_Plane *pPlane,
 									geVec3d *pIn, geVec3d *pOut,
 									Surf_TexVert *pTIn, Surf_TexVert *pTOut,
 									int32 NumVerts, int32 *OutVerts)
 {
-    int32		i, NextVert, CurIn, NextIn;
-    geFloat		CurDot, NextDot, Scale;
-    geVec3d		*pInVert, *pOutVert, *pNext;
-    Surf_TexVert *pTInVert, *pTOutVert, *pTNext;
+	int32		i, NextVert, CurIn, NextIn;
+	geFloat		CurDot, NextDot, Scale;
+	geVec3d		*pInVert, *pOutVert, *pNext;
+	Surf_TexVert *pTInVert, *pTOutVert, *pTNext;
 	geVec3d		*pNormal;
 
-    pNormal = &pPlane->Normal;
+	pNormal = &pPlane->Normal;
 	pInVert = pIn;
-    pOutVert = pOut;
+	pOutVert = pOut;
 	pTInVert = pTIn;
-    pTOutVert = pTOut;
+	pTOutVert = pTOut;
 
 	CurDot = (pInVert->X * pNormal->X) + (pInVert->Y * pNormal->Y) + (pInVert->Z * pNormal->Z);
-    CurIn = (CurDot >= pPlane->Dist);
+	CurIn = (CurDot >= pPlane->Dist);
 
-    for (i=0 ; i<NumVerts ; i++)
-    {
-        NextVert = (i + 1);
+	for (i=0 ; i<NumVerts ; i++)
+	{
+		NextVert = (i + 1);
 		if (NextVert == NumVerts)
 			NextVert = 0;
 
-        // Keep the current vertex if it's inside the plane
-        if (CurIn) 
+		// Keep the current vertex if it's inside the plane
+		if (CurIn)
 		{
-            *pOutVert++ = *pInVert;
-            *pTOutVert++ = *pTInVert;
+			*pOutVert++ = *pInVert;
+			*pTOutVert++ = *pTInVert;
 		}
 
 		pNext = &pIn[NextVert];
 		pTNext = &pTIn[NextVert];
-		
+
 		NextDot = (pNext->X * pNormal->X) + (pNext->Y * pNormal->Y) + (pNext->Z * pNormal->Z);
 		NextIn = (NextDot >= pPlane->Dist);
 
-        // Add a clipped vertex if one end of the current edge is
-        // inside the plane and the other is outside
-        if (CurIn != NextIn)
-        {
+		// Add a clipped vertex if one end of the current edge is
+		// inside the plane and the other is outside
+		if (CurIn != NextIn)
+		{
 			Scale = (pPlane->Dist - CurDot) / (NextDot - CurDot);
 
-            pOutVert->X = pInVert->X + (pNext->X - pInVert->X) * Scale;
-            pOutVert->Y = pInVert->Y + (pNext->Y - pInVert->Y) * Scale;
-            pOutVert->Z = pInVert->Z + (pNext->Z - pInVert->Z) * Scale;
+			pOutVert->X = pInVert->X + (pNext->X - pInVert->X) * Scale;
+			pOutVert->Y = pInVert->Y + (pNext->Y - pInVert->Y) * Scale;
+			pOutVert->Z = pInVert->Z + (pNext->Z - pInVert->Z) * Scale;
 
-            pTOutVert->r = pTInVert->r + (pTNext->r - pTInVert->r) * Scale;
-            pTOutVert->g = pTInVert->g + (pTNext->g - pTInVert->g) * Scale;
-            pTOutVert->b = pTInVert->b + (pTNext->b - pTInVert->b) * Scale;
+			pTOutVert->r = pTInVert->r + (pTNext->r - pTInVert->r) * Scale;
+			pTOutVert->g = pTInVert->g + (pTNext->g - pTInVert->g) * Scale;
+			pTOutVert->b = pTInVert->b + (pTNext->b - pTInVert->b) * Scale;
 
-            pOutVert++;
-            pTOutVert++;
-        }
+			pOutVert++;
+			pTOutVert++;
+		}
 
-        CurDot = NextDot;
-        CurIn = NextIn;
-        pInVert++;
-        pTInVert++;
-    }
+		CurDot = NextDot;
+		CurIn = NextIn;
+		pInVert++;
+		pTInVert++;
+	}
 
-    *OutVerts = pOutVert - pOut;
+	*OutVerts = pOutVert - pOut;
 
-    if (*OutVerts < 3)
-        return GE_FALSE;
+	if (*OutVerts < 3)
+		return GE_FALSE;
 
-    return GE_TRUE;
+	return GE_TRUE;
 }
 
 //================================================================================
 //	Frustum_Project
 //================================================================================
 void Frustum_Project(geVec3d *pIn, Surf_TexVert *pTIn, DRV_TLVertex *pOut, int32 NumVerts, const geCamera *Camera)
-{  
+{
 	int32			i;
 	geVec3d			Out;
 
 	assert( pIn    != NULL);
 	assert( pTIn   != NULL);
-	assert( pOut   != NULL);  
+	assert( pOut   != NULL);
 	assert( Camera != NULL);
 
 	for (i=0; i<NumVerts; i++)
@@ -1007,8 +1007,8 @@ void Frustum_Project(geVec3d *pIn, Surf_TexVert *pTIn, DRV_TLVertex *pOut, int32
 		pOut->x = Out.X;
 		pOut->y = Out.Y;
 		pOut->z = Out.Z;
-    	pOut->u = pTIn->u;  
-		pOut->v = pTIn->v; 
+		pOut->u = pTIn->u;
+		pOut->v = pTIn->v;
 
 		pOut++;
 		pTIn++;
@@ -1019,13 +1019,13 @@ void Frustum_Project(geVec3d *pIn, Surf_TexVert *pTIn, DRV_TLVertex *pOut, int32
 //	Frustum_Project
 //================================================================================
 void Frustum_ProjectRGB(geVec3d *pIn, Surf_TexVert *pTIn, DRV_TLVertex *pOut, int32 NumVerts, const geCamera *Camera)
-{  
+{
 	int32	i;
 	geVec3d Out;
 
 	assert( pIn    != NULL);
 	assert( pTIn   != NULL);
-	assert( pOut   != NULL);  
+	assert( pOut   != NULL);
 	assert( Camera != NULL);
 
 	for (i=0; i<NumVerts; i++)
@@ -1035,11 +1035,11 @@ void Frustum_ProjectRGB(geVec3d *pIn, Surf_TexVert *pTIn, DRV_TLVertex *pOut, in
 		pOut->y = Out.Y;
 		pOut->z = Out.Z;
 
-    	pOut->u = pTIn->u;  
-		pOut->v = pTIn->v; 
-    	pOut->r = pTIn->r;  
-		pOut->g = pTIn->g; 
-		pOut->b = pTIn->b; 
+		pOut->u = pTIn->u;
+		pOut->v = pTIn->v;
+		pOut->r = pTIn->r;
+		pOut->g = pTIn->g;
+		pOut->b = pTIn->b;
 
 		pOut++;
 		pTIn++;
@@ -1050,12 +1050,12 @@ void Frustum_ProjectRGB(geVec3d *pIn, Surf_TexVert *pTIn, DRV_TLVertex *pOut, in
 //	Frustum_Project
 //================================================================================
 void Frustum_ProjectRGBA(geVec3d *pIn, Surf_TexVert *pTIn, DRV_TLVertex *pOut, int32 NumVerts, const geCamera *Camera)
-{  
+{
 	int32	i;
 	geVec3d Out;
 	assert( pIn    != NULL);
 	assert( pTIn   != NULL);
-	assert( pOut   != NULL);  
+	assert( pOut   != NULL);
 	assert( Camera != NULL);
 
 	for (i=0; i<NumVerts; i++)
@@ -1064,12 +1064,12 @@ void Frustum_ProjectRGBA(geVec3d *pIn, Surf_TexVert *pTIn, DRV_TLVertex *pOut, i
 		pOut->x = Out.X;
 		pOut->y = Out.Y;
 		pOut->z = Out.Z;
-		pOut->u = pTIn->u;  
-		pOut->v = pTIn->v; 
-    	pOut->r = pTIn->r;  
-		pOut->g = pTIn->g; 
-		pOut->b = pTIn->b; 
-		pOut->a = pTIn->a; 
+		pOut->u = pTIn->u;
+		pOut->v = pTIn->v;
+		pOut->r = pTIn->r;
+		pOut->g = pTIn->g;
+		pOut->b = pTIn->b;
+		pOut->a = pTIn->a;
 
 		pOut++;
 		pTIn++;
@@ -1080,12 +1080,12 @@ void Frustum_ProjectRGBA(geVec3d *pIn, Surf_TexVert *pTIn, DRV_TLVertex *pOut, i
 //	Frustum_Project
 //================================================================================
 void Frustum_ProjectRGBNoClamp(geVec3d *pIn, Surf_TexVert *pTIn, DRV_TLVertex *pOut, int32 NumVerts, const geCamera *Camera)
-{  
+{
 	int32	i;
 	geVec3d Out;
 	assert( pIn    != NULL);
 	assert( pTIn   != NULL);
-	assert( pOut   != NULL);  
+	assert( pOut   != NULL);
 	assert( Camera != NULL);
 
 	for (i=0; i<NumVerts; i++)
@@ -1094,12 +1094,12 @@ void Frustum_ProjectRGBNoClamp(geVec3d *pIn, Surf_TexVert *pTIn, DRV_TLVertex *p
 		pOut->x = Out.X;
 		pOut->y = Out.Y;
 		pOut->z = Out.Z;
-	
-    	pOut->u = pTIn->u;  
-		pOut->v = pTIn->v; 
-    	pOut->r = pTIn->r;  
-		pOut->g = pTIn->g; 
-		pOut->b = pTIn->b; 
+
+		pOut->u = pTIn->u;
+		pOut->v = pTIn->v;
+		pOut->r = pTIn->r;
+		pOut->g = pTIn->g;
+		pOut->b = pTIn->b;
 
 		pOut++;
 		pTIn++;
@@ -1111,7 +1111,7 @@ void Frustum_ProjectRGBNoClamp(geVec3d *pIn, Surf_TexVert *pTIn, DRV_TLVertex *p
 //================================================================================
 geBoolean Frustum_PointsInFrustum(const geVec3d *Pin, const GFX_Plane *Plane, int32 NumVerts, int32 *c)
 {
-    int32	Count, i;
+	int32	Count, i;
 
 	Count = 0;
 
@@ -1165,7 +1165,7 @@ GFX_Plane * FPlane;
 
 	p1 = Verts;
 	p2 = WorkVerts;
-	
+
 	FPlane = (GFX_Plane *)Fi->Planes;
 
 	for(mask=1; mask <= ClipFlags; mask += mask, FPlane++)
@@ -1195,69 +1195,69 @@ return GE_TRUE;
 //================================================================================
 //	Frustum_ClipToPlaneL	(CB added)
 //================================================================================
-geBoolean Frustum_ClipToPlaneL(GFX_Plane *pPlane, 
+geBoolean Frustum_ClipToPlaneL(GFX_Plane *pPlane,
 								GE_LVertex *pIn, GE_LVertex *pOut,
 								int32 NumVerts, int32 *NumOutVerts)
 {
-    int32		i, NextVert, CurIn, NextIn;
-    geFloat		CurDot, NextDot, Scale;
-    GE_LVertex	*pInVert, *pOutVert, *pNext;
+	int32		i, NextVert, CurIn, NextIn;
+	geFloat		CurDot, NextDot, Scale;
+	GE_LVertex	*pInVert, *pOutVert, *pNext;
 	geVec3d		*pNormal;
 
-    pNormal = &pPlane->Normal;
+	pNormal = &pPlane->Normal;
 	pInVert = pIn;
-    pOutVert = pOut;
+	pOutVert = pOut;
 
 	CurDot = (pInVert->X * pNormal->X) + (pInVert->Y * pNormal->Y) + (pInVert->Z * pNormal->Z);
-    CurIn = (CurDot >= pPlane->Dist);
+	CurIn = (CurDot >= pPlane->Dist);
 
-    for (i=0 ; i<NumVerts ; i++)
-    {
-        NextVert = (i + 1);
+	for (i=0 ; i<NumVerts ; i++)
+	{
+		NextVert = (i + 1);
 		if (NextVert == NumVerts)
 			NextVert = 0;
 
-        // Keep the current vertex if it's inside the plane
-        if (CurIn) 
+		// Keep the current vertex if it's inside the plane
+		if (CurIn)
 		{
-            *pOutVert++ = *pInVert;
+			*pOutVert++ = *pInVert;
 		}
 
 		pNext = &pIn[NextVert];
-		
+
 		NextDot = (pNext->X * pNormal->X) + (pNext->Y * pNormal->Y) + (pNext->Z * pNormal->Z);
 		NextIn = (NextDot >= pPlane->Dist);
 
-        // Add a clipped vertex if one end of the current edge is
-        // inside the plane and the other is outside
-        if (CurIn != NextIn)
-        {
+		// Add a clipped vertex if one end of the current edge is
+		// inside the plane and the other is outside
+		if (CurIn != NextIn)
+		{
 			Scale = (pPlane->Dist - CurDot) / (NextDot - CurDot);
 
-            pOutVert->X = pInVert->X + (pNext->X - pInVert->X) * Scale;
-            pOutVert->Y = pInVert->Y + (pNext->Y - pInVert->Y) * Scale;
-            pOutVert->Z = pInVert->Z + (pNext->Z - pInVert->Z) * Scale;
+			pOutVert->X = pInVert->X + (pNext->X - pInVert->X) * Scale;
+			pOutVert->Y = pInVert->Y + (pNext->Y - pInVert->Y) * Scale;
+			pOutVert->Z = pInVert->Z + (pNext->Z - pInVert->Z) * Scale;
 
-            pOutVert->u = pInVert->u + (pNext->u - pInVert->u) * Scale;
-            pOutVert->v = pInVert->v + (pNext->v - pInVert->v) * Scale;
+			pOutVert->u = pInVert->u + (pNext->u - pInVert->u) * Scale;
+			pOutVert->v = pInVert->v + (pNext->v - pInVert->v) * Scale;
 
-            pOutVert->r = pInVert->r + (pNext->r - pInVert->r) * Scale;
-            pOutVert->g = pInVert->g + (pNext->g - pInVert->g) * Scale;
-            pOutVert->b = pInVert->b + (pNext->b - pInVert->b) * Scale;
-            pOutVert->a = pInVert->a + (pNext->a - pInVert->a) * Scale;
+			pOutVert->r = pInVert->r + (pNext->r - pInVert->r) * Scale;
+			pOutVert->g = pInVert->g + (pNext->g - pInVert->g) * Scale;
+			pOutVert->b = pInVert->b + (pNext->b - pInVert->b) * Scale;
+			pOutVert->a = pInVert->a + (pNext->a - pInVert->a) * Scale;
 
-            pOutVert++;
-        }
+			pOutVert++;
+		}
 
-        CurDot = NextDot;
-        CurIn = NextIn;
-        pInVert++;
-    }
+		CurDot = NextDot;
+		CurIn = NextIn;
+		pInVert++;
+	}
 
-    *NumOutVerts = ((uint32)pOutVert - (uint32)pOut)/sizeof(*pOut);
+	*NumOutVerts = ((uint32)pOutVert - (uint32)pOut)/sizeof(*pOut);
 
-    if ( *NumOutVerts < 3)
-        return GE_FALSE;
+	if ( *NumOutVerts < 3)
+		return GE_FALSE;
 
 return GE_TRUE;
 }

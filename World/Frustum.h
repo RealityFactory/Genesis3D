@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_FRUSTUM_H
@@ -46,7 +46,7 @@ typedef struct Frustum_Info
 {
 	int32			NumPlanes;					// Number of frustum planes to clip against
 	GFX_Plane		Planes[MAX_FCP];			// Planes to clip against
-					
+
 	// Quick LUTS For BBox testing against frustum
 	int32			FrustumBBoxIndexes[MAX_FCP*6];
 	int32			*pFrustumBBoxIndexes[MAX_FCP];
@@ -60,34 +60,34 @@ geBoolean Frustum_SetFromPoly(Frustum_Info *Info, geVec3d *Verts, int32 NumVerts
 void Frustum_RotateToWorldSpace(Frustum_Info *In, geCamera *Camera, Frustum_Info *Out);
 void Frustum_TransformToWorldSpace(const Frustum_Info *In, const geCamera *Camera, Frustum_Info *Out);
 
-geBoolean gePlane_ClipVertsFannedUVRGB(	const geVec3d *In, const Surf_TexVert *TIn, int32 NumIn, 
-										const GFX_Plane *Plane, 
+geBoolean gePlane_ClipVertsFannedUVRGB(	const geVec3d *In, const Surf_TexVert *TIn, int32 NumIn,
+										const GFX_Plane *Plane,
 										geVec3d *Out, Surf_TexVert *TOut, int32 *NumOut);
 
-geBoolean Frustum_ClipToPlane(		GFX_Plane *pPlane, 
+geBoolean Frustum_ClipToPlane(		GFX_Plane *pPlane,
 									geVec3d *pIn, geVec3d *pOut,
 									int32 NumVerts, int32 *OutVerts);
-geBoolean Frustum_ClipToPlaneUV(	GFX_Plane *pPlane, 
-									geVec3d *pIn, geVec3d *pOut,
-									Surf_TexVert *pTIn, Surf_TexVert *pTOut,
-									int32 NumVerts, int32 *OutVerts);
-
-geBoolean Frustum_ClipToPlaneUVRGB(GFX_Plane *pPlane, 
+geBoolean Frustum_ClipToPlaneUV(	GFX_Plane *pPlane,
 									geVec3d *pIn, geVec3d *pOut,
 									Surf_TexVert *pTIn, Surf_TexVert *pTOut,
 									int32 NumVerts, int32 *OutVerts);
 
-geBoolean Frustum_ClipToPlaneUVRGBA(GFX_Plane *pPlane, 
+geBoolean Frustum_ClipToPlaneUVRGB(GFX_Plane *pPlane,
 									geVec3d *pIn, geVec3d *pOut,
 									Surf_TexVert *pTIn, Surf_TexVert *pTOut,
 									int32 NumVerts, int32 *OutVerts);
 
-geBoolean Frustum_ClipToPlaneRGB(	GFX_Plane *pPlane, 
+geBoolean Frustum_ClipToPlaneUVRGBA(GFX_Plane *pPlane,
 									geVec3d *pIn, geVec3d *pOut,
 									Surf_TexVert *pTIn, Surf_TexVert *pTOut,
 									int32 NumVerts, int32 *OutVerts);
 
-geBoolean Frustum_ClipToPlaneL(		GFX_Plane *pPlane, 
+geBoolean Frustum_ClipToPlaneRGB(	GFX_Plane *pPlane,
+									geVec3d *pIn, geVec3d *pOut,
+									Surf_TexVert *pTIn, Surf_TexVert *pTOut,
+									int32 NumVerts, int32 *OutVerts);
+
+geBoolean Frustum_ClipToPlaneL(		GFX_Plane *pPlane,
 									GE_LVertex *pIn, GE_LVertex *pOut,
 									int32 NumVerts, int32 *OutVerts);	// CB added
 

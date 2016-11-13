@@ -4,8 +4,8 @@
 /*  Author: John Pollard                                                                */
 /*  Description: Creates geBitmaps from the data in the BSP, that are used to render    */
 /*                                                                                      */
-/*  Edit History:                                                                       */   
-/*   10/15/2003 Wendell Buckner                                                         */  
+/*  Edit History:                                                                       */
+/*   10/15/2003 Wendell Buckner                                                         */
 /*    Bumpmapping for the World                                                         */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
@@ -81,7 +81,7 @@ geWBitmap_Pool *geWBitmap_Pool_Create(GBSP_BSPData *BSPData)
 	}
 
 	// Clear out the memory for the Pool
-	ZeroMem(Pool);				
+	ZeroMem(Pool);
 
 	// Create all the bitmaps from the bspdata... (this should eventually just stream right out of the file...)
 	if (!geWBitmap_Pool_CreateAllWBitmaps(Pool, BSPData))
@@ -218,7 +218,7 @@ geBoolean geWBitmap_Pool_CreateAllWBitmaps(geWBitmap_Pool *Pool, GBSP_BSPData *B
 	assert(BSPData->GFXTextures);
 
 	// BitmapIsTransparent is a temporary array, that is filled in with a 1, if any face that uses it, has the
-	//	TEXINFO_TRANS flag set.  If they expect to "see" thru the surface, then they should have set this flag 
+	//	TEXINFO_TRANS flag set.  If they expect to "see" thru the surface, then they should have set this flag
 	//	in the editor.  If this flag is not set, then we won't allow a color key on the surface...
 	BitmapIsTransparent = GE_RAM_ALLOCATE_ARRAY(uint8, BSPData->NumGFXTextures);
 
@@ -240,7 +240,7 @@ geBoolean geWBitmap_Pool_CreateAllWBitmaps(geWBitmap_Pool *Pool, GBSP_BSPData *B
 
 		assert(pTexInfo->Texture >= 0 || pTexInfo->Texture < BSPData->NumGFXTextures);
 
-		if (pTexInfo->Flags & TEXINFO_TRANS)	
+		if (pTexInfo->Flags & TEXINFO_TRANS)
 		{
 			BitmapIsTransparent[pTexInfo->Texture] = 1;		// This face has the transparent value set, so mark the bitmap it references
 		}
@@ -272,16 +272,16 @@ geBoolean geWBitmap_Pool_CreateAllWBitmaps(geWBitmap_Pool *Pool, GBSP_BSPData *B
 		if (BitmapIsTransparent[i])
 		{
 			UseColorKey = GE_TRUE;
-         //Start Dec2001DCS - ColorKey = 24 bit version of bright magenta.  NOTE: Blue value is 254 (0xfe)
-         //                                                                       because I couldn't make a 24 bit bitmap
-         //                                                                       with MSPaint using the color 
-         //                                                                       255 0 255.  Even though Paint said it
-         //                                                                       was the right value, by the time the 
-         //                                                                       bitmap got to Genesis it was read as
-         //                                                                       255 0 254 ???
+		 //Start Dec2001DCS - ColorKey = 24 bit version of bright magenta.  NOTE: Blue value is 254 (0xfe)
+		 //                                                                       because I couldn't make a 24 bit bitmap
+		 //                                                                       with MSPaint using the color
+		 //                                                                       255 0 255.  Even though Paint said it
+		 //                                                                       was the right value, by the time the
+		 //                                                                       bitmap got to Genesis it was read as
+		 //                                                                       255 0 254 ???
 		ColorKey = 0x00ff00fe;
 
-         //End Dec2001DCS
+		 //End Dec2001DCS
 		}
 		else
 		{
@@ -296,7 +296,7 @@ geBoolean geWBitmap_Pool_CreateAllWBitmaps(geWBitmap_Pool *Pool, GBSP_BSPData *B
 		// Get width and height
 		Width = pGFXTexture->Width;
 		Height = pGFXTexture->Height;
-		
+
 		if (pGFXTexture->Flags & TEXTURE_SKYBOX)
 			NumMips = 1;
 		else
@@ -336,7 +336,7 @@ geBoolean geWBitmap_Pool_CreateAllWBitmaps(geWBitmap_Pool *Pool, GBSP_BSPData *B
 			geBitmap_SetDriverFlags(pWBitmap->Bitmap, RDRIVER_PF_3D | RDRIVER_PF_COMBINE_LIGHTMAP);
 		}
 
-		//<> 
+		//<>
 		NumMips = 1;
 		// Lock all the miplevels
 		if (!geBitmap_LockForWrite(pWBitmap->Bitmap, Mips, 0, NumMips-1))
@@ -368,14 +368,14 @@ geBoolean geWBitmap_Pool_CreateAllWBitmaps(geWBitmap_Pool *Pool, GBSP_BSPData *B
 
 			if ( Stride == Width )
 			{
-            //Start Dec2001DCS - Added * 4 since textures are now 32 bit
+			//Start Dec2001DCS - Added * 4 since textures are now 32 bit
 			// added transparent textures
 			if(depth == GE_PIXELFORMAT_32BIT_ARGB)
 				memcpy(pDest,pSrc,Width*Height*4);
 			else
 			   memcpy(pDest,pSrc,Width*Height*3);
 
-            //End Dec2001DCS
+			//End Dec2001DCS
 			}
 			else
 			{
@@ -398,7 +398,7 @@ geBoolean geWBitmap_Pool_CreateAllWBitmaps(geWBitmap_Pool *Pool, GBSP_BSPData *B
 						pSrc += Width*3;
 						pDest += Stride*3;
 					}
-					
+
 				}
 			}
 
@@ -426,14 +426,14 @@ geBoolean geWBitmap_Pool_CreateAllWBitmaps(geWBitmap_Pool *Pool, GBSP_BSPData *B
 				geErrorLog_AddString(-1, "geWBitmap_Pool_CreateAllWBitmaps:  geBitmap_Palette_Create failed.", NULL);
 				return GE_FALSE;
 			}
-			
+
 			if (!geBitmap_Palette_Lock(Pal, &DstPalData, &Format, &PalSize))
 			{
 				geErrorLog_AddString(-1, "geWBitmap_Pool_CreateAllWBitmaps:  geBitmap_Palette_Lock failed.", NULL);
 				return GE_FALSE;
 			}
 
-			//cnt = sizeof(DRV_Palette); 
+			//cnt = sizeof(DRV_Palette);
 			// <> this doesn't seem to respect the pragma pack in dcommon !
 				// I get size == 768
 
@@ -454,7 +454,7 @@ geBoolean geWBitmap_Pool_CreateAllWBitmaps(geWBitmap_Pool *Pool, GBSP_BSPData *B
 				return GE_FALSE;
 			}
 
- 			if (!geBitmap_SetPalette(pWBitmap->Bitmap, Pal))
+			if (!geBitmap_SetPalette(pWBitmap->Bitmap, Pal))
 			{
 				geErrorLog_AddString(-1, "geWBitmap_Pool_CreateAllWBitmaps:  geBitmap_SetPalette failed.", NULL);
 				return GE_FALSE;
@@ -474,7 +474,7 @@ geBoolean geWBitmap_Pool_CreateAllWBitmaps(geWBitmap_Pool *Pool, GBSP_BSPData *B
 
 	}
 
-	// added to stop a leak		
+	// added to stop a leak
 	if (BitmapIsTransparent)
 	{
 		geRam_Free(BitmapIsTransparent);
@@ -515,13 +515,13 @@ void geWBitmap_Pool_DestroyAllWBitmaps(geWBitmap_Pool *Pool)
 		geWBitmap		*pWBitmap;
 
 		pWBitmap = Pool->WBitmaps;
-		
+
 		for (i=0; i< Pool->NumWBitmaps; i++, pWBitmap++)
 		{
-			// Destroy the geBitmap 
+			// Destroy the geBitmap
 			if (pWBitmap->Bitmap)
 			{
-				geBitmap_Destroy(&pWBitmap->Bitmap); 
+				geBitmap_Destroy(&pWBitmap->Bitmap);
 				pWBitmap->Bitmap = NULL;
 			}
 		}
@@ -533,7 +533,7 @@ void geWBitmap_Pool_DestroyAllWBitmaps(geWBitmap_Pool *Pool)
 }
 
 /* 10/15/2003 Wendell Buckner
-    Bumpmapping for the World */
+	Bumpmapping for the World */
 
 //=====================================================================================
 //	geWBitmap_GetName

@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <stdio.h>
@@ -498,7 +498,7 @@ BOOL GBSP_LoadGBSPFile(geVFile *File, GBSP_BSPData *BSP)
 			geErrorLog_Add(GE_ERR_ERROR_READING_BSP_CHUNK, NULL);
 			return GE_FALSE;
 		}
-		
+
 		if (Chunk.Type == GBSP_CHUNK_END)
 			break;
 	}
@@ -578,7 +578,7 @@ BOOL GBSP_FreeGBSPFile(GBSP_BSPData *BSP)
 	BSP->GFXVertIndexList = NULL;
 	BSP->GFXRGBVerts = NULL;
 	BSP->GFXEntData = NULL;
-	
+
 	BSP->GFXTextures = NULL;
 	BSP->GFXTexInfo = NULL;
 	BSP->GFXTexData = NULL;

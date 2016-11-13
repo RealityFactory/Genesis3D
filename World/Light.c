@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <assert.h>
@@ -98,7 +98,7 @@ static BOOL CombineDLightWithRGBMap(int32 *LightData, Light_DLight *Light, GFX_F
 static BOOL CombineDLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo);
 static void BuildLightLUTS(geEngine *Engine);
 static void SetupDynamicLight_r(Light_DLight *pLight, geVec3d *Pos, int32 LNum, int32 Node);
-// added QuestOfDreams DSpotLight 
+// added QuestOfDreams DSpotLight
 static BOOL CombineDSpotLightWithRGBMap(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo);
 
 static BOOL CombineDSpotLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo);
@@ -194,7 +194,7 @@ geBoolean Light_SetEngine(geEngine *Engine)
 geBoolean Light_SetWorld(geWorld *World)
 {
 	assert(World != NULL);
-	
+
 	CWorld = World;
 
 	LightInfo = World->LightInfo;
@@ -243,19 +243,19 @@ void Light_FogVerts(const geFog *Fog, const geVec3d *POV, const geVec3d *Verts, 
 
 		geVec3d_Subtract(Verts, POV, &Ray);
 		geVec3d_Normalize(&Ray);
-		
+
 		v = geVec3d_DotProduct(&FogRay, &Ray);
 
 		Disc = (RadiusSq) - (FogRayDot - (v*v));
 
 		if (Disc <= 0)
 			continue;
-				
+
 		d = (geFloat)sqrt(Disc);
 
 		t0 = v - d;
 		t1 = v + d;
-					
+
 		if (t0 > 0)
 			t = t0;
 		else if (t1 > 0)
@@ -266,7 +266,7 @@ void Light_FogVerts(const geFog *Fog, const geVec3d *POV, const geVec3d *Verts, 
 		geVec3d_Subtract(Verts, &Fog->Pos, &Ray2);
 		DistSq = geVec3d_DotProduct(&Ray2, &Ray2);
 		VertDist = (geFloat)sqrt(DistSq);
-					
+
 		if (EyeDist < Radius && VertDist < Radius)		// Both inside sphere
 		{
 			Impact1 = *Verts;
@@ -287,14 +287,14 @@ void Light_FogVerts(const geFog *Fog, const geVec3d *POV, const geVec3d *Verts, 
 			geVec3d_AddScaled(POV, &Ray, t0, &Impact1);
 			geVec3d_AddScaled(POV, &Ray, t1, &Impact2);
 			geVec3d_Subtract(&Impact1, POV, &Ray);
-					
+
 			d2 = geVec3d_DotProduct(&Ray, &Ray);
 
 			if (d2 > DistSq)
 				continue;
 		}
 		geVec3d_Subtract(&Impact1, &Impact2, &Ray);
-	
+
 		Dist = geVec3d_Length(&Ray)*OneOverRadiusDotBright;
 
 	#if 1
@@ -331,15 +331,15 @@ static geBoolean FogLightmap1(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 	geFloat		RadiusSq, FogRayDot, Radius2;
 	geVec3d		UAdd, VAdd, FogPos;
 	int32		Width, Height;
-	
+
 	Hit = GE_FALSE;
 
 	Start = UV = SInfo->TexOrg;
 
 	FogPos = Fog->Pos;
-	
+
 	geVec3d_Subtract(&FogPos, &GlobalEyePos, &FogRay);
-	
+
 	Ray2 = FogRay;
 	EyeDist = geVec3d_Normalize(&Ray2);
 
@@ -348,14 +348,14 @@ static geBoolean FogLightmap1(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 	Radius2 = Fog->VolumeRadius2;
 
 	FogRayDot = geVec3d_DotProduct(&FogRay,&FogRay);
-	
+
 	Red = Fog->Color.r;
 	Grn = Fog->Color.g;
 	Blu = Fog->Color.b;
 
 	//if (EyeDist < Radius)
 	//	return GE_FALSE;
-	
+
 	UAdd = SInfo->T2WVecs[0];
 	VAdd = SInfo->T2WVecs[1];
 
@@ -371,7 +371,7 @@ static geBoolean FogLightmap1(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 			Ray.X = UV.X - GlobalEyePos.X;
 			Ray.Y = UV.Y - GlobalEyePos.Y;
 			Ray.Z = UV.Z - GlobalEyePos.Z;
-				
+
 			DistSq = Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z;
 			Dist = (geFloat)FastSqrt(DistSq);
 
@@ -392,7 +392,7 @@ static geBoolean FogLightmap1(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 
 				t0 = v - d;
 				t1 = v + d;
-					
+
 				if (t0 > 0)
 					t = t0;
 				else if (t1 > 0)
@@ -402,13 +402,13 @@ static geBoolean FogLightmap1(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 					*LightData++ = 0;
 					*LightData++ = 0;
 					*LightData++ = 0;
-		
+
 					UV.X += UAdd.X;
 					UV.Y += UAdd.Y;
 					UV.Z += UAdd.Z;
 					continue;
 				}
-					
+
 			#if 1
 				Ray2.X = UV.X - FogPos.X;
 				Ray2.Y = UV.Y - FogPos.Y;
@@ -416,7 +416,7 @@ static geBoolean FogLightmap1(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 
 				//UVDist = sqrt(Ray2.X*Ray2.X + Ray2.Y*Ray2.Y + Ray2.Z*Ray2.Z);
 				UVDist = (geFloat)FastSqrt(Ray2.X*Ray2.X + Ray2.Y*Ray2.Y + Ray2.Z*Ray2.Z);
-					
+
 				if (EyeDist < Radius && UVDist < Radius)
 				{
 					Impact1 = UV;
@@ -437,22 +437,22 @@ static geBoolean FogLightmap1(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 					Impact2.X = GlobalEyePos.X + t*Ray.X;
 					Impact2.Y = GlobalEyePos.Y + t*Ray.Y;
 					Impact2.Z = GlobalEyePos.Z + t*Ray.Z;
-	
+
 				}
 				else											// Both lie outside sphere
 				{
 					Impact1.X = GlobalEyePos.X + t0*Ray.X;
 					Impact1.Y = GlobalEyePos.Y + t0*Ray.Y;
 					Impact1.Z = GlobalEyePos.Z + t0*Ray.Z;
-					
+
 					Impact2.X = GlobalEyePos.X + t1*Ray.X;
 					Impact2.Y = GlobalEyePos.Y + t1*Ray.Y;
 					Impact2.Z = GlobalEyePos.Z + t1*Ray.Z;
-					
+
 					Ray.X = Impact1.X - GlobalEyePos.X;
 					Ray.Y = Impact1.Y - GlobalEyePos.Y;
 					Ray.Z = Impact1.Z - GlobalEyePos.Z;
-					
+
 					//d2 = sqrt(Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z);
 					//d2 = (geFloat)FastSqrt(Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z);
 					d2 = Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z;
@@ -471,14 +471,14 @@ static geBoolean FogLightmap1(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 							*LightData++ = 0;
 							*LightData++ = 0;
 							*LightData++ = 0;
-						
+
 							UV.X += UAdd.X;
 							UV.Y += UAdd.Y;
 							UV.Z += UAdd.Z;
 							continue;
 						}
 					}
-					
+
 				}
 			#endif
 				// Get the distance of the part of the ray that is in the fog
@@ -497,7 +497,7 @@ static geBoolean FogLightmap1(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 				//Dist = 255.0f;
 
 				Hit = GE_TRUE;
-					
+
 				Light1 = (int32)(Dist*Red);
 				Light2 = (int32)(Dist*Grn);
 				Light3 = (int32)(Dist*Blu);
@@ -517,7 +517,7 @@ static geBoolean FogLightmap1(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 			UV.Y += UAdd.Y;
 			UV.Z += UAdd.Z;
 
-		}	
+		}
 
 		Start.X += VAdd.X;
 		Start.Y += VAdd.Y;
@@ -546,15 +546,15 @@ static geBoolean FogLightmap2(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 	geFloat		RadiusSq, FogRayDot, Radius2;
 	geVec3d		UAdd, VAdd, FogPos;
 	int32		LightAdd, Width, Height;
-	
+
 	Hit = GE_FALSE;
 
 	Start = UV = SInfo->TexOrg;
 
 	FogPos = Fog->Pos;
-	
+
 	geVec3d_Subtract(&FogPos, &GlobalEyePos, &FogRay);
-	
+
 	Ray2 = FogRay;
 	EyeDist = geVec3d_Normalize(&Ray2);
 
@@ -563,14 +563,14 @@ static geBoolean FogLightmap2(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 	Radius2 = Fog->VolumeRadius2;
 
 	FogRayDot = geVec3d_DotProduct(&FogRay,&FogRay);
-	
+
 	Red = Fog->Color.r;
 	Grn = Fog->Color.g;
 	Blu = Fog->Color.b;
 
 	//if (EyeDist < Radius)
 	//	return GE_FALSE;
-	
+
 	UAdd = SInfo->T2WVecs[0];
 	VAdd = SInfo->T2WVecs[1];
 
@@ -588,7 +588,7 @@ static geBoolean FogLightmap2(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 			Ray.X = UV.X - GlobalEyePos.X;
 			Ray.Y = UV.Y - GlobalEyePos.Y;
 			Ray.Z = UV.Z - GlobalEyePos.Z;
-				
+
 			//Dist = (geFloat)sqrt(Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z);
 			DistSq = Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z;
 			Dist = (geFloat)FastSqrt(DistSq);
@@ -611,7 +611,7 @@ static geBoolean FogLightmap2(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 
 				t0 = v - d;
 				t1 = v + d;
-					
+
 				if (t0 > 0)
 					t = t0;
 				else if (t1 > 0)
@@ -619,13 +619,13 @@ static geBoolean FogLightmap2(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 				else
 				{
 					LightData+=3;
-		
+
 					UV.X += UAdd.X;
 					UV.Y += UAdd.Y;
 					UV.Z += UAdd.Z;
 					continue;
 				}
-					
+
 			#if 1
 				Ray2.X = UV.X - FogPos.X;
 				Ray2.Y = UV.Y - FogPos.Y;
@@ -633,7 +633,7 @@ static geBoolean FogLightmap2(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 
 				//UVDist = sqrt(Ray2.X*Ray2.X + Ray2.Y*Ray2.Y + Ray2.Z*Ray2.Z);
 				UVDist = (geFloat)FastSqrt(Ray2.X*Ray2.X + Ray2.Y*Ray2.Y + Ray2.Z*Ray2.Z);
-					
+
 				if (EyeDist < Radius && UVDist < Radius)
 				{
 					Impact1 = UV;
@@ -654,22 +654,22 @@ static geBoolean FogLightmap2(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 					Impact2.X = GlobalEyePos.X + t*Ray.X;
 					Impact2.Y = GlobalEyePos.Y + t*Ray.Y;
 					Impact2.Z = GlobalEyePos.Z + t*Ray.Z;
-	
+
 				}
 				else											// Both lie outside sphere
 				{
 					Impact1.X = GlobalEyePos.X + t0*Ray.X;
 					Impact1.Y = GlobalEyePos.Y + t0*Ray.Y;
 					Impact1.Z = GlobalEyePos.Z + t0*Ray.Z;
-					
+
 					Impact2.X = GlobalEyePos.X + t1*Ray.X;
 					Impact2.Y = GlobalEyePos.Y + t1*Ray.Y;
 					Impact2.Z = GlobalEyePos.Z + t1*Ray.Z;
-					
+
 					Ray.X = Impact1.X - GlobalEyePos.X;
 					Ray.Y = Impact1.Y - GlobalEyePos.Y;
 					Ray.Z = Impact1.Z - GlobalEyePos.Z;
-					
+
 					//d2 = sqrt(Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z);
 					//d2 = (geFloat)FastSqrt(Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z);
 					d2 = Ray.X*Ray.X + Ray.Y*Ray.Y + Ray.Z*Ray.Z;
@@ -686,14 +686,14 @@ static geBoolean FogLightmap2(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 						*/
 						{
 							LightData+=3;
-						
+
 							UV.X += UAdd.X;
 							UV.Y += UAdd.Y;
 							UV.Z += UAdd.Z;
 							continue;
 						}
 					}
-					
+
 				}
 			#endif
 				// Get the distance of the part of the ray that is in the fog
@@ -712,7 +712,7 @@ static geBoolean FogLightmap2(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 				//Dist = 255.0f;
 
 				Hit = GE_TRUE;
-					
+
 				Light1 = (int32)(Dist*Red);
 				Light2 = (int32)(Dist*Grn);
 				Light3 = (int32)(Dist*Blu);
@@ -733,13 +733,13 @@ static geBoolean FogLightmap2(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 			UV.Y += UAdd.Y;
 			UV.Z += UAdd.Z;
 
-		}	
+		}
 
 		Start.X += VAdd.X;
 		Start.Y += VAdd.Y;
 		Start.Z += VAdd.Z;
 		UV = Start;
-		
+
 		LightData += LightAdd;
 
 	}
@@ -775,9 +775,9 @@ void Light_SetupLightmap(DRV_LInfo *LInfo, BOOL *Dynamic)
 	Face = &BSPData->GFXFaces[LInfo->Face];
 
 	NumLTypes = SInfo->NumLTypes;
-	
+
 	LightOffset = Face->LightOfs;
-	
+
 	lWidth = LInfo->Width;
 	lHeight = LInfo->Height;
 	LMapSize = lHeight * lWidth;
@@ -785,13 +785,13 @@ void Light_SetupLightmap(DRV_LInfo *LInfo, BOOL *Dynamic)
 	IsDyn = HasDLight = GE_FALSE;
 
 	if (SInfo->DLightFrame == CWorld->CurFrameDynamic)
-	if (LightInfo->NumDynamicLights > 0 && !(BSPData->GFXTexInfo[Face->TexInfo].Flags & TEXINFO_FULLBRIGHT)) 
+	if (LightInfo->NumDynamicLights > 0 && !(BSPData->GFXTexInfo[Face->TexInfo].Flags & TEXINFO_FULLBRIGHT))
 		HasDLight = GE_TRUE;
 
 	// We can early out if no dlights on this surface, and no styled lighting...
 	if (!HasDLight && !(SInfo->Flags & SURFINFO_LTYPED))
 	{
-		if (LightOffset >=0) 
+		if (LightOffset >=0)
 			LInfo->RGBLight[0] = (DRV_RGB*)&BSPData->GFXLightData[LightOffset+1];
 		else
 			LInfo->RGBLight[0] = BlankRGB;
@@ -801,20 +801,20 @@ void Light_SetupLightmap(DRV_LInfo *LInfo, BOOL *Dynamic)
 	CEngine->DebugInfo.LMap1++;
 
 	// If there is light data
-	if (LightOffset >=0) 
+	if (LightOffset >=0)
 	{
 		// FIXME:	Take out one byte RGB check...
 		//	Lightmaps are allways RGB now...
 		LightData = &BSPData->GFXLightData[LightOffset+1];
 
 		// layer all styles on first map, using its intensity table
-		for (MapNum = 0; MapNum < 4; MapNum++) 
+		for (MapNum = 0; MapNum < 4; MapNum++)
 		{
 			SIndex = Face->LTypes[MapNum];
-			
+
 			if (SIndex == 255)
 				break;
-			
+
 			if (LightInfo->LTypeDynamic[SIndex])
 				IsDyn = GE_TRUE;
 
@@ -847,15 +847,15 @@ void Light_SetupLightmap(DRV_LInfo *LInfo, BOOL *Dynamic)
 	}
 	else
 		memset(TempRGB32, 0, LMapSize*3*sizeof(TempRGB32[0]));
-	
+
 	// Tack on dynamic lights
 	if (HasDLight)
 	{
 		Light_DLight	*DLights = LightInfo->DynamicLights;
 
-		for (Ln = 0; Ln <MAX_DYNAMIC_LIGHTS; Ln++, DLights++) 
+		for (Ln = 0; Ln <MAX_DYNAMIC_LIGHTS; Ln++, DLights++)
 		{
-			if (!DLights->Active) 
+			if (!DLights->Active)
 				continue;
 
 			if (!(SInfo->DLights & (1<<Ln)))
@@ -863,7 +863,7 @@ void Light_SetupLightmap(DRV_LInfo *LInfo, BOOL *Dynamic)
 
 			CEngine->DebugInfo.NumDLights++;
 
-			// changed QuestOfDreams DSpotLight 
+			// changed QuestOfDreams DSpotLight
 			if(DLights->Spot == GE_FALSE)
 			{
 				if (DLights->CastShadow)
@@ -894,7 +894,7 @@ void Light_SetupLightmap(DRV_LInfo *LInfo, BOOL *Dynamic)
 		}
 	}
 
-	// Put the light into a driver compatible pointer, and clamp it 
+	// Put the light into a driver compatible pointer, and clamp it
 	pRGB1 = TempRGB32;
 	pRGB2 = TempRGB;
 	for (i=0; i< LMapSize; i++)
@@ -922,7 +922,7 @@ void Light_SetupLightmap(DRV_LInfo *LInfo, BOOL *Dynamic)
 
 		pRGB2++;
 	}
-	
+
 	// Point the lightmap to the data
 	LInfo->RGBLight[0] = TempRGB;
 
@@ -938,15 +938,15 @@ void Light_SetupLightmap(DRV_LInfo *LInfo, BOOL *Dynamic)
 	{
 		geFog		*Fog;
 		geBoolean	WasFog;
-		
+
 		WasFog = GE_FALSE;
-		
+
 		if (CWorld->NumVisibleFog)
 		{
 			for (i=0; i< CWorld->NumVisibleFog; i++)
 			{
 				Fog = CWorld->VisibleFog[i];
-			
+
 				if (i == 0)		// Use FogLightmap1 for first one ONLY
 				{
 					if (FogLightmap1(Fog, TempRGB32Fog, Face, SInfo))
@@ -959,12 +959,12 @@ void Light_SetupLightmap(DRV_LInfo *LInfo, BOOL *Dynamic)
 				}
 			}
 		}
-		
+
 		if (WasFog)
 		{
 			CEngine->DebugInfo.LMap2++;
 
-			// Put the light into a driver compatible pointer, and clamp it 
+			// Put the light into a driver compatible pointer, and clamp it
 			pRGB1 = TempRGB32Fog;
 			pRGB2 = TempRGBFog;
 			for (i=0; i< LMapSize; i++)
@@ -1002,7 +1002,7 @@ void Light_SetupLightmap(DRV_LInfo *LInfo, BOOL *Dynamic)
 //	AddLightType
 //=====================================================================================
 static void AddLightType(int32 *LightDest, uint8 *LightData, int32 lw, int32 lh, int32 Intensity)
-{	
+{
 	int32	h;
 
 	assert(LightDest != NULL);
@@ -1020,7 +1020,7 @@ static void AddLightType(int32 *LightDest, uint8 *LightData, int32 lw, int32 lh,
 //	AddLightType0
 //=====================================================================================
 static void AddLightType0(int32 *LightDest, uint8 *LightData, int32 lw, int32 lh)
-{	
+{
 	int32	h;
 
 	assert(LightDest != NULL);
@@ -1038,7 +1038,7 @@ static void AddLightType0(int32 *LightDest, uint8 *LightData, int32 lw, int32 lh
 //	AddLightType1
 //=====================================================================================
 static void AddLightType1(int32 *LightDest, uint8 *LightData, int32 lw, int32 lh, int32 Intensity)
-{	
+{
 	int32	h;
 
 	assert(LightDest != NULL);
@@ -1090,21 +1090,21 @@ static BOOL CombineDLightWithRGBMap(int32 *LightData, Light_DLight *Light, GFX_F
 	Sy = (int32)(geVec3d_DotProduct(&LPos, &TexInfo->Vecs[1]));
 
 	// Align the light with the upper left corner of the ligtmap
-	Sx -= SInfo->LInfo.MinU;		
+	Sx -= SInfo->LInfo.MinU;
 	Sy -= SInfo->LInfo.MinV;
 
 	// Scale by the texture scaling (1:21:10 fixed)
 	Sx *= SInfo->XScale;
 	Sy *= SInfo->YScale;
-	
+
 	Hit = FALSE;
 
-	ColorR = Light->FColorR; 
-	ColorG = Light->FColorG; 
-	ColorB = Light->FColorB; 
+	ColorR = Light->FColorR;
+	ColorG = Light->FColorG;
+	ColorB = Light->FColorB;
 
 	Radius2 = (int32)Radius;
-	
+
 	XStep = SInfo->XStep;
 	YStep = SInfo->YStep;
 
@@ -1118,7 +1118,7 @@ static BOOL CombineDLightWithRGBMap(int32 *LightData, Light_DLight *Light, GFX_F
 			y = -y;
 
 		FixedX = Sx;
-		
+
 		for (u=0; u< SInfo->LInfo.Width; u++)
 		{
 			x = FixedX >> 10;
@@ -1130,11 +1130,11 @@ static BOOL CombineDLightWithRGBMap(int32 *LightData, Light_DLight *Light, GFX_F
 				Dist2 = (x + (y>>1));
 			else
 				Dist2 = (y + (x>>1));
-			
+
 			if (Dist2 < Radius2)
 			{
 				Hit = TRUE;
-				
+
 				Val = (Radius2 - Dist2);
 
 				*LightData++ += (int32)(Val * ColorR);
@@ -1197,15 +1197,15 @@ static BOOL CombineDLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Li
 	// Scale by the texture scaling (1:21:10 fixed)
 	Sx *= SInfo->XScale;
 	Sy *= SInfo->YScale;
-		
+
 	Hit = FALSE;
 
-	ColorR = Light->FColorR; 
-	ColorG = Light->FColorG; 
-	ColorB = Light->FColorB; 
+	ColorR = Light->FColorR;
+	ColorG = Light->FColorG;
+	ColorB = Light->FColorB;
 
 	Radius2 = (int32)Radius;
-	
+
 	XStep = SInfo->XStep;
 	YStep = SInfo->YStep;
 
@@ -1225,7 +1225,7 @@ static BOOL CombineDLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Li
 			y = -y;
 
 		FixedX = Sx;
-		
+
 		for (u=0; u< SInfo->LInfo.Width; u++)
 		{
 			x = FixedX >> 10;
@@ -1237,7 +1237,7 @@ static BOOL CombineDLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Li
 				Dist2 = (x + (y>>1));
 			else
 				Dist2 = (y + (x>>1));
-			
+
 			if (Dist2 < Radius2)
 			{
 				if (Trace_IntersectWorldBSP(&LPos, &LMapPos, 0))
@@ -1249,7 +1249,7 @@ static BOOL CombineDLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Li
 				}
 
 				Hit = TRUE;
-				
+
 				Val = (Radius2 - Dist2);
 
 				*LightData++ += (int32)(Val * ColorR);
@@ -1266,7 +1266,7 @@ static BOOL CombineDLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Li
 
 		geVec3d_Add(&Start, &Down, &Start);
 		LMapPos = Start;
-		
+
 		FixedY -= YStep;
 	}
 
@@ -1303,21 +1303,21 @@ static BOOL CombineDSpotLightWithRGBMap(int32 *LightData, Light_DLight *Light, G
 		geVec3d_Inverse(&PNormal);
 	}
 
-	ColorR = Light->FColorR; 
-	ColorG = Light->FColorG; 
-	ColorB = Light->FColorB; 
+	ColorR = Light->FColorR;
+	ColorG = Light->FColorG;
+	ColorB = Light->FColorB;
 
 	LMapPos = Start = SInfo->TexOrg;
 	Right = SInfo->T2WVecs[0];
 	Down = SInfo->T2WVecs[1];
-	
+
 	for (v=0; v< SInfo->LInfo.Height; v++)
 	{
-		
+
 		for (u=0; u< SInfo->LInfo.Width; u++)
 		{
 			geVec3d_Subtract(&Light->Pos, &LMapPos, &Vect);
-			Dist = geVec3d_Normalize(&Vect); 
+			Dist = geVec3d_Normalize(&Vect);
 			Angle = geVec3d_DotProduct(&Vect, &PNormal);
 
 			if(Angle < 0.001f|| Dist>Radius)
@@ -1327,7 +1327,7 @@ static BOOL CombineDSpotLightWithRGBMap(int32 *LightData, Light_DLight *Light, G
 			else
 			{
 				Angle2 = -geVec3d_DotProduct(&Vect, &Light->Normal);
-				
+
 				if(Angle2<Light->Angle)
 				{
 					LightData+=3;
@@ -1335,7 +1335,7 @@ static BOOL CombineDSpotLightWithRGBMap(int32 *LightData, Light_DLight *Light, G
 				else
 				{
 					Hit = TRUE;
-				
+
 					// get a nice falloff ...
 					Val = (Angle2-Light->Angle)/(1.001f-Light->Angle);
 					// softer
@@ -1350,7 +1350,7 @@ static BOOL CombineDSpotLightWithRGBMap(int32 *LightData, Light_DLight *Light, G
 					*LightData++ += (int32)(Val * ColorR);
 					*LightData++ += (int32)(Val * ColorG);
 					*LightData++ += (int32)(Val * ColorB);
-			
+
 				}
 			}
 
@@ -1392,9 +1392,9 @@ static BOOL CombineDSpotLightWithRGBMapWithShadow(int32 *LightData, Light_DLight
 		geVec3d_Inverse(&PNormal);
 	}
 
-	ColorR = Light->FColorR; 
-	ColorG = Light->FColorG; 
-	ColorB = Light->FColorB; 
+	ColorR = Light->FColorR;
+	ColorG = Light->FColorG;
+	ColorB = Light->FColorB;
 
 	LMapPos = Start = SInfo->TexOrg;
 	Right = SInfo->T2WVecs[0];
@@ -1402,14 +1402,14 @@ static BOOL CombineDSpotLightWithRGBMapWithShadow(int32 *LightData, Light_DLight
 
 	// cast shadow
 	Trace_SetupIntersect(CWorld);
-	
+
 	for (v=0; v< SInfo->LInfo.Height; v++)
 	{
-		
+
 		for (u=0; u< SInfo->LInfo.Width; u++)
 		{
 			geVec3d_Subtract(&Light->Pos, &LMapPos, &Vect);
-			Dist = geVec3d_Normalize(&Vect); 
+			Dist = geVec3d_Normalize(&Vect);
 			Angle = geVec3d_DotProduct(&Vect, &PNormal);
 
 			if(Angle < 0.001f || Dist>Radius)
@@ -1431,18 +1431,18 @@ static BOOL CombineDSpotLightWithRGBMapWithShadow(int32 *LightData, Light_DLight
 				else
 				{
 					Hit = TRUE;
-				
+
 					// get a nice falloff ...
 					Val = (Angle2-Light->Angle)/(1.001f-Light->Angle);
-					// softer				
+					// softer
 					if(Light->Style==1)
 						Val *= Val;
 					// harder
 					else if(Light->Style==2)
 						Val = (geFloat)FastSqrt(Val);
-					
+
 					Val *= (Radius-Dist);
-			
+
 					*LightData++ += (int32)(Val * ColorR);
 					*LightData++ += (int32)(Val * ColorG);
 					*LightData++ += (int32)(Val * ColorB);
@@ -1457,7 +1457,7 @@ static BOOL CombineDSpotLightWithRGBMapWithShadow(int32 *LightData, Light_DLight
 
 	return Hit;
 }
-// end change QuestOfDreams 
+// end change QuestOfDreams
 
 //=====================================================================================
 //	Light_SetupLights
@@ -1507,11 +1507,11 @@ geBoolean Light_SetupLights(geWorld *World)
 				continue;
 
 			Node = BSPData->GFXModels[m].RootNode[0];
-			
+
 			geVec3d_Subtract(&DLights->Pos, &Model->Pivot, &NewPos);
 			// InverseTransform the light about models center of rotation
 			geXForm3d_TransposeTransform(&Model->XForm, &NewPos, &NewPos);
-			
+
 			geVec3d_Add(&NewPos , &Model->Pivot, &NewPos);
 
 			SetupDynamicLight_r(DLights, &NewPos, i, Node);
@@ -1548,12 +1548,12 @@ static void UpdateLTypeTables(geWorld *World)
 	Light_LightInfo	*LInfo;
 
 	LInfo = World->LightInfo;
-		
-	for (s =0; s <MAX_LTYPES; s++) 
+
+	for (s =0; s <MAX_LTYPES; s++)
 	{
 		LInfo->IPos[s]++;
 
-		if (LInfo->LTypeTable[s][LInfo->IPos[s]] == 0) 
+		if (LInfo->LTypeTable[s][LInfo->IPos[s]] == 0)
 			LInfo->IPos[s] = 0;
 
 		i = (geFloat)(LInfo->LTypeTable[s][LInfo->IPos[s]]-96) / 27.0f;
@@ -1564,10 +1564,10 @@ static void UpdateLTypeTables(geWorld *World)
 			LInfo->LTypeDynamic[s] = TRUE;
 		else
 			LInfo->LTypeDynamic[s] = FALSE;
-	
+
 		LInfo->LTypeIntensities2[s] = LInfo->LTypeTable[s][LInfo->IPos[s]]-96;
 	}
-}   
+}
 
 //=====================================================================================
 //	Light_WorldAddLight
@@ -1603,7 +1603,7 @@ Light_DLight *Light_WorldAddLight(geWorld *World)
 
 	DLights->Active = GE_TRUE;
 	LInfo->NumDynamicLights++;
-	
+
 
 	return DLights;
 }
@@ -1628,14 +1628,14 @@ void Light_WorldRemoveLight(geWorld *World, Light_DLight *DLight)
 //=====================================================================================
 //	Light_SetAttributes
 //=====================================================================================
-geBoolean Light_SetAttributes(	Light_DLight *Light, 
-								const geVec3d *Pos, 
-								const GE_RGBA *RGBA, 
+geBoolean Light_SetAttributes(	Light_DLight *Light,
+								const geVec3d *Pos,
+								const GE_RGBA *RGBA,
 								geFloat Radius,
 								geBoolean CastShadow)
 {
 	assert(Light != NULL);
-	
+
 	Light->Pos = *Pos;
 	Light->Color = *RGBA;
 	Light->Radius = Radius;
@@ -1646,7 +1646,7 @@ geBoolean Light_SetAttributes(	Light_DLight *Light,
 	Light->FColorB = (int32)((Light->Color.b/195.0f) * (1<<LIGHT_FRACT));
 
 	Light->CastShadow = CastShadow;
-// changed QuestOfDreams DSpotLight 
+// changed QuestOfDreams DSpotLight
 	Light->Spot = GE_FALSE;
 	// end change QuestOfDreams
 	return GE_TRUE;
@@ -1657,20 +1657,20 @@ geBoolean Light_SetAttributes(	Light_DLight *Light,
 //=====================================================================================
 //	Light_SetSpotAttributes
 //=====================================================================================
-geBoolean Light_SetSpotAttributes(	Light_DLight *Light, 
-								const geVec3d *Pos, 
-								const GE_RGBA *RGBA, 
+geBoolean Light_SetSpotAttributes(	Light_DLight *Light,
+								const geVec3d *Pos,
+								const GE_RGBA *RGBA,
 								geFloat Radius,
 								geFloat Arc,
-								const geVec3d *Angles, 
+								const geVec3d *Angles,
 								int Style,
 								geBoolean CastShadow)
 {
 	geVec3d				Angles2;
 	geXForm3d			XForm;
-	
+
 	assert(Light != NULL);
-	
+
 	Light->Pos = *Pos;
 	Light->Color = *RGBA;
 	Light->Radius = Radius;
@@ -1688,7 +1688,7 @@ geBoolean Light_SetSpotAttributes(	Light_DLight *Light,
 	Light->Normal.X = -Angles2.X;
 	Light->Normal.Y = -Angles2.Y;
 	Light->Normal.Z = -Angles2.Z;
-	
+
 	// Pre-compute fixed point light colors
 	Light->FColorR = (int32)((Light->Color.r/195.0f)* (1<<LIGHT_FRACT));
 	Light->FColorG = (int32)((Light->Color.g/195.0f)* (1<<LIGHT_FRACT));
@@ -1697,7 +1697,7 @@ geBoolean Light_SetSpotAttributes(	Light_DLight *Light,
 	Light->CastShadow = CastShadow;
 
 	Light->Spot = GE_TRUE;
-	
+
 	return GE_TRUE;
 }
 
@@ -1741,12 +1741,12 @@ static int32 FastDist(int32 dx, int32 dy, int32 dz)
 	Med = (dz < 0) ? -dz : dz;
 	Min = (dy < 0) ? -dy : dy;
 
-	if (Max < Med) 
-	{ 
+	if (Max < Med)
+	{
 		Tmp = Max; Max = Med; Med = Tmp;
 	}
-	if (Max < Min) 
-	{ 
+	if (Max < Min)
+	{
 		Tmp = Max; Max = Min; Min = Tmp;
 	}
 	Max <<= 2;
@@ -1760,7 +1760,7 @@ static int32 FastDist(int32 dx, int32 dy, int32 dz)
 //	SetupWavyColorLight1
 //=====================================================================================
 static void SetupWavyColorLight1(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32 lh)
-{ 
+{
 	int32	h;
 	DRV_RGB *rgb;
 	U16		r,g,b, II;
@@ -1775,7 +1775,7 @@ static void SetupWavyColorLight1(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32
 	assert(CEngine != NULL);
 
 	WaveTable = CEngine->WaveTable;
-	
+
 	lm = light1;
 	rgb = RGBM;
 	Index = 0;
@@ -1788,7 +1788,7 @@ static void SetupWavyColorLight1(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32
 		II = WaveTable[Index++];
 		if (Index > A_MOD)
 			Index -= A_MOD;
-		
+
 		II >>= 2;
 		if (II > 63) II = 63;
 		II <<= 8;
@@ -1822,7 +1822,7 @@ static void SetupWavyColorLight2(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32
 	assert(RGBM != NULL);
 
 	assert(CEngine != NULL);
-	
+
 	WaveTable = CEngine->WaveTable;
 
 	lm = light1;
@@ -1837,16 +1837,16 @@ static void SetupWavyColorLight2(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32
 		II = WaveTable[Index++];
 		if (Index > A_MOD)
 			Index -= A_MOD;
-		
+
 		II >>= 2;
-		if (II > 63) 
+		if (II > 63)
 			II = 63;
 		II <<= 8;
 
 		r = rgb->r + SLUT[II + lm->r];
 		g = rgb->g + SLUT[II + lm->g];
 		b = rgb->b + SLUT[II + lm->b];
-		
+
 		if (r > 255) r = 255;
 		if (g > 255) g = 255;
 		if (b > 255) b = 255;
@@ -1864,14 +1864,14 @@ static void SetupWavyColorLight2(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32
 //	SetupColorLight1
 //=====================================================================================
 static void SetupColorLight1(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32 lh, geFloat intensity)
-{	
+{
 	int32	h;
 	DRV_RGB *rgb;
 	uint16	r,g,b;
 	DRV_RGB *lm;
 	uint16	II;
 	uint8	*SLUT;
-	
+
 	assert(light1 != NULL);
 	assert(RGBM != NULL);
 	assert(CEngine != NULL);
@@ -1883,7 +1883,7 @@ static void SetupColorLight1(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32 lh,
 	if (II > 63) II = 63;
 
 	SLUT = &CEngine->StyleLUT1[II][0];
-	
+
 	for (h = 0; h < lh*lw; h++)
 	{
 		r = SLUT[lm->r];
@@ -1919,14 +1919,14 @@ static void SetupColorLight2(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32 lh,
 	rgb = RGBM;
 	II = (uint16)(intensity * 63);
 
-	if (II > 63) 
+	if (II > 63)
 		II = 63;
-	
+
 	SLUT = &CEngine->StyleLUT1[II][0];
-	
+
 	for (h = 0; h < lh*lw; h++)
 	{
-		
+
 		r = rgb->r + SLUT[lm->r];
 		g = rgb->g + SLUT[lm->g];
 		b = rgb->b + SLUT[lm->b];
@@ -1938,7 +1938,7 @@ static void SetupColorLight2(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32 lh,
 		rgb->r = (uint8)r;
 		rgb->g = (uint8)g;
 		rgb->b = (uint8)b;
-		
+
 		lm++;
 		rgb++;
 	}
@@ -1948,7 +1948,7 @@ static void SetupColorLight2(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32 lh,
 //	AddLightTypeWavy1
 //=====================================================================================
 static void AddLightTypeWavy1(int32 *LightDest, uint8 *LightData, int32 lw, int32 lh)
-{ 
+{
 	uint16	*WaveTable, II;
 	int32	Index, h;
 	uint8	*SLUT;
@@ -1958,7 +1958,7 @@ static void AddLightTypeWavy1(int32 *LightDest, uint8 *LightData, int32 lw, int3
 	assert(CEngine != NULL);
 
 	WaveTable = CEngine->WaveTable;
-	
+
 	Index = 0;
 
 	SLUT = CEngine->StyleLUT1[0];
@@ -1967,10 +1967,10 @@ static void AddLightTypeWavy1(int32 *LightDest, uint8 *LightData, int32 lw, int3
 	{
 		// We know that WaterColor table is from 0-255...
 		II = WaveTable[Index++];
-		
+
 		if (Index > A_MOD)
 			Index -= A_MOD;
-		
+
 		II >>= 2;
 		if (II > 30) II = 30;
 		II <<= 8;
@@ -1985,7 +1985,7 @@ static void AddLightTypeWavy1(int32 *LightDest, uint8 *LightData, int32 lw, int3
 //	AddLightTypeWavy
 //=====================================================================================
 static void AddLightTypeWavy(int32 *LightDest, uint8 *LightData, int32 lw, int32 lh)
-{ 
+{
 	uint16	*WaveTable, II;
 	int32	Index, h;
 	uint8	*SLUT;
@@ -1995,7 +1995,7 @@ static void AddLightTypeWavy(int32 *LightDest, uint8 *LightData, int32 lw, int32
 	assert(CEngine != NULL);
 
 	WaveTable = CEngine->WaveTable;
-	
+
 	Index = 0;
 
 	SLUT = CEngine->StyleLUT1[0];
@@ -2004,10 +2004,10 @@ static void AddLightTypeWavy(int32 *LightDest, uint8 *LightData, int32 lw, int32
 	{
 		// We know that WaterColor table is from 0-255...
 		II = WaveTable[Index++];
-		
+
 		if (Index > A_MOD)
 			Index -= A_MOD;
-		
+
 		II >>= 2;
 		if (II > 30) II = 30;
 		II <<= 8;
@@ -2032,7 +2032,7 @@ static void BuildLightLUTS(geEngine *Engine)
 			geFloat ii = (geFloat)i;
 			geFloat kk = (geFloat)k;
 			geFloat Intensity = (ii * (kk / 62.0f));// * 5.0f;
-			if (Intensity > 255) 
+			if (Intensity > 255)
 				Intensity = 255.0f;
 			Engine->StyleLUT1[k][i] = (U8)Intensity;
 		}
@@ -2073,15 +2073,15 @@ static void SetupDynamicLight_r(Light_DLight *pLight, geVec3d *Pos, int32 LNum, 
 	pSInfo = &CBSP->SurfInfo[pNode->FirstFace];
 	for (i=0; i< pNode->NumFaces; i++, pSInfo++)
 	{
-		if (!Surf_InSurfBoundingBox(pSInfo, Pos, pLight->Radius) ) 
+		if (!Surf_InSurfBoundingBox(pSInfo, Pos, pLight->Radius) )
 			continue;
-		
+
 		if (pSInfo->DLightFrame != CWorld->CurFrameDynamic)
 		{
 			pSInfo->DLightFrame = CWorld->CurFrameDynamic;
 			pSInfo->DLights = 0;
 		}
-		
+
 		// We might need to go to a linked list, if more than 32 lights are needed
 		pSInfo->DLights |= 1<<LNum;
 	}
@@ -2104,13 +2104,13 @@ geBoolean Light_GetLightmapRGB(Surf_SurfInfo *Surf, geVec3d *Pos, GE_RGBA *RGBA)
 	geVec3d		VecU, VecV;
 	geFloat		TexU, TexV;
 	int32		Index, Width, Height;
-	
+
 	// Make sure this is a lightmaped face
 	if (!(Surf->Flags & SURFINFO_LIGHTMAP))
 		return GE_FALSE;
 
 	RGBLight = Surf->LInfo.RGBLight[0];
-	
+
 	if (!RGBLight)						// Make sure we are not null!!!
 		return GE_FALSE;
 
@@ -2127,7 +2127,7 @@ geBoolean Light_GetLightmapRGB(Surf_SurfInfo *Surf, geVec3d *Pos, GE_RGBA *RGBA)
 
 	if (TexU < 0 || TexV < 0)
 		return GE_FALSE;
-	
+
 	if (TexU > Surf->LInfo.Width<<4 || TexV > Surf->LInfo.Height<<4)
 		return GE_FALSE;
 
@@ -2145,7 +2145,7 @@ geBoolean Light_GetLightmapRGB(Surf_SurfInfo *Surf, geVec3d *Pos, GE_RGBA *RGBA)
 	if (TexV < 0) TexV = 0.0f;
 
 	Index = (int32)TexV * Width + (int32)TexU;
-	
+
 	// Return the color dude...
 	RGBA->r = (geFloat)RGBLight[Index].r;
 	RGBA->g = (geFloat)RGBLight[Index].g;
@@ -2165,13 +2165,13 @@ geBoolean Light_GetLightmapRGBBlended(Surf_SurfInfo *Surf, geVec3d *Pos, GE_RGBA
 	geVec3d		VecU, VecV;
 	geFloat		TexU, TexV;
 	int32		Index, Width, Height;
-	
+
 	// Make sure this is a lightmaped face
 	if (!(Surf->Flags & SURFINFO_LIGHTMAP))
 		return GE_FALSE;
 
 	RGBLight = Surf->LInfo.RGBLight[0];
-	
+
 	if (!RGBLight)						// Make sure we are not null!!!
 		return GE_FALSE;
 
@@ -2184,7 +2184,7 @@ geBoolean Light_GetLightmapRGBBlended(Surf_SurfInfo *Surf, geVec3d *Pos, GE_RGBA
 
 	if (TexU < 0 || TexV < 0)
 		return GE_FALSE;
-	
+
 	if (TexU > Surf->LInfo.Width<<4 || TexV > Surf->LInfo.Height<<4)
 		return GE_FALSE;
 
@@ -2202,7 +2202,7 @@ geBoolean Light_GetLightmapRGBBlended(Surf_SurfInfo *Surf, geVec3d *Pos, GE_RGBA
 	if (TexV < 0) TexV = 0.0f;
 
 	Index = (int32)TexV * Width + (int32)TexU;
-	
+
 	// Return the color dude...
 	RGBA->r = (geFloat)RGBLight[Index].r;
 	RGBA->g = (geFloat)RGBLight[Index].g;
@@ -2242,18 +2242,18 @@ static FastSqrtFloat FastSqrt(FastSqrtFloat f)
 
 	//return sqrt(f);
 
-	if (f == (FastSqrtFloat)0.0) 
+	if (f == (FastSqrtFloat)0.0)
 		return((FastSqrtFloat)0.0);
-	
+
 	e = (*fi >> EXP_SHIFTS) - EXP_BIAS;
 	*fi &= MANT_MASK;
-	
+
 	if (e & 1)
 		*fi |= EXP_LSB;
-	
+
 	e >>= 1;
 	*fi = (SqrtTab[*fi >> MANT_SHIFTS]) | ((e + EXP_BIAS) << EXP_SHIFTS);
-	
+
 	return(f);
 }
 #if 0
@@ -2269,10 +2269,10 @@ void DumpSqrtTab()
 	{
 		printf("0x%x,", sqrt_tab[i]);
 		nl++;
-		if (nl > 8) 
-		{ 
-			nl = 0; 
-			putchar('\n'); 
+		if (nl > 8)
+		{
+			nl = 0;
+			putchar('\n');
 		}
 	}
 	printf("0x%x\n", SqrtTab[SQRT_TAB_SIZE-1]);

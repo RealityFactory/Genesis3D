@@ -48,11 +48,11 @@ typedef struct Surf_SurfInfo
 
 	geVec3d		VMins;
 	geVec3d		VMaxs;
-	
+
 	int32		VisFrame;
-	
+
 	int32		TexInfo;
-	
+
 	int32		XStep;							// Lightmap step values (1:21:10 fixed)
 	int32		YStep;
 	int32		XScale;
@@ -60,7 +60,7 @@ typedef struct Surf_SurfInfo
 
 	geFloat		ShiftU;
 	geFloat		ShiftV;
-	
+
 	int32		NumLTypes;						// Number of lightmap types this face has...
 	int32		DLightFrame;					// == Globals->CurFrame if dlighted
 	uint32		DLights;						// Bit set for each DLight

@@ -19,8 +19,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_USER_H
@@ -43,7 +43,7 @@
 extern "C" {
 #endif
 
-#define MAX_USER_VERTS				4			
+#define MAX_USER_VERTS				4
 #define USER_MAX_SORTED_POLYS		1024
 
 //================================================================================
@@ -57,7 +57,7 @@ typedef struct	gePoly
 #endif
 
 	geWorld			*World;
-	GE_LVertex		Verts[MAX_USER_VERTS];	// Copy of user verts					
+	GE_LVertex		Verts[MAX_USER_VERTS];	// Copy of user verts
 
 	geWorld_Leaf	*LeafData;
 	geFloat			ZOrder;
@@ -97,20 +97,20 @@ void		User_WorldShutdown(geWorld *World);
 geBoolean User_RenderPolyList(gePoly *PolyList);
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) */
+	BUG FIX: Rendering Transparent Polys properly (2) */
 geBoolean User_RenderTLPoly (gePoly *Poly);
 geBoolean User_RenderPoly (gePoly *Poly);
 
-GENESISAPI	gePoly *geWorld_AddPolyOnce(	geWorld *World, 
-										GE_LVertex *Verts, 
-										int32 NumVerts, 
+GENESISAPI	gePoly *geWorld_AddPolyOnce(	geWorld *World,
+										GE_LVertex *Verts,
+										int32 NumVerts,
 										geBitmap *Bitmap,
-										gePoly_Type Type, 
+										gePoly_Type Type,
 										uint32 RenderFlags,
 										geFloat Scale);
-GENESISAPI	gePoly *geWorld_AddPoly(	geWorld *World, 
-									GE_LVertex *Verts, 
-									int32 NumVerts, 
+GENESISAPI	gePoly *geWorld_AddPoly(	geWorld *World,
+									GE_LVertex *Verts,
+									int32 NumVerts,
 									geBitmap *Bitmap,
 									gePoly_Type Type,
 									uint32 RenderFlags,

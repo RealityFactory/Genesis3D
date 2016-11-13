@@ -4,8 +4,8 @@
 /*  Author: John Pollard                                                                */
 /*  Description: Creates geBitmaps from the data in the BSP, that are used to render    */
 /*                                                                                      */
-/*  Edit History:                                                                       */   
-/*   10/15/2003 Wendell Buckner                                                         */  
+/*  Edit History:                                                                       */
+/*   10/15/2003 Wendell Buckner                                                         */
 /*    Bumpmapping for the World                                                         */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
@@ -19,8 +19,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef WBITMAP_H
@@ -84,7 +84,7 @@ char *geWBitmap_Pool_GetWNameByBitmap(geWBitmap_Pool *Pool, const geBitmap *Bitm
 // end change texture name
 
 /* 10/15/2003 Wendell Buckner
-    Bumpmapping for the World */
+	Bumpmapping for the World */
 char * geWBitmap_GetName(geWBitmap *WBitmap);
 
 #ifdef __cplusplus

@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_GBSPFILE_H
@@ -35,7 +35,7 @@
 extern "C" {
 #endif
 
-#define GBSP_VERSION				15	
+#define GBSP_VERSION				15
 
 #define GBSP_CHUNK_HEADER			0
 
@@ -44,8 +44,8 @@ extern "C" {
 #define GBSP_CHUNK_BNODES			3
 #define GBSP_CHUNK_LEAFS			4
 #define GBSP_CHUNK_CLUSTERS			5
-#define GBSP_CHUNK_AREAS			6	
-#define GBSP_CHUNK_AREA_PORTALS		7	
+#define GBSP_CHUNK_AREAS			6
+#define GBSP_CHUNK_AREA_PORTALS		7
 #define GBSP_CHUNK_LEAF_SIDES		8
 #define GBSP_CHUNK_PORTALS			9
 #define GBSP_CHUNK_PLANES			10
@@ -55,9 +55,9 @@ extern "C" {
 #define GBSP_CHUNK_VERTS			14
 #define GBSP_CHUNK_RGB_VERTS		15
 #define GBSP_CHUNK_ENTDATA			16
-									 
+
 #define GBSP_CHUNK_TEXINFO			17
-#define GBSP_CHUNK_TEXTURES			18 
+#define GBSP_CHUNK_TEXTURES			18
 #define GBSP_CHUNK_TEXDATA			19
 
 #define GBSP_CHUNK_LIGHTDATA		20
@@ -126,7 +126,7 @@ extern "C" {
 
 #endif
 
-#define BSP_CONTENTS_SOLID			-1			
+#define BSP_CONTENTS_SOLID			-1
 #define BSP_CONTENTS_EMPTY			-2
 
 #define	PLANE_X						0
@@ -135,7 +135,7 @@ extern "C" {
 #define	PLANE_ANYX					3
 #define	PLANE_ANYY					4
 #define	PLANE_ANYZ					5
-#define	PLANE_ANY					6		
+#define	PLANE_ANY					6
 
 typedef struct
 {
@@ -179,7 +179,7 @@ typedef struct
 	int32			Children[2];				// Children, indexed into GFXNodes, < 0 = Leaf
 	int32			NumFaces;					// Num faces
 	int32			FirstFace;					// First face
-	int32			PlaneNum;					// 
+	int32			PlaneNum;					//
 	geVec3d			Mins;						// For BBox frustum culling
 	geVec3d			Maxs;
 } GFX_Node;
@@ -187,7 +187,7 @@ typedef struct
 typedef struct
 {
 	int32			Children[2];				// Children, indexed into GFXBNodes, < 0 = Contents
-	int32			PlaneNum;					// 
+	int32			PlaneNum;					//
 	//int32			PlaneSide;
 } GFX_BNode;
 
@@ -208,7 +208,7 @@ typedef struct
 	int32			Contents;					// Contents of leaf
 	geVec3d			Mins;						// For BBox vis testing
 	geVec3d			Maxs;
-	int32			FirstFace;					// First face in GFXLeafFaces 
+	int32			FirstFace;					// First face in GFXLeafFaces
 	int32			NumFaces;
 	int32			FirstPortal;				// Number of portals
 	int32			NumPortals;					// First portal
@@ -235,7 +235,7 @@ typedef struct
 {
 	int32			FirstVert;					// First vertex indexed in GFXVertices
 	int32			NumVerts;					// Number of vertices in face
-	int32			PlaneNum;					// PlaneNum 
+	int32			PlaneNum;					// PlaneNum
 	int32			PlaneSide;					// 0 = Same direction of plane normal
 	int32			TexInfo;
 	int32			LightOfs;					// Offset info GFXLightData, -1 = No light
@@ -297,8 +297,8 @@ typedef struct
 	GFX_Node		*GFXNodes;			// Nodes
 	GFX_BNode		*GFXBNodes;			// Bevel Clip Nodes
 	GFX_Leaf		*GFXLeafs;			// Leafs
-	GFX_Cluster		*GFXClusters;		
-	GFX_Area		*GFXAreas;		
+	GFX_Cluster		*GFXClusters;
+	GFX_Area		*GFXAreas;
 	GFX_AreaPortal	*GFXAreaPortals;
 	GFX_Plane		*GFXPlanes;			// Planes
 	GFX_Face		*GFXFaces;			// Faces

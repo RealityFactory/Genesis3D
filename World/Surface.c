@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <assert.h>
@@ -29,7 +29,7 @@
 #include "World.h"
 #include "Ram.h"
 #include "Surface.h"
-#include "WBitmap.h"	
+#include "WBitmap.h"
 #include "Vec3d.h"
 #include "Vis.h"
 
@@ -89,7 +89,7 @@ geBoolean Surf_SetEngine(geEngine *Engine)
 geBoolean Surf_SetWorld(geWorld *World)
 {
 	assert(World != NULL);
-	
+
 	CWorld = World;
 
 	return GE_TRUE;
@@ -118,7 +118,7 @@ geBoolean Surf_WorldInit(geWorld *World)
 	World_BSP	*BSP;
 
 	assert(World != NULL);
-	
+
 	BSP = World->CurrentBSP;
 
 	assert(BSP != NULL);
@@ -126,14 +126,14 @@ geBoolean Surf_WorldInit(geWorld *World)
 	// Make sure we free the old ones...
 	if (BSP->TexVerts)
 		geRam_Free(BSP->TexVerts);
-	
+
 	if (BSP->SurfInfo)
 		geRam_Free(BSP->SurfInfo);
 
 	// Create new TexVerts and FaceInfo structure for this bsp
 	BSP->TexVerts = GE_RAM_ALLOCATE_ARRAY(Surf_TexVert, BSP->BSPData.NumGFXVertIndexList);
 	BSP->SurfInfo = GE_RAM_ALLOCATE_ARRAY(Surf_SurfInfo, BSP->BSPData.NumGFXFaces);
-	
+
 	// Fill in info needed to render this tree
 	if (!GetTexVerts(BSP))			// Calc texture uv's at vertices...
 		return GE_FALSE;
@@ -220,13 +220,13 @@ static geBoolean GetTexVerts(World_BSP *BSP)
 	GFX_Face		*pFace;
 
 	TexVerts = BSP->TexVerts;
-	
+
 	for (i=0; i< BSP->BSPData.NumGFXFaces; i++)
 	{
 		pFace = &BSP->BSPData.GFXFaces[i];
 		TexInfo = BSP->BSPData.GFXFaces[i].TexInfo;
 		pTexInfo = &BSP->BSPData.GFXTexInfo[TexInfo];
-		
+
 		pVecU = &pTexInfo->Vecs[0];
 		pVecV = &pTexInfo->Vecs[1];
 
@@ -283,12 +283,12 @@ static geBoolean GetSurfInfo(World_BSP *BSP)
 
 		// Find number of styles
 		NumLTypes = 0;
-		for (NumLTypes = 0; NumLTypes < 4; NumLTypes++) 
+		for (NumLTypes = 0; NumLTypes < 4; NumLTypes++)
 		{
-			if (BSP->BSPData.GFXFaces[i].LTypes[NumLTypes]==255) 
+			if (BSP->BSPData.GFXFaces[i].LTypes[NumLTypes]==255)
 				break;
 
-			if (BSP->BSPData.GFXFaces[i].LTypes[NumLTypes] != 0) 
+			if (BSP->BSPData.GFXFaces[i].LTypes[NumLTypes] != 0)
 				SurfInfo[i].Flags |= SURFINFO_LTYPED;
 		}
 
@@ -298,7 +298,7 @@ static geBoolean GetSurfInfo(World_BSP *BSP)
 
 		pTexInfo = &BSP->BSPData.GFXTexInfo[BSP->BSPData.GFXFaces[i].TexInfo];
 		pTexture = &BSP->BSPData.GFXTextures[BSP->BSPData.GFXTexInfo[SurfInfo[i].TexInfo].Texture];
-		
+
 		if (pTexInfo->Flags & TEXINFO_TRANS)
 			SurfInfo[i].Flags |= SURFINFO_TRANS;
 
@@ -372,7 +372,7 @@ static geBoolean GetSurfInfo(World_BSP *BSP)
 
 			ScaleU = 1.0f/pTexInfo->DrawScale[0];
 			ScaleV = 1.0f/pTexInfo->DrawScale[1];
-			
+
 			Width = pTexture->Width;
 			Height = pTexture->Height;
 
@@ -397,14 +397,14 @@ static geBoolean GetSurfInfo(World_BSP *BSP)
 
 		if (BSP->BSPData.GFXTexInfo[BSP->BSPData.GFXFaces[i].TexInfo].Flags & TEXINFO_NO_LIGHTMAP)
 			continue;
-		
+
 		for (k=0; k< 2; k++)
 		{
 			Mins[k] = (geFloat)floor(Mins[k]/16);
 			Maxs[k] = (geFloat)ceil(Maxs[k]/16);
-			
+
 			Size[k] = (S32)(Maxs[k] - Mins[k]) + 1;
-			
+
 			if (Size[k] > MAX_LMAP_SIZE)
 			{
 				geErrorLog_Add(GE_ERR_BAD_LMAP_EXTENTS, NULL);
@@ -451,7 +451,7 @@ static geBoolean GetSurfInfo(World_BSP *BSP)
 			}
 		}
 		#endif
-		
+
 		#if 0
 		//
 		//	Make sure the lightmap u,v's are legit...
@@ -462,20 +462,20 @@ static geBoolean GetSurfInfo(World_BSP *BSP)
 
 			U = TexVerts[vn].u - SurfInfo[i].LInfo.MinU;
 			V = TexVerts[vn].v - SurfInfo[i].LInfo.MinV;
-			
+
 			if (U < 0 || V > 16*128)
 			{
 				SurfInfo[i].LInfo.Face = -1;
 				//geErrorLog_Add(GE_ERR_BAD_LMAP_EXTENTS, NULL);
 				//return GE_FALSE;
-			}	
+			}
 			if (V < 0 || V > 16*128)
 			{
 				SurfInfo[i].LInfo.Face = -1;
 				//geErrorLog_Add(GE_ERR_BAD_LMAP_EXTENTS, NULL);
 				//return GE_FALSE;
 			}
-			
+
 		}
 		#endif
 
@@ -485,7 +485,7 @@ static geBoolean GetSurfInfo(World_BSP *BSP)
 
 	if (!Vis_MarkWaterFaces(BSP))
 		return GE_FALSE;
-	
+
 	return GE_TRUE;
 }
 
@@ -515,7 +515,7 @@ static geBoolean GetRGBVerts(World_BSP *BSP)
 			for (v= 0; v< pGFXFace->NumVerts; v++)
 			{
 				int32		vn;
-			
+
 				vn = pGFXFace->FirstVert + v;
 
 				pTexVerts[vn].r = 255.0f;
@@ -536,7 +536,7 @@ static geBoolean GetRGBVerts(World_BSP *BSP)
 			pTexVerts[vn].b = pGFXRGBVerts[vn].Z;
 		}
 	}
-	
+
 	return GE_TRUE;
 }
 
@@ -560,7 +560,7 @@ void CalcSurfVectors (World_BSP *BSP)
 	geFloat			UU, VV;
 
 	BSPData = &BSP->BSPData;
-	
+
 	pSurfInfo = BSP->SurfInfo;
 
 	GFXPlanes = BSPData->GFXPlanes;
@@ -572,7 +572,7 @@ void CalcSurfVectors (World_BSP *BSP)
 		pFace = &BSPData->GFXFaces[i];
 
 		Tex = &BSPData->GFXTexInfo[pFace->TexInfo];
-	
+
 		geVec3d_CrossProduct(&Tex->Vecs[0], &Tex->Vecs[1], &TexNormal);
 		geVec3d_Normalize(&TexNormal);
 
@@ -585,14 +585,14 @@ void CalcSurfVectors (World_BSP *BSP)
 			geVec3d_Inverse(&FaceNormal);
 			PlaneDist = -PlaneDist;
 		}
-	
+
 		DistScale = geVec3d_DotProduct(&TexNormal, &FaceNormal);
-	
+
 		if (DistScale < 0)
 		{
 			geVec3d_Inverse(&TexNormal);
 			DistScale = -DistScale;
-		}	
+		}
 
 		// distscale is the ratio of the distance along the texture normal to
 		// the distance along the plane normal
@@ -610,9 +610,9 @@ void CalcSurfVectors (World_BSP *BSP)
 
 
 		for (k=0 ; k<3 ; k++)
-			VectorToSUB(Si->TexOrg,k) = 
-				- Tex->Vecs[0].Z * VectorToSUB(Si->T2WVecs[0], k) 
-			    - Tex->Vecs[1].Z * VectorToSUB(Si->T2WVecs[1], k);
+			VectorToSUB(Si->TexOrg,k) =
+				- Tex->Vecs[0].Z * VectorToSUB(Si->T2WVecs[0], k)
+				- Tex->Vecs[1].Z * VectorToSUB(Si->T2WVecs[1], k);
 
 		Dist = geVec3d_DotProduct(&Si->TexOrg, &FaceNormal) - PlaneDist - 1;
 		Dist *= DistScale;
@@ -620,10 +620,10 @@ void CalcSurfVectors (World_BSP *BSP)
 
 		Startx = Si->LInfo.MinU;
 		Starty = Si->LInfo.MinV;
-	
+
 		UU = (geFloat)Startx;
 		VV = (geFloat)Starty;
-	
+
 		Ws[0].X = Si->TexOrg.X + Si->T2WVecs[0].X*UU + Si->T2WVecs[1].X*VV;
 		Ws[0].Y = Si->TexOrg.Y + Si->T2WVecs[0].Y*UU + Si->T2WVecs[1].Y*VV;
 		Ws[0].Z = Si->TexOrg.Z + Si->T2WVecs[0].Z*UU + Si->T2WVecs[1].Z*VV;
@@ -642,5 +642,5 @@ void CalcSurfVectors (World_BSP *BSP)
 		geVec3d_Subtract(&Ws[2], &Ws[0], &Si->T2WVecs[1]);
 		Si->TexOrg = Ws[0];
 	}
-   
+
 }

@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <assert.h>
@@ -52,7 +52,7 @@ geBoolean Vis_WorldInit(geWorld *World)
 	World_BSP	*BSP;
 	int32		i;
 	static int32 StartupParams[]={0x696C6345,0x21657370};
-	
+
 	assert(World  != NULL);
 
 	BSP = World->CurrentBSP;
@@ -87,7 +87,7 @@ geBoolean Vis_WorldInit(geWorld *World)
 	memset(BSP->AreaVisFrame, 0, sizeof(int32)*BSP->BSPData.NumGFXAreas);
 
 	memset(BSP->NodeParents, 0, sizeof(int32)*BSP->BSPData.NumGFXNodes);
-	
+
 	FindParents(World->CurrentBSP);
 
 	// Set the identity on the AreaMatrix
@@ -119,14 +119,14 @@ geBoolean Vis_WorldInit(geWorld *World)
 void Vis_WorldShutdown(geWorld *World)
 {
 	World_BSP	*BSP;
-	
+
 	assert(World  != NULL);
 
 	if (!World->CurrentBSP)
 		return;
 
 	BSP = World->CurrentBSP;
-	
+
 	if (BSP->NodeVisFrame)
 		geRam_Free(BSP->NodeVisFrame);
 	if (BSP->ClusterVisFrame)
@@ -162,9 +162,9 @@ void Vis_FloodAreas_r(geWorld *World, int32 Area)
 
 	if (World->CurrentBSP->AreaVisFrame[Area] == World->CurFrameStatic)
 		return;		// Area already set
-	
+
 	World->CurrentBSP->AreaVisFrame[Area] = World->CurFrameStatic;		// Mark this area visible
-	
+
 	BSP = &World->CurrentBSP->BSPData;
 
 	a = &BSP->GFXAreas[Area];
@@ -227,7 +227,7 @@ geBoolean Vis_VisWorld(geEngine *Engine, geWorld *World, const geCamera *Camera,
 		goto LeafDidNotChange;
 
 	World->ForceVis = GE_FALSE;			// Reset force vis flag
-	
+
 	World->CurrentLeaf = Leaf;
 
 	World->CurFrameStatic++;			// Make all old vis info obsolete
@@ -269,7 +269,7 @@ geBoolean Vis_VisWorld(geEngine *Engine, geWorld *World, const geCamera *Camera,
 		// If the cluster is not visible, then the leaf is not visible
 		if (World->CurrentBSP->ClusterVisFrame[Cluster] != World->CurFrameStatic)
 			continue;
-		
+
 		// If the area is not visible, then the leaf is not visible
 		if (World->CurrentBSP->AreaVisFrame[pLeaf->Area] != World->CurFrameStatic)
 			continue;
@@ -279,7 +279,7 @@ geBoolean Vis_VisWorld(geEngine *Engine, geWorld *World, const geCamera *Camera,
 
 		// Mark the leafs vis frame to worlds current frame
 		World->CurrentBSP->LeafData[i].VisFrame = World->CurFrameStatic;
-			
+
 		pFace = &GFXLeafFaces[pLeaf->FirstFace];
 
 		// Go ahead and vis surfaces here...
@@ -317,7 +317,7 @@ geBoolean Vis_VisWorld(geEngine *Engine, geWorld *World, const geCamera *Camera,
 
 				pModel = &BSPData->GFXModels[i];
 
-				if (pModel->Areas[0] == Area || pModel->Areas[1] == Area && 
+				if (pModel->Areas[0] == Area || pModel->Areas[1] == Area &&
 					World->CurrentBSP->ClusterVisFrame[Cluster] == World->CurFrameStatic)
 					Models->VisFrame = World->CurFrameDynamic;
 			}
@@ -325,21 +325,21 @@ geBoolean Vis_VisWorld(geEngine *Engine, geWorld *World, const geCamera *Camera,
 		else if (ModelVisible(World, Models))
 			Models->VisFrame = World->CurFrameDynamic;
 	#else
-		
+
 		if (ModelVisible(World, Models))
 			Models->VisFrame = World->CurFrameDynamic;
-		
+
 	#endif
-		
+
 		Models->ChangedFlags &= ~MODEL_CHANGED_XFORM;
 	}
-	
+
 	VisFog(Engine, World, Camera, Fi, Area);
 
 #ifdef _TSC
 	showPopTSC("Vis_VisWorld");
 #endif
-	
+
 	return GE_TRUE;
 }
 
@@ -355,12 +355,12 @@ geBoolean Vis_MarkWaterFaces(World_BSP *WBSP)
 	S32				*GFXLeafFaces;
 
 	assert(WBSP != NULL);
-	
+
 	GFXLeafs = WBSP->BSPData.GFXLeafs;
 	GFXLeafFaces = WBSP->BSPData.GFXLeafFaces;
 
 	NumLeafs = WBSP->BSPData.GFXModels[0].NumLeafs;
-	
+
 	SurfInfo = WBSP->SurfInfo;
 
 	assert(SurfInfo != NULL);
@@ -414,7 +414,7 @@ static void FindParents_r(int32 Node, int32 Parent)
 static void FindParents(World_BSP *Bsp)
 {
 	assert(Bsp != NULL);
-	
+
 	// Assign some static globals so they don't flood the stack...
 	GFXNodes = Bsp->BSPData.GFXNodes;
 	LeafData = Bsp->LeafData;
@@ -475,18 +475,18 @@ static void VisFog(geEngine *Engine, geWorld *World, const geCamera *Camera, Fru
 	Frustum_TransformToWorldSpace(Fi, Camera, &WorldSpaceFrustum);
 
 	CBSP = World->CurrentBSP;
-	
+
 	BSPData = &CBSP->BSPData;
 
 	GFXLeafs = BSPData->GFXLeafs;
-	
+
 	for (Fog = World->FogList; Fog; Fog = Fog->Next)
 	{
 		geWorld_FogData	*FogData;
 
 		if (World->NumVisibleFog >= MAX_VISIBLE_FOG)
 			return;		// Oh well...
-		
+
 		FogData = (geWorld_FogData*)geFog_GetUserData(Fog);
 
 		if (CBSP->LeafData[FogData->Leaf].VisFrame != World->CurFrameStatic)
@@ -498,12 +498,12 @@ static void VisFog(geEngine *Engine, geWorld *World, const geCamera *Camera, Fru
 		// If not in the view frustum, then tottaly ignore...
 		if (!Frustum_PointInFrustum(&WorldSpaceFrustum, &Fog->Pos, Fog->VolumeRadius-1.0f))
 			continue;
-		
+
 		FogData->VisFrame = World->CurFrameDynamic;
 
 		// Add it to the list
 		World->VisibleFog[World->NumVisibleFog++] = Fog;
-		
+
 		// For debugging...
 		Engine->DebugInfo.NumFog++;
 	}

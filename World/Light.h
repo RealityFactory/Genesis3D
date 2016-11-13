@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_LIGHT_H
@@ -112,9 +112,9 @@ geBoolean	Light_SetGBSP(World_BSP *BSP);
 Light_DLight *Light_WorldAddLight(geWorld *World);
 void		Light_WorldRemoveLight(geWorld *World, Light_DLight *DLight);
 geBoolean	Light_SetupLights(geWorld *World);
-geBoolean	Light_SetAttributes(	Light_DLight *Light, 
-								const geVec3d *Pos, 
-								const GE_RGBA *RGBA, 
+geBoolean	Light_SetAttributes(	Light_DLight *Light,
+								const geVec3d *Pos,
+								const GE_RGBA *RGBA,
 								geFloat Radius,
 								geBoolean CastShadow);
 geBoolean	Light_WorldSetLTypeTable(geWorld *World, int32 LType, const char *Table);
@@ -126,12 +126,12 @@ geBoolean	Light_GetLightmapRGBBlended(Surf_SurfInfo *Surf, geVec3d *Pos, GE_RGBA
 void		Light_FogVerts(const geFog *Fog, const geVec3d *POV, const geVec3d *Verts, Surf_TexVert *TexVerts, int32 NumVerts);
 
 // added QuestOfDreams DSpotLight
-geBoolean Light_SetSpotAttributes(	Light_DLight *Light, 
-								const geVec3d *Pos, 
-								const GE_RGBA *RGBA, 
+geBoolean Light_SetSpotAttributes(	Light_DLight *Light,
+								const geVec3d *Pos,
+								const GE_RGBA *RGBA,
 								geFloat Radius,
 								geFloat Arc,
-								const geVec3d *Angles, 
+								const geVec3d *Angles,
 								int Style,
 								geBoolean CastShadow);
 // end change QuestOfDreams

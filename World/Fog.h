@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_FOG_H
@@ -51,7 +51,7 @@ typedef struct geFog
 	geFloat			VolumeRadius2;				// *2
 	geFloat			VolumeRadiusSquared;		// Radius squared
 
-	void			*UserData;	
+	void			*UserData;
 
 	SET_ATTR_CB		*SetAttrCB;					// CB for when geFog_SetAttributes is called
 
@@ -66,11 +66,11 @@ GENESISAPI		geFog *geFog_Create(SET_ATTR_CB *SetAttrCB);
 
 GENESISAPI		void geFog_Destroy(geFog *Fog);
 
-GENESISAPI		geBoolean geFog_SetAttributes(	geFog			*Fog, 
-												const geVec3d	*Pos, 
+GENESISAPI		geBoolean geFog_SetAttributes(	geFog			*Fog,
+												const geVec3d	*Pos,
 												GE_RGBA			*Color,
-												geFloat			LightBrightness, 
-												geFloat			VolumeBrightness, 
+												geFloat			LightBrightness,
+												geFloat			VolumeBrightness,
 												geFloat			VolumeRadius);
 
 GENESISAPI		geBoolean geFog_SetUserData(geFog *Fog, void *UserData);

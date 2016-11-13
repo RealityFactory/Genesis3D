@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <windows.h>
@@ -43,7 +43,7 @@ GENESISAPI geFog *geFog_Create(SET_ATTR_CB *SetAttrCB)
 
 	if (SetAttrCB)
 		Fog->SetAttrCB = SetAttrCB;
-	
+
 	return Fog;
 }
 
@@ -60,11 +60,11 @@ GENESISAPI void geFog_Destroy(geFog *Fog)
 //================================================================================
 //	geFog_SetAttributes
 //================================================================================
-GENESISAPI geBoolean geFog_SetAttributes(	geFog			*Fog, 
-											const geVec3d	*Pos, 
+GENESISAPI geBoolean geFog_SetAttributes(	geFog			*Fog,
+											const geVec3d	*Pos,
 											GE_RGBA			*Color,
-											geFloat			LightBrightness, 
-											geFloat			VolumeBrightness, 
+											geFloat			LightBrightness,
+											geFloat			VolumeBrightness,
 											geFloat			VolumeRadius)
 {
 	Fog->Pos = *Pos;

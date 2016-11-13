@@ -4,12 +4,12 @@
 /*  Author: John Pollard                                                                */
 /*  Description: Code to render the world, and distribute work to other modules         */
 /*                                                                                      */
-/*  Edit History:                                                                       */   
+/*  Edit History:                                                                       */
 /*   03/24/2004 Wendell Buckner                                                         */
 /*    BUG FIX: Rendering Transparent Polys properly (2)                                 */
 /*   02/18/2004 Wendell Buckner                                                         */
 /*    DOT BUMPMAPPING                                                                   */
-/*   10/15/2003 Wendell Buckner                                                         */  
+/*   10/15/2003 Wendell Buckner                                                         */
 /*    Bumpmapping for the World                                                         */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
@@ -43,12 +43,12 @@
 
 #include "BitmapList.h"
 
-#include "Actor.h"			
+#include "Actor.h"
 
 //MRB BEGIN
 //geSprite
 #include "Sprite.h"
-//MRB END			
+//MRB END
 
 #ifdef __cplusplus
 extern "C" {
@@ -138,12 +138,12 @@ typedef struct
 	// Untransformed original data
 	geVec3d			Verts[6][4];
 	Surf_TexVert	TexVerts[6][4];
-	
+
 	geVec3d			Axis;								// Rotation axis
 	geFloat			Dpm;								// Degres per minute
 	geFloat			DrawScale;							// Texture drawscale
 	int32			Textures[6];
-	
+
 	geFloat			Angle;								// Current rotation angle around roation axis
 
 } World_SkyBox;
@@ -232,7 +232,7 @@ typedef struct geWorld
 	Light_LightInfo		*LightInfo;							// Info that the light module fills in
 
 	Mesh_MeshInfo		*MeshInfo;							// Info that the mesh module fills in
-	
+
 	int32				ActorCount;							// Number of actors in world
 	World_Actor			*ActorArray;						// Array of actors
 
@@ -241,7 +241,7 @@ typedef struct geWorld
 	int32				SpriteCount;							// Number of sprites in world
 	World_Sprite		*SpriteArray;						// Array of sprites
 //MRB END
-	
+
 	geWorld_EntClassSet	EntClassSets[MAX_WORLD_ENT_CLASS_SETS];
 	int32				NumEntClassSets;
 
@@ -252,11 +252,11 @@ typedef struct geWorld
 	geWorld_DebugInfo	DebugInfo;
 
 	geFog				*FogList;							// Linked list of fog in the world currently
-	
+
 	geFog				*VisibleFog[MAX_VISIBLE_FOG];		// List of visible fog for this frame
 	int32				NumVisibleFog;
 
-	BitmapList			*AttachedBitmaps;						
+	BitmapList			*AttachedBitmaps;
 
 	geXForm3d			LastCameraXForm;
 
@@ -317,15 +317,15 @@ geBoolean geWorld_AttachAll(geWorld *World, DRV_Driver *Driver, geFloat Gamma);
 geBoolean geWorld_DetachAll(geWorld *World);
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) */
+	BUG FIX: Rendering Transparent Polys properly (2) */
 void GList_AddOperation(uint8 Type, uint32 Data);
 
 /* 02/18/2004 Wendell Buckner
-    DOT BUMPMAPPING */
+	DOT BUMPMAPPING */
 GENESISAPI geBoolean geWorld_CreateBumpmapByNameDot3(geWorld *World, const char *BumpmapName);
 
 /* 10/15/2003 Wendell Buckner
-    Bumpmapping for the World */
+	Bumpmapping for the World */
 GENESISAPI geBitmap * geWorld_CreateBumpmapByName(geWorld *World, const char *BumpmapName, gePixelFormat BumpFormat);
 GENESISAPI geBoolean geWorld_GetWorldGeometry(geWorld *World, geVec3d **Verts, int *NumVerts, long **Indices, long *NumIndices);
 

@@ -13,7 +13,7 @@
 /*   03/24/2004 Wendell Buckner                                                         */
 /*    BUG FIX: Rendering Transparent Polys properly (2)                                 */
 /*  01/30/2003 Wendell Buckner                                                          */
-/*   Driver render flush is probably causing a slow down!                               */       
+/*   Driver render flush is probably causing a slow down!                               */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -68,7 +68,7 @@ static	gePoly			*SortedPolys[USER_MAX_SORTED_POLYS];
 //=====================================================================================
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) */
+	BUG FIX: Rendering Transparent Polys properly (2) */
 static geBoolean RenderUserTLPoly ( geCamera *Camera, gePoly *Poly );
 static geBoolean RenderTexturedTLPoint(DRV_Driver *RDriver, gePoly *Poly, Frustum_Info *FInfo, geCamera *Camera);
 static void RenderTexturedTLPoly(DRV_Driver *RDriver, gePoly *Poly);
@@ -152,7 +152,7 @@ geBoolean User_WorldInit(geWorld *World)
 	assert(World != NULL);
 
 	Info = GE_RAM_ALLOCATE_STRUCT(User_Info);
-	
+
 	assert(Info != NULL);
 
 	if (!Info)
@@ -165,7 +165,7 @@ geBoolean User_WorldInit(geWorld *World)
 
 	World->UserInfo = Info;
 
-	return GE_TRUE;	
+	return GE_TRUE;
 }
 
 //=====================================================================================
@@ -188,7 +188,7 @@ void User_WorldShutdown(geWorld *World)
 }
 
 //=====================================================================================
-//	
+//
 //=====================================================================================
 static int PolyComp(const void *a, const void *b)
 {
@@ -207,7 +207,7 @@ static int PolyComp(const void *a, const void *b)
 }
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) */
+	BUG FIX: Rendering Transparent Polys properly (2) */
 
 //=====================================================================================
 //	User_RenderTLPoly
@@ -221,7 +221,7 @@ geBoolean User_RenderTLPoly (gePoly *Poly)
 
 	RenderUserTLPoly ( gCamera, Poly );
 
-	return GE_TRUE;	
+	return GE_TRUE;
 }
 
 //=====================================================================================
@@ -236,7 +236,7 @@ geBoolean User_RenderPoly (gePoly *Poly)
 
 	RenderUserPoly(gCamera, Poly);
 
-	return GE_TRUE;	
+	return GE_TRUE;
 }
 
 //=====================================================================================
@@ -291,7 +291,7 @@ geBoolean User_RenderPolyList(gePoly *PolyList)
 		RenderUserPoly(gCamera, Poly);
 	}
 
-	return GE_TRUE;	
+	return GE_TRUE;
 }
 
 //=====================================================================================
@@ -351,7 +351,7 @@ geBoolean User_SetCameraInfo(geEngine *Engine, geWorld *World, geCamera *Camera,
 	// Make the frustum go to World/Model space
 	Frustum_TransformToWorldSpace(Fi, Camera, &gWorldSpaceFrustum);
 
-	return GE_TRUE;	
+	return GE_TRUE;
 }
 
 //=====================================================================================
@@ -369,7 +369,7 @@ geBoolean User_DestroyOncePolys(geWorld *World)
 }
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) */
+	BUG FIX: Rendering Transparent Polys properly (2) */
 
 //=====================================================================================
 //	RenderTexturedTLPoint
@@ -416,15 +416,15 @@ static geBoolean RenderTexturedTLPoint ( DRV_Driver *RDriver, gePoly *Poly, Frus
 		pVerts->v = 0.0f;
 
 		pVerts++;
-	
+
 		pVerts->X = Start.X + Left.X + Up.X;
 		pVerts->Y = Start.Y + Left.Y + Up.Y;
 		pVerts->Z = Start.Z + Left.Z + Up.Z;
 		pVerts->u = 1.0f;
 		pVerts->v = 0.0f;
-	
+
 		pVerts++;
-	
+
 		pVerts->X = Start.X + Left.X - Up.X;
 		pVerts->Y = Start.Y + Left.Y - Up.Y;
 		pVerts->Z = Start.Z + Left.Z - Up.Z;
@@ -432,7 +432,7 @@ static geBoolean RenderTexturedTLPoint ( DRV_Driver *RDriver, gePoly *Poly, Frus
 		pVerts->v = 1.0f;
 
 		pVerts++;
-	
+
 		pVerts->X = Start.X - Left.X - Up.X;
 		pVerts->Y = Start.Y - Left.Y - Up.Y;
 		pVerts->Z = Start.Z - Left.Z - Up.Z;
@@ -456,13 +456,13 @@ static geBoolean RenderTexturedTLPoint ( DRV_Driver *RDriver, gePoly *Poly, Frus
 		geFloat			Scale;
 		uint32			RenderFlags;
 		int32			i;
-		
+
 		assert(Poly != NULL);
 		assert(Camera != NULL);
 
 		pVerts = &Poly->Verts[0];
-	
-		// Xform the point 
+
+		// Xform the point
 		Src.X = pVerts->X;
 		Src.Y = pVerts->Y;
 		Src.Z = pVerts->Z;
@@ -477,7 +477,7 @@ static geBoolean RenderTexturedTLPoint ( DRV_Driver *RDriver, gePoly *Poly, Frus
 			ScreenPnts[i].b = pVerts->b;
 			ScreenPnts[i].a = pVerts->a;
 		}
-	
+
 		z = Src.Z;
 
 		if (z < 1)
@@ -532,7 +532,7 @@ static geBoolean RenderTexturedTLPoint ( DRV_Driver *RDriver, gePoly *Poly, Frus
 
 			UVAdd = (Left-ScreenPnts[0].x) / Width;
 			Width -= Left-ScreenPnts[0].x;
-		
+
 			ScreenPnts[0].u += UVAdd;
 			ScreenPnts[3].u += UVAdd;
 
@@ -546,7 +546,7 @@ static geBoolean RenderTexturedTLPoint ( DRV_Driver *RDriver, gePoly *Poly, Frus
 
 			UVAdd = (Top-ScreenPnts[0].y) / Height;
 			Height -= (Top-ScreenPnts[0].y);
-		
+
 			ScreenPnts[0].v += UVAdd;
 			ScreenPnts[1].v += UVAdd;
 
@@ -557,13 +557,13 @@ static geBoolean RenderTexturedTLPoint ( DRV_Driver *RDriver, gePoly *Poly, Frus
 		{
 			if (ScreenPnts[0].x >= Right)
 				return GE_TRUE;
-	
+
 			UVAdd = (ScreenPnts[1].x-Right) / Width;
 			Width -= (ScreenPnts[1].x-Right);
-		
+
 			ScreenPnts[1].u -= UVAdd;
 			ScreenPnts[2].u -= UVAdd;
-		
+
 			ScreenPnts[1].x	= Right-1;
 			ScreenPnts[2].x	= Right-1;
 		}
@@ -574,7 +574,7 @@ static geBoolean RenderTexturedTLPoint ( DRV_Driver *RDriver, gePoly *Poly, Frus
 
 			UVAdd = (ScreenPnts[2].y-Bottom) / Height;
 			Height -= (ScreenPnts[2].x-Bottom);
-		
+
 			ScreenPnts[2].v -= UVAdd;
 			ScreenPnts[3].v -= UVAdd;
 
@@ -600,10 +600,10 @@ static geBoolean RenderTexturedTLPoint ( DRV_Driver *RDriver, gePoly *Poly, Frus
 		if (pVerts->a != 255.0f)
 			RenderFlags |= DRV_RENDER_ALPHA;
 
-/* 01/30/2003 Wendell Buckner 
-     Driver render flush is probably causing a slow down! */
-		if (Poly->RenderFlags & GE_RENDER_DEPTH_SORT_BF)    
-			RenderFlags |= DRV_RENDER_FLUSH;                 
+/* 01/30/2003 Wendell Buckner
+	 Driver render flush is probably causing a slow down! */
+		if (Poly->RenderFlags & GE_RENDER_DEPTH_SORT_BF)
+			RenderFlags |= DRV_RENDER_FLUSH;
 
 		if (Poly->RenderFlags & GE_RENDER_CLAMP_UV)
 			RenderFlags |= DRV_RENDER_CLAMP_UV;
@@ -636,7 +636,7 @@ static void RenderTexturedTLPoly(DRV_Driver *RDriver, gePoly *Poly)
 	uint32			RenderFlags;
 
 	assert(geWorld_PolyIsValid(Poly));
- 
+
 	for (i=0; i< Poly->NumVerts; i++)
 	{
 		Clipped1[i].x = Poly->Verts[i].X;
@@ -653,7 +653,7 @@ static void RenderTexturedTLPoly(DRV_Driver *RDriver, gePoly *Poly)
 	Length1 = Poly->NumVerts;
 
 	pBitmap = Poly->Bitmap;
-		
+
 	if (Poly->RenderFlags & GE_RENDER_DO_NOT_OCCLUDE_OTHERS)
 		RenderFlags = DRV_RENDER_NO_ZWRITE;
 	else
@@ -661,11 +661,11 @@ static void RenderTexturedTLPoly(DRV_Driver *RDriver, gePoly *Poly)
 
 	if (Poly->RenderFlags & GE_RENDER_DO_NOT_OCCLUDE_SELF)
 		RenderFlags |= DRV_RENDER_NO_ZMASK;
-	
+
 	if (Clipped1[0].a != 255.0f)
 		RenderFlags |= DRV_RENDER_ALPHA;
 
-	if (Poly->RenderFlags & GE_RENDER_DEPTH_SORT_BF) 
+	if (Poly->RenderFlags & GE_RENDER_DEPTH_SORT_BF)
 		RenderFlags |= DRV_RENDER_FLUSH;
 
 	if (Poly->RenderFlags & GE_RENDER_CLAMP_UV)
@@ -679,7 +679,7 @@ static void RenderTexturedTLPoly(DRV_Driver *RDriver, gePoly *Poly)
 	assert(geBitmap_GetTHandle(pBitmap));
 
 	geBitmap_SetRenderFlags(pBitmap, &RenderFlags);
-	
+
 	RDriver->RenderMiscTexturePoly(Clipped1, Length1, geBitmap_GetTHandle(pBitmap), RenderFlags);
 
 }
@@ -781,15 +781,15 @@ static geBoolean RenderTexturedPoint(DRV_Driver *RDriver, gePoly *Poly, Frustum_
 		pVerts->v = 0.0f;
 
 		pVerts++;
-	
+
 		pVerts->X = Start.X + Left.X + Up.X;
 		pVerts->Y = Start.Y + Left.Y + Up.Y;
 		pVerts->Z = Start.Z + Left.Z + Up.Z;
 		pVerts->u = 1.0f;
 		pVerts->v = 0.0f;
-	
+
 		pVerts++;
-	
+
 		pVerts->X = Start.X + Left.X - Up.X;
 		pVerts->Y = Start.Y + Left.Y - Up.Y;
 		pVerts->Z = Start.Z + Left.Z - Up.Z;
@@ -797,7 +797,7 @@ static geBoolean RenderTexturedPoint(DRV_Driver *RDriver, gePoly *Poly, Frustum_
 		pVerts->v = 1.0f;
 
 		pVerts++;
-	
+
 		pVerts->X = Start.X - Left.X - Up.X;
 		pVerts->Y = Start.Y - Left.Y - Up.Y;
 		pVerts->Z = Start.Z - Left.Z - Up.Z;
@@ -821,13 +821,13 @@ static geBoolean RenderTexturedPoint(DRV_Driver *RDriver, gePoly *Poly, Frustum_
 		geFloat			Scale;
 		uint32			RenderFlags;
 		int32			i;
-		
+
 		assert(Poly != NULL);
 		assert(Camera != NULL);
 
 		pVerts = &Poly->Verts[0];
-	
-		// Xform the point 
+
+		// Xform the point
 		Src.X = pVerts->X;
 		Src.Y = pVerts->Y;
 		Src.Z = pVerts->Z;
@@ -846,7 +846,7 @@ static geBoolean RenderTexturedPoint(DRV_Driver *RDriver, gePoly *Poly, Frustum_
 			ScreenPnts[i].b = pVerts->b;
 			ScreenPnts[i].a = pVerts->a;
 		}
-	
+
 		z = -Dest.Z;
 
 		if (z < 1)
@@ -901,7 +901,7 @@ static geBoolean RenderTexturedPoint(DRV_Driver *RDriver, gePoly *Poly, Frustum_
 
 			UVAdd = (Left-ScreenPnts[0].x) / Width;
 			Width -= Left-ScreenPnts[0].x;
-		
+
 			ScreenPnts[0].u += UVAdd;
 			ScreenPnts[3].u += UVAdd;
 
@@ -915,7 +915,7 @@ static geBoolean RenderTexturedPoint(DRV_Driver *RDriver, gePoly *Poly, Frustum_
 
 			UVAdd = (Top-ScreenPnts[0].y) / Height;
 			Height -= (Top-ScreenPnts[0].y);
-		
+
 			ScreenPnts[0].v += UVAdd;
 			ScreenPnts[1].v += UVAdd;
 
@@ -926,13 +926,13 @@ static geBoolean RenderTexturedPoint(DRV_Driver *RDriver, gePoly *Poly, Frustum_
 		{
 			if (ScreenPnts[0].x >= Right)
 				return GE_TRUE;
-	
+
 			UVAdd = (ScreenPnts[1].x-Right) / Width;
 			Width -= (ScreenPnts[1].x-Right);
-		
+
 			ScreenPnts[1].u -= UVAdd;
 			ScreenPnts[2].u -= UVAdd;
-		
+
 			ScreenPnts[1].x	= Right-1;
 			ScreenPnts[2].x	= Right-1;
 		}
@@ -943,7 +943,7 @@ static geBoolean RenderTexturedPoint(DRV_Driver *RDriver, gePoly *Poly, Frustum_
 
 			UVAdd = (ScreenPnts[2].y-Bottom) / Height;
 			Height -= (ScreenPnts[2].x-Bottom);
-		
+
 			ScreenPnts[2].v -= UVAdd;
 			ScreenPnts[3].v -= UVAdd;
 
@@ -969,10 +969,10 @@ static geBoolean RenderTexturedPoint(DRV_Driver *RDriver, gePoly *Poly, Frustum_
 		if (pVerts->a != 255.0f)
 			RenderFlags |= DRV_RENDER_ALPHA;
 
-/* 01/30/2003 Wendell Buckner 
-     Driver render flush is probably causing a slow down! */
-		if (Poly->RenderFlags & GE_RENDER_DEPTH_SORT_BF)    
-			RenderFlags |= DRV_RENDER_FLUSH;                 
+/* 01/30/2003 Wendell Buckner
+	 Driver render flush is probably causing a slow down! */
+		if (Poly->RenderFlags & GE_RENDER_DEPTH_SORT_BF)
+			RenderFlags |= DRV_RENDER_FLUSH;
 
 		if (Poly->RenderFlags & GE_RENDER_CLAMP_UV)
 			RenderFlags |= DRV_RENDER_CLAMP_UV;
@@ -985,7 +985,7 @@ static geBoolean RenderTexturedPoint(DRV_Driver *RDriver, gePoly *Poly, Frustum_
 		assert(geBitmap_GetTHandle(Bitmap));
 
 /* 08/08/2004 Wendell Buckner
-     BUG FIX: Allways call geBitmap_SetRenderFlags() before calling a textured rendering function(for embm, dot3, & etc...). */
+	 BUG FIX: Allways call geBitmap_SetRenderFlags() before calling a textured rendering function(for embm, dot3, & etc...). */
 		geBitmap_SetRenderFlags(Bitmap, &RenderFlags);
 
 		RDriver->RenderMiscTexturePoly((DRV_TLVertex*)ScreenPnts, 4, geBitmap_GetTHandle(Bitmap), RenderFlags);
@@ -1016,7 +1016,7 @@ static void RenderTexturedPoly(DRV_Driver *RDriver, gePoly *Poly, Frustum_Info *
 	assert(geWorld_PolyIsValid(Poly));
 
 	pFPlanes = FInfo->Planes;
-	
+
 	pDest1 = Dest1;
 	pTex1 = Tex1;
 	pLVert = Poly->Verts;
@@ -1032,7 +1032,7 @@ static void RenderTexturedPoly(DRV_Driver *RDriver, gePoly *Poly, Frustum_Info *
 		pTex1->r = pLVert->r;
 		pTex1->g = pLVert->g;
 		pTex1->b = pLVert->b;
-		
+
 		pDest1++;
 		pLVert++;
 		pTex1++;
@@ -1060,7 +1060,7 @@ static void RenderTexturedPoly(DRV_Driver *RDriver, gePoly *Poly, Frustum_Info *
 		pTempDest = pDest1;
 		pDest1 = pDest2;
 		pDest2 = pTempDest;
-	
+
 		pTempTex = pTex1;
 		pTex1 = pTex2;
 		pTex2 = pTempTex;
@@ -1083,7 +1083,7 @@ static void RenderTexturedPoly(DRV_Driver *RDriver, gePoly *Poly, Frustum_Info *
 	Frustum_ProjectRGB(pDest3, pTex1, Clipped1, Length1, Camera);
 
 	pBitmap = Poly->Bitmap;
-		
+
 	Clipped1[0].a = Poly->Verts[0].a;
 
 
@@ -1095,29 +1095,29 @@ static void RenderTexturedPoly(DRV_Driver *RDriver, gePoly *Poly, Frustum_Info *
 		RenderFlags = 0;
 
 	if (Poly->RenderFlags & GE_RENDER_DO_NOT_OCCLUDE_SELF)
-	{	
+	{
 		RenderFlags |= DRV_RENDER_NO_ZMASK;
 	}
-	
+
 	if (Clipped1[0].a != 255.0f)
 	{
 		RenderFlags |= DRV_RENDER_ALPHA;
 	}
 
-/* 01/30/2003 Wendell Buckner 
-     Driver render flush is probably causing a slow down! */
-	if (Poly->RenderFlags & GE_RENDER_DEPTH_SORT_BF) 
-	{	
+/* 01/30/2003 Wendell Buckner
+	 Driver render flush is probably causing a slow down! */
+	if (Poly->RenderFlags & GE_RENDER_DEPTH_SORT_BF)
+	{
 		RenderFlags |= DRV_RENDER_FLUSH;
 	}
 
 	if (Poly->RenderFlags & GE_RENDER_CLAMP_UV)
-	{	
+	{
 		RenderFlags |= DRV_RENDER_CLAMP_UV;
 	}
 
 	if (Poly->RenderFlags & GE_RENDER_NO_FOG) // skybox fog
-	{	
+	{
 		RenderFlags |= DRV_RENDER_POLY_NO_FOG;
 	}
 
@@ -1126,7 +1126,7 @@ static void RenderTexturedPoly(DRV_Driver *RDriver, gePoly *Poly, Frustum_Info *
 	assert(geBitmap_GetTHandle(pBitmap));
 
 /* 08/08/2004 Wendell Buckner
-     BUG FIX: Allways call geBitmap_SetRenderFlags() before calling a textured rendering function(for embm, dot3, & etc...). */
+	 BUG FIX: Allways call geBitmap_SetRenderFlags() before calling a textured rendering function(for embm, dot3, & etc...). */
 	geBitmap_SetRenderFlags(pBitmap, &RenderFlags);
 
 	RDriver->RenderMiscTexturePoly(Clipped1, Length1, geBitmap_GetTHandle(pBitmap), RenderFlags);
@@ -1152,7 +1152,7 @@ static void RenderGouraudPoly(DRV_Driver *RDriver, gePoly *Poly, Frustum_Info *F
 	assert(geWorld_PolyIsValid(Poly));
 
 	pFPlanes = FInfo->Planes;
-	
+
 	pVert = Verts;
 	pLVert = Poly->Verts;
 	pTex1 = Tex1;
@@ -1166,7 +1166,7 @@ static void RenderGouraudPoly(DRV_Driver *RDriver, gePoly *Poly, Frustum_Info *F
 		pTex1->r = pLVert->r;
 		pTex1->g = pLVert->g;
 		pTex1->b = pLVert->b;
-		
+
 		pVert++;
 		pLVert++;
 		pTex1++;
@@ -1213,7 +1213,7 @@ static void RenderGouraudPoly(DRV_Driver *RDriver, gePoly *Poly, Frustum_Info *F
 	}
 
 	Frustum_ProjectRGB(pDest3, pTex1, Clipped1, Length1, Camera);
-		
+
 	Clipped1[0].a = Poly->Verts[0].a;
 
 	if(Poly->RenderFlags & GE_RENDER_DO_NOT_OCCLUDE_OTHERS)
@@ -1291,8 +1291,8 @@ void User_EngineFillRect(geEngine *Engine, const GE_Rect *Rect, const GE_RGBA *C
 	DrvVertex[3].b = Color->b;
 	DrvVertex[3].a = Color->a;
 
-/* 01/30/2003 Wendell Buckner 
-     Driver render flush is probably causing a slow down! */
+/* 01/30/2003 Wendell Buckner
+	 Driver render flush is probably causing a slow down! */
 	if (Color->a != 255.0f)
 		RDriver->RenderGouraudPoly(DrvVertex, 4, DRV_RENDER_FLUSH);
 	else
@@ -1304,7 +1304,7 @@ void User_EngineFillRect(geEngine *Engine, const GE_Rect *Rect, const GE_RGBA *C
 }
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) */
+	BUG FIX: Rendering Transparent Polys properly (2) */
 
 static geBoolean RenderUserTLPoly ( geCamera *Camera, gePoly *Poly)
 {
@@ -1417,7 +1417,7 @@ void geWorld_LinkPolyToLeaf(const geWorld *World, gePoly *Poly)
 	}
 
 	assert(Leaf >=0 && Leaf < World->CurrentBSP->BSPData.NumGFXLeafs);
-	
+
 	pLeafData = &World->CurrentBSP->LeafData[Leaf];
 
 	// Insert into the beginning of the list
@@ -1474,11 +1474,11 @@ void geWorld_UnLinkPolyFromLeaf(gePoly *Poly)
 //=====================================================================================
 //	geWorld_AddPoly
 //=====================================================================================
-GENESISAPI gePoly *geWorld_AddPoly(		geWorld *World, 
-										GE_LVertex *Verts, 
-										int32 NumVerts, 
+GENESISAPI gePoly *geWorld_AddPoly(		geWorld *World,
+										GE_LVertex *Verts,
+										int32 NumVerts,
 										geBitmap *Bitmap,
-										gePoly_Type Type, 
+										gePoly_Type Type,
 										uint32 RenderFlags,
 										geFloat Scale)
 {
@@ -1490,7 +1490,7 @@ GENESISAPI gePoly *geWorld_AddPoly(		geWorld *World,
 	assert(Bitmap != NULL || Type == GE_GOURAUD_POLY);
 	assert(Verts != NULL);
 	assert(NumVerts <= MAX_USER_VERTS);
-	
+
 	Poly = GE_RAM_ALLOCATE_STRUCT(gePoly);
 
 	if (!Poly)
@@ -1530,9 +1530,9 @@ GENESISAPI gePoly *geWorld_AddPoly(		geWorld *World,
 //=====================================================================================
 //	geWorld_AddPolyOnce
 //=====================================================================================
-GENESISAPI gePoly *geWorld_AddPolyOnce(	geWorld *World, 
-										GE_LVertex *Verts, 
-										int32 NumVerts, 
+GENESISAPI gePoly *geWorld_AddPolyOnce(	geWorld *World,
+										GE_LVertex *Verts,
+										int32 NumVerts,
 										geBitmap *Bitmap,
 										gePoly_Type Type,
 										uint32 RenderFlags,
@@ -1542,7 +1542,7 @@ GENESISAPI gePoly *geWorld_AddPolyOnce(	geWorld *World,
 
 	assert(World != NULL);
 	assert(World->UserInfo != NULL);
-	
+
 	// For AddPOlyOnce, do an AddPoly, then put it in the list to be removed at the end of the frame
 	Poly = geWorld_AddPoly(World, Verts, NumVerts, Bitmap, Type, RenderFlags, Scale);
 
@@ -1608,6 +1608,6 @@ GENESISAPI geBoolean gePoly_SetLVertex(gePoly *Poly, int32 Index, const GE_LVert
 
 	geWorld_UnLinkPolyFromLeaf(Poly);			// Detach the poly from it's current leaf
 	geWorld_LinkPolyToLeaf(Poly->World, Poly);	// Re-attach to the new leaf (if any, check for cohearency!)
-	
+
 	return GE_TRUE;
 }
