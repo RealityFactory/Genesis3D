@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  Palettize                                                                           */
+/*  Palettize.c                                                                         */
 /*                                                                                      */
 /*  Author: Charles Bloom                                                               */
 /*  Description:  Palettize-ing code                                                    */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 
@@ -111,7 +111,7 @@ uint8 palette[768],*pSrc,*pDst;
 		assert(ops);
 		DstCK = DstInfo->ColorKey;
 
-		if ( gePixelFormat_HasAlpha(Format) )	
+		if ( gePixelFormat_HasAlpha(Format) )
 		{
 		gePixelFormat_ColorGetter GetColor;
 			GetColor = ops->GetColor;
@@ -245,7 +245,7 @@ uint8 palette[768],*pSrc,*pDst;
 #endif
 
 	closestPalFree(palInfo);
-	
+
 return GE_TRUE;
 }
 
@@ -269,13 +269,13 @@ we store palette entries in the octree as (palVal+1) so that we can use 0 to mea
 per-pixel time : 5e-7	(found in octree lookup)
 per-color time : 7e-6	(not in octree time)
 
-total_seconds = (5e-7)*(num_pels + palettize_size) + 
+total_seconds = (5e-7)*(num_pels + palettize_size) +
 	(3e-8)*(num_actual_colors - palettize_size)*(palettize_size)
 
 	(coder=bitplane,transform=L97)
 
 stop-rate 4 , PSNR on :
-brute-force 
+brute-force
 	pal1 ; 33.29
 	pal2 : 37.69
 	pal3 : 33.69
@@ -308,19 +308,19 @@ OctTree with brute-force on null
 #define HASHROUNDED(R,G,B)	( (((R+QUANT_ROUND)>>QUANT_SHIFT)<<(QUANT_BITS+QUANT_BITS)) + (((G+QUANT_ROUND)>>QUANT_SHIFT)<<(QUANT_BITS)) + (((B+QUANT_ROUND)>>QUANT_SHIFT)))
 
 typedef struct octNode octNode;
-struct octNode 
+struct octNode
 {
 	octNode * kids[8];
 	octNode * parent;
 };
 
-typedef struct hashNode 
+typedef struct hashNode
 {
 	struct hashNode *next;
 	int R,G,B,pal;
 } hashNode;
 
-struct palInfo 
+struct palInfo
 {
 	uint8 *palette;
 	octNode *root;
@@ -380,7 +380,7 @@ int i;
 	pi->root = MemPool_GetHunk(octNodePool);
 	assert(pi->root);
 
-	for(i=0;i<256;i++) 
+	for(i=0;i<256;i++)
 	{
 		int R,G,B;
 		R = palette[3*i]; G = palette[3*i+1]; B = palette[3*i+2];
@@ -400,7 +400,7 @@ int hash,d,bestD,bestP;
 	if ( hash > HASH_SIZE ) hash = HASH_SIZE;
 
 	node = pi->hash[ hash ];
-	if ( ! node ) 
+	if ( ! node )
 	{
 		bestP = findClosestPalBrute(R,G,B,pi);
 #if 1
@@ -423,10 +423,10 @@ int hash,d,bestD,bestP;
 	}
 
 	bestD = 99999999;	bestP = node->pal;
-	while(node) 
+	while(node)
 	{
 		d = (R - node->R)*(R - node->R) + (G - node->G)*(G - node->G) + (B - node->B)*(B - node->B);
-		if ( d < bestD ) 
+		if ( d < bestD )
 		{
 			bestD = d;
 			bestP = node->pal;
@@ -473,7 +473,7 @@ void closestPalFree(palInfo *pi)
 {
 
 	assert(pi);
-	
+
 	MemPool_Reset(octNodePool);
 	MemPool_Reset(hashNodePool);
 
@@ -498,7 +498,7 @@ uint8 color[3];
 	{
 		pal += 3;
 		d = colorDistance(color,pal);
-		if ( d < bestD ) 
+		if ( d < bestD )
 		{
 			bestD = d;
 			bestP = p;
@@ -526,10 +526,10 @@ int idx;
 int bits;
 octNode *node = root;
 
-	for(bits=7;bits>0;bits--) 
+	for(bits=7;bits>0;bits--)
 	{
 		idx = RGBbits(R,G,B,bits);
-		if ( ! node->kids[idx] ) 
+		if ( ! node->kids[idx] )
 		{
 			node->kids[idx] = MemPool_GetHunk(octNodePool);
 			node->kids[idx]->parent = node;
@@ -545,10 +545,10 @@ void addHash(palInfo *pi,int R,int G,int B,int palVal,int hash)
 hashNode *node;
 int i,h;
 
-	for(i=0;i<8;i++) 
+	for(i=0;i<8;i++)
 	{
 		h = hash + (i&1) + (((i>>1)&1)<<QUANT_BITS) + ((i>>2)<<(QUANT_BITS+QUANT_BITS));
-		if ( h <= HASH_SIZE ) 
+		if ( h <= HASH_SIZE )
 		{
 			node = MemPool_GetHunk(hashNodePool);
 			assert(node);

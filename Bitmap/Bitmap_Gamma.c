@@ -3,14 +3,14 @@
 /*                                                                                      */
 /*  Author: Charles Bloom                                                               */
 /*  Description:  The Bitmap_Gamma_Apply function                                       */
-/*					Fast Gamma correction routines for various pixel formats			*/
+/*                  Fast Gamma correction routines for various pixel formats            */
 /*                                                                                      */
 /*  Edit History:                                                                       */
 /*   02/20/2004 Wendell Buckner                                                         */
-/*    DOT3 BUMPMAPPING                                                                   */
-/*   08/27/2003 Wendell Buckner                                                         */  
-/*    BUMPMAPPING                                                                       */    
-/*	   Don't gamma correct the true bump-map bitmap                                     */
+/*    DOT3 BUMPMAPPING                                                                  */
+/*   08/27/2003 Wendell Buckner                                                         */
+/*    BUMPMAPPING                                                                       */
+/*    Don't gamma correct the true bump-map bitmap                                      */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -24,7 +24,7 @@
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
 /*  Genesis3D Version 1.1 released November 15, 1999                                    */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                             */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 
@@ -94,7 +94,7 @@ geFloat Gamma;
 	void *	Bits;
 	int		Size;
 	gePixelFormat Format;
-	
+
 		// gamma correct the palette
 
 		assert(Bitmap->DriverInfo.Palette);
@@ -139,7 +139,7 @@ geFloat Gamma;
 		for(mip=0;mip<mipCount;mip++)
 		{
 			Lock = Locks[mip];
-			
+
 			if ( ! geBitmap_GetInfo(Lock,&Info,NULL) )
 			{
 				geErrorLog_AddString(-1,"geBitmap_Gamma_Apply : GetInfo failed", NULL);
@@ -180,26 +180,26 @@ gePixelFormat_ColorGetter	GetColor;
 gePixelFormat_ColorPutter	PutColor;
 
 /* 02/20/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
-    if ( pInfo->IsNormalMap ) return GE_TRUE;
+	DOT3 BUMPMAPPING */
+	if ( pInfo->IsNormalMap ) return GE_TRUE;
 
 	Format = pInfo->Format;
 
 /* 08/27/2003 Wendell Buckner
-    BUMPMAPPING 
+	BUMPMAPPING
 	Don't gamma correct the true bump-map bitmap */
 	switch (Format)
 	{
-     case GE_PIXELFORMAT_16BIT_88_UV:
-     case GE_PIXELFORMAT_16BIT_556_UVL:
-     case GE_PIXELFORMAT_24BIT_888_UVL:
+	 case GE_PIXELFORMAT_16BIT_88_UV:
+	 case GE_PIXELFORMAT_16BIT_556_UVL:
+	 case GE_PIXELFORMAT_24BIT_888_UVL:
 	  return GE_TRUE;
-    }	
+	}
 
 	ops = gePixelFormat_GetOperations(Format);
 	if ( ! ops )
 		return GE_FALSE;
-	
+
 	Decompose	= ops->DecomposePixel;
 	Compose		= ops->ComposePixel;
 	GetColor 	= ops->GetColor;
@@ -314,7 +314,7 @@ gePixelFormat_ColorPutter	PutColor;
 							R = Lut[R];
 							G = Lut[G];
 							B = Lut[B];
-							Pixel = Compose(R,G,B,A);	
+							Pixel = Compose(R,G,B,A);
 							if ( Pixel == ck )
 								Pixel ^= 1;
 							*ptr++ = (uint8)((Pixel>>16)&0xFF);
@@ -494,7 +494,7 @@ uint16 * ptr;
 	{
 	uint16 ck;
 		ck = (uint16) pInfo->ColorKey;
-		
+
 		for(y=h;y--;)
 		{
 			for(x=w;x--;)
@@ -525,7 +525,7 @@ uint16 * ptr;
 	assert( (int)(ptr) == ( ((int)Bits) + pInfo->Height * pInfo->Stride * 2 ) );
 
 }
-					
+
 void geBitmap_GammaCorrect_Data_4444_ARGB(void * Bits,geBitmap_Info * pInfo)
 {
 uint32 w,h,xtra,x,y;
@@ -568,7 +568,7 @@ uint16 * ptr;
 	{
 	uint16 ck;
 		ck = (uint16) pInfo->ColorKey;
-		
+
 		for(y=h;y--;)
 		{
 			for(x=w;x--;)
@@ -598,7 +598,7 @@ uint16 * ptr;
 
 	assert( (int)(ptr) == ( ((int)Bits) + pInfo->Height * pInfo->Stride * 2 ) );
 }
-																	
+
 void geBitmap_Gamma_Compute_Lut(double Gamma)
 {
 uint32 c=0,gc=0,lgc=0;

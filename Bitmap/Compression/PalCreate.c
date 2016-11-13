@@ -1,7 +1,5 @@
-/*}{*************************************************/
-
 /****************************************************************************************/
-/*  PalCreate                                                                           */
+/*  PalCreate.c                                                                         */
 /*                                                                                      */
 /*  Author: Charles Bloom                                                               */
 /*  Description:  Palette Creation code                                                 */
@@ -17,10 +15,12 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
+
+/*}{*************************************************/
 
 /**********
 
@@ -63,7 +63,7 @@ my fast (incremental) way to compute the GE_TRUE node cost :
 			  = Sum[kids] kid_count * ((kid_color - node_color)^2 + (node_color - new_color)^2
 										+ 2 * (kid_color - node_color) * (node_color - new_color))
 			= approx_cost + 2 *  (node_color - new_color) * { Sum[kids] kid_count * (kid_color - node_color) }
-					  
+
 	the correction here is exactly zero! why :
 		Sum[kids] kid_count * (kid_color - node_color) = (Sum[kids] kid_count * kid_color) - node_count * node_color = 0 !
 	since that's the definition of node_color !
@@ -144,7 +144,7 @@ geBitmap_Palette * Pal;
 
 	if ( ! geBitmap_LockForRead((geBitmap *)Bitmap,&Lock,0,0,GE_PIXELFORMAT_24BIT_RGB,GE_FALSE,0) )
 		return NULL;
-	
+
 	if ( ! geBitmap_GetInfo(Lock,&Info,NULL) )
 		return NULL;
 
@@ -158,13 +158,13 @@ geBitmap_Palette * Pal;
 
 		if ( ! geBitmap_Palette_GetData(Pal,paldata,GE_PIXELFORMAT_24BIT_RGB,256) )
 			assert(0);
-		
+
 		paletteOptimize(&Info,Bits,paldata,256,0);
-		
+
 		if ( ! geBitmap_Palette_SetData(Pal,paldata,GE_PIXELFORMAT_24BIT_RGB,256) )
 			assert(0);
 	}
-		
+
 	geBitmap_UnLock(Lock);
 
 return Pal;
@@ -173,7 +173,7 @@ return Pal;
 /*}{*************************************************/
 
 typedef struct octNode octNode;
-struct octNode 
+struct octNode
 {
 	octNode * kids[8];
 	octNode * parent;
@@ -255,7 +255,7 @@ geBitmap_Palette * Pal;
 
 	leaves = geRam_AllocateClear(sizeof(octNode *)*nLeaves);
 	assert(leaves);
-	
+
 	// gather leaves into a linear array
 	//	for speed we ignore leaves with a count lower than [x]
 
@@ -324,7 +324,7 @@ geBitmap_Palette * Pal;
 	root->parent = root;
 	computeCutCosts(root);
 	root->parent = NULL;
-	
+
 	// gather leaves into a linear array
 	//	for speed we ignore leaves with a count lower than [x]
 
@@ -383,7 +383,7 @@ geBitmap_Palette * Pal;
 
 	palPtr = palette;
 	radixN = RADIX_SIZE-1;
-	leaf = radix[radixN].prev;	
+	leaf = radix[radixN].prev;
 	for(i=0;i<palEntries && radixN>0;i++)
 	{
 		*palPtr++ = leaf->R;
@@ -425,7 +425,7 @@ void insertRadix(octNode * radix,octNode *leaf)
 {
 octNode *insertAt;
 
-	if ( leaf->cutCost >= RADIX_SIZE ) 
+	if ( leaf->cutCost >= RADIX_SIZE )
 	{
 		octNode * head;
 		insertAt = head = & radix[RADIX_SIZE-1];
@@ -449,7 +449,7 @@ int i,d,bestD,bestP;
 	{
 		d = square(R - palette[0]) + square(G - palette[1]) + square(B - palette[2]);
 		palette += 3;
-		if ( d < bestD ) 
+		if ( d < bestD )
 		{
 			bestD = d;
 			bestP = i;
@@ -466,10 +466,10 @@ int bits;
 octNode *node;
 
 	node = root;
-	for(bits=7;bits>=0;bits--) 
+	for(bits=7;bits>=0;bits--)
 	{
 		idx = RGBbits(R,G,B,bits);
-		if ( ! node->kids[idx] ) 
+		if ( ! node->kids[idx] )
 		{
 			node->nKids ++;
 			node->kids[idx] = MemPool_GetHunk(octNodePool);
@@ -488,9 +488,9 @@ octNode *node;
 static void gatherLeaves(octNode *node,octNode *** leavesPtrPtr,int minCount)
 {
 	if ( node->count <= minCount ) return;
-	if ( node->nKids == 0 ) 
+	if ( node->nKids == 0 )
 	{
-		*(*leavesPtrPtr)++ = node;	
+		*(*leavesPtrPtr)++ = node;
 	}
 	else
 	{
@@ -504,7 +504,7 @@ static void gatherLeaves(octNode *node,octNode *** leavesPtrPtr,int minCount)
 
 static void gatherLeavesCutting(octNode *node,octNode *** leavesPtrPtr)
 {
-	if ( node->nKids > 0 ) 
+	if ( node->nKids > 0 )
 	{
 		int i;
 		for(i=0;i<8;i++)
@@ -520,14 +520,14 @@ static void gatherLeavesCutting(octNode *node,octNode *** leavesPtrPtr)
 				else
 				{
 					gatherLeavesCutting(node->kids[i],leavesPtrPtr);
-					
+
 					if ( node->kids[i]->nKids == 1 )
 					{
 						octNode *kid;
 						int j;
 						kid = node->kids[i];
 						for(j=0;j<8;j++)
-							if ( kid->kids[j] ) 
+							if ( kid->kids[j] )
 								node->kids[i] = kid->kids[j];
 						assert( node->kids[i] != kid );
 						node->kids[i]->cutCost = kid->cutCost;
@@ -539,9 +539,9 @@ static void gatherLeavesCutting(octNode *node,octNode *** leavesPtrPtr)
 		}
 	}
 
-	if ( node->nKids == 0 ) 
+	if ( node->nKids == 0 )
 	{
-		*(*leavesPtrPtr)++ = node;	
+		*(*leavesPtrPtr)++ = node;
 	}
 }
 
@@ -567,7 +567,7 @@ void computeCutCosts(octNode *node)
 					+ square(node->G - node->parent->G)
 					+ square(node->B - node->parent->B);
 	node->cutCost *= node->count;
-	
+
 	if ( node->nKids > 0 )
 	{
 	int i;

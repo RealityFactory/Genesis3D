@@ -1,19 +1,16 @@
-#ifndef BITMAP_H
-#define BITMAP_H
-
 /****************************************************************************************/
 /*  Bitmap.h                                                                            */
 /*                                                                                      */
 /*  Author: Charles Bloom                                                               */
 /*  Description:  Abstract Bitmap system                                                */
 /*                                                                                      */
-/*  Edit History:                                                                       */ 
+/*  Edit History:                                                                       */
 /*                                                                                      */
-/*  Edit History:                                                                       */ 
-/*   03/24/2004 Wendell Buckner                                                         */
-/*    BUG FIX: Rendering Transparent Polys properly (2)                                 */
-/*	03/15/2004 Wendell Buckner                                                          */ 
-/*    SPHEREMAPPING                                                                     */
+/*  Edit History:                                                                       */
+/*  03/24/2004 Wendell Buckner                                                          */
+/*   BUG FIX: Rendering Transparent Polys properly (2)                                  */
+/*  03/15/2004 Wendell Buckner                                                          */
+/*   SPHEREMAPPING                                                                      */
 /*  03/14/2004 Wendell Buckner                                                          */
 /*   BUMPMAPPING - Allow the height differential map to be changed by the height map    */
 /*  02/21/2004 Wendell Buckner                                                          */
@@ -23,8 +20,8 @@
 /*  02/18/2004 Wendell Buckner                                                          */
 /*   DOT3 BUMPMAPPING                                                                   */
 /*  10/15/2003 Wendell Buckner                                                          */
-/*    Bumpmapping for the World                                                         */
-/*  03/28/2003 Wendell Buckner                                                          */   
+/*   Bumpmapping for the World                                                          */
+/*  03/28/2003 Wendell Buckner                                                          */
 /*    BUMPMAPPING                                                                       */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
@@ -42,6 +39,8 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
+#ifndef BITMAP_H
+#define BITMAP_H
 
 
 #include "BaseType.h"
@@ -70,23 +69,23 @@ typedef struct geBitmap_Info
 	geBitmap_Palette *		Palette;
 
 /* 02/20/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
-    geBoolean IsNormalMap;
+	DOT3 BUMPMAPPING */
+	geBoolean IsNormalMap;
 
-/* 03/14/2004 Wendell Buckner 
-    BUMPMAPPING - Have a informational variable which tells us what kind of bitmap this is */
-    geBoolean IsHeightMap;
+/* 03/14/2004 Wendell Buckner
+	BUMPMAPPING - Have a informational variable which tells us what kind of bitmap this is */
+	geBoolean IsHeightMap;
 
 } geBitmap_Info;
 
-/***********************************************************************************/		
+/***********************************************************************************/
 // Bitmap methods
 
 // see a big comment at the end of this file
 
 /************************************************************************/
 
-GENESISAPI geBitmap *	GENESISCC	geBitmap_Create(int Width, int Height, int MipCount, gePixelFormat Format ); 
+GENESISAPI geBitmap *	GENESISCC	geBitmap_Create(int Width, int Height, int MipCount, gePixelFormat Format );
 GENESISAPI void			GENESISCC	geBitmap_CreateRef(geBitmap *Bmp);
 
 GENESISAPI geBitmap *	GENESISCC	geBitmap_CreateFromInfo(const geBitmap_Info * pInfo);
@@ -152,8 +151,8 @@ GENESISAPI geBoolean 	GENESISCC	geBitmap_LockForWriteFormat(
 GENESISAPI geBoolean 	GENESISCC	geBitmap_UnLock(geBitmap *Bmp);	// must be done on All locked mips
 GENESISAPI geBoolean 	GENESISCC	geBitmap_UnLockArray(geBitmap **Locks,int Size);
 
-GENESISAPI geBoolean 	GENESISCC	geBitmap_SetFormat(geBitmap *Bmp, 
-							gePixelFormat NewFormat, 
+GENESISAPI geBoolean 	GENESISCC	geBitmap_SetFormat(geBitmap *Bmp,
+							gePixelFormat NewFormat,
 							geBoolean RespectColorKey, uint32 ColorKey,
 							const geBitmap_Palette * Palette);
 	// _SetFormat may cause you to lose color information!
@@ -178,7 +177,7 @@ GENESISAPI geBoolean			GENESISCC	geBitmap_SetPalette(geBitmap *Bmp, const geBitm
 	//	(hence Palette is *not* const)
 	// Warning : SetPalette on any mip changes the palette of ALL mips !
 	// see Palette note at _UnLock
-	// _SetPal destroys the bitmap's original palette and refs the new one, 
+	// _SetPal destroys the bitmap's original palette and refs the new one,
 	//		so if you setpal with the bitmap's palette, there is no net change in ref counts (good!)
 
 GENESISAPI geBoolean	GENESISCC	geBitmap_HasAlpha(const geBitmap * Bmp);
@@ -206,7 +205,7 @@ GENESISAPI void *		GENESISCC	geBitmap_GetBits(geBitmap *Bmp);	// works only on a
 
 GENESISAPI geBoolean 	GENESISCC	geBitmap_RefreshMips(geBitmap *Bmp);	// rebuilds mips; *tries* to be smart & not overwrite manually-fixed mips
 												// RefreshMips does *not* build mips that don't exist
-GENESISAPI geBoolean 	GENESISCC	geBitmap_UpdateMips(geBitmap *Bmp,int SourceMip,int TargetMip);	
+GENESISAPI geBoolean 	GENESISCC	geBitmap_UpdateMips(geBitmap *Bmp,int SourceMip,int TargetMip);
 												// will create the target if it doesn't exist;
 												// will overwrite manually-fixed mips!
 GENESISAPI geBoolean 	GENESISCC	geBitmap_SetMipCount(geBitmap *Bmp,int Count);
@@ -228,7 +227,7 @@ GENESISAPI uint32		GENESISCC	geBitmap_MipBytes(const geBitmap * Bitmap,int mip);
 *
 * warning : if you lock multiple mips for write, and then modify one of the mips
 *		(such as via SetPalette) it may affect the owner and all sibling mips!
-*		doing different SetPalettes with different palettes on different locked mips 
+*		doing different SetPalettes with different palettes on different locked mips
 *		has undefined behavior!
 *
 **/
@@ -314,7 +313,7 @@ GENESISAPI geBoolean		GENESISCC	geBitmap_Palette_Lock(geBitmap_Palette *Palette,
 
 GENESISAPI geBoolean		GENESISCC	geBitmap_Palette_UnLock(geBitmap_Palette *Palette);
 											// palette unlock does NOT notify the bitmap that the palette has changed.
-											// call Bitmap_SetPalette() with the same palette pointer 
+											// call Bitmap_SetPalette() with the same palette pointer
 											// 	to tell the bitmap that it must to some processing
 											// (don't worry, it won't duplicate it or copy it onto itself)
 
@@ -331,23 +330,23 @@ GENESISAPI geBoolean		GENESISCC	geBitmap_Palette_SetEntry(      geBitmap_Palette
 GENESISAPI geBoolean		GENESISCC	geBitmap_Palette_GetEntry(const geBitmap_Palette *P,int Color,uint32 *Pixel);
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) */
-GENESISAPI geBoolean GENESISCC geBitmap_UsesColorKey(const geBitmap * Bmp); 
+	BUG FIX: Rendering Transparent Polys properly (2) */
+GENESISAPI geBoolean GENESISCC geBitmap_UsesColorKey(const geBitmap * Bmp);
 
 /*	03/15/2004 Wendell Buckner
-    SPHEREMAPPING */
+	SPHEREMAPPING */
 GENESISAPI geBoolean GENESISCC geBitmap_IsSphereMapName(const char *BmpName);
 
-/* 03/14/2004 Wendell Buckner 
-    BUMPMAPPING - Allow the height differential map to be changed by the height map */
+/* 03/14/2004 Wendell Buckner
+	BUMPMAPPING - Allow the height differential map to be changed by the height map */
 GENESISAPI geBoolean GENESISCC geBitmap_UpdateBumpMapAlt ( geBitmap *BumpBmp );
 
 /* 02/21/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
+	DOT3 BUMPMAPPING */
 GENESISAPI geBoolean GENESISCC geBitmap_GetEngineSupport(void * EngineSupport, uint32 DesiredEngineSupport );
 
 /* 02/18/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
+	DOT3 BUMPMAPPING */
 GENESISAPI geBoolean GENESISCC geBitmap_CreateBumpmapDot3 (geBitmap *BaseBmp, geBitmap *BumpBmp, geBitmap *SpecularBmp);
 GENESISAPI geBoolean GENESISCC geBitmap_IsBumpmapNameDot3(const char *BmpName);
 GENESISAPI geBoolean GENESISCC geBitmap_DestroyBumpmapDot3 (geBitmap *BaseBmp);
@@ -355,14 +354,14 @@ GENESISAPI void GENESISCC geBitmap_AttachBumpmapToDriverDot3( geBitmap *Bmp );
 GENESISAPI void GENESISCC geBitmap_DetachBumpmapFromDriverDot3( geBitmap *Bmp );
 
 /* 10/15/2003 Wendell Buckner
-    Bumpmapping for the World */
+	Bumpmapping for the World */
 GENESISAPI char * GENESISCC geBitmap_GetGreyBumpmapName(const char *BumpName);
 GENESISAPI char * GENESISCC geBitmap_GetSpecularBumpmapName(const char *BmpName);
 GENESISAPI geBoolean GENESISCC geBitmap_IsGreyBumpmapName(const char *BmpName);
 GENESISAPI geBoolean GENESISCC geBitmap_IsSpecularBumpmapName(const char *BmpName);
 
 /* 03/28/2003 Wendell Buckner
-    BUMPMAPPING */
+	BUMPMAPPING */
 GENESISAPI geBoolean GENESISCC geBitmap_IsBumpmapName(const char *BmpName);
 GENESISAPI void GENESISCC geBitmap_GetBumpMapPixelFormats( gePixelFormat *DriverFormatsPtr, gePixelFormat *BumpMapPixelFormats, int *BumpMapPixelFormatCount);
 GENESISAPI geBitmap * GENESISCC geBitmap_CreateBumpmap (geBitmap *BaseBmp, geBitmap *BumpBmp, geBitmap *SpecularBmp, gePixelFormat BumpFormat );
@@ -470,7 +469,7 @@ geBitmap_Info Info;
 
 		success = geBitmap_SetColorKey(myBM,GE_TRUE,gePixelFormat_ComposePixel(Info.Format,0,0,0,0));
 		assert(success);
-	}	
+	}
 
 	// note that I did NOT use SetFormat.  SetFormat may do a conversion, and since the original
 	//	bitmap was created without colorkey, it would have been converted to a new format but
@@ -494,7 +493,7 @@ void Shutdown(void)
 geBoolean WasDestroyed;
 
 	assert(myBM);
-	
+
 	// clean up
 
 	geEngine_RemoveBitmap(myEngine,myBM);

@@ -5,7 +5,7 @@
 /*  Description:  The abstract Pixel primitives                                         */
 /*                                                                                      */
 /*  Edit History:                                                                       */
-/*  05/27/2003 Wendell Buckner                                                          */ 
+/*  05/27/2003 Wendell Buckner                                                          */
 /*   BUMPMAPPING                                                                        */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
@@ -19,8 +19,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 
@@ -159,7 +159,7 @@ return count;
 GENESISAPI geBoolean GENESISCC gePixelFormat_HasGoodAlpha(  gePixelFormat Format )
 {
 	assert( gePixelFormat_IsValid(Format) );
-	
+
 	if ( NumBitsOn(gePixelFormat_Operations_Array[Format].AMask) > 1 )
 		return GE_TRUE;
 	else
@@ -830,7 +830,7 @@ void	Put_32abgr(uint8 **ppData,int  R,int  G,int  B,int  A)
 
 
 /* 05/27/2003 Wendell Buckner
-    BUMPMAPPING */
+	BUMPMAPPING */
 
 //********************************************************************
 
@@ -877,16 +877,16 @@ void	Decompose_24uvl (uint32 Pixel, int *U,int *V,int *L,int *A)
 
 /*}{********* the giant format-ops definition ****************/
 
-static const gePixelFormat_Operations gePixelFormat_Operations_Array_Def[] = 
+static const gePixelFormat_Operations gePixelFormat_Operations_Array_Def[] =
 {
-	{0,0,0,0,			0,0,0,0,	0,0,0,0,	0 ,0,		"invalid"},	
+	{0,0,0,0,			0,0,0,0,	0,0,0,0,	0 ,0,		"invalid"},
 
 	{0,0,0,0,			0,0,0,0,	0,0,0,0,	1 ,1,		"8bit pal",		NULL,NULL,	NULL,NULL,	GetPixel_8bit, PutPixel_8bit},
 	//	Gray = (R>>2) + (G>>1) + (B>>2)
 	{0x3F,0x7F,0x3F,0,	-2,-1,-2,0, 3,0,3,0xFF,	1 ,0,		"8bit gray",	Compose_8bitGray,Decompose_8bitGray, Get_8bitGray,Put_8bitGray, GetPixel_8bit, PutPixel_8bit},
 
 	// 16 bit (in uwords)
-	{0x7C00	,0x03E0	,0x001F	,0,			 7, 2, -3, 0,	4,4,4,0xFF,		2,0,	"555 RGB",		Compose_555rgb,Decompose_555rgb, Get_555rgb,Put_555rgb,	GetPixel_16bit,PutPixel_16bit},	
+	{0x7C00	,0x03E0	,0x001F	,0,			 7, 2, -3, 0,	4,4,4,0xFF,		2,0,	"555 RGB",		Compose_555rgb,Decompose_555rgb, Get_555rgb,Put_555rgb,	GetPixel_16bit,PutPixel_16bit},
 	{0x001F	,0x03E0	,0x7C00	,0,			-3, 2,  7, 0,	4,4,4,0xFF,		2,0,	"555 BGR",		Compose_555bgr,Decompose_555bgr, Get_555bgr,Put_555bgr,	GetPixel_16bit,PutPixel_16bit},
 	{0xF800	,0x07E0	,0x001F	,0,			 8, 3, -3, 0,	4,2,4,0xFF,		2,0,	"565 RGB",		Compose_565rgb,Decompose_565rgb, Get_565rgb,Put_565rgb,	GetPixel_16bit,PutPixel_16bit},
 	{0x001F	,0x07E0	,0xF800	,0,			-3, 3,  8, 0,	4,2,4,0xFF,		2,0,	"565 BGR",		Compose_565bgr,Decompose_565bgr, Get_565bgr,Put_565bgr,	GetPixel_16bit,PutPixel_16bit},
@@ -912,7 +912,7 @@ static const gePixelFormat_Operations gePixelFormat_Operations_Array_Def[] =
 	{0,0,0,0, 			0,0,0,0,	0,0,0,0,	0 ,0,	"wavelet"},
 
 /* 05/27/2003 Wendell Buckner
-    BUMPMAPPING */
+	BUMPMAPPING */
 	{0x00000000,0x00000000,0x00000000,0x00000000,	0 , 0, 0, 0,	0,0,0,0,2,0,"16 bit UV",	 Compose_16uv, Decompose_16uv,	0,	0,	GetPixel_16bit,PutPixel_16bit},
 	{0x00000000,0x00000000,0x00000000,0x00000000,	0 , 0, 0, 0,	0,0,0,0,2,0,"16 bit UVL",	Compose_16uvl,Decompose_16uvl,	0,	0,	GetPixel_16bit,PutPixel_16bit},
 	{0x00000000,0x00000000,0x00000000,0x00000000,	0 , 0, 0, 0,	0,0,0,0,3,0,"24 bit UVL",	Compose_24uvl,Decompose_24uvl,	0,	0,	GetPixel_24bit,PutPixel_24bit},

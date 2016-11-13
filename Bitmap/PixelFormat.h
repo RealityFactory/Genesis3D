@@ -1,6 +1,3 @@
-#ifndef	PIXELFORMAT_H
-#define	PIXELFORMAT_H
-
 /****************************************************************************************/
 /*  PixelFormat.h                                                                       */
 /*                                                                                      */
@@ -22,10 +19,12 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
+#ifndef	PIXELFORMAT_H
+#define	PIXELFORMAT_H
 
 #include "BaseType.h"
 
@@ -41,32 +40,32 @@ typedef enum		// all supported formats (including shifts)
 	GE_PIXELFORMAT_16BIT_555_RGB,
 	GE_PIXELFORMAT_16BIT_555_BGR,
 	GE_PIXELFORMAT_16BIT_565_RGB,	// #5
-	GE_PIXELFORMAT_16BIT_565_BGR, 
+	GE_PIXELFORMAT_16BIT_565_BGR,
 	GE_PIXELFORMAT_16BIT_4444_ARGB, // #7
-	GE_PIXELFORMAT_16BIT_1555_ARGB, 
+	GE_PIXELFORMAT_16BIT_1555_ARGB,
 	GE_PIXELFORMAT_24BIT_RGB,		// #9
 	GE_PIXELFORMAT_24BIT_BGR,
 	GE_PIXELFORMAT_24BIT_YUV,		// * see note below
-	GE_PIXELFORMAT_32BIT_RGBX, 
-	GE_PIXELFORMAT_32BIT_XRGB, 
-	GE_PIXELFORMAT_32BIT_BGRX, 
+	GE_PIXELFORMAT_32BIT_RGBX,
+	GE_PIXELFORMAT_32BIT_XRGB,
+	GE_PIXELFORMAT_32BIT_BGRX,
 	GE_PIXELFORMAT_32BIT_XBGR,
-	GE_PIXELFORMAT_32BIT_RGBA, 
+	GE_PIXELFORMAT_32BIT_RGBA,
 	GE_PIXELFORMAT_32BIT_ARGB,		// #17
-	GE_PIXELFORMAT_32BIT_BGRA, 
+	GE_PIXELFORMAT_32BIT_BGRA,
 	GE_PIXELFORMAT_32BIT_ABGR,
-	
+
 	GE_PIXELFORMAT_WAVELET,			// #20 , Wavelet Compression
 
 /* 03/30/2003 Wendell Buckner
-    BUMPMAPPING */
+	BUMPMAPPING */
 	GE_PIXELFORMAT_16BIT_88_UV,
 	GE_PIXELFORMAT_16BIT_556_UVL,
 	GE_PIXELFORMAT_24BIT_888_UVL,
 
 	GE_PIXELFORMAT_COUNT
 } gePixelFormat;
-	
+
 /******
 
 there's something wacked out about these format names :
@@ -115,7 +114,7 @@ typedef struct gePixelFormat_Operations
 	int			BytesPerPel;
 	geBoolean	HasPalette;
 	char *		Description;
-	
+
 	gePixelFormat_Composer		ComposePixel;
 	gePixelFormat_Decomposer	DecomposePixel;
 
@@ -142,7 +141,7 @@ GENESISAPI geBoolean	GENESISCC gePixelFormat_IsRaw(			gePixelFormat Format );
 
 GENESISAPI uint32		GENESISCC gePixelFormat_ComposePixel(	gePixelFormat Format,int R,int G,int B,int A);
 GENESISAPI void			GENESISCC gePixelFormat_DecomposePixel(	gePixelFormat Format,uint32 Pixel,int *R,int *G,int *B,int *A);
-			
+
 															// these four functions move ppData to the next pixel
 
 GENESISAPI void			GENESISCC gePixelFormat_GetColor(gePixelFormat Format,uint8 **ppData,int *R,int *G,int *B,int *A);
@@ -150,7 +149,7 @@ GENESISAPI void			GENESISCC gePixelFormat_PutColor(gePixelFormat Format,uint8 **
 
 GENESISAPI uint32		GENESISCC gePixelFormat_GetPixel(gePixelFormat Format,uint8 **ppData);
 GENESISAPI void			GENESISCC gePixelFormat_PutPixel(gePixelFormat Format,uint8 **ppData,uint32 Pixel);
-	
+
 GENESISAPI uint32		GENESISCC gePixelFormat_ConvertPixel(gePixelFormat Format,uint32 Pixel,gePixelFormat ToFormat);
 
 

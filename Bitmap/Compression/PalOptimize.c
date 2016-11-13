@@ -1,6 +1,5 @@
-
 /****************************************************************************************/
-/*  PalOptimize                                                                         */
+/*  PalOptimize.c                                                                       */
 /*                                                                                      */
 /*  Author: Charles Bloom                                                               */
 /*  Description:  Palette Perfecting code                                               */
@@ -16,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 
@@ -54,7 +53,7 @@ The problems :
 		course the optimal is
 
 				*
-		
+
 			  *   *
 
 		(where * = X and +)
@@ -84,7 +83,7 @@ The problems :
 
 /*******/
 
-typedef struct 
+typedef struct
 {
 	int totR,totG,totB,count;
 } palOptInfo;
@@ -159,8 +158,8 @@ palOptInfo optInfo[256];
 
 			pal = closestPal(R,G,B,palInfo);
 
-			if ( pal >= palEntries ) pal = palEntries-1;			
-		
+			if ( pal >= palEntries ) pal = palEntries-1;
+
 			palPtr = palette + pal*3;
 			d = R - (*palPtr++);	mse += d*d;
 			d = G - (*palPtr++);	mse += d*d;
@@ -199,7 +198,7 @@ palOptInfo optInfo[256];
 		{
 			memcpy(savePalette,palette,768);
 		}
-	
+
 		Log_Printf("mse*256 = %7d , extrastep = %4d, samples = %7d\n",mse,extraStepSize,samples);
 
 		if ( totSamples >= maxSamples )
@@ -236,7 +235,7 @@ palOptInfo optInfo[256];
 			palPtr[1] = minmax( palPtr[1]+diffG , 0,255);
 			palPtr[2] = minmax( palPtr[2]+diffB , 0,255);
 		}
-		
+
 		if ( abs(mse - last_mse) < 50 && extraStepSize == 0 )
 		{
 			break;

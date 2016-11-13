@@ -1,13 +1,10 @@
-#ifndef GE_BITMAP____H
-#define GE_BITMAP____H
-
 /****************************************************************************************/
 /*  Bitmap.__h                                                                          */
 /*                                                                                      */
 /*  Author: Charles Bloom                                                               */
 /*  Description:  Bitmap*.c Internal Header (contains the Bitmap Struct)                */
 /*                                                                                      */
-/*  Edit History                                                                                    */
+/*  Edit History                                                                        */
 /*  03/14/2004 Wendell Buckner                                                          */
 /*   BUMPMAPPING - It's useful to navigate through the textures to get to the head or   */
 /*   the tail                                                                           */
@@ -25,14 +22,16 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
+#ifndef GE_BITMAP____H
+#define GE_BITMAP____H
 
 #include "Bitmap.h"
 #include "Bitmap._h"
 
-// Hey ! 
+// Hey !
 // this is bitmap.__h : for inclusion by bitmap friends ONLY!
 //	included by bitmap.c , bitmap_blitdata.c
 
@@ -98,12 +97,12 @@ struct geBitmap
 	geBoolean			DriverGammaSet;
 
 /* 03/31/2003 Wendell Buckner
-    BUMPMAPPING  */
+	BUMPMAPPING  */
 	geBitmap *NextBitmap;
 
-/* 03/14/2004 Wendell Buckner 
-    BUMPMAPPING - It's useful to navigate through the textures to get to the head or the tail*/
-    geBitmap *PrevBitmap;
+/* 03/14/2004 Wendell Buckner
+	BUMPMAPPING - It's useful to navigate through the textures to get to the head or the tail*/
+	geBitmap *PrevBitmap;
 
 };
 
@@ -138,7 +137,7 @@ geBoolean geBitmap_UpdateMips_Data(	geBitmap_Info * FmInfo,void * FmBits,
 geBoolean geBitmap_UpdateMips_System(geBitmap *Bmp,int fm,int to);
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) 
+	BUG FIX: Rendering Transparent Polys properly (2)
 geBoolean geBitmap_UsesColorKey(const geBitmap * Bmp);*/
 
 void	  geBitmap_MakeMipInfo(  geBitmap_Info *Src,int mip,geBitmap_Info *Into);

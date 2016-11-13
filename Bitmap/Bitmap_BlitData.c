@@ -3,7 +3,7 @@
 /*                                                                                      */
 /*  Author: Charles Bloom                                                               */
 /*  Description:  The Bitmap_BlitData function                                          */
-/*					Does all format conversions											*/
+/*                  Does all format conversions                                         */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -16,8 +16,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 
@@ -118,7 +118,7 @@ geBoolean geBitmap_BlitData_Sub(	const geBitmap_Info * iSrcInfo,const void *iSrc
 	if ( SizeX > SrcInfo->Width || SizeX > DstInfo->Width ||
 		 SizeY > SrcInfo->Height|| SizeY > DstInfo->Height)
 	{
-		geErrorLog_AddString(-1,"Bitmap_BlitData : size mismatch", NULL);	
+		geErrorLog_AddString(-1,"Bitmap_BlitData : size mismatch", NULL);
 		return GE_FALSE;
 	}
 
@@ -133,7 +133,7 @@ geBoolean geBitmap_BlitData_Sub(	const geBitmap_Info * iSrcInfo,const void *iSrc
 			geErrorLog_AddString(-1,"Bitmap_BlitData: SrcOps != DstOps",NULL);
 			return GE_FALSE;
 		}
-		
+
 	SrcPelBytes = SrcOps->BytesPerPel;
 	DstPelBytes = DstOps->BytesPerPel;
 
@@ -197,7 +197,7 @@ geBoolean geBitmap_BlitData_Sub(	const geBitmap_Info * iSrcInfo,const void *iSrc
 			geErrorLog_AddString(-1,"Bitmap_BlitData : Palette_Copy failed", NULL);
 			return GE_FALSE;
 		}
-		
+
 		if ( SrcInfo->HasColorKey )
 		{
 			if ( ! geBitmap_Palette_SetEntryColor(DstInfo->Palette,SrcInfo->ColorKey,0,0,0,0) )
@@ -224,8 +224,8 @@ geBoolean geBitmap_BlitData_Sub(	const geBitmap_Info * iSrcInfo,const void *iSrc
 	 ****/
 
 	/****/
-	
-	if (	SrcBmp && SrcBmp->Alpha && SrcBmp->Alpha->LockOwner && 
+
+	if (	SrcBmp && SrcBmp->Alpha && SrcBmp->Alpha->LockOwner &&
 		DstBmp && DstBmp->Alpha && DstBmp->Alpha->LockOwner )
 	{
 		if ( ! geBitmap_BlitBitmap(SrcBmp->Alpha,DstBmp->Alpha) )
@@ -235,11 +235,11 @@ geBoolean geBitmap_BlitData_Sub(	const geBitmap_Info * iSrcInfo,const void *iSrc
 			}
 		// now continue through to blit the main bitmap
 	}
-	else if ( SrcBmp && SrcBmp->Alpha && SrcBmp->Alpha->LockOwner && 
+	else if ( SrcBmp && SrcBmp->Alpha && SrcBmp->Alpha->LockOwner &&
 			( gePixelFormat_HasAlpha(DstFormat) || DstInfo->HasColorKey ) )
 	{
 		// there is no separate alpha -> color key conversion
-		// note that we cannot add separate alpha -> CK because the 
+		// note that we cannot add separate alpha -> CK because the
 		// separate-alpha *target* type has colorkey too !
 		if (BlitData_FromSeparateAlpha()==GE_FALSE)
 			{
@@ -250,11 +250,11 @@ geBoolean geBitmap_BlitData_Sub(	const geBitmap_Info * iSrcInfo,const void *iSrc
 			return GE_TRUE;
 
 	}
-	else if ( DstBmp && DstBmp->Alpha && DstBmp->Alpha->LockOwner && 
+	else if ( DstBmp && DstBmp->Alpha && DstBmp->Alpha->LockOwner &&
 			gePixelFormat_HasAlpha(SrcFormat) )
 	{
 		// there is no separate alpha -> color key conversion
-		// note that we cannot add separate alpha -> CK because the 
+		// note that we cannot add separate alpha -> CK because the
 		// separate-alpha *target* type has colorkey too !
 		if (BlitData_ToSeparateAlpha()==GE_FALSE)
 			{
@@ -270,7 +270,7 @@ geBoolean geBitmap_BlitData_Sub(	const geBitmap_Info * iSrcInfo,const void *iSrc
 	if (	SrcFormat == GE_PIXELFORMAT_WAVELET ||
 			DstFormat == GE_PIXELFORMAT_WAVELET )
 	{
-		geErrorLog_AddString(-1,"Bitmap_BlitData : no wavelets in Genesis 1.0", NULL);	
+		geErrorLog_AddString(-1,"Bitmap_BlitData : no wavelets in Genesis 1.0", NULL);
 		return GE_FALSE;
 	}
 	else if ( SrcFormat == DstFormat )
@@ -299,7 +299,7 @@ geBoolean geBitmap_BlitData_Sub(	const geBitmap_Info * iSrcInfo,const void *iSrc
 			if (BlitData_DePalettize()==GE_FALSE)
 				{
 					geErrorLog_AddString(-1,"geBitmap_BlitData:  BlitData_DePalettize() failed.",NULL);
-					return GE_FALSE;	
+					return GE_FALSE;
 				}
 			else
 				return GE_TRUE;
@@ -328,7 +328,7 @@ geBoolean geBitmap_BlitData_Sub(	const geBitmap_Info * iSrcInfo,const void *iSrc
 				}
 				if ( ! DstInfo->Palette )
 				{
-					geErrorLog_AddString(-1,"Bitmap_BlitData : Pal create failed", NULL);	
+					geErrorLog_AddString(-1,"Bitmap_BlitData : Pal create failed", NULL);
 					return GE_FALSE;
 				}
 
@@ -350,7 +350,7 @@ geBoolean geBitmap_BlitData_Sub(	const geBitmap_Info * iSrcInfo,const void *iSrc
 					NewPal = createPalette(&Info,SrcData);
 					if ( ! NewPal )
 					{
-						geErrorLog_AddString(-1,"Bitmap_BlitData : createPalette failed", NULL);	
+						geErrorLog_AddString(-1,"Bitmap_BlitData : createPalette failed", NULL);
 						return GE_FALSE;
 					}
 					geBitmap_Palette_Copy(NewPal,DstInfo->Palette);
@@ -371,7 +371,7 @@ geBoolean geBitmap_BlitData_Sub(	const geBitmap_Info * iSrcInfo,const void *iSrc
 			if (BlitData_Palettize()==GE_FALSE)
 				{
 					geErrorLog_AddString(-1,"geBitmap_BlitData:  BlitData_Palettize failed.",NULL);
-					return GE_FALSE;	
+					return GE_FALSE;
 				}
 			else
 				return GE_TRUE;
@@ -382,10 +382,10 @@ geBoolean geBitmap_BlitData_Sub(	const geBitmap_Info * iSrcInfo,const void *iSrc
 		if (BlitData_Raw()==GE_FALSE)
 			{
 				geErrorLog_AddString(-1,"geBitmap_BlitData:  BlitData_Raw failed.",NULL);
-				return GE_FALSE;	
+				return GE_FALSE;
 			}
 		else
-			return GE_TRUE;	
+			return GE_TRUE;
 	}
 
 	assert(0);
@@ -399,9 +399,9 @@ geBoolean geBitmap_BlitData(	const geBitmap_Info * iSrcInfo,const void *iSrcData
 {
 geBoolean Ret;
 
-	Ret = geBitmap_BlitData_Sub(	
+	Ret = geBitmap_BlitData_Sub(
 							iSrcInfo,iSrcData,iSrcBmp,
-							iDstInfo,iDstData,iDstBmp,	
+							iDstInfo,iDstData,iDstBmp,
 							iSizeX,iSizeY);
 
 return Ret;
@@ -426,7 +426,7 @@ uint32 ColorKey,Pixel;
 	// fortunately genesis uses mostly the (Pal -> UnPal) conversion
 	// or the (Wavelet -> UnPal) conversion
 
-	if ( SrcPelBytes == 0 || DstPelBytes == 0 ) 
+	if ( SrcPelBytes == 0 || DstPelBytes == 0 )
 	{
 		geErrorLog_AddString(-1,"Bitmap_BlitData : invalid format", NULL);
 		return GE_FALSE;
@@ -607,7 +607,7 @@ int AlphaXtra;
 		uint8 Pixel,DstColorKey;
 
 			assert(DstInfo->HasColorKey);
-			
+
 			DstColorKey = (uint8)DstInfo->ColorKey;
 			for(y=SizeY;y--;)
 			{
@@ -746,12 +746,12 @@ int AlphaXtra;
 			return GE_FALSE;
 		}
 
-		if ( SrcPelBytes == 0 ) 
+		if ( SrcPelBytes == 0 )
 		{
 			geErrorLog_AddString(-1,"Bitmap_BlitData : FromSeparateAlpha : bad Src format", NULL);
 			return GE_FALSE;
 		}
-		else if ( DstPelBytes == 0 || ! DstPutColor || ! DstComposePixel ) 
+		else if ( DstPelBytes == 0 || ! DstPutColor || ! DstComposePixel )
 		{
 			geErrorLog_AddString(-1,"Bitmap_BlitData : FromSeparateAlpha : bad Dst format", NULL);
 			return GE_FALSE;
@@ -971,7 +971,7 @@ int AlphaXtra;
 
 		assert( SrcOps->AMask && !(DstOps->AMask) );
 
-		if ( SrcPelBytes == 0 || DstPelBytes == 0 ) 
+		if ( SrcPelBytes == 0 || DstPelBytes == 0 )
 		{
 			geErrorLog_AddString(-1,"Bitmap_BlitData : bad formats", NULL);
 			return GE_FALSE;
@@ -1098,12 +1098,12 @@ gePixelFormat Format;
 	SrcPtr = (char *)SrcData;
 	DstPtr = (char *)DstData;
 
-	if ( (!DstInfo->HasColorKey) || 
+	if ( (!DstInfo->HasColorKey) ||
 			( SrcInfo->HasColorKey && DstInfo->HasColorKey && SrcInfo->ColorKey == DstInfo->ColorKey ) )
 	{
 	int RowBytes,SrcStepBytes,DstStepBytes,y;
 		// just a mem-copy, with strides
-		
+
 		RowBytes = SizeX * SrcPelBytes;
 		SrcStepBytes = SrcXtraBytes + RowBytes;
 		DstStepBytes = DstXtraBytes + RowBytes;
@@ -1125,7 +1125,7 @@ gePixelFormat Format;
 
 		assert(DstInfo->HasColorKey);
 		DstColorKey = DstInfo->ColorKey;
-		
+
 		if ( SrcInfo->HasColorKey )
 		{
 		uint32 SrcColorKey ;
@@ -1133,9 +1133,9 @@ gePixelFormat Format;
 			SrcColorKey = SrcInfo->ColorKey;
 
 			assert(SrcColorKey != DstColorKey);
-			
+
 			// start : formats same, source & dest have different color key
-			
+
 			switch(SrcPelBytes)
 			{
 				default:
@@ -1238,7 +1238,7 @@ gePixelFormat Format;
 		}
 		else
 		{
-		
+
 			// start : formats same, dest had color key, source doesn't
 
 			switch(SrcPelBytes)
@@ -1330,7 +1330,7 @@ gePixelFormat Format;
 					return GE_TRUE;
 				}
 			}
-			
+
 			// end : formats same, dest had color key, source doesn't
 		}
 
@@ -1365,7 +1365,7 @@ geBoolean BlitData_DePalettize(void)
 		DstPal = geBitmap_Palette_Create(DstFormat,256);
 		if ( ! DstPal )
 		{
-			geErrorLog_AddString(-1,"Bitmap_BlitData : Palette_Create failed", NULL);	
+			geErrorLog_AddString(-1,"Bitmap_BlitData : Palette_Create failed", NULL);
 			return GE_FALSE;
 		}
 
@@ -1402,7 +1402,7 @@ geBoolean BlitData_DePalettize(void)
 					geBitmap_Palette_SetEntry(DstPal,pal,Pixel^1);
 				}
 			}
-			
+
 		}
 
 		if ( SrcInfo->HasColorKey && DstInfo->HasColorKey )
@@ -1480,7 +1480,7 @@ geBoolean BlitData_DePalettize(void)
 
 						xor eax,eax
 						xor edx,edx
-						
+
 					moredata1:
 
 						mov al, BYTE PTR [esi]
@@ -1542,7 +1542,7 @@ geBoolean BlitData_DePalettize(void)
 						assert( (((uint32)DstPtr )&3) == 0 );
 
 						// pair two pixels so we can output in dwords
-						
+
 						__asm
 						{
 							//pusha
@@ -1554,7 +1554,7 @@ geBoolean BlitData_DePalettize(void)
 							mov ebp,PalData
 
 							xor eax,eax
-							
+
 						moredata2_z:
 
 							//WordCopy : 0.000664 secs
@@ -1579,7 +1579,7 @@ geBoolean BlitData_DePalettize(void)
 							sub ecx,2
 							jnz moredata2_z
 
-#if 0 //{ 
+#if 0 //{
 						// the old bad way:
 						// 0.000710 secs
 						moredata2_z:
@@ -1634,7 +1634,7 @@ geBoolean BlitData_DePalettize(void)
 
 							xor eax,eax
 							xor edx,edx
-							
+
 						moredata2:
 
 							// about 14 clocks (!)
@@ -1686,7 +1686,7 @@ geBoolean BlitData_DePalettize(void)
 				//WordCopy             : 0.000903 : 99.2 %
 				// asm paired : with xor edx,0 & mov dx,
 				//WordCopy             : 0.000941 : 99.4 %
-				// asm : not paired 
+				// asm : not paired
 				//WordCopy             : 0.000765 : 98.8 %
 				// asm : paired, using xor edx,eax !
 				//WordCopy             : 0.000710 : 98.9 %
@@ -1731,7 +1731,7 @@ geBoolean BlitData_DePalettize(void)
 
 						xor eax,eax
 						xor edx,edx
-						
+
 					moredata3:
 
 						movzx eax, BYTE PTR [esi]
@@ -1763,7 +1763,7 @@ geBoolean BlitData_DePalettize(void)
 					SrcPtr += SrcXtra;
 					DstPtr += DstXtra;
 				}
-				
+
 //				showPopTSCper("depal 24bit",SizeX*SizeY,"pixel");
 
 				break;
@@ -1798,7 +1798,7 @@ geBoolean BlitData_DePalettize(void)
 						mov ebp,PalData
 
 						xor eax,eax
-						
+
 					moredata4:
 
 						mov al, BYTE PTR [esi]

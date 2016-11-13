@@ -1,8 +1,5 @@
-#ifndef GE_PALOPTIMIZE_H
-#define GE_PALOPTIMIZE_H
-
 /****************************************************************************************/
-/*  PalOptimize                                                                         */
+/*  PalOptimize.h                                                                       */
 /*                                                                                      */
 /*  Author: Charles Bloom                                                               */
 /*  Description:  Palette Perfecting code                                               */
@@ -18,10 +15,12 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
+#ifndef GE_PALOPTIMIZE_H
+#define GE_PALOPTIMIZE_H
 
 #include "BaseType.h"
 #include "Bitmap.h"

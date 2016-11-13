@@ -1,11 +1,8 @@
-#ifndef __COMPUTIL_UTILITY_H
-#define __COMPUTIL_UTILITY_H
-
 /****************************************************************************************/
-/*  Utility.h			                                                                */
+/*  Utility.h                                                                           */
 /*                                                                                      */
 /*  Author: Charles Bloom                                                               */
-/*  Description:  Macros				                                                */
+/*  Description:  Macros                                                                */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -18,10 +15,12 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
+#ifndef __COMPUTIL_UTILITY_H
+#define __COMPUTIL_UTILITY_H
 
 #include "BaseType.h"
 #include "Ram.h"

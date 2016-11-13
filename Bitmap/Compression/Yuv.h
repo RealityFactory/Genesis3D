@@ -1,8 +1,5 @@
-#ifndef GE_BRANDO_YUV_H
-#define GE_BRANDO_YUV_H
-
 /****************************************************************************************/
-/*  Yuv                                                                                 */
+/*  Yuv.h                                                                               */
 /*                                                                                      */
 /*  Author: Charles Bloom                                                               */
 /*  Description:  YUV <-> RGB code                                                      */
@@ -18,10 +15,12 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
+#ifndef GE_BRANDO_YUV_H
+#define GE_BRANDO_YUV_H
 
 #include "BaseType.h"
 
@@ -56,15 +55,15 @@ extern void YUVi_to_BGRb_line(int *line1,int *line2,int *line3,uint8 * bline,int
 #define V_R   ((int)(-0.50000 * YUV_ONE ))	// ** important sign change of 'V' from jpeg default
 #define V_G   ((int)( 0.41869 * YUV_ONE ))
 #define V_B   ((int)( 0.08131 * YUV_ONE ))
-#define R_Y   (    				YUV_ONE )       
+#define R_Y   (    				YUV_ONE )
 #define R_U   (0)
 #define R_V   ((int)(-1.40200 * YUV_ONE ))
-#define G_Y   (    				YUV_ONE )       
+#define G_Y   (    				YUV_ONE )
 #define G_U   ((int)(-0.34414 * YUV_ONE ))
 #define G_V   ((int)( 0.71414 * YUV_ONE ))
-#define B_Y   (     			YUV_ONE )       
+#define B_Y   (     			YUV_ONE )
 #define B_U   ((int)( 1.77200 * YUV_ONE ))
-#define B_V   (0)       
+#define B_V   (0)
 
 #define Y_RGB(R,G,B) (( Y_R * (R) + Y_G * (G) + Y_B * (B) + YUV_HALF ) >> YUV_SHIFT)
 #define U_RGB(R,G,B) (( U_R * (R) + U_G * (G) + U_B * (B) + YUV_HALF ) >> YUV_SHIFT)

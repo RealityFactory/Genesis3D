@@ -1,15 +1,9 @@
-#ifndef BITMAP_BLITDATA_H
-#define BITMAP_BLITDATA_H
-
-#ifndef BITMAP_PRIVATE_H
-Intentional Error : bitmap_blidata only allowed in bitmap internals!
-#endif
 /****************************************************************************************/
 /*  Bitmap_BlitData.h                                                                   */
 /*                                                                                      */
 /*  Author: Charles Bloom                                                               */
 /*  Description:  The Bitmap_BlitData function                                          */
-/*					Does all format conversions											*/
+/*                  Does all format conversions                                         */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -22,11 +16,16 @@ Intentional Error : bitmap_blidata only allowed in bitmap internals!
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
+#ifndef BITMAP_BLITDATA_H
+#define BITMAP_BLITDATA_H
 
+#ifndef BITMAP_PRIVATE_H
+#error Intentional Error : bitmap_blitdata only allowed in bitmap internals!
+#endif
 
 extern geBoolean geBitmap_BlitData(
 								const geBitmap_Info * SrcInfo,const void *SrcData,const geBitmap *SrcBmp,
