@@ -114,136 +114,137 @@ geBoolean GENESISCC geBody_CreateTangentSpace( const geBody *B )
 
 	if ( !B->XSkinTangentSpace ) return GE_FALSE;
 
-	geBody_Index FaceCount = B->SkinFaces[GE_BODY_HIGHEST_LOD].FaceCount;
-	const geBody_Triangle     *SF = B->SkinFaces[GE_BODY_HIGHEST_LOD].FaceArray;
-	const geBody_XSkinVertex  *SV = B->XSkinVertexArray;
-	const geBody_Normal       *SN = B->SkinNormalArray;
-
-	memset(B->XSkinTangentSpace,0,sizeof(geBody_TangentSpace) * VertexCount );
-
 	{
-		geBody_TangentSpace       *TS = B->XSkinTangentSpace;
-		geBody_Index i;
-		geBody_Index j;
-		geBody_Index k;
+		geBody_Index FaceCount = B->SkinFaces[GE_BODY_HIGHEST_LOD].FaceCount;
+		const geBody_Triangle     *SF = B->SkinFaces[GE_BODY_HIGHEST_LOD].FaceArray;
+		const geBody_XSkinVertex  *SV = B->XSkinVertexArray;
+		const geBody_Normal       *SN = B->SkinNormalArray;
+
+		memset(B->XSkinTangentSpace,0,sizeof(geBody_TangentSpace) * VertexCount );
+
+		{
+			geBody_TangentSpace       *TS = B->XSkinTangentSpace;
+			geBody_Index i;
+			geBody_Index j;
+			geBody_Index k;
 
 #ifdef _DEBUG // changed QD bug fix
-		{
-			FILE *fp = fopen("c:\\cube.txt","at");
-
-			if(fp)
 			{
-				fprintf(fp,"Vertex List\n");
+				FILE *fp = fopen("c:\\cube.txt","at");
 
-				for ( i= 0; i < VertexCount; i++ )
-					fprintf(fp,"%i,  X = %f Y = %f Z= %f U = %f V = %f \n", i, SV[i].XPoint.X,SV[i].XPoint.Y,SV[i].XPoint.Z,SV[i].XU,SV[i].XV);
+				if(fp)
+				{
+					fprintf(fp,"Vertex List\n");
 
-				fprintf(fp,"Normal List\n");
+					for ( i= 0; i < VertexCount; i++ )
+						fprintf(fp,"%i,  X = %f Y = %f Z= %f U = %f V = %f \n", i, SV[i].XPoint.X,SV[i].XPoint.Y,SV[i].XPoint.Z,SV[i].XU,SV[i].XV);
 
-				for ( i= 0; i < B->SkinNormalCount; i++ )
-					fprintf(fp,"%i,  X = %f Y = %f Z = %f\n", i, SN[i].Normal.X,SN[i].Normal.Y,SN[i].Normal.Z);
+					fprintf(fp,"Normal List\n");
 
-				for ( j = 0; j < FaceCount; j++ )
-					fprintf(fp,"%i,  V1 = %i V2 = %i V3 = %i N1 = %i N2 = %i N3 = %i\n",j, SF[j].VtxIndex[0],SF[j].VtxIndex[1],SF[j].VtxIndex[2],SF[j].NormalIndex[0],SF[j].NormalIndex[1],SF[j].NormalIndex[2]);
+					for ( i= 0; i < B->SkinNormalCount; i++ )
+						fprintf(fp,"%i,  X = %f Y = %f Z = %f\n", i, SN[i].Normal.X,SN[i].Normal.Y,SN[i].Normal.Z);
 
-				fclose(fp);
+					for ( j = 0; j < FaceCount; j++ )
+						fprintf(fp,"%i,  V1 = %i V2 = %i V3 = %i N1 = %i N2 = %i N3 = %i\n",j, SF[j].VtxIndex[0],SF[j].VtxIndex[1],SF[j].VtxIndex[2],SF[j].NormalIndex[0],SF[j].NormalIndex[1],SF[j].NormalIndex[2]);
+
+					fclose(fp);
+				}
 			}
-		}
 #endif // end change
 
-		for ( i= 0; i < VertexCount; i++ )
-		{
-			geBoolean TangentSpaceCreated = GE_FALSE;
-
-			for ( j = 0; j < FaceCount; j++ )
+			for ( i= 0; i < VertexCount; i++ )
 			{
-				for ( k = 0; k < 3; k++)
+				geBoolean TangentSpaceCreated = GE_FALSE;
+
+				for ( j = 0; j < FaceCount; j++ )
 				{
-					if ( i  != SF[j].VtxIndex[k] ) continue;
-
-//Compute tangent space for the vertex...
-
+					for ( k = 0; k < 3; k++)
 					{
-						geBody_Index v1 = SF[j].VtxIndex[0];
-						geBody_Index v2 = SF[j].VtxIndex[1];
-						geBody_Index v3 = SF[j].VtxIndex[2];
-						const geBody_XSkinVertex *p1 = &SV[v1];
-						const geBody_XSkinVertex *p2 = &SV[v2];
-						const geBody_XSkinVertex *p3 = &SV[v3];
-						geFloat p1U = (geFloat) fabs(p1->XU) + 10.0f;
-						geFloat p1V = (geFloat) fabs(p1->XV) + 10.0f;
-						geFloat p2U = (geFloat) fabs(p2->XU) + 10.0f;
-						geFloat p2V = (geFloat) fabs(p2->XV) + 10.0f;
-						geFloat p3U = (geFloat) fabs(p3->XU) + 10.0f;
-						geFloat p3V = (geFloat) fabs(p3->XV) + 10.0f;
-						geBody_Index n1 = SF[j].NormalIndex[k];
-						const geBody_Normal *BodyNormal = &SN[n1];
-						const geVec3d *Normal = &BodyNormal->Normal;
-						geBody_Index vt = SF[j].VtxIndex[k];
-						geBody_TangentSpace *TSP1 = &TS[vt];
-						geVec3d AlignedVector;
-						geVec3d BaseVector1;
-						geVec3d BaseVector2;
-						geVec3d Tangent;
-						geVec3d Binormal;
-						geFloat UV[2];
-
-						geVec3d_Subtract(&p2->XPoint,&p1->XPoint,&BaseVector1);
-						geVec3d_Subtract(&p3->XPoint,&p1->XPoint,&BaseVector2);
-
-						if ( (p2U == p1U) || (p3U == p1U) )
-						{
-							if ( p2U == p1U )
-							{
-								UV[0] = ( p1V < p2V ) ?  1.0f : -1.0f;
-								UV[1] = 0.0f;
-							}
-							else if	( p3U == p1U )
-							{
-								UV[0] = 0.0f;
-								UV[1] = ( p1V < p3V ) ?  -1.0f : 1.0f;
-							}
-						}
-						else
-						{
-							UV[0] = -p1U/(p2U-p1U);
-							UV[1] = -p1U/(p3U-p1U);
-
-							if ( UV[0] * UV[1] < 0.0f )
-							{
-								UV[0] = -UV[0];
-								UV[1] = -UV[1];
-							}
-						}
-
-						geVec3d_Scale(&BaseVector2,UV[1],&BaseVector2);
-						geVec3d_Scale(&BaseVector1,UV[0],&BaseVector1);
-						geVec3d_Subtract(&BaseVector2,&BaseVector1,&AlignedVector);
-
-						geVec3d_CrossProduct(&AlignedVector,Normal,&Tangent);
-						geVec3d_CrossProduct(&Tangent,Normal,&Binormal);
-
-						if ( ( (p1U-p3U) * (p2V-p3V) ) > ( (p2U-p3U) *(p1V - p3V) ) )
-							geVec3d_Scale(&Binormal,-1.0f,&Binormal);
-
-						geVec3d_Normalize(&Tangent);
-						geVec3d_Normalize(&Binormal);
-
-						geVec3d_Set(&TSP1->T,Tangent.X,Tangent.Y,Tangent.Z);
-						geVec3d_Set(&TSP1->B,Binormal.X,Binormal.Y,Binormal.Z);
-						geVec3d_Set(&TSP1->N,Normal->X,Normal->Y,Normal->Z);
-
-						TangentSpaceCreated = GE_TRUE;
-					}
+						if ( i  != SF[j].VtxIndex[k] ) continue;
 
 //Compute tangent space for the vertex...
+
+						{
+							geBody_Index v1 = SF[j].VtxIndex[0];
+							geBody_Index v2 = SF[j].VtxIndex[1];
+							geBody_Index v3 = SF[j].VtxIndex[2];
+							const geBody_XSkinVertex *p1 = &SV[v1];
+							const geBody_XSkinVertex *p2 = &SV[v2];
+							const geBody_XSkinVertex *p3 = &SV[v3];
+							geFloat p1U = (geFloat) fabs(p1->XU) + 10.0f;
+							geFloat p1V = (geFloat) fabs(p1->XV) + 10.0f;
+							geFloat p2U = (geFloat) fabs(p2->XU) + 10.0f;
+							geFloat p2V = (geFloat) fabs(p2->XV) + 10.0f;
+							geFloat p3U = (geFloat) fabs(p3->XU) + 10.0f;
+							geFloat p3V = (geFloat) fabs(p3->XV) + 10.0f;
+							geBody_Index n1 = SF[j].NormalIndex[k];
+							const geBody_Normal *BodyNormal = &SN[n1];
+							const geVec3d *Normal = &BodyNormal->Normal;
+							geBody_Index vt = SF[j].VtxIndex[k];
+							geBody_TangentSpace *TSP1 = &TS[vt];
+							geVec3d AlignedVector;
+							geVec3d BaseVector1;
+							geVec3d BaseVector2;
+							geVec3d Tangent;
+							geVec3d Binormal;
+							geFloat UV[2];
+
+							geVec3d_Subtract(&p2->XPoint,&p1->XPoint,&BaseVector1);
+							geVec3d_Subtract(&p3->XPoint,&p1->XPoint,&BaseVector2);
+
+							if ( (p2U == p1U) || (p3U == p1U) )
+							{
+								if ( p2U == p1U )
+								{
+									UV[0] = ( p1V < p2V ) ?  1.0f : -1.0f;
+									UV[1] = 0.0f;
+								}
+								else if	( p3U == p1U )
+								{
+									UV[0] = 0.0f;
+									UV[1] = ( p1V < p3V ) ?  -1.0f : 1.0f;
+								}
+							}
+							else
+							{
+								UV[0] = -p1U/(p2U-p1U);
+								UV[1] = -p1U/(p3U-p1U);
+
+								if ( UV[0] * UV[1] < 0.0f )
+								{
+									UV[0] = -UV[0];
+									UV[1] = -UV[1];
+								}
+							}
+
+							geVec3d_Scale(&BaseVector2,UV[1],&BaseVector2);
+							geVec3d_Scale(&BaseVector1,UV[0],&BaseVector1);
+							geVec3d_Subtract(&BaseVector2,&BaseVector1,&AlignedVector);
+
+							geVec3d_CrossProduct(&AlignedVector,Normal,&Tangent);
+							geVec3d_CrossProduct(&Tangent,Normal,&Binormal);
+
+							if ( ( (p1U-p3U) * (p2V-p3V) ) > ( (p2U-p3U) *(p1V - p3V) ) )
+								geVec3d_Scale(&Binormal,-1.0f,&Binormal);
+
+							geVec3d_Normalize(&Tangent);
+							geVec3d_Normalize(&Binormal);
+
+							geVec3d_Set(&TSP1->T,Tangent.X,Tangent.Y,Tangent.Z);
+							geVec3d_Set(&TSP1->B,Binormal.X,Binormal.Y,Binormal.Z);
+							geVec3d_Set(&TSP1->N,Normal->X,Normal->Y,Normal->Z);
+
+							TangentSpaceCreated = GE_TRUE;
+						}
+
+//Compute tangent space for the vertex...
+
+						if ( TangentSpaceCreated ) break;
+					}
 
 					if ( TangentSpaceCreated ) break;
 				}
-
-				if ( TangentSpaceCreated ) break;
 			}
-
 		}
 	}
 
