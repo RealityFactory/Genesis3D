@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <windows.h>
@@ -208,7 +208,7 @@ BOOL PCache_InsertWorldPoly(DRV_TLVertex *Verts, int32 NumVerts, geRDriver_THand
 
 	// Get a pointer to the original polys verts
 	pVerts = Verts;
-	
+
 	// Store info about this poly in the cache
 	pCachePoly = &WorldCache.Polys[WorldCache.NumPolys];
 
@@ -256,17 +256,17 @@ BOOL PCache_InsertWorldPoly(DRV_TLVertex *Verts, int32 NumVerts, geRDriver_THand
 				Val = AppInfo.FogEnd;
 
 			FogVal = (DWORD)((AppInfo.FogEnd-Val)/(AppInfo.FogEnd-AppInfo.FogStart)*255.0f);
-		
+
 			if (FogVal < 0)
 				FogVal = 0;
 			else if (FogVal > 255)
 				FogVal = 255;
-		
+
 			pD3DVerts->specular = (FogVal<<24);		// Alpha component in specular is the fog value (0...255)
 		}
 		else
 			pD3DVerts->specular = 0;
-		
+
 		// Store the uv's so the prep pass can use them...
 		pTVerts->u = pVerts->u;
 		pTVerts->v = pVerts->v;
@@ -274,11 +274,11 @@ BOOL PCache_InsertWorldPoly(DRV_TLVertex *Verts, int32 NumVerts, geRDriver_THand
 		pTVerts->Color = Alpha | ((uint32)pVerts->r<<16) | ((uint32)pVerts->g<<8) | (uint32)pVerts->b;
 
 		pTVerts++;
-		pVerts++;	 
+		pVerts++;
 		pD3DVerts++;
 
 	}
-	
+
 	// Update globals about the world poly cache
 	WorldCache.NumVerts += NumVerts;
 	WorldCache.NumPolys++;
@@ -296,7 +296,7 @@ BOOL PCache_FlushWorldPolys(void)
 
 	if (!THandle_CheckCache())
 		return GE_FALSE;
-	
+
 	if (AppInfo.CanDoMultiTexture)
 	{
 		RenderWorldPolys(RENDER_WORLD_POLYS_SINGLE_PASS);
@@ -348,7 +348,7 @@ static void SortMiscPolysByHandle(void)
 		MiscCache.SortedPolys[i] = pPoly;
 		pPoly++;
 	}
-	
+
 	// Sort the polys
 	qsort(&MiscCache.SortedPolys, MiscCache.NumPolys, sizeof(MiscCache.SortedPolys[0]), MiscBitmapHandleComp);
 }
@@ -388,7 +388,7 @@ static void FillLMapSurface(DRV_LInfo *LInfo, int32 LNum)
 			R = *pBitPtr++;
 			G = *pBitPtr++;
 			B =  *pBitPtr++;
-			
+
 			Color = (U16)(Lut->R[R] | Lut->G[G] | Lut->B[B]);
 
 			*pTempBits++ = Color;
@@ -412,7 +412,7 @@ static void FillLMapSurface2(DRV_LInfo *LInfo, int32 LNum)
 	geRDriver_THandle	*THandle;
 	HRESULT				Result;
 	const RECT			*pRect;
-    DDSURFACEDESC2		SurfDesc;
+	DDSURFACEDESC2		SurfDesc;
 	LPDIRECTDRAWSURFACE4	Surface;
 	int32				Extra;
 
@@ -425,11 +425,11 @@ static void FillLMapSurface2(DRV_LInfo *LInfo, int32 LNum)
 
 	Lut = &AppInfo.Lut1;
 
-    pRect = TPage_BlockGetRect(THandle->Block);
+	pRect = TPage_BlockGetRect(THandle->Block);
 	Surface = TPage_BlockGetSurface(THandle->Block);
 
-    memset(&SurfDesc, 0, sizeof(DDSURFACEDESC2));
-    SurfDesc.dwSize = sizeof(DDSURFACEDESC2);
+	memset(&SurfDesc, 0, sizeof(DDSURFACEDESC2));
+	SurfDesc.dwSize = sizeof(DDSURFACEDESC2);
 
 	Result = Surface->Lock((RECT*)pRect, &SurfDesc, DDLOCK_WAIT, NULL);
 
@@ -439,7 +439,7 @@ static void FillLMapSurface2(DRV_LInfo *LInfo, int32 LNum)
 
 	pTempBits = (U16*)SurfDesc.lpSurface;
 
-	Extra = Stride - Width; 
+	Extra = Stride - Width;
 
 	for (h=0; h< Height; h++)
 	{
@@ -450,7 +450,7 @@ static void FillLMapSurface2(DRV_LInfo *LInfo, int32 LNum)
 			R = *pBitPtr++;
 			G = *pBitPtr++;
 			B = *pBitPtr++;
-			
+
 			Color = (U16)(Lut->R[R] | Lut->G[G] | Lut->B[B]);
 
 			*pTempBits++ = Color;
@@ -458,7 +458,7 @@ static void FillLMapSurface2(DRV_LInfo *LInfo, int32 LNum)
 		pTempBits += Extra;
 	}
 
-    Result = Surface->Unlock((RECT*)pRect);
+	Result = Surface->Unlock((RECT*)pRect);
 
 	assert(Result == DD_OK);
 }
@@ -474,8 +474,8 @@ static void LoadLMapFromSystem(DRV_LInfo *LInfo, int32 Log, int32 LNum)
 	U8					*pBitPtr;
 	LPDIRECTDRAWSURFACE4 Surface;
 	RGB_LUT				*Lut;
-    DDSURFACEDESC2		ddsd;
-    HRESULT				ddrval;
+	DDSURFACEDESC2		ddsd;
+	HRESULT				ddrval;
 
 	pBitPtr = (U8*)LInfo->RGBLight[LNum];
 
@@ -489,9 +489,9 @@ static void LoadLMapFromSystem(DRV_LInfo *LInfo, int32 Log, int32 LNum)
 
 	Surface = SystemToVideo[Log].Surface;
 
-    memset(&ddsd, 0, sizeof(DDSURFACEDESC2));
-    ddsd.dwSize = sizeof(DDSURFACEDESC2);
-    ddrval = Surface->Lock(NULL, &ddsd, DDLOCK_WAIT, NULL);
+	memset(&ddsd, 0, sizeof(DDSURFACEDESC2));
+	ddsd.dwSize = sizeof(DDSURFACEDESC2);
+	ddrval = Surface->Lock(NULL, &ddsd, DDLOCK_WAIT, NULL);
 
 	assert(ddrval == DD_OK);
 	U8	R, G, B;
@@ -506,15 +506,15 @@ static void LoadLMapFromSystem(DRV_LInfo *LInfo, int32 Log, int32 LNum)
 			R = *pBitPtr++;
 			G = *pBitPtr++;
 			B =  *pBitPtr++;
-			
+
 			Color = (U16)(Lut->R[R] | Lut->G[G] | Lut->B[B]);
-			
+
 			*pTempBits++ = Color;
 		}
 		pTempBits += Extra;
 	}
 
-    ddrval = Surface->Unlock(NULL);
+	ddrval = Surface->Unlock(NULL);
 	assert(ddrval == DD_OK);
 }
 
@@ -587,7 +587,7 @@ geBoolean SetupLMap(int32 Stage, DRV_LInfo *LInfo, int32 LNum, geBoolean Dynamic
 
 		TPage_BlockSetLRU(THandle->Block, CurrentLRU);
 		D3DSetTexture(Stage, TPage_BlockGetTexture(THandle->Block));
-	
+
 		if (Dynamic)
 			THandle->Flags |= THANDLE_UPDATE;
 		else
@@ -608,7 +608,7 @@ geBoolean SetupLMap(int32 Stage, DRV_LInfo *LInfo, int32 LNum, geBoolean Dynamic
 			FillLMapSurface(LInfo, LNum);
 
 		D3DSetTexture(Stage, THandle->MipData[0].Texture);
-	
+
 		if (Dynamic)
 			THandle->MipData[0].Flags |= THANDLE_UPDATE;
 		else
@@ -640,7 +640,7 @@ geBoolean SetupLMap(int32 Stage, DRV_LInfo *LInfo, int32 LNum, geBoolean Dynamic
 		LPDIRECTDRAWSURFACE4	Surface;
 
 		assert(MipData->Slot);
-		
+
 		Surface = D3DCache_SlotGetSurface(MipData->Slot);
 
 		assert(Surface);
@@ -653,7 +653,7 @@ geBoolean SetupLMap(int32 Stage, DRV_LInfo *LInfo, int32 LNum, geBoolean Dynamic
 		//Error = Surface->BltFast(0, 0, SystemToVideo[THandle->Log].Surface, NULL, 0);
 		//Error = Surface->Blt(NULL, SystemToVideo[THandle->Log].Surface, NULL, DDBLT_WAIT, NULL);
 		//Error = Surface->Blt(NULL, SystemToVideo[THandle->Log].Surface, NULL, 0, NULL);
-		
+
 		if (Error != DD_OK)
 		{
 			if(Error==DDERR_SURFACELOST)
@@ -693,7 +693,7 @@ geBoolean SetupTexture(int32 Stage, geRDriver_THandle *THandle, int32 MipLevel)
 	THandle_MipData		*MipData;
 
 	MipData = &THandle->MipData[MipLevel];
-	
+
 	if (!SetupMipData(MipData))
 	{
 		MipData->Flags |= THANDLE_UPDATE;		// Force an upload
@@ -754,7 +754,7 @@ BOOL PCache_FlushMiscPolys(void)
 		AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_ALPHAOP,   D3DTOP_DISABLE );
 		D3DSetTexture(1, NULL);		// Reset texture stage 1
 	}
-	
+
 	  AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_TEXCOORDINDEX, 0);
 	  AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
 	  AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
@@ -778,10 +778,10 @@ BOOL PCache_FlushMiscPolys(void)
 			D3DZEnable(TRUE);
 
 		if (pPoly->Flags & DRV_RENDER_NO_ZWRITE)	// We are assuming that this is not going to change all that much
-			D3DZWriteEnable(FALSE);	
+			D3DZWriteEnable(FALSE);
 		else
 			D3DZWriteEnable(TRUE);
-									  
+
 		if (pPoly->Flags & DRV_RENDER_CLAMP_UV)
 			D3DTexWrap(0, FALSE);
 		else
@@ -796,7 +796,7 @@ BOOL PCache_FlushMiscPolys(void)
 	// Turn z stuff back on...
 	D3DZWriteEnable (TRUE);
 	D3DZEnable(TRUE);
-	
+
 	MiscCache.NumPolys = 0;
 	MiscCache.NumVerts = 0;
 
@@ -869,7 +869,7 @@ BOOL PCache_InsertMiscPoly(DRV_TLVertex *Verts, int32 NumVerts, geRDriver_THandl
 
 		pD3DVerts->z = (1.0f - ZRecip);		// ZBUFFER
 		pD3DVerts->rhw = ZRecip;
-		
+
 		u = pVerts->u * ScaleU;
 		v = pVerts->v * ScaleV;
 
@@ -889,12 +889,12 @@ BOOL PCache_InsertMiscPoly(DRV_TLVertex *Verts, int32 NumVerts, geRDriver_THandl
 				Val = AppInfo.FogEnd;
 
 			FogVal = (DWORD)((AppInfo.FogEnd-Val)/(AppInfo.FogEnd-AppInfo.FogStart)*255.0f);
-		
+
 			if (FogVal < 0)
 				FogVal = 0;
 			else if (FogVal > 255)
 				FogVal = 255;
-		
+
 			pD3DVerts->specular = (FogVal<<24);		// Alpha component in specular is the fog value (0...255)
 		}
 		else
@@ -903,7 +903,7 @@ BOOL PCache_InsertMiscPoly(DRV_TLVertex *Verts, int32 NumVerts, geRDriver_THandl
 		pVerts++;
 		pD3DVerts++;
 	}
-	
+
 	// Update globals about the misc poly cache
 	MiscCache.NumVerts += NumVerts;
 	MiscCache.NumPolys++;
@@ -935,14 +935,14 @@ geBoolean World_PolyPrepVerts(World_Poly *pPoly, int32 PrepMode, int32 Stage1, i
 
 			ShiftU = pPoly->ShiftU;
 			ShiftV = pPoly->ShiftV;
-		 	ScaleU = pPoly->ScaleU;
+			ScaleU = pPoly->ScaleU;
 			ScaleV = pPoly->ScaleV;
 
 			// Get scale value for vertices
 			InvScale = 1.0f / (geFloat)((1<<pPoly->THandle->Log));
 
 			pVerts = &WorldCache.Verts[pPoly->FirstVert];
-			
+
 			for (j=0; j< pPoly->NumVerts; j++)
 			{
 				u = pTVerts->u*ScaleU+ShiftU;
@@ -970,7 +970,7 @@ geBoolean World_PolyPrepVerts(World_Poly *pPoly, int32 PrepMode, int32 Stage1, i
 
 			// Get scale value for vertices
 			InvScale = 1.0f/(geFloat)((1<<pPoly->LInfo->THandle->Log)<<4);
-				
+
 			pTVerts = &WorldCache.TVerts[pPoly->FirstVert];
 			pVerts = &WorldCache.Verts[pPoly->FirstVert];
 
@@ -1000,7 +1000,7 @@ geBoolean World_PolyPrepVerts(World_Poly *pPoly, int32 PrepMode, int32 Stage1, i
 			// Set up shifts and scaled for texture uv's
 			ShiftU = pPoly->ShiftU;
 			ShiftV = pPoly->ShiftV;
-		 	ScaleU = pPoly->ScaleU;
+			ScaleU = pPoly->ScaleU;
 			ScaleV = pPoly->ScaleV;
 
 			// Get scale value for vertices
@@ -1020,7 +1020,7 @@ geBoolean World_PolyPrepVerts(World_Poly *pPoly, int32 PrepMode, int32 Stage1, i
 
 				pVerts->uv[Stage1].u = u * InvScale;
 				pVerts->uv[Stage1].v = v * InvScale;
-			
+
 				u = pTVerts->u + ShiftU2;
 				v = pTVerts->v + ShiftV2;
 
@@ -1075,7 +1075,7 @@ static void SortWorldPolysByHandle(void)
 		WorldCache.SortedPolys[i] = pPoly;
 		pPoly++;
 	}
-	
+
 	// Sort the polys
 	qsort(&WorldCache.SortedPolys, WorldCache.NumPolys, sizeof(WorldCache.SortedPolys[0]), BitmapHandleComp);
 }
@@ -1098,7 +1098,7 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 		return	TRUE;
 	}
 	switch (RenderMode)
-	{	
+	{
 		case RENDER_WORLD_POLYS_NORMAL:
 		{
 			AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_TEXCOORDINDEX, 0 );
@@ -1106,10 +1106,10 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 			// Set the default state for the normal poly render mode for the world
 			D3DBlendEnable(TRUE);
 			D3DBlendFunc (D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA);
-			
+
 			// Get the first poly in the sorted list
 			SortWorldPolysByHandle();
-			
+
 			for (i=0; i< WorldCache.NumPolys; i++)
 			{
 				pPoly = WorldCache.SortedPolys[i];
@@ -1126,10 +1126,10 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 
 				D3DTexturedPoly(&WorldCache.Verts[pPoly->FirstVert], pPoly->NumVerts);
 			}
-			
+
 			break;
 		}
-		
+
 		case RENDER_WORLD_POLYS_LMAP:
 		{
 			AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_TEXCOORDINDEX, 0);
@@ -1157,7 +1157,7 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 				World_PolyPrepVerts(pPoly, PREP_WORLD_VERTS_LMAP, 0, 0);
 
 				D3DTexturedPoly(&WorldCache.Verts[pPoly->FirstVert], pPoly->NumVerts);
-				
+
 				if (pPoly->LInfo->RGBLight[1])
 				{
 					AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, FALSE);
@@ -1172,7 +1172,7 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 						return GE_FALSE;
 
 					D3DTexturedPoly(&WorldCache.Verts[pPoly->FirstVert], pPoly->NumVerts);
-		
+
 					D3DBlendFunc (D3DBLEND_DESTCOLOR, D3DBLEND_ZERO);		// Restore state
 
 					if (AppInfo.FogEnable)
@@ -1192,10 +1192,10 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 			AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
 			AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );
 			AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP,   D3DTOP_MODULATE);
-									 
+
 			AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_TEXCOORDINDEX, 1 );
 			AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_COLORARG1, D3DTA_TEXTURE );
-			AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_COLORARG2, D3DTA_CURRENT ); 
+			AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_COLORARG2, D3DTA_CURRENT );
 			AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_COLOROP,   D3DTOP_MODULATE );
 			AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE );
 			AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_ALPHAARG2, D3DTA_CURRENT );
@@ -1212,7 +1212,7 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 
 			// Sort the list for front back operation to get the least number of world texture misses
 			SortWorldPolysByHandle();
-			
+
 			// Reset non lightmaps faces to 0
 			WorldCache.NumPolys2 = 0;
 
@@ -1235,20 +1235,20 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 					D3DTexWrap(TSTAGE_0, TRUE);
 
 				if (!SetupTexture(TSTAGE_0, pPoly->THandle, pPoly->MipLevel))
-					return GE_FALSE;				
+					return GE_FALSE;
 
 				// Call the engine to set this sucker up, because it's visible...
 				D3DDRV.SetupLightmap(pPoly->LInfo, &Dynamic);
 
 				if (!SetupLMap(TSTAGE_1, pPoly->LInfo, 0, Dynamic))
 					return GE_FALSE;
-					
+
 				// Prep the verts for a lightmap and texture map
 				World_PolyPrepVerts(pPoly, PREP_WORLD_VERTS_SINGLE_PASS, TSTAGE_0, TSTAGE_1);
 
 				// Draw the texture
 				D3DTexturedPoly(&WorldCache.Verts[pPoly->FirstVert], pPoly->NumVerts);
-				
+
 				// Render any fog maps
 				if (pPoly->LInfo->RGBLight[1])
 				{
@@ -1272,12 +1272,12 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 						return GE_FALSE;
 
 					D3DTexturedPoly(&WorldCache.Verts[pPoly->FirstVert], pPoly->NumVerts);
-	
+
 					// Restore states to the last state before fag map
 				#if (TSTAGE_0 == 0)
 					AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );
 					AppInfo.lpD3DDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP,   D3DTOP_MODULATE);
-	
+
 					AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_COLOROP,   D3DTOP_MODULATE );
 				#else
 					AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_COLOROP,   D3DTOP_MODULATE );
@@ -1286,10 +1286,10 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 
 					D3DBlendFunc (D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA);
 				}
-				
-				
+
+
 			}
-			
+
 			// Setup for any non-lightmaped faces faces, turn tmu1 off
 		#if (TSTAGE_0 == 0)
 			AppInfo.lpD3DDevice->SetTextureStageState( 1, D3DTSS_COLOROP, D3DTOP_DISABLE);
@@ -1312,7 +1312,7 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 					D3DTexWrap(TSTAGE_0, TRUE);
 
 				if (!SetupTexture(TSTAGE_0, pPoly->THandle, pPoly->MipLevel))
-					return GE_FALSE;				
+					return GE_FALSE;
 
 				// Prep verts as if there was no lightmap
 				World_PolyPrepVerts(pPoly, PREP_WORLD_VERTS_NORMAL, TSTAGE_0, TSTAGE_1);
@@ -1321,7 +1321,7 @@ static BOOL RenderWorldPolys(int32 RenderMode)
 				D3DTexturedPoly(&WorldCache.Verts[pPoly->FirstVert], pPoly->NumVerts);
 			}
 
-			break;						 
+			break;
 		}
 
 		default:
@@ -1396,7 +1396,7 @@ static int32 GetMipLevel(DRV_TLVertex *Verts, int32 NumVerts, geFloat ScaleU, ge
 			dv = pVert1->v - pVert0->v;
 			dx = pVert1->x - pVert0->x;
 			dy = pVert1->y - pVert0->y;
-			
+
 			du *= ScaleU;
 			dv *= ScaleV;
 

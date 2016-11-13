@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <windows.h>
@@ -45,7 +45,7 @@ void D3DSetTexHandle(D3DTEXTUREHANDLE TexHandle)
 
 	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_TEXTUREHANDLE, TexHandle);
 }
-	
+
 static LPDIRECT3DTEXTURE2 OldTexture[8];
 
 //======================================================================================================
@@ -59,7 +59,7 @@ void D3DSetTexture(int32 Stage, LPDIRECT3DTEXTURE2 Texture)
 
 	AppInfo.lpD3DDevice->SetTexture(Stage, Texture);
 }
-		
+
 //======================================================================================================
 //======================================================================================================
 void D3DBilinearFilter(D3DTEXTUREFILTER Min, D3DTEXTUREFILTER Mag)
@@ -80,21 +80,21 @@ void D3DBilinearFilter(D3DTEXTUREFILTER Min, D3DTEXTUREFILTER Mag)
 void D3DTexturedPolyOld(void *Pnts, int32 NumPoints)
 {
 	AppInfo.lpD3DDevice->DrawPrimitive(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX, Pnts, NumPoints, D3DDP_DONOTUPDATEEXTENTS | D3DDP_DONOTLIGHT | D3DDP_DONOTCLIP);
-}	
+}
 
 //======================================================================================================
 //	D3DTexturedPoly
 //======================================================================================================
 void D3DTexturedPoly(void *Pnts, int32 NumPoints)
 {
-	AppInfo.lpD3DDevice->DrawPrimitive(	D3DPT_TRIANGLEFAN, 
-										//D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX2, 
-										D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX2, 
-										Pnts, 
-										NumPoints, 
+	AppInfo.lpD3DDevice->DrawPrimitive(	D3DPT_TRIANGLEFAN,
+										//D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX2,
+										D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX2,
+										Pnts,
+										NumPoints,
 										D3DDP_DONOTUPDATEEXTENTS | D3DDP_DONOTLIGHT | D3DDP_DONOTCLIP);
 										//D3DDP_DONOTUPDATEEXTENTS | D3DDP_DONOTCLIP);
-}	
+}
 
 //======================================================================================================
 //	D3DViewport
@@ -105,29 +105,29 @@ void D3DViewport (int32 x, int32 y, int32 width, int32 height)
 
 	return;
 
-    vport.dwSize = sizeof(D3DVIEWPORT2);
-    AppInfo.lpD3DViewport->GetViewport2(&vport);
-    vport.dwX = x;
-    vport.dwY = AppInfo.OldHeight - (y + height);
-    vport.dwWidth = width;
-    vport.dwHeight = height;
-    vport.dvClipX = -1.0f;
-    vport.dvClipY = 1.0f;
-    vport.dvClipWidth = (geFloat)width /2.0f;
-    vport.dvClipHeight = (geFloat)height/2.0f;
-    AppInfo.lpD3DViewport->SetViewport2(&vport);
+	vport.dwSize = sizeof(D3DVIEWPORT2);
+	AppInfo.lpD3DViewport->GetViewport2(&vport);
+	vport.dwX = x;
+	vport.dwY = AppInfo.OldHeight - (y + height);
+	vport.dwWidth = width;
+	vport.dwHeight = height;
+	vport.dvClipX = -1.0f;
+	vport.dvClipY = 1.0f;
+	vport.dvClipWidth = (geFloat)width /2.0f;
+	vport.dvClipHeight = (geFloat)height/2.0f;
+	AppInfo.lpD3DViewport->SetViewport2(&vport);
 }
 
 //======================================================================================================
 //======================================================================================================
 void D3DDepthRange (geFloat zNear, geFloat zFar)
 {
-    D3DVIEWPORT2 vport;
-    vport.dwSize = sizeof(D3DVIEWPORT2);
-    AppInfo.lpD3DViewport->GetViewport2(&vport);
-    vport.dvMinZ = (D3DVALUE)(((-1.0) * (zFar + zNear)) / (zFar - zNear));
-    vport.dvMaxZ = (D3DVALUE)(((-1.0) * (zFar + zNear - 2.0)) / (zFar - zNear));
-    AppInfo.lpD3DViewport->SetViewport2(&vport);
+	D3DVIEWPORT2 vport;
+	vport.dwSize = sizeof(D3DVIEWPORT2);
+	AppInfo.lpD3DViewport->GetViewport2(&vport);
+	vport.dvMinZ = (D3DVALUE)(((-1.0) * (zFar + zNear)) / (zFar - zNear));
+	vport.dvMaxZ = (D3DVALUE)(((-1.0) * (zFar + zNear - 2.0)) / (zFar - zNear));
+	AppInfo.lpD3DViewport->SetViewport2(&vport);
 }
 
 static D3DBLEND OldSFunc = D3DBLEND_ONE;

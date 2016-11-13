@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef THANDLE_H
@@ -42,7 +42,7 @@ typedef struct
 	LPDIRECTDRAWSURFACE4	Surface;			// The DD surface
 	D3DCache_Type			*CacheType;
 	D3DCache_Slot			*Slot;
-	
+
 	LPDIRECT3DTEXTURE2		Texture;			// The texture interface to the surface
 
 	uint8					Flags;

@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <windows.h>
@@ -30,7 +30,7 @@
 // Cache types are just the different types of textures
 // Texutres may vary from width/height/num miplevels/etc...
 // Cache types is just a way to combine them to similar types...
-#define	D3DCACHE_MAX_CACHE_TYPES		128		
+#define	D3DCACHE_MAX_CACHE_TYPES		128
 
 //========================================================================================================
 //========================================================================================================
@@ -77,7 +77,7 @@ typedef struct D3DCache_Slot
 	LPDIRECT3DTEXTURE2		Texture;						// The texture interface to the surface
 
 	uint32					LRU;							// Current LRU for cache slot
-						
+
 	void					*UserData;
 
 } D3DCache_Slot;
@@ -164,7 +164,7 @@ geBoolean D3DCache_EvictAllSurfaces(D3DCache *Cache)
 			D3DCache_SlotSetUserData(pSlot, NULL);
 		}
 	}
-	
+
 	return GE_TRUE;
 }
 
@@ -199,7 +199,7 @@ D3DCache_Type *D3DCache_FindCacheType(D3DCache *Cache, int32 Width, int32 Height
 
 		if (memcmp(&pCacheType->ddsd, ddsd, sizeof(DDSURFACEDESC2)))
 			continue;
-		
+
 		return pCacheType;						// Found a match
 	}
 
@@ -478,7 +478,7 @@ geBoolean D3DCache_AdjustSlots(D3DCache *Cache, const int32 *MaxTable, geBoolean
 			Height = pCacheType->Height;
 
 			Size = Width*Height*(pCacheType->ddsd.ddpfPixelFormat.dwRGBBitCount>>3);  // (BitCount/8)
-		
+
 			if (UsePartition)
 			{
 				if (!DDMemMgr_PartitionAllocMem(Cache->Partition, Size))
@@ -520,7 +520,7 @@ geBoolean D3DCache_AdjustSlots(D3DCache *Cache, const int32 *MaxTable, geBoolean
 	}
 
 	pCacheType = Cache->CacheTypes;
-	
+
 	// Go through one last time, and make sure all got allocated
 	for (i=0; i< D3DCACHE_MAX_CACHE_TYPES; i++, pCacheType++)
 	{
@@ -530,7 +530,7 @@ geBoolean D3DCache_AdjustSlots(D3DCache *Cache, const int32 *MaxTable, geBoolean
 			continue;
 		}
 
-		if (pCacheType->NumUsedSlots <= 0)		
+		if (pCacheType->NumUsedSlots <= 0)
 		{
 			D3DMain_Log("D3DCache_AdjustSlots:  Out of ram creating surfaces for cache.\n");
 			D3DMain_Log("D3DCache_AdjustSlots:  Pick a display mode with a smaller resolution.\n");
@@ -572,7 +572,7 @@ int32 D3DCache_SetupSlot(D3DCache *Cache, D3DCache_Slot *Slot, int32 Width, int3
 	LPDIRECTDRAWSURFACE4 Surface;
 	DDSURFACEDESC2		ddsd;
 	HRESULT				Hr;
-			
+
 	assert(D3DCache_IsValid(Cache));
 	assert(D3DCache_SlotIsValid(Slot));
 
@@ -590,13 +590,13 @@ int32 D3DCache_SetupSlot(D3DCache *Cache, D3DCache_Slot *Slot, int32 Width, int3
 	ddsd.ddsCaps.dwCaps4 = 0;
 	ddsd.dwHeight = Width;
 	ddsd.dwWidth = Height;
-	
+
 	ddsd.dwTextureStage = Stage;
-	
+
 	Hr = Cache->lpDD->CreateSurface(&ddsd, &Surface, NULL);
 
-	if(Hr != DD_OK) 
-	{ 
+	if(Hr != DD_OK)
+	{
 		if (Hr == DDERR_OUTOFVIDEOMEMORY)
 		{
 			return 0;
@@ -611,11 +611,11 @@ int32 D3DCache_SetupSlot(D3DCache *Cache, D3DCache_Slot *Slot, int32 Width, int3
 #if 0
 	{
 		DDCOLORKEY			CKey;
-		
+
 		// Create the color key for this surface
 		CKey.dwColorSpaceLowValue = 1;
 		CKey.dwColorSpaceHighValue = 1;
-		
+
 		if (Slot->Surface->SetColorKey(DDCKEY_SRCBLT , &CKey) != DD_OK)
 		{
 			Slot->Surface->Release();
@@ -625,10 +625,10 @@ int32 D3DCache_SetupSlot(D3DCache *Cache, D3DCache_Slot *Slot, int32 Width, int3
 	}
  #endif
 
-	Hr = Surface->QueryInterface(IID_IDirect3DTexture2, (void**)&Slot->Texture);  
+	Hr = Surface->QueryInterface(IID_IDirect3DTexture2, (void**)&Slot->Texture);
 
-	if(Hr != DD_OK) 
-	{ 
+	if(Hr != DD_OK)
+	{
 		Surface->Release();
 		return -1;
 	}
@@ -733,7 +733,7 @@ uint32 Log2(uint32 P2)
 {
 	uint32		p = 0;
 	int32		i = 0;
-	
+
 	for (i = P2; i > 0; i>>=1)
 		p++;
 
@@ -757,24 +757,24 @@ int32 SnapToPower2(int32 Width)
 	else if (Width > 64 && Width <= 128) Width = 128;
 	else if (Width > 128 && Width <= 256) Width = 256;
 	/* 11/25/2002 Wendell Buckner
-    Raise texture limits to 16384 x 16384. */
-    else if (Width > 256  && Width <=  512 ) Width = 512;
-    else if (Width > 512  && Width <= 1024 ) Width = 1024;
-    else if (Width > 1024 && Width <= 2048 ) Width = 2048;
-    else if (Width > 2048 && Width <= 4096 ) Width = 4096;
-    else if (Width > 4096 && Width <= 8192 ) Width = 8192;
-    else if (Width > 8192 && Width <= 16384) Width = 16384;
-	else 
+	Raise texture limits to 16384 x 16384. */
+	else if (Width > 256  && Width <=  512 ) Width = 512;
+	else if (Width > 512  && Width <= 1024 ) Width = 1024;
+	else if (Width > 1024 && Width <= 2048 ) Width = 2048;
+	else if (Width > 2048 && Width <= 4096 ) Width = 4096;
+	else if (Width > 4096 && Width <= 8192 ) Width = 8192;
+	else if (Width > 8192 && Width <= 16384) Width = 16384;
+	else
 		return -1;
 #else
-	
+
 	if (Width > 1 && Width <= 8) Width = 8;
 	else if (Width > 8 && Width <= 16) Width =16;
 	else if (Width > 16 && Width <= 32) Width = 32;
 	else if (Width > 32 && Width <= 64) Width = 64;
 	else if (Width > 64 && Width <= 128) Width = 128;
 	else if (Width > 128 && Width <= 256) Width = 256;
-	else 
+	else
 		return -1;
 #endif
 
@@ -787,7 +787,7 @@ int32 SnapToPower2(int32 Width)
 int32 GetLog(int32 Width, int32 Height)
 {
 	int32	LWidth = SnapToPower2(max(Width, Height));
-	
+
 	return Log2(LWidth);
 }
 

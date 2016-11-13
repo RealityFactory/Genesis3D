@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <windows.h>
@@ -96,7 +96,7 @@ BOOL D3DMain_RestoreAllSurfaces(void)
 #ifdef _DEBUG
 	OutputDebugString("--- D3DMain_RestoreAllSurfaces ---\n");
 #endif
-	
+
 	if (AppInfo.lpDD)
 	{
 		if (!D3DMain_SetDisplayMode(AppInfo.hWnd, AppInfo.CurrentWidth, AppInfo.CurrentHeight, AppInfo.CurrentBpp, AppInfo.FullScreen))
@@ -130,7 +130,7 @@ BOOL D3DMain_RestoreAllSurfaces(void)
 //================================================================================
 static DWORD BPPToDDBD(int bpp)
 {
-	switch(bpp) 
+	switch(bpp)
 	{
 		case 1:
 			return DDBD_1;
@@ -148,7 +148,7 @@ static DWORD BPPToDDBD(int bpp)
 			return DDBD_32;
 		default:
 			assert(!"BOGUS bpp");
-	}	
+	}
 
 	return DDBD_1;		// Shutup compiler warning
 }
@@ -164,9 +164,9 @@ BOOL D3DMain_InitD3D(HWND hWnd, const char *DriverName, int32 Width, int32 Heigh
 	SYSTEMTIME		Time;
 
 	memset(&AppInfo, 0, sizeof(App_Info));
-	
+
 	GetSystemTime(&Time);
-		
+
 	unlink(D3DMAIN_LOG_FILENAME);
 
 	D3DMain_Log("=================================================================\n");
@@ -182,7 +182,7 @@ BOOL D3DMain_InitD3D(HWND hWnd, const char *DriverName, int32 Width, int32 Heigh
 
 	// Create DD
 	ATTEMPT(D3DMain_CreateDDFromName(DriverName));
-	
+
 	ATTEMPT(D3DMain_GetTextureMemory());
 
 	// We must do this after the DD object is created!!!
@@ -200,7 +200,7 @@ BOOL D3DMain_InitD3D(HWND hWnd, const char *DriverName, int32 Width, int32 Heigh
 		// Force Width/Height to client window area size
 		Width = AppInfo.OldWindowWidth;
 		Height = AppInfo.OldWindowHeight;
-		
+
 		ATTEMPT(D3DMain_SetDisplayMode(hWnd, Width, Height, AppInfo.OldBpp, FALSE));
 	}
 	else
@@ -212,8 +212,8 @@ BOOL D3DMain_InitD3D(HWND hWnd, const char *DriverName, int32 Width, int32 Heigh
 	ATTEMPT(D3DMain_PickDevice());
 
 	// Create front/back buffer
-	ATTEMPT(D3DMain_CreateBuffers());		
-	
+	ATTEMPT(D3DMain_CreateBuffers());
+
 	// For some reason, we have to create the zbuffer BEFORE the device??? Why???
 	ATTEMPT(D3DMain_CreateZBuffer());
 
@@ -231,7 +231,7 @@ BOOL D3DMain_InitD3D(HWND hWnd, const char *DriverName, int32 Width, int32 Heigh
 #endif
 
 	D3DMain_Log("--- D3DMain_SetRenderState --- \n");
-    
+
 	// Set some defaults render states
 	LastError = AppInfo.lpD3DDevice->BeginScene();
 
@@ -243,7 +243,7 @@ BOOL D3DMain_InitD3D(HWND hWnd, const char *DriverName, int32 Width, int32 Heigh
 	}
 
 	LastError = AppInfo.lpD3DDevice->SetCurrentViewport(AppInfo.lpD3DViewport);
-	
+
 	if (LastError != D3D_OK)
 	{
 		D3DMain_Log("D3DMain_InitD3D:  SetViewport failed.\n  %s\n",
@@ -258,7 +258,7 @@ BOOL D3DMain_InitD3D(HWND hWnd, const char *DriverName, int32 Width, int32 Heigh
 	//AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_GREATEREQUAL);
 
 	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, TRUE);
-    AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_SPECULARENABLE, FALSE);
+	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_SPECULARENABLE, FALSE);
 
 	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_DITHERENABLE, TRUE);
 
@@ -266,9 +266,9 @@ BOOL D3DMain_InitD3D(HWND hWnd, const char *DriverName, int32 Width, int32 Heigh
 	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_ANTIALIAS, D3DANTIALIAS_SORTINDEPENDENT);
 	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_EDGEANTIALIAS, TRUE);
 #endif
-	
+
 	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_SHADEMODE, D3DSHADE_GOURAUD);
-    AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_CULLMODE, D3DCULL_NONE);
+	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_CULLMODE, D3DCULL_NONE);
 	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, TRUE);
 
 	AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_TEXTUREMIN, D3DFILTER_LINEARMIPNEAREST);
@@ -392,13 +392,13 @@ void D3DMain_Log(LPSTR Str, ... )
 //================================================================================
 //	CompareModes
 //================================================================================
-static int CompareModes(const void* element1, const void* element2) 
+static int CompareModes(const void* element1, const void* element2)
 {
 	App_Mode *lpMode1, *lpMode2;
-  
+
 	lpMode1 = (App_Mode*)element1;
 	lpMode2 = (App_Mode*)element2;
-  
+
 	if (lpMode1->Bpp > lpMode2->Bpp)
 		return -1;
 	else if (lpMode2->Bpp > lpMode1->Bpp)
@@ -424,7 +424,7 @@ static HRESULT CALLBACK EnumDisplayModesCallback(LPDDSURFACEDESC2 pddsd, LPVOID 
 
 	if (!pddsd)
 		return DDENUMRET_OK;
-		
+
 	if (pddsd->dwWidth > 1024 || pddsd->dwHeight > 768)
 		return DDENUMRET_OK;
 
@@ -453,10 +453,10 @@ BOOL D3DMain_EnumDisplayModes(void)
 
 	// Get a list of available display modes from DirectDraw
 	AppInfo.NumModes = 0;
-  
+
 	LastError = AppInfo.lpDD->EnumDisplayModes(0, NULL, 0, EnumDisplayModesCallback);
 
-	if(LastError != DD_OK ) 
+	if(LastError != DD_OK )
 	{
 		D3DMain_Log("EnumDisplayModes failed.\n  %s\n", D3DErrorToString(LastError));
 		AppInfo.NumModes = 0;
@@ -465,7 +465,7 @@ BOOL D3DMain_EnumDisplayModes(void)
 
 	// Sort the list of display modes
 	qsort((void *)&AppInfo.Modes[0], (size_t)AppInfo.NumModes, sizeof(App_Mode), CompareModes);
-	
+
 	return TRUE;
 }
 
@@ -477,14 +477,14 @@ BOOL D3DMain_EnumDisplayModes(void)
 static BOOL D3DMain_CreateD3D(void)
 {
 	HRESULT		LastError;
-	
+
 	assert(AppInfo.lpDD);
 
 	D3DMain_Log("--- D3DMain_CreateD3D ---\n");
 
 	LastError = AppInfo.lpDD->QueryInterface(IID_IDirect3D3, (LPVOID*)&AppInfo.lpD3D);
 
-	if (LastError != DD_OK) 
+	if (LastError != DD_OK)
 	{
 		D3DMain_Log("Creation of IDirect3D failed.\n  %s\n", D3DErrorToString(LastError));
 		goto exit_with_error;
@@ -538,10 +538,10 @@ static BOOL D3DMain_CreateD3D(void)
 //	EnumDeviceFunc
 //================================================================================
 static HRESULT WINAPI EnumDeviceFunc(LPGUID lpGuid, LPSTR lpDeviceDescription,
-                      LPSTR lpDeviceName, LPD3DDEVICEDESC lpHWDesc,
-                      LPD3DDEVICEDESC lpHELDesc, LPVOID lpContext)
+					  LPSTR lpDeviceName, LPD3DDEVICEDESC lpHWDesc,
+					  LPD3DDEVICEDESC lpHELDesc, LPVOID lpContext)
 {
-	DDMain_D3DDriver	*Driver;	
+	DDMain_D3DDriver	*Driver;
 	BOOL				Good;
 
 	if (!lpGuid|| !lpDeviceDescription || !lpDeviceName || !lpHWDesc || !lpHELDesc)
@@ -560,7 +560,7 @@ static HRESULT WINAPI EnumDeviceFunc(LPGUID lpGuid, LPSTR lpDeviceDescription,
 	AppInfo.CurrentDriver = AppInfo.NumDrivers;
 
 	Driver = &AppInfo.Drivers[AppInfo.NumDrivers];
-	
+
 	// Record the D3D driver's inforamation
 	memcpy(&AppInfo.Drivers[AppInfo.NumDrivers].Guid, lpGuid, sizeof(GUID));
 	lstrcpy(AppInfo.Drivers[AppInfo.NumDrivers].About, lpDeviceDescription);
@@ -568,12 +568,12 @@ static HRESULT WINAPI EnumDeviceFunc(LPGUID lpGuid, LPSTR lpDeviceDescription,
 
 	// Is this a hardware device or software emulation?  Checking the color
 	// model for a valid model works.
-	if (lpHWDesc->dcmColorModel) 
+	if (lpHWDesc->dcmColorModel)
 	{
 		AppInfo.Drivers[AppInfo.NumDrivers].IsHardware = TRUE;
 		memcpy(&AppInfo.Drivers[AppInfo.NumDrivers].Desc, lpHWDesc, sizeof(D3DDEVICEDESC));
 	}
-	else	
+	else
 	{
 		// Skip if this is not a hardware driver
 		AppInfo.Drivers[AppInfo.NumDrivers].IsHardware = FALSE;
@@ -583,8 +583,8 @@ static HRESULT WINAPI EnumDeviceFunc(LPGUID lpGuid, LPSTR lpDeviceDescription,
 
 	LPD3DDEVICEDESC Desc = &AppInfo.Drivers[AppInfo.NumDrivers].Desc;
 
-    Driver->MaxTextureBlendStages = Desc->wMaxTextureBlendStages;
-    Driver->MaxSimultaneousTextures = Desc->wMaxSimultaneousTextures;	
+	Driver->MaxTextureBlendStages = Desc->wMaxTextureBlendStages;
+	Driver->MaxSimultaneousTextures = Desc->wMaxSimultaneousTextures;
 
 	if (!(Desc->dwDeviceZBufferBitDepth))
 		Good = FALSE;
@@ -606,7 +606,7 @@ static HRESULT WINAPI EnumDeviceFunc(LPGUID lpGuid, LPSTR lpDeviceDescription,
 		Good = FALSE;
 	else
 		AppInfo.Drivers[AppInfo.NumDrivers].DoesTransparency = TRUE;
-		
+
 	//if (!(lpHWDesc->dpcTriCaps.dwTextureAddressCaps & D3DPTADDRESSCAPS_CLAMP))
 	//	Good = FALSE;
 	//else
@@ -644,7 +644,7 @@ static HRESULT WINAPI EnumDeviceFunc(LPGUID lpGuid, LPSTR lpDeviceDescription,
 
 	// Tell global structure that we found a good device
 	AppInfo.FoundGoodDevice = TRUE;
-	
+
 	// If all was good, increment the number of drivers
 	AppInfo.NumDrivers++;
 
@@ -667,7 +667,7 @@ static BOOL D3DMain_EnumDevices(void)
 
 	LastError = AppInfo.lpD3D->EnumDevices(EnumDeviceFunc, NULL);
 
-	if (LastError != DD_OK) 
+	if (LastError != DD_OK)
 	{
 		D3DMain_Log("Enumeration of drivers failed.\n  %s\n", D3DErrorToString(LastError));
 		return FALSE;
@@ -681,15 +681,15 @@ static BOOL D3DMain_EnumDevices(void)
 //================================================================================
 //	CreateSurface
 //================================================================================
-static HRESULT CreateSurface(LPDDSURFACEDESC2 lpDDSurfDesc, LPDIRECTDRAWSURFACE4 FAR *lpDDSurface) 
+static HRESULT CreateSurface(LPDDSURFACEDESC2 lpDDSurfDesc, LPDIRECTDRAWSURFACE4 FAR *lpDDSurface)
 {
 	HRESULT Result;
-	
+
 	//if (AppInfo.OnlySystemMemory)
 	//	lpDDSurfDesc->ddsCaps.dwCaps |= DDSCAPS_SYSTEMMEMORY;
 
 	Result = AppInfo.lpDD->CreateSurface(lpDDSurfDesc, lpDDSurface, NULL);
-	
+
 	return Result;
 }
 
@@ -699,13 +699,13 @@ static HRESULT CreateSurface(LPDDSURFACEDESC2 lpDDSurfDesc, LPDIRECTDRAWSURFACE4
 static HRESULT GetSurfDesc(LPDDSURFACEDESC2 lpDDSurfDesc, LPDIRECTDRAWSURFACE4 lpDDSurf)
 {
 	HRESULT Result;
-	
+
 	memset(lpDDSurfDesc, 0, sizeof(DDSURFACEDESC2));
-	
+
 	lpDDSurfDesc->dwSize = sizeof(DDSURFACEDESC2);
-	
+
 	Result = lpDDSurf->GetSurfaceDesc(lpDDSurfDesc);
-	
+
 	return Result;
 }
 
@@ -716,26 +716,26 @@ static BOOL D3DMain_CreateViewPort(int w, int h)
 {
 	LPDIRECT3DVIEWPORT3	lpD3DViewport;
 	HRESULT				rval;
-  
+
 	D3DMain_Log("--- D3DMain_CreateViewPort ---\n");
 
 	// Create the D3D viewport object
 	rval = AppInfo.lpD3D->CreateViewport(&lpD3DViewport, NULL);
 
-	if (rval != D3D_OK) 
+	if (rval != D3D_OK)
 	{
 		D3DMain_Log("Create D3D viewport failed.\n  %s\n", D3DErrorToString(rval));
 		return FALSE;
 	}
-	
+
 	// Add the viewport to the D3D device
 	rval = AppInfo.lpD3DDevice->AddViewport(lpD3DViewport);
-	if (rval != D3D_OK) 
+	if (rval != D3D_OK)
 	{
 		D3DMain_Log("Add D3D viewport failed.\n  %s\n", D3DErrorToString(rval));
 		return FALSE;
 	}
-	
+
 	// Setup the viewport for a reasonable viewing area
 	D3DVIEWPORT2 viewData;
 
@@ -750,17 +750,17 @@ static BOOL D3DMain_CreateViewPort(int w, int h)
 	viewData.dvClipY = viewData.dvClipHeight / 2.0f;
 	viewData.dvMinZ = 0.0f;
 	viewData.dvMaxZ = 1.0f;
-	
+
 	rval = lpD3DViewport->SetViewport2(&viewData);
-	if (rval != D3D_OK) 
+	if (rval != D3D_OK)
 	{
 		D3DMain_Log("SetViewport failed.\n  %s\n", D3DErrorToString(rval));
 		return FALSE;
 	}
 
 	AppInfo.lpD3DViewport = lpD3DViewport;
-	
-    // Create the material that will be used for the background
+
+	// Create the material that will be used for the background
 	{
 		D3DMATERIAL			Material;
 		D3DMATERIALHANDLE	MatHandle;
@@ -783,11 +783,11 @@ static BOOL D3DMain_CreateViewPort(int w, int h)
 		Material.dcvDiffuse.b = Material.dcvAmbient.b = 0.0f;
 		Material.dwRampSize   = 16L; // A default ramp size
 
-	    AppInfo.BackgroundMaterial->SetMaterial(&Material);
+		AppInfo.BackgroundMaterial->SetMaterial(&Material);
 
 		// Attach the material to the viewport
 		AppInfo.BackgroundMaterial->GetHandle( AppInfo.lpD3DDevice, &MatHandle);
-	    AppInfo.lpD3DViewport->SetBackground(MatHandle);
+		AppInfo.lpD3DViewport->SetBackground(MatHandle);
 	}
 
 	return TRUE;
@@ -801,7 +801,7 @@ static BOOL D3DMain_CreateViewPort(int w, int h)
 static HRESULT CALLBACK EnumTextureFormatsCallback(LPDDPIXELFORMAT lpddpfPixelFormat, LPVOID lpContext)
 {
 	DDMain_SurfFormat	*pTexFormat;
-	
+
 	if(!lpddpfPixelFormat)
 		return DDENUMRET_OK;
 
@@ -815,21 +815,21 @@ static HRESULT CALLBACK EnumTextureFormatsCallback(LPDDPIXELFORMAT lpddpfPixelFo
 	// Clear out this texture format slot
 	memset(pTexFormat, 0, sizeof(DDMain_SurfFormat));
 
-	if(lpddpfPixelFormat->dwFlags & DDPF_ALPHAPIXELS) 
+	if(lpddpfPixelFormat->dwFlags & DDPF_ALPHAPIXELS)
 	{
-		if(lpddpfPixelFormat->dwRGBAlphaBitMask == 0x8000) 
+		if(lpddpfPixelFormat->dwRGBAlphaBitMask == 0x8000)
 		{
-			if(lpddpfPixelFormat->dwRBitMask != 0x7c00 || 
+			if(lpddpfPixelFormat->dwRBitMask != 0x7c00 ||
 				lpddpfPixelFormat->dwGBitMask != 0x3e0 ||
 				lpddpfPixelFormat->dwBBitMask != 0x1f)
 					return DDENUMRET_OK;
-				
+
 			pTexFormat->HasOneBitAlpha = TRUE;
 			pTexFormat->HasFourBitAlpha = FALSE;
 		}
-		else if(lpddpfPixelFormat->dwRGBAlphaBitMask == 0xf000) 
+		else if(lpddpfPixelFormat->dwRGBAlphaBitMask == 0xf000)
 		{
-			if(lpddpfPixelFormat->dwRBitMask != 0xf00 || 
+			if(lpddpfPixelFormat->dwRBitMask != 0xf00 ||
 				lpddpfPixelFormat->dwGBitMask != 0xf0 ||
 				lpddpfPixelFormat->dwBBitMask != 0xf)
 					return DDENUMRET_OK;
@@ -843,13 +843,13 @@ static HRESULT CALLBACK EnumTextureFormatsCallback(LPDDPIXELFORMAT lpddpfPixelFo
 			pTexFormat->HasFourBitAlpha = FALSE;
 		}
 	}
-	else 
+	else
 	{
 		if(!(lpddpfPixelFormat->dwFlags & DDPF_RGB))
 			return DDENUMRET_OK;
-		
+
 		#if 0
-		if(lpddpfPixelFormat->dwRGBBitCount != 16) 
+		if(lpddpfPixelFormat->dwRGBBitCount != 16)
 			return DDENUMRET_OK;
 
 		if(	(lpddpfPixelFormat->dwRBitMask != 0xf800 && lpddpfPixelFormat->dwRBitMask != 0x7c00) ||
@@ -884,8 +884,8 @@ BOOL Main_EnumTextureFormats(void)
 	AppInfo.NumTextureFormats = 0;
 
 	LastError = AppInfo.lpD3DDevice->EnumTextureFormats(EnumTextureFormatsCallback, NULL);
-	
-	if (LastError != DD_OK) 
+
+	if (LastError != DD_OK)
 	{
 		D3DMain_Log("Main_EnumTextureFormats:  Enumeration of texture formats failed.\n  %s\n",
 			D3DErrorToString(LastError));
@@ -906,7 +906,7 @@ HRESULT WINAPI EnumSurfaceFormatsCallback(LPDIRECTDRAWSURFACE4 lpDDSurface, LPDD
 
 	// Don't need this.
 	RELEASE(lpDDSurface);
-	
+
 	lpddpfPixelFormat = &lpDDSurfaceDesc->ddpfPixelFormat;
 
 	if(!lpddpfPixelFormat)
@@ -920,23 +920,23 @@ HRESULT WINAPI EnumSurfaceFormatsCallback(LPDIRECTDRAWSURFACE4 lpDDSurface, LPDD
 	// Clear out this texture format slot
 	memset(pSurfFormat, 0, sizeof(DDMain_SurfFormat));
 
-	if(lpddpfPixelFormat->dwFlags & DDPF_ALPHAPIXELS) 
+	if(lpddpfPixelFormat->dwFlags & DDPF_ALPHAPIXELS)
 	{
-		if(lpddpfPixelFormat->dwRGBAlphaBitMask == 0x8000) 
+		if(lpddpfPixelFormat->dwRGBAlphaBitMask == 0x8000)
 		{
 			// 1555
-			if(lpddpfPixelFormat->dwRBitMask != 0x7c00 || 
+			if(lpddpfPixelFormat->dwRBitMask != 0x7c00 ||
 				lpddpfPixelFormat->dwGBitMask != 0x3e0 ||
 				lpddpfPixelFormat->dwBBitMask != 0x1f)
 					return DDENUMRET_OK;
-				
+
 			pSurfFormat->HasOneBitAlpha = TRUE;
 			pSurfFormat->HasFourBitAlpha = FALSE;
 		}
-		else if(lpddpfPixelFormat->dwRGBAlphaBitMask == 0xf000) 
+		else if(lpddpfPixelFormat->dwRGBAlphaBitMask == 0xf000)
 		{
 			// 4444
-			if(lpddpfPixelFormat->dwRBitMask != 0xf00 || 
+			if(lpddpfPixelFormat->dwRBitMask != 0xf00 ||
 				lpddpfPixelFormat->dwGBitMask != 0xf0 ||
 				lpddpfPixelFormat->dwBBitMask != 0xf)
 					return DDENUMRET_OK;
@@ -950,7 +950,7 @@ HRESULT WINAPI EnumSurfaceFormatsCallback(LPDIRECTDRAWSURFACE4 lpDDSurface, LPDD
 			pSurfFormat->HasFourBitAlpha = FALSE;
 		}
 	}
-	else 
+	else
 	{
 		if(!(lpddpfPixelFormat->dwFlags & DDPF_RGB))
 			return DDENUMRET_OK;
@@ -966,7 +966,7 @@ HRESULT WINAPI EnumSurfaceFormatsCallback(LPDIRECTDRAWSURFACE4 lpDDSurface, LPDD
 
 	return DDENUMRET_OK;
 }
-  
+
 //================================================================================
 //	Main_EnumSurfaceFormats
 //================================================================================
@@ -980,8 +980,8 @@ BOOL Main_EnumSurfaceFormats(void)
 
 	LastError = AppInfo.lpDD->EnumSurfaces(DDENUMSURFACES_DOESEXIST|DDENUMSURFACES_ALL,
 		NULL, NULL, EnumSurfaceFormatsCallback);
-	
-	if (LastError != DD_OK) 
+
+	if (LastError != DD_OK)
 	{
 		D3DMain_Log("Main_EnumSurfaceFormats:  Enumeration of texture formats failed.\n  %s\n",
 			D3DErrorToString(LastError));
@@ -997,24 +997,24 @@ BOOL Main_EnumSurfaceFormats(void)
 // Desc: Enumeration function to report valid pixel formats for z-buffers.
 //-----------------------------------------------------------------------------
 static HRESULT WINAPI EnumZBufferFormatsCallback( DDPIXELFORMAT* pddpf,
-                                                  VOID* pddpfDesired )
+												  VOID* pddpfDesired )
 {
-    if( NULL==pddpf || NULL==pddpfDesired )
-        return D3DENUMRET_CANCEL;
+	if( NULL==pddpf || NULL==pddpfDesired )
+		return D3DENUMRET_CANCEL;
 
-    // If the current pixel format's match the desired ones (DDPF_ZBUFFER and
-    // possibly DDPF_STENCILBUFFER), lets copy it and return. This function is
-    // not choosy...it accepts the first valid format that comes along.
-    if( pddpf->dwFlags == ((DDPIXELFORMAT*)pddpfDesired)->dwFlags )
-    {
-        memcpy( pddpfDesired, pddpf, sizeof(DDPIXELFORMAT) );
+	// If the current pixel format's match the desired ones (DDPF_ZBUFFER and
+	// possibly DDPF_STENCILBUFFER), lets copy it and return. This function is
+	// not choosy...it accepts the first valid format that comes along.
+	if( pddpf->dwFlags == ((DDPIXELFORMAT*)pddpfDesired)->dwFlags )
+	{
+		memcpy( pddpfDesired, pddpf, sizeof(DDPIXELFORMAT) );
 
 		// We're happy with a 16-bit z-buffer. Otherwise, keep looking.
 		if( pddpf->dwZBufferBitDepth == 16 )
 			return D3DENUMRET_CANCEL;
-    }
+	}
 
-    return D3DENUMRET_OK;
+	return D3DENUMRET_OK;
 }
 
 //================================================================================
@@ -1029,25 +1029,25 @@ static BOOL D3DMain_ClearBuffers(void)
 
 	// Find the width and height of the front buffer by getting its
 	// DDSURFACEDESC2
-	if (AppInfo.lpFrontBuffer) 
+	if (AppInfo.lpFrontBuffer)
 	{
 		LastError = GetSurfDesc(&ddsd, AppInfo.lpFrontBuffer);
-		if (LastError != DD_OK) 
+		if (LastError != DD_OK)
 		{
 			D3DMain_Log("D3DMain_ClearBuffers:  Failure getting the surface description of the front buffer before clearing.\n  %s\n",
 				D3DErrorToString(LastError));
 			return FALSE;
 		}
-    
+
 		// Clear the front buffer to black
 		memset(&ddbltfx, 0, sizeof(ddbltfx));
 		ddbltfx.dwSize = sizeof(DDBLTFX);
 		SetRect(&dst, 0, 0, ddsd.dwWidth, ddsd.dwHeight);
-    
-		LastError = AppInfo.lpFrontBuffer->Blt(&dst, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, 
+
+		LastError = AppInfo.lpFrontBuffer->Blt(&dst, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT,
 							&ddbltfx);
-    
-		if (LastError != DD_OK) 
+
+		if (LastError != DD_OK)
 		{
 			if(LastError==DDERR_SURFACELOST)
 			{
@@ -1065,21 +1065,21 @@ static BOOL D3DMain_ClearBuffers(void)
 			}
 		}
 	}
-	
-	if (AppInfo.lpBackBuffer) 
+
+	if (AppInfo.lpBackBuffer)
 	{
 		// Find the width and height of the back buffer by getting its
 		// DDSURFACEDESC2
-		
+
 		LastError = GetSurfDesc(&ddsd, AppInfo.lpBackBuffer);
-		
-		if (LastError != DD_OK) 
+
+		if (LastError != DD_OK)
 		{
 			D3DMain_Log("D3DMain_ClearBuffers:  Failure while getting the surface description of the back buffer before clearing.\n  %s\n",
 				D3DErrorToString(LastError));
 			return FALSE;
 		}
-		
+
 		// Clear the back buffer to black
 		memset(&ddbltfx, 0, sizeof(ddbltfx));
 		ddbltfx.dwSize = sizeof(DDBLTFX);
@@ -1087,7 +1087,7 @@ static BOOL D3DMain_ClearBuffers(void)
 		LastError = AppInfo.lpBackBuffer->Blt(&dst, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT,
 					&ddbltfx);
 
-		if (LastError != DD_OK) 
+		if (LastError != DD_OK)
 		{
 			if(LastError==DDERR_SURFACELOST)
 			{
@@ -1105,7 +1105,7 @@ static BOOL D3DMain_ClearBuffers(void)
 			}
 		}
 	}
-	
+
 	return TRUE;
 }
 
@@ -1116,37 +1116,37 @@ BOOL Main_ShowBackBuffer(void)
 {
 	HRESULT		LastError;
 
-	if (!AppInfo.RenderingIsOK) 
+	if (!AppInfo.RenderingIsOK)
 		return TRUE;
-  
-	if (AppInfo.FullScreen) 
-	{  
+
+	if (AppInfo.FullScreen)
+	{
 		// Flip the back and front buffers
 		#if 1
 			LastError = AppInfo.lpFrontBuffer->Flip(AppInfo.lpBackBuffer, DDFLIP_WAIT);
 		#else
 			LastError = AppInfo.lpFrontBuffer->Flip(AppInfo.lpBackBuffer, DDFLIP_NOVSYNC);
 		#endif
-		
-		if (LastError == DDERR_SURFACELOST) 
+
+		if (LastError == DDERR_SURFACELOST)
 		{
 			D3DMain_RestoreAllSurfaces();
 			//AppInfo.lpFrontBuffer->Restore();
 			//AppInfo.lpBackBuffer->Restore();
-			
+
 			D3DMain_ClearBuffers();
 
-		} 
+		}
 		else if (LastError == DDERR_WASSTILLDRAWING)
 		{
 		}
-		else if (LastError != DD_OK) 
+		else if (LastError != DD_OK)
 		{
 			D3DMain_Log("Flipping complex display surface failed.\n  %s\n", D3DErrorToString(LastError));
 			return FALSE;
 		}
-	} 
-	else 
+	}
+	else
 	{
 		RECT	FRect, BRect;
 
@@ -1163,7 +1163,7 @@ BOOL Main_ShowBackBuffer(void)
 		LastError = AppInfo.lpFrontBuffer->Blt(&FRect, AppInfo.lpBackBuffer,
 				&BRect, DDBLT_WAIT, NULL);
 
-		if (LastError != DD_OK) 
+		if (LastError != DD_OK)
 		{
 			if(LastError==DDERR_SURFACELOST)
 			{
@@ -1189,30 +1189,30 @@ BOOL Main_ShowBackBuffer(void)
 //================================================================================
 BOOL Main_ClearBackBuffer(BOOL Clear, BOOL ClearZ)
 {
-    int			ClearFlags;
-    D3DRECT		Dummy;
+	int			ClearFlags;
+	D3DRECT		Dummy;
 	HRESULT		LastError;
 
-	if (!AppInfo.RenderingIsOK) 
+	if (!AppInfo.RenderingIsOK)
 		return TRUE;
-	
-    // Default to clear nothing
+
+	// Default to clear nothing
 	ClearFlags = 0;
 
 	// Then set in what callers wants to clear
 	if (Clear)
 		ClearFlags |= D3DCLEAR_TARGET;
-	
+
 	if (ClearZ)
 		ClearFlags |= D3DCLEAR_ZBUFFER;
 
-    Dummy.x1 = Dummy.y1 = 0;
-    Dummy.x2 = AppInfo.CurrentWidth;
-    Dummy.y2 = AppInfo.CurrentHeight;
-    
+	Dummy.x1 = Dummy.y1 = 0;
+	Dummy.x2 = AppInfo.CurrentWidth;
+	Dummy.y2 = AppInfo.CurrentHeight;
+
 	LastError = AppInfo.lpD3DViewport->Clear(1, &Dummy, ClearFlags);
-    
-	if (LastError != D3D_OK) 
+
+	if (LastError != D3D_OK)
 	{
 		D3DMain_Log("Viewport clear failed.\n  %s\n",
 			D3DErrorToString(LastError));
@@ -1324,7 +1324,7 @@ static unsigned int MyRGB(DWORD R, DWORD G, DWORD B, D3D_PixelMask *PixelMask)
 {
    DWORD       R_Left, G_Left, B_Left;
    DWORD       R_Right, G_Right, B_Right;
-   
+
 
    // Get shift constants for current video mode
    R_Left = PixelMask->R_Shift;
@@ -1335,10 +1335,10 @@ static unsigned int MyRGB(DWORD R, DWORD G, DWORD B, D3D_PixelMask *PixelMask)
    G_Right = 8 - PixelMask->G_Width;
    B_Right = 8 - PixelMask->B_Width;
    // Shift R,G, and B into one value
-   return( 
-       (((((unsigned int) R) >> R_Right) << R_Left) & PixelMask->R_Mask) |
-       (((((unsigned int) G) >> G_Right) << G_Left) & PixelMask->G_Mask) |
-       (((((unsigned int) B) >> B_Right) << B_Left) & PixelMask->B_Mask)
+   return(
+	   (((((unsigned int) R) >> R_Right) << R_Left) & PixelMask->R_Mask) |
+	   (((((unsigned int) G) >> G_Right) << G_Left) & PixelMask->G_Mask) |
+	   (((((unsigned int) B) >> B_Right) << B_Left) & PixelMask->B_Mask)
    );
 }
 
@@ -1349,17 +1349,17 @@ BOOL D3DMain_GetSurfaceFormats(void)
 {
 	int32		i;
 
-    D3DMain_Log("--- D3DMain_GetSurfaceFormats ---\n");
-	
+	D3DMain_Log("--- D3DMain_GetSurfaceFormats ---\n");
+
 	if (!Main_EnumTextureFormats())
 	{
-        D3DMain_Log("D3DMain_GetSurfaceFormats:  Main_EnumTextureFormats failed.\n");
+		D3DMain_Log("D3DMain_GetSurfaceFormats:  Main_EnumTextureFormats failed.\n");
 		return FALSE;
-    }
-	
+	}
+
 	if (!Main_EnumSurfaceFormats())
 	{
-        D3DMain_Log("D3DMain_GetSurfaceFormats:  Main_EnumSurfaceFormats failed.\n");
+		D3DMain_Log("D3DMain_GetSurfaceFormats:  Main_EnumSurfaceFormats failed.\n");
 		return FALSE;
 	}
 
@@ -1373,35 +1373,35 @@ BOOL D3DMain_GetSurfaceFormats(void)
 		if(lpddpfPixelFormat->dwRGBBitCount != AppInfo.ddsd.ddpfPixelFormat.dwRGBBitCount)
 			continue;
 
-        if (lpddpfPixelFormat->dwRGBAlphaBitMask != AppInfo.ddsd.ddpfPixelFormat.dwRGBAlphaBitMask)
+		if (lpddpfPixelFormat->dwRGBAlphaBitMask != AppInfo.ddsd.ddpfPixelFormat.dwRGBAlphaBitMask)
 			continue;
 		if (lpddpfPixelFormat->dwRBitMask != AppInfo.ddsd.ddpfPixelFormat.dwRBitMask)
 			continue;
-        if (lpddpfPixelFormat->dwGBitMask != AppInfo.ddsd.ddpfPixelFormat.dwGBitMask)
+		if (lpddpfPixelFormat->dwGBitMask != AppInfo.ddsd.ddpfPixelFormat.dwGBitMask)
 			continue;
-        if (lpddpfPixelFormat->dwBBitMask != AppInfo.ddsd.ddpfPixelFormat.dwBBitMask)
+		if (lpddpfPixelFormat->dwBBitMask != AppInfo.ddsd.ddpfPixelFormat.dwBBitMask)
 			continue;
 
 	#if 0	// For debugging (This is the surface it is going to use for 2d decals)
-		D3DMain_Log("Bits: %i, A:%x, R:%x, G:%x, B:%x\n",	AppInfo.ddsd.ddpfPixelFormat.dwRGBBitCount, 
-															AppInfo.ddsd.ddpfPixelFormat.dwRGBAlphaBitMask, 
-															AppInfo.ddsd.ddpfPixelFormat.dwRBitMask, 
-															AppInfo.ddsd.ddpfPixelFormat.dwGBitMask, 
+		D3DMain_Log("Bits: %i, A:%x, R:%x, G:%x, B:%x\n",	AppInfo.ddsd.ddpfPixelFormat.dwRGBBitCount,
+															AppInfo.ddsd.ddpfPixelFormat.dwRGBAlphaBitMask,
+															AppInfo.ddsd.ddpfPixelFormat.dwRBitMask,
+															AppInfo.ddsd.ddpfPixelFormat.dwGBitMask,
 															AppInfo.ddsd.ddpfPixelFormat.dwBBitMask);
 		return FALSE;
 	#endif
 
-		
+
 		AppInfo.ddSurfFormat = AppInfo.SurfFormats[i].ddsd;
 
 		break;
 	}
 
-    if(i == AppInfo.NumSurfFormats) 
+	if(i == AppInfo.NumSurfFormats)
 	{
 		D3DMain_Log("D3DMain_GetSurfaceFormats:  Unable to find a 2d surface format that matches current bit depth.\n");
-        return FALSE;
-    }
+		return FALSE;
+	}
 
 #else
 	for(i = 0; i < AppInfo.NumTextureFormats; i++)
@@ -1413,35 +1413,35 @@ BOOL D3DMain_GetSurfaceFormats(void)
 		if(lpddpfPixelFormat->dwRGBBitCount != AppInfo.ddsd.ddpfPixelFormat.dwRGBBitCount)
 			continue;
 
-        if (lpddpfPixelFormat->dwRGBAlphaBitMask != AppInfo.ddsd.ddpfPixelFormat.dwRGBAlphaBitMask)
+		if (lpddpfPixelFormat->dwRGBAlphaBitMask != AppInfo.ddsd.ddpfPixelFormat.dwRGBAlphaBitMask)
 			continue;
 		if (lpddpfPixelFormat->dwRBitMask != AppInfo.ddsd.ddpfPixelFormat.dwRBitMask)
 			continue;
-        if (lpddpfPixelFormat->dwGBitMask != AppInfo.ddsd.ddpfPixelFormat.dwGBitMask)
+		if (lpddpfPixelFormat->dwGBitMask != AppInfo.ddsd.ddpfPixelFormat.dwGBitMask)
 			continue;
-        if (lpddpfPixelFormat->dwBBitMask != AppInfo.ddsd.ddpfPixelFormat.dwBBitMask)
+		if (lpddpfPixelFormat->dwBBitMask != AppInfo.ddsd.ddpfPixelFormat.dwBBitMask)
 			continue;
 
 	#if 0	// For debugging (This is the surface it is going to use for 2d decals)
-		D3DMain_Log("Bits: %i, A:%x, R:%x, G:%x, B:%x\n",	AppInfo.ddsd.ddpfPixelFormat.dwRGBBitCount, 
-															AppInfo.ddsd.ddpfPixelFormat.dwRGBAlphaBitMask, 
-															AppInfo.ddsd.ddpfPixelFormat.dwRBitMask, 
-															AppInfo.ddsd.ddpfPixelFormat.dwGBitMask, 
+		D3DMain_Log("Bits: %i, A:%x, R:%x, G:%x, B:%x\n",	AppInfo.ddsd.ddpfPixelFormat.dwRGBBitCount,
+															AppInfo.ddsd.ddpfPixelFormat.dwRGBAlphaBitMask,
+															AppInfo.ddsd.ddpfPixelFormat.dwRBitMask,
+															AppInfo.ddsd.ddpfPixelFormat.dwGBitMask,
 															AppInfo.ddsd.ddpfPixelFormat.dwBBitMask);
 		return FALSE;
 	#endif
 
-		
+
 		AppInfo.ddSurfFormat = AppInfo.TextureFormats[i].ddsd;
 
 		break;
 	}
 
-    if(i == AppInfo.NumTextureFormats) 
+	if(i == AppInfo.NumTextureFormats)
 	{
 		D3DMain_Log("D3DMain_GetSurfaceFormats:  Unable to find a 2d surface format that matches current bit depth.\n");
-        return FALSE;
-    }
+		return FALSE;
+	}
 #endif
 
 	// Now get the 3d surface formats
@@ -1449,44 +1449,44 @@ BOOL D3DMain_GetSurfaceFormats(void)
 	// Get 1555
 	for(i = 0; i < AppInfo.NumTextureFormats; i++)
 	{
-        if(AppInfo.TextureFormats[i].HasOneBitAlpha == TRUE) 
+		if(AppInfo.TextureFormats[i].HasOneBitAlpha == TRUE)
 		{
-            AppInfo.ddOneBitAlphaSurfFormat = AppInfo.TextureFormats[i].ddsd;
-            break;
-        }
+			AppInfo.ddOneBitAlphaSurfFormat = AppInfo.TextureFormats[i].ddsd;
+			break;
+		}
 	}
 
-    if(i == AppInfo.NumTextureFormats) 
+	if(i == AppInfo.NumTextureFormats)
 	{
 		D3DMain_Log("D3DMain_GetSurfaceFormats:  Unable to find 1555 texture support.\n");
-        return FALSE;
-    }
-    
-    // Get 4444
-	for(i = 0; i < AppInfo.NumTextureFormats; i++)
-	{
-        if(AppInfo.TextureFormats[i].HasFourBitAlpha == TRUE) 
-		{
-            AppInfo.ddFourBitAlphaSurfFormat = AppInfo.TextureFormats[i].ddsd;
-            break;
-        }
+		return FALSE;
 	}
 
-    if(i == AppInfo.NumTextureFormats) 
+	// Get 4444
+	for(i = 0; i < AppInfo.NumTextureFormats; i++)
+	{
+		if(AppInfo.TextureFormats[i].HasFourBitAlpha == TRUE)
+		{
+			AppInfo.ddFourBitAlphaSurfFormat = AppInfo.TextureFormats[i].ddsd;
+			break;
+		}
+	}
+
+	if(i == AppInfo.NumTextureFormats)
 	{
 		D3DMain_Log("D3DMain_GetSurfaceFormats:  Unable to find 4444 texture support.\n");
-        return FALSE;
-    }
+		return FALSE;
+	}
 
 	// Get either 555, or 565.
 	for(i = 0; i < AppInfo.NumTextureFormats; i++)
 	{
 		LPDDPIXELFORMAT lpddpfPixelFormat;
 
-        if(AppInfo.TextureFormats[i].HasOneBitAlpha == TRUE)
+		if(AppInfo.TextureFormats[i].HasOneBitAlpha == TRUE)
 			continue;
 
-		if (AppInfo.TextureFormats[i].HasFourBitAlpha == TRUE) 
+		if (AppInfo.TextureFormats[i].HasFourBitAlpha == TRUE)
 			continue;
 
 		lpddpfPixelFormat = &AppInfo.TextureFormats[i].ddsd.ddpfPixelFormat;
@@ -1496,7 +1496,7 @@ BOOL D3DMain_GetSurfaceFormats(void)
 		if (lpddpfPixelFormat->dwFlags & DDPF_ALPHAPIXELS)
 			continue;		// We don't want any surface that has alpha, just pure RGB...
 
-		if(lpddpfPixelFormat->dwRGBBitCount != 16) 
+		if(lpddpfPixelFormat->dwRGBBitCount != 16)
 			continue;
 
 		if(	(lpddpfPixelFormat->dwRBitMask != 0xf800 && lpddpfPixelFormat->dwRBitMask != 0x7c00) ||
@@ -1510,14 +1510,14 @@ BOOL D3DMain_GetSurfaceFormats(void)
 		break;
 	}
 
-    if(i == AppInfo.NumTextureFormats) 
+	if(i == AppInfo.NumTextureFormats)
 	{
 		D3DMain_Log("D3DMain_GetSurfaceFormats:  Unable to find 555 or 565 texture support.\n");
 		return FALSE;
-    }
+	}
 
 	Main_BuildRGBGammaTables(1.0f);
-	
+
 	return TRUE;
 }
 
@@ -1533,7 +1533,7 @@ BOOL Main_CheckDD(void)
 	AppInfo.CanDoWindow = FALSE;
 
 	assert(AppInfo.lpDD);
-	
+
 	if (!D3DMain_RememberOldMode(GetDesktopWindow()))
 		return FALSE;
 
@@ -1561,7 +1561,7 @@ static BOOL OutputDriverInfo(const char *FileName, DDMain_D3DDriver *Driver)
 	char			YesNo[2][10];
 
 	f = fopen(FileName, "a+t");
-      
+
 	if (!f)
 		return FALSE;
 
@@ -1569,7 +1569,7 @@ static BOOL OutputDriverInfo(const char *FileName, DDMain_D3DDriver *Driver)
 
 	strcpy(YesNo[0], "No\n");
 	strcpy(YesNo[1], "Yes\n");
-	
+
 	fprintf(f,"=================================================================\n");
 	fprintf(f,"Time: %2i:%2i:%2i\n", Time.wHour, Time.wMinute, Time.wSecond);
 	fprintf(f,"Date: %2i-%2i-%4i\n", Time.wMonth, Time.wDay, Time.wYear);
@@ -1641,7 +1641,7 @@ void Main_BuildRGBGammaTables(geFloat Gamma)
 	D3D_PixelMask	PixelMask;
 	DWORD			R_Left, G_Left, B_Left, A_Left;
 	DWORD			R_Right, G_Right, B_Right, A_Right;
-	
+
 
 	AppInfo.Gamma = Gamma;
 
@@ -1655,7 +1655,7 @@ void Main_BuildRGBGammaTables(geFloat Gamma)
 		geFloat Ratio = (i+0.5f)/255.5f;
 
 		geFloat RGB = (geFloat)(255.0 * pow((double)Ratio, 1.0/(double)Gamma) + 0.5);
-		
+
 		if (RGB < 0.0f)
 			RGB = 0.0f;
 		if (RGB > 255.0f)
@@ -1761,9 +1761,9 @@ geBoolean DRIVERCC D3DMain_SetActive(geBoolean wParam)
 					OutputDebugString("Couldn't restore surfaces!\n");
 					return GE_FALSE;
 				}
-				
+
 				OutputDebugString("D3DMain_SetActive: Regained Focus...\n");
-		
+
 				ShowWindow(AppInfo.hWnd, SW_SHOWNORMAL);		// Dx doesn't restore it
 			}
 			else
@@ -1805,7 +1805,7 @@ geBoolean DRIVERCC D3DMain_SetFogEnable(geBoolean Enable, geFloat r, geFloat g, 
 		Material.dcvDiffuse.g = Material.dcvAmbient.g = AppInfo.ClearG/255.0f;
 		Material.dcvDiffuse.b = Material.dcvAmbient.b = AppInfo.ClearB/255.0f;
 	}
-	
+
 	Material.dwRampSize = 16L; // A default ramp size
 
 	AppInfo.BackgroundMaterial->SetMaterial(&Material);
@@ -1823,7 +1823,7 @@ geBoolean DRIVERCC D3DMain_SetClearColor(geFloat r, geFloat g, geFloat b)
 	AppInfo.ClearR = r;
 	AppInfo.ClearG = g;
 	AppInfo.ClearB = b;
-	
+
 	// Fill in the material with the data
 	memset(&Material, 0, sizeof(D3DMATERIAL));
 
@@ -1865,21 +1865,21 @@ static BOOL D3DMain_RememberOldMode(HWND hWnd)
 	DDSURFACEDESC2	ddsd;
 	HRESULT			LastError;
 	RECT			CRect;
-  
+
 	D3DMain_Log("--- D3DMain_RememberOldMode ---\n");
 
 	memset(&ddsd, 0, sizeof(DDSURFACEDESC2));
-	
+
 	ddsd.dwSize = sizeof(DDSURFACEDESC2);
-	
+
 	LastError = AppInfo.lpDD->GetDisplayMode(&ddsd);
 
-	if (LastError != DD_OK) 
+	if (LastError != DD_OK)
 	{
 		D3DMain_Log("Getting the current display mode failed.\n  %s\n", D3DErrorToString(LastError));
 		return FALSE;
 	}
-	
+
 	GetClientRect(hWnd, &CRect);
 
 	// Get old fulscreen width/height/bpp
@@ -1893,7 +1893,7 @@ static BOOL D3DMain_RememberOldMode(HWND hWnd)
 
 	GetWindowRect(hWnd, &CRect);
 	AppInfo.OldWindowRect = CRect;
-	
+
 	AppInfo.OldGWL_STYLE = GetWindowLong(hWnd, GWL_STYLE);
 
 	D3DMain_GetClientWindowOffset(hWnd);
@@ -1912,15 +1912,15 @@ static BOOL D3DMain_SetDisplayMode(HWND hWnd, int w, int h, int bpp, BOOL FullSc
 
 	strcpy(YN[0], "NO");
 	strcpy(YN[1], "YES");
-  
+
 	D3DMain_Log("--- D3DMain_SetDisplayMode ---\n");
 	D3DMain_Log("  W: %i, H: %i, Bpp: %i, FullScreen: %s\n", w, h, bpp, YN[FullScreen]);
 
 	if (FullScreen)
 	{
 		LastError = AppInfo.lpDD->SetCooperativeLevel(hWnd, DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN);// | DDSCL_ALLOWREBOOT);
-		
-		if(LastError != DD_OK ) 
+
+		if(LastError != DD_OK )
 		{
 			D3DMain_Log("SetCooperativeLevel to fullscreen failed.\n  %s\n",
 				D3DErrorToString(LastError));
@@ -1929,7 +1929,7 @@ static BOOL D3DMain_SetDisplayMode(HWND hWnd, int w, int h, int bpp, BOOL FullSc
 
 		LastError = AppInfo.lpDD->SetDisplayMode(w, h, bpp,0,0);
 
-		if(LastError != DD_OK ) 
+		if(LastError != DD_OK )
 		{
 			D3DMain_Log("SetFullScreenDisplayMode:  Mode %dx%dx%d failed\n  %s\n", w, h, bpp, D3DErrorToString(LastError));
 			return FALSE;
@@ -1942,23 +1942,23 @@ static BOOL D3DMain_SetDisplayMode(HWND hWnd, int w, int h, int bpp, BOOL FullSc
 		// Set window boundaries to cover entire desktop, and show it
 		//
 		SetWindowLong(hWnd, GWL_STYLE, AppInfo.OldGWL_STYLE | WS_POPUP);
-	
-		SetWindowLong(hWnd, GWL_STYLE, AppInfo.OldGWL_STYLE & 
-											  ~(WS_OVERLAPPED  | 
-												WS_CAPTION     | 
-                                                WS_SYSMENU     | 
-                                                WS_MINIMIZEBOX | 
-                                                WS_MAXIMIZEBOX | 
-                                                WS_THICKFRAME));
+
+		SetWindowLong(hWnd, GWL_STYLE, AppInfo.OldGWL_STYLE &
+											  ~(WS_OVERLAPPED  |
+												WS_CAPTION     |
+												WS_SYSMENU     |
+												WS_MINIMIZEBOX |
+												WS_MAXIMIZEBOX |
+												WS_THICKFRAME));
 
 
-		SetWindowPos(AppInfo.hWnd, 
-		            HWND_TOP, 
-		            0,
-		            0,
-		            DWidth,
-		            DHeight,
-		            SWP_NOCOPYBITS | SWP_NOZORDER);
+		SetWindowPos(AppInfo.hWnd,
+					HWND_TOP,
+					0,
+					0,
+					DWidth,
+					DHeight,
+					SWP_NOCOPYBITS | SWP_NOZORDER);
 
 		ShowWindow(AppInfo.hWnd, SW_SHOWNORMAL);
 	}
@@ -1966,7 +1966,7 @@ static BOOL D3DMain_SetDisplayMode(HWND hWnd, int w, int h, int bpp, BOOL FullSc
 	{
 		LastError = AppInfo.lpDD->SetCooperativeLevel(hWnd, DDSCL_NORMAL);
 
-		if(LastError != DD_OK ) 
+		if(LastError != DD_OK )
 		{
 			D3DMain_Log("SetCooperativeLevel to normal failed.\n  %s\n",
 				D3DErrorToString(LastError));
@@ -2037,12 +2037,12 @@ static BOOL D3DMain_CreateDevice(void)
 
 	// Release old device
 	RELEASE(AppInfo.lpD3DDevice);
-  
-	Error = AppInfo.lpD3D->CreateDevice(AppInfo.Drivers[AppInfo.CurrentDriver].Guid, 
-										AppInfo.lpBackBuffer, 
+
+	Error = AppInfo.lpD3D->CreateDevice(AppInfo.Drivers[AppInfo.CurrentDriver].Guid,
+										AppInfo.lpBackBuffer,
 										&AppInfo.lpD3DDevice,NULL);
 
-	if (Error != DD_OK) 
+	if (Error != DD_OK)
 	{
 		D3DMain_Log("D3DMain_CreateDevice:  lpD3D->CreateDevice failed:\n  %s\n", D3DErrorToString(Error));
 		return FALSE;
@@ -2054,15 +2054,15 @@ static BOOL D3DMain_CreateDevice(void)
 		D3DDEVICEDESC hw, sw;
 
 		hw.dwSize = sw.dwSize = D3DDEVICEDESCSIZE;
-    
+
 		AppInfo.lpD3DDevice->GetCaps(&hw, &sw);
 	}
 	#endif
-	
+
 	// Get Device Identifier
 	Error = AppInfo.lpDD->GetDeviceIdentifier(&AppInfo.DeviceIdentifier, 0);
 
-	if (Error != DD_OK) 
+	if (Error != DD_OK)
 	{
 		D3DMain_Log("D3DMain_CreateDevice:  lpDD->GetDeviceIdentifier failed:\n  %s\n", D3DErrorToString(Error));
 		return FALSE;
@@ -2083,7 +2083,7 @@ static BOOL D3DMain_CreateBuffers(void)
 	DDSURFACEDESC2	ddsd;
 	DDSCAPS2		ddscaps;
 	HRESULT			LastError;
-  
+
 	D3DMain_Log("--- D3DMain_CreateBuffers ---\n");
 
 	// Release any old objects that might be lying around.  This should have
@@ -2091,8 +2091,8 @@ static BOOL D3DMain_CreateBuffers(void)
 	RELEASE(AppInfo.lpClipper);
 	RELEASE(AppInfo.lpBackBuffer);
 	RELEASE(AppInfo.lpFrontBuffer);
-  
-	if (AppInfo.FullScreen) 
+
+	if (AppInfo.FullScreen)
 	{
 		// Create a complex flipping surface for fullscreen mode with one
 		// back buffer.
@@ -2107,18 +2107,18 @@ static BOOL D3DMain_CreateBuffers(void)
 
 		LastError = CreateSurface(&ddsd, &AppInfo.lpFrontBuffer);
 
-		if(LastError != DD_OK) 
+		if(LastError != DD_OK)
 		{
-			if (LastError == DDERR_OUTOFMEMORY || LastError == DDERR_OUTOFVIDEOMEMORY) 
+			if (LastError == DDERR_OUTOFMEMORY || LastError == DDERR_OUTOFVIDEOMEMORY)
 			{
 				D3DMain_Log("CreateBuffers:  There was not enough video memory to create the rendering surface.\n  Please restart the program and try another fullscreen mode with less resolution or lower bit depth.\n");
-			} 
-			else 
+			}
+			else
 			{
 				D3DMain_Log("CreateBuffers:  CreateSurface for fullscreen flipping surface failed.\n  %s\n",
 						D3DErrorToString(LastError));
 			}
-			
+
 			goto exit_with_error;
 		}
 
@@ -2127,30 +2127,30 @@ static BOOL D3DMain_CreateBuffers(void)
 		// video memory (FYI).
 		ddscaps.dwCaps = DDSCAPS_BACKBUFFER;
 		LastError = AppInfo.lpFrontBuffer->GetAttachedSurface(&ddscaps, &AppInfo.lpBackBuffer);
-		
-		if(LastError != DD_OK) 
+
+		if(LastError != DD_OK)
 		{
 			D3DMain_Log("CreateBuffers:  GetAttachedSurface failed to get back buffer.\n  %s\n",
 				D3DErrorToString(LastError));
 			goto exit_with_error;
 		}
-		
+
 		LastError = GetSurfDesc(&ddsd, AppInfo.lpBackBuffer);
-		
-		if (LastError != DD_OK) 
+
+		if (LastError != DD_OK)
 		{
 			D3DMain_Log("CreateBuffers:  Failed to get surface description of back buffer.\n  %s\n",
 				D3DErrorToString(LastError));
 			goto exit_with_error;
 		}
-		
+
 		AppInfo.BackBufferInVideo =
 			(ddsd.ddsCaps.dwCaps & DDSCAPS_VIDEOMEMORY) ? TRUE : FALSE;
 
 		AppInfo.ddsd = ddsd;	// Save the format of the back buffer
 	}
-	else 
-	{	
+	else
+	{
 		// In the window case, create a front buffer which is the primary
 		// surface and a back buffer which is an offscreen plane surface.
 
@@ -2158,82 +2158,82 @@ static BOOL D3DMain_CreateBuffers(void)
 		ddsd.dwSize = sizeof(DDSURFACEDESC2);
 		ddsd.dwFlags = DDSD_CAPS;
 		ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE | DDSCAPS_3DDEVICE;
-		
+
 		LastError = AppInfo.lpDD->CreateSurface(&ddsd, &AppInfo.lpFrontBuffer, NULL);
 
-		if(LastError != DD_OK ) 
+		if(LastError != DD_OK )
 		{
-			if (LastError == DDERR_OUTOFMEMORY || LastError == DDERR_OUTOFVIDEOMEMORY) 
+			if (LastError == DDERR_OUTOFMEMORY || LastError == DDERR_OUTOFVIDEOMEMORY)
 			{
 				D3DMain_Log("CreateBuffers:  There was not enough video memory to create the rendering surface.\n  To run this program in a window of this size, please adjust your display settings for a smaller desktop area or a lower palette size and restart the program.\n");
-			} 
-			else 
+			}
+			else
 			{
 				D3DMain_Log("CreateBuffers:  CreateSurface for window front buffer failed.\n  %s\n",
 					D3DErrorToString(LastError));
 			}
 			goto exit_with_error;
 		}
-    
+
 		ddsd.dwFlags = DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS;
 		ddsd.dwWidth = AppInfo.CurrentWidth;
 		ddsd.dwHeight = AppInfo.CurrentHeight;
 		ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN | DDSCAPS_3DDEVICE;
-    
+
 		ddsd.ddsCaps.dwCaps |= DDSCAPS_VIDEOMEMORY;
-    
+
 		LastError = CreateSurface(&ddsd, &AppInfo.lpBackBuffer);
-	
-		if (LastError != DD_OK) 
+
+		if (LastError != DD_OK)
 		{
-			if (LastError == DDERR_OUTOFMEMORY || LastError == DDERR_OUTOFVIDEOMEMORY) 
+			if (LastError == DDERR_OUTOFMEMORY || LastError == DDERR_OUTOFVIDEOMEMORY)
 			{
 				D3DMain_Log("CreateBuffers:  There was not enough video memory to create the rendering surface.\n  To run this program in a window of this size, please adjust your display settings for a smaller desktop area or a lower palette size and restart the program.\n");
-			} 
-			else 
+			}
+			else
 			{
 				D3DMain_Log("CreateBuffers:  CreateSurface for window back buffer failed.\n  %s\n",
 					D3DErrorToString(LastError));
 			}
 			goto exit_with_error;
 		}
-    
+
 		// Check to see if the back buffer is in video memory (FYI).
 		LastError = GetSurfDesc(&ddsd, AppInfo.lpBackBuffer);
 
-		if (LastError != DD_OK) 
+		if (LastError != DD_OK)
 		{
 			D3DMain_Log("CreateBuffers:  Failed to get surface description for back buffer.\n  %s\n",
 				D3DErrorToString(LastError));
 			goto exit_with_error;
 		}
-    
+
 		AppInfo.BackBufferInVideo =	(ddsd.ddsCaps.dwCaps & DDSCAPS_VIDEOMEMORY) ? TRUE : FALSE;
-    
+
 		// Create the DirectDraw Clipper object and attach it to the window
 		// and front buffer.
 		LastError = AppInfo.lpDD->CreateClipper(0, &AppInfo.lpClipper, NULL);
 
-		if(LastError != DD_OK ) 
+		if(LastError != DD_OK )
 		{
 			D3DMain_Log("CreateBuffers:  CreateClipper failed.\n  %s\n",
 				D3DErrorToString(LastError));
 			goto exit_with_error;
 		}
-	
+
 		LastError = AppInfo.lpClipper->SetHWnd(0, AppInfo.hWnd);
 
-		if(LastError != DD_OK ) 
+		if(LastError != DD_OK )
 		{
 			D3DMain_Log("CreateBuffers:  Attaching clipper to window failed.\n  %s\n",
 				D3DErrorToString(LastError));
 			goto exit_with_error;
 		}
-	
-		
+
+
 		LastError = AppInfo.lpFrontBuffer->SetClipper(AppInfo.lpClipper);
-    
-		if(LastError != DD_OK ) 
+
+		if(LastError != DD_OK )
 		{
 			D3DMain_Log("CreateBuffers:  Attaching clipper to front buffer failed.\n  %s\n",
 				D3DErrorToString(LastError));
@@ -2241,14 +2241,14 @@ static BOOL D3DMain_CreateBuffers(void)
 		}
 
 		AppInfo.ddsd = ddsd;		// Save the format of the back buffer
-	}	
-  
+	}
+
 	D3DMain_ClearBuffers();
-  
+
 	return TRUE;
-  
+
 	exit_with_error:
-		
+
 		RELEASE(AppInfo.lpFrontBuffer);
 		RELEASE(AppInfo.lpBackBuffer);
 		RELEASE(AppInfo.lpClipper);
@@ -2273,82 +2273,82 @@ static BOOL D3DMain_CreateZBuffer(void)
 {
 	DDSURFACEDESC2	ddsd;
 	HRESULT			LastError;
-	
+
 	assert(AppInfo.lpBackBuffer);
 
 	D3DMain_Log("--- D3DMain_CreateZBuffer ---\n");
 
 	// Release any Z-Buffer that might be around just in case.
 	RELEASE(AppInfo.lpZBuffer);
-  
+
 	memset(&ddsd, 0 ,sizeof(DDSURFACEDESC2));
 	ddsd.dwSize = sizeof( ddsd );
 	ddsd.dwFlags = DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS | DDSD_PIXELFORMAT;//DDSD_ZBUFFERBITDEPTH;
 	ddsd.ddsCaps.dwCaps = DDSCAPS_ZBUFFER | DDSCAPS_VIDEOMEMORY;
 	ddsd.dwWidth = AppInfo.CurrentWidth;
 	ddsd.dwHeight = AppInfo.CurrentHeight;
-	
+
 	ddsd.ddpfPixelFormat.dwFlags = DDPF_ZBUFFER;
 
-    // Find a valid zbuffer, from the current device
-    AppInfo.lpD3D->EnumZBufferFormats(AppInfo.Drivers[AppInfo.CurrentDriver].Guid, EnumZBufferFormatsCallback,
+	// Find a valid zbuffer, from the current device
+	AppInfo.lpD3D->EnumZBufferFormats(AppInfo.Drivers[AppInfo.CurrentDriver].Guid, EnumZBufferFormatsCallback,
 										(VOID*)&ddsd.ddpfPixelFormat);
 
-    
+
 	if( sizeof(DDPIXELFORMAT) != ddsd.ddpfPixelFormat.dwSize )
-    {
+	{
 		D3DMain_Log("CreateZBuffer:  No zbuffer found for 3d device.\n");
 		return FALSE;
-    }
+	}
 
 	LastError = AppInfo.lpDD->CreateSurface(&ddsd, &AppInfo.lpZBuffer, NULL);
-	
-	if(LastError != DD_OK) 
+
+	if(LastError != DD_OK)
 	{
-		if (LastError == DDERR_OUTOFMEMORY || LastError == DDERR_OUTOFVIDEOMEMORY) 
+		if (LastError == DDERR_OUTOFMEMORY || LastError == DDERR_OUTOFVIDEOMEMORY)
 		{
-			if (AppInfo.FullScreen) 
-			{
-				D3DMain_Log("CreateZBuffer:  There was not enough video memory to create the Z-buffer surface.\n  Please try another mode with less resolution.\n");
-			} 
-			else 
+			if (AppInfo.FullScreen)
 			{
 				D3DMain_Log("CreateZBuffer:  There was not enough video memory to create the Z-buffer surface.\n  Please try another mode with less resolution.\n");
 			}
-		} 
-		else 
+			else
+			{
+				D3DMain_Log("CreateZBuffer:  There was not enough video memory to create the Z-buffer surface.\n  Please try another mode with less resolution.\n");
+			}
+		}
+		else
 		{
 			D3DMain_Log("CreateZBuffer:  CreateSurface for Z-buffer failed.\n  %s\n",
 				D3DErrorToString(LastError));
 		}
-	
+
 		goto exit_with_error;
 	}
-	
+
 	// Attach the Z-buffer to the back buffer so D3D will find it
 	LastError = AppInfo.lpBackBuffer->AddAttachedSurface(AppInfo.lpZBuffer);
-	
-	if(LastError != DD_OK) 
+
+	if(LastError != DD_OK)
 	{
 		D3DMain_Log("CreateZBuffer:  AddAttachedBuffer failed for Z-Buffer.\n  %s\n",
 			D3DErrorToString(LastError));
 		goto exit_with_error;
 	}
-	
+
 	// Find out if it ended up in video memory.
 	LastError = GetSurfDesc(&ddsd, AppInfo.lpZBuffer);
 
-	if (LastError != DD_OK) 
+	if (LastError != DD_OK)
 	{
 		D3DMain_Log("CreateZBuffer:  Failed to get surface description of Z buffer.\n  %s\n",
 			D3DErrorToString(LastError));
 		goto exit_with_error;
 	}
-	
+
 	AppInfo.ZBufferInVideo = (ddsd.ddsCaps.dwCaps & DDSCAPS_VIDEOMEMORY) ? TRUE : FALSE;
-  
+
 	return TRUE;
-  
+
 	exit_with_error:
 		RELEASE(AppInfo.lpZBuffer);
 		return FALSE;
@@ -2377,37 +2377,37 @@ static BOOL D3DMain_RestoreDisplayMode(void)
 
 	assert(AppInfo.lpDD);
 
-	if (AppInfo.FullScreen) 
+	if (AppInfo.FullScreen)
 	{
 		LastError = AppInfo.lpDD->RestoreDisplayMode();
-	
-		if (LastError != DD_OK) 
+
+		if (LastError != DD_OK)
 		{
 			D3DMain_Log("D3DMain_RestoreDisplayMode:  RestoreDisplayMode failed.\n  %s\n",
 				D3DErrorToString(LastError));
 			return FALSE;
 		}
-	
+
 		LastError = AppInfo.lpDD->SetCooperativeLevel(AppInfo.hWnd, DDSCL_NORMAL);
 
-		if(LastError != DD_OK ) 
+		if(LastError != DD_OK )
 		{
 			D3DMain_Log("SetCooperativeLevel to normal failed.\n  %s\n",
 				D3DErrorToString(LastError));
 			return FALSE;
 		}
 	}
-	
+
 	// Restore window width/height
 	SetWindowLong(AppInfo.hWnd, GWL_STYLE, AppInfo.OldGWL_STYLE);
 
-	SetWindowPos(AppInfo.hWnd, 
-	            HWND_TOP, 
+	SetWindowPos(AppInfo.hWnd,
+				HWND_TOP,
 				AppInfo.OldWindowRect.left,
 				AppInfo.OldWindowRect.top,
 				(AppInfo.OldWindowRect.right - AppInfo.OldWindowRect.left),
 				(AppInfo.OldWindowRect.bottom - AppInfo.OldWindowRect.top),
-	            SWP_NOCOPYBITS | SWP_NOZORDER);
+				SWP_NOCOPYBITS | SWP_NOZORDER);
 
 	ShowWindow(AppInfo.hWnd, SW_SHOWNORMAL);
 
@@ -2469,21 +2469,21 @@ BOOL DRIVERCC EnumSubDrivers2(DRV_ENUM_DRV_CB *Cb, void *Context)
 	DDEnumInfo	Info;
 
 	unlink(D3DMAIN_LOG_FILENAME);
-	
+
 	Info.Drivers = Drivers;
 	Info.NumDrivers = 0;
 
 	hr = DirectDrawEnumerate(EnumDriversCB2, &Info);
 
-    if (hr != DD_OK) 
+	if (hr != DD_OK)
 	{
 		D3DMain_Log("D3DMain_EnumSubDrivers: DirectDrawEnumerate failed.\n");
 		return FALSE;
-    }
+	}
 
 	for (i=0; i< Info.NumDrivers; i++)
 	{
- 		// Create the DD object for this driver
+		// Create the DD object for this driver
 		if (!CreateDDFromDriver(&Info.Drivers[i]))
 			return GE_FALSE;
 
@@ -2501,7 +2501,7 @@ BOOL DRIVERCC EnumSubDrivers2(DRV_ENUM_DRV_CB *Cb, void *Context)
 				break;
 			}
 		}
-		
+
 		RELEASE(AppInfo.lpD3D);
 		AppInfo.lpD3D = NULL;
 
@@ -2510,11 +2510,11 @@ BOOL DRIVERCC EnumSubDrivers2(DRV_ENUM_DRV_CB *Cb, void *Context)
 		AppInfo.lpDD = NULL;
 		memset(&AppInfo, 0, sizeof(AppInfo));
 	}
-	
+
 	//Cb(i, "(D3D)HackDriver", Context);
 
 	return TRUE;
-}	
+}
 
 //========================================================================================================
 //	EnumModes2
@@ -2525,7 +2525,7 @@ BOOL DRIVERCC EnumModes2(int32 Driver, char *DriverName, DRV_ENUM_MODES_CB *Cb, 
 	int32			i, Width, Height;
 	char			ModeName[MAX_DRIVER_NAME];
 	DDEnumInfo		Info;
-	
+
 	//Cb(0, "HackMode 2", 640, 480, Context);
 	//return GE_TRUE;
 
@@ -2534,11 +2534,11 @@ BOOL DRIVERCC EnumModes2(int32 Driver, char *DriverName, DRV_ENUM_MODES_CB *Cb, 
 
 	hr = DirectDrawEnumerate(EnumDriversCB2, &Info);
 
-    if (hr != DD_OK) 
+	if (hr != DD_OK)
 	{
 		D3DMain_Log("D3DMain_EnumModes:  DirectDrawEnumerate failed.\n");
 		return FALSE;
-    }
+	}
 
 
 	if (!CreateDDFromName(DriverName, &Info))
@@ -2547,11 +2547,11 @@ BOOL DRIVERCC EnumModes2(int32 Driver, char *DriverName, DRV_ENUM_MODES_CB *Cb, 
 	if (!D3DMain_EnumDisplayModes())
 	{
 		D3DMain_ShutdownD3D();
-		
+
 		D3DMain_Log("D3DMain_EnumModes: D3DMain_EnumDisplayModes failed.\n");
 		return FALSE;
 	}
-		
+
 	for (i=0; i< AppInfo.NumModes; i++)
 	{
 		if (AppInfo.Modes[i].Bpp != 16)
@@ -2571,9 +2571,9 @@ BOOL DRIVERCC EnumModes2(int32 Driver, char *DriverName, DRV_ENUM_MODES_CB *Cb, 
 			return GE_TRUE;
 		}
 	}
-	
+
 	if (AppInfo.CanDoWindow)
-	{	
+	{
 		if (!Cb(i, "WindowMode", -1, -1, Context))
 		{
 			D3DMain_ShutdownD3D();
@@ -2589,9 +2589,9 @@ BOOL DRIVERCC EnumModes2(int32 Driver, char *DriverName, DRV_ENUM_MODES_CB *Cb, 
 //================================================================================
 //	DDEnumCallback
 //================================================================================
-static BOOL FAR PASCAL DDEnumCallback(	GUID FAR* lpGUID, 
-										LPSTR lpDriverDesc, 
-										LPSTR lpDriverName, 
+static BOOL FAR PASCAL DDEnumCallback(	GUID FAR* lpGUID,
+										LPSTR lpDriverDesc,
+										LPSTR lpDriverName,
 										LPVOID lpContext)
 {
 	LPDIRECTDRAW4	pDD6;
@@ -2601,13 +2601,13 @@ static BOOL FAR PASCAL DDEnumCallback(	GUID FAR* lpGUID,
 	HRESULT			hr;
 
 	DDEnum = (DD_Enum*)lpContext;
-	  
-	if(strncmp(lpDriverDesc, DDEnum->DriverName, strlen(DDEnum->DriverName))) 
+
+	if(strncmp(lpDriverDesc, DDEnum->DriverName, strlen(DDEnum->DriverName)))
 		return DDENUMRET_OK;		// Next... This is not the one they wanted
 
 	pDD1 = NULL;
 	hr = DirectDrawCreate( lpGUID, &pDD1, NULL );
-		
+
 	if(FAILED( hr ))
 		return DDENUMRET_CANCEL;		// Assume this is bad, and stop
 
@@ -2627,20 +2627,20 @@ static BOOL FAR PASCAL DDEnumCallback(	GUID FAR* lpGUID,
 	DriverCaps.dwSize = sizeof(DDCAPS);
 	memset(&HELCaps, 0, sizeof(DDCAPS));
 	HELCaps.dwSize = sizeof(DDCAPS);
-		
-	if (FAILED(pDD6->GetCaps(&DriverCaps, &HELCaps))) 
+
+	if (FAILED(pDD6->GetCaps(&DriverCaps, &HELCaps)))
 	{
 		RELEASE(pDD6);
 		return DDENUMRET_CANCEL;
 	}
 
 	// Make sure it's a 3d compatible device
-	if (!(DriverCaps.dwCaps & DDCAPS_3D)) 
+	if (!(DriverCaps.dwCaps & DDCAPS_3D))
 	{
 		RELEASE(pDD6);
 		return DDENUMRET_CANCEL;
 	}
-		
+
 	if (!lpGUID)
 		AppInfo.IsPrimary = TRUE;
 	else
@@ -2648,7 +2648,7 @@ static BOOL FAR PASCAL DDEnumCallback(	GUID FAR* lpGUID,
 
 	DDEnum->lpDD = pDD6;
 	DDEnum->FoundDD = TRUE;
-			
+
 	return DDENUMRET_CANCEL;	// We are done
 }
 
@@ -2661,9 +2661,9 @@ static BOOL D3DMain_CreateDDFromName(const char *DriverName)
 	HRESULT			hr;
 	DDCAPS			DriverCaps, HELCaps;
 	DDEnumInfo		Info;
-	
+
 	D3DMain_Log("--- D3DMain_CreateDDFromName ---\n");
-	
+
 	if (strlen(DriverName) >= MAX_DRIVER_NAME)
 		return GE_FALSE;
 
@@ -2674,12 +2674,12 @@ static BOOL D3DMain_CreateDDFromName(const char *DriverName)
 
 	hr = DirectDrawEnumerate(EnumDriversCB2, &Info);
 
-    if (hr != DD_OK) 
+	if (hr != DD_OK)
 	{
 		D3DMain_Log("D3DMain_CreateDDFromName:  DirectDrawEnumerate failed.\n");
 		return FALSE;
-    }
-		
+	}
+
 	{
 		char		TempName[1024];
 
@@ -2696,7 +2696,7 @@ static BOOL D3DMain_CreateDDFromName(const char *DriverName)
 	memset(&HELCaps, 0, sizeof(DDCAPS));
 	HELCaps.dwSize = sizeof(DDCAPS);
 
-	if (FAILED(AppInfo.lpDD->GetCaps(&DriverCaps, &HELCaps))) 
+	if (FAILED(AppInfo.lpDD->GetCaps(&DriverCaps, &HELCaps)))
 	{
 		D3DMain_Log("D3DMain_CreateDDFromName:  GetCaps failed.\n");
 		D3DMain_ShutdownD3D();
@@ -2715,7 +2715,7 @@ static BOOL D3DMain_CreateDDFromName(const char *DriverName)
 
 	// Save the DD object
 	strcpy(AppInfo.DDName, DriverName);
-	
+
 	return TRUE;
 }
 
@@ -2766,7 +2766,7 @@ static geBoolean CreateDDFromName(const char *DriverName, const DDEnumInfo *Info
 	if (i == Info->NumDrivers)
 		return GE_FALSE;
 
- 	// Create the DD object for this driver
+	// Create the DD object for this driver
 	if (!CreateDDFromDriver(&Info->Drivers[i]))
 		return GE_FALSE;
 

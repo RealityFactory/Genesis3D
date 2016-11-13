@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef TPAGE_H
@@ -66,4 +66,4 @@ void			TPage_BlockSetLRU(TPage_Block *Block, uint32 LRU);
 void			TPage_BlockSetUserData(TPage_Block *Block, void *UserData);
 void			*TPage_BlockGetUserData(TPage_Block *Block);
 
-#endif	
+#endif
