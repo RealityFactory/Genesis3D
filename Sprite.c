@@ -1,7 +1,7 @@
 /****************************************************************************************/
-/*  SPRITE.C                                                                            */
+/*  Sprite.c                                                                            */
 /*                                                                                      */
-/*  Author: Michael R. Brumm	                                                          */
+/*  Author: Michael R. Brumm                                                            */
 /*  Description: Sprite implementation                                                  */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
@@ -71,7 +71,7 @@ static Surf_TLVertex	FrustumClippedTexturedLitVertexes[MAX_TEMP_VERTS];
 typedef struct geSprite
 {
 	// number of owners
-	int32				RefCount;				
+	int32				RefCount;
 
 	// bitmaps used to texture the sprite
 	geBitmap *	Bitmap;
@@ -281,7 +281,7 @@ __inline static void geSprite_UpdateSurfaceNormal(geSprite *S)
 		//		S->SurfaceNormal.X = 0.0f;
 		//		S->SurfaceNormal.Y = 0.0f;
 		//		S->SurfaceNormal.Z = -1.0f;
-		// 
+		//
 		//		geXForm3d_Rotate(&(S->InternalTransform), &(S->SurfaceNormal), &(S->SurfaceNormal));
 		//
 		S->SurfaceNormal.X = -S->InternalTransform.AZ;
@@ -302,7 +302,7 @@ __inline static void geSprite_UpdateSurfaceNormal(geSprite *S)
 		//		S->SurfaceNormal.X = 0.0f;
 		//		S->SurfaceNormal.Y = 0.0f;
 		//		S->SurfaceNormal.Z = -1.0f;
-		// 
+		//
 		//		geXForm3d_Rotate(&(S->Transform), &(S->SurfaceNormal), &(S->SurfaceNormal));
 		//
 		S->SurfaceNormal.X = -S->Transform.AZ;
@@ -382,7 +382,7 @@ __inline static void geSprite_CreateFrustumClippedScreenPoly(geSprite *S, geCame
 	}
 
 	// no sense in rendering a completely transparent face
-	if ( ((!(*RenderBackface)) && (S->RGBA.a == 0.0f)) || 
+	if ( ((!(*RenderBackface)) && (S->RGBA.a == 0.0f)) ||
 			 ((*RenderBackface) && (S->BackfaceRGBA.a == 0.0f)) )
 	{
 		*Render = GE_FALSE;
@@ -418,12 +418,12 @@ __inline static void geSprite_CreateFrustumClippedScreenPoly(geSprite *S, geCame
 	// clip the vertexes (including their texture and lighting) to the frustum
 	for (i = 0; i < FInfo->NumPlanes; i++, FPlanes++)
 	{
-		
+
 		if (!Frustum_ClipToPlaneUV(FPlanes, pVerts1, pVerts2, pTexs1, pTexs2, Length, &FrustumNumClippedTexturedLitVertices))
 			break;
 
 		assert(FrustumNumClippedTexturedLitVertices < MAX_TEMP_VERTS);
-		
+
 		// this is hard to read, but essentially what is happening is that
 		// source data is swapping with destination data every frustum clip.
 		// in this way, vertexes are further clipped each time
@@ -444,7 +444,7 @@ __inline static void geSprite_CreateFrustumClippedScreenPoly(geSprite *S, geCame
 
 		Length = FrustumNumClippedTexturedLitVertices;
 	}
-			
+
 	assert(FrustumNumClippedTexturedLitVertices < MAX_TEMP_VERTS);
 
 	// Not visible or not enough vertexes
@@ -587,7 +587,7 @@ __inline static void geSprite_UpdateLighting(geSprite *S, geWorld *World)
 	{
 		// a pointer to make things easier
 		Light_DLight *DynamicLights = World->LightInfo->DynamicLights;
-		
+
 		// start out with no dynamic lights available for lighting
 		int32 DLCount = 0;
 
@@ -601,8 +601,8 @@ __inline static void geSprite_UpdateLighting(geSprite *S, geWorld *World)
 				geVec3d_Subtract(&(S->Position), &(DynamicLights[i].Pos), &Normal);
 
 				// which is why it can be used to calculate distance (squared)
-				geSpriteDynamicLights[DLCount].Distance = (Normal.X * Normal.X) + 
-																									(Normal.Y * Normal.Y) + 
+				geSpriteDynamicLights[DLCount].Distance = (Normal.X * Normal.X) +
+																									(Normal.Y * Normal.Y) +
 																									(Normal.Z * Normal.Z);
 
 				// if the sprite is inside the active dynamic light's radius, then add it to the array
@@ -615,7 +615,7 @@ __inline static void geSprite_UpdateLighting(geSprite *S, geWorld *World)
 						if(Angle < DynamicLights[i].Angle)
 							continue;
 					}
-					// end change QuestOfDreams	
+					// end change QuestOfDreams
 					geSpriteDynamicLights[DLCount].Color.r = DynamicLights[i].Color.r;
 					geSpriteDynamicLights[DLCount].Color.g = DynamicLights[i].Color.g;
 					geSpriteDynamicLights[DLCount].Color.b = DynamicLights[i].Color.b;
@@ -750,7 +750,7 @@ __inline static void geSprite_UpdateLighting(geSprite *S, geWorld *World)
 							break;
 						}
 					}
-					
+
 					// go to the next surface
 					Surf++;
 				}
@@ -831,7 +831,7 @@ GENESISAPI geSprite *GENESISCC geSprite_Create(geBitmap *SpriteBitmap, geBitmap 
 		geErrorLog_Add( ERR_SPRITE_ENOMEM , NULL);
 		return NULL;
 	}
-	
+
 	S->RefCount = 0;
 
 	S->Bitmap = SpriteBitmap;
@@ -846,7 +846,7 @@ GENESISAPI geSprite *GENESISCC geSprite_Create(geBitmap *SpriteBitmap, geBitmap 
 	S->BackfaceMirrorImage = GE_TRUE;
 
 	S->AlwaysFaceCamera = GE_FALSE;
-	
+
 	geXForm3d_SetIdentity(&(S->Transform));
 
 	S->InternalTransformUsed = GE_FALSE;
@@ -867,8 +867,8 @@ GENESISAPI geSprite *GENESISCC geSprite_Create(geBitmap *SpriteBitmap, geBitmap 
 	geVec3d_Clear(&(S->BoundingBoxMinCorner));
 	geVec3d_Clear(&(S->BoundingBoxMaxCorner));
 
-	S->AmbientLight.r = 0.1f;		
-	S->AmbientLight.g = 0.1f;			
+	S->AmbientLight.r = 0.1f;
+	S->AmbientLight.g = 0.1f;
 	S->AmbientLight.b = 0.1f;
 	S->UseFillLight = GE_FALSE;
 	S->UseLightFromFloor = GE_FALSE;
@@ -889,7 +889,7 @@ GENESISAPI geSprite *GENESISCC geSprite_Create(geBitmap *SpriteBitmap, geBitmap 
 	geSprite_Count++;
 
 	return S;
-}	
+}
 
 
 GENESISAPI void GENESISCC geSprite_CreateRef(geSprite *S)
@@ -907,7 +907,7 @@ GENESISAPI void GENESISCC geSprite_Destroy(geSprite **pS)
 	assert(  pS != NULL );
 	assert( *pS != NULL );
 	assert( geSprite_IsValid(*pS) );
-	
+
 	S = *pS;
 	if (S->RefCount > 0)
 	{
@@ -1052,7 +1052,7 @@ GENESISAPI void GENESISCC geSprite_SetTransform(geSprite *S, const geXForm3d *Tr
 	assert( Transform );
 
 	S->Transform = *Transform;
-	
+
 	geSprite_UpdatePosition(S);
 
 	S->TransformChanged = GE_TRUE;
@@ -1122,7 +1122,7 @@ GENESISAPI void GENESISCC geSprite_GetNonWorldExtBox(const geSprite *S, geExtBox
 {
 	assert( geSprite_IsValid(S) );
 	assert( ExtBox != NULL );
-	
+
 	ExtBox->Min = S->BoundingBoxMinCorner;
 	ExtBox->Max = S->BoundingBoxMaxCorner;
 }
@@ -1175,27 +1175,27 @@ GENESISAPI void GENESISCC geSprite_SetTextureParameters(geSprite *S,
 
 
 GENESISAPI void GENESISCC geSprite_GetLightingOptions(const geSprite *S,
-	geFloat *AmbientLightRed,			
-	geFloat *AmbientLightGreen,			
-	geFloat *AmbientLightBlue,			
+	geFloat *AmbientLightRed,
+	geFloat *AmbientLightGreen,
+	geFloat *AmbientLightBlue,
 	geBoolean *UseFillLight,
 	geVec3d *FillLightNormal,
-	geFloat *FillLightRed,				
-	geFloat *FillLightGreen,				
-	geFloat *FillLightBlue,				
+	geFloat *FillLightRed,
+	geFloat *FillLightGreen,
+	geFloat *FillLightBlue,
 	geBoolean *UseLightFromFloor,
 	int32 *MaximumDynamicLightsToUse)
 {
 	assert( geSprite_IsValid(S) );
 
 	assert( AmbientLightRed != NULL );
-	assert( AmbientLightGreen != NULL );			
-	assert( AmbientLightBlue != NULL );			
+	assert( AmbientLightGreen != NULL );
+	assert( AmbientLightBlue != NULL );
 	assert( UseFillLight != NULL );
 	assert( FillLightNormal != NULL );
-	assert( FillLightRed != NULL );	
-	assert( FillLightGreen != NULL );	
-	assert( FillLightBlue != NULL );	
+	assert( FillLightRed != NULL );
+	assert( FillLightGreen != NULL );
+	assert( FillLightBlue != NULL );
 	assert( UseLightFromFloor != NULL );
 	assert( MaximumDynamicLightsToUse != NULL );
 
@@ -1247,7 +1247,7 @@ GENESISAPI void GENESISCC geSprite_SetLightingOptions(geSprite *S,
 	//
 	// if the camera always faces the camera, then this will be updated every
 	// render (and using a different normal), so don't do it now.
-	if ( (!S->TransformChanged) && 
+	if ( (!S->TransformChanged) &&
 			 (!S->AlwaysFaceCamera) &&
 			 (!S->LightingUsesSurfaceNormal) && ((UseFillLight) || (MaximumDynamicLightsToUse > 0)) )
 		geSprite_UpdateSurfaceNormal(S);
@@ -1327,7 +1327,7 @@ geBoolean GENESISCC geSprite_RenderPrep(geSprite *S, geWorld *World)
 			return GE_FALSE;
 		}
 	}
-	
+
 	return GE_TRUE;
 }
 
@@ -1433,6 +1433,6 @@ geBoolean GENESISCC geSprite_RenderThroughFrustum(geSprite *S, geEngine *Engine,
 			geEngine_RenderPoly(Engine, (GE_TLVertex*)FrustumClippedTexturedLitVertexes, FrustumNumClippedTexturedLitVertices, S->Bitmap, 0);
 		}
 	}
-	
+
 	return GE_TRUE;
 }

@@ -1,8 +1,5 @@
-#ifndef LIST_H
-#define LIST_H
-
 /****************************************************************************************/
-/*  List                                                                                */
+/*  List.h                                                                              */
 /*                                                                                      */
 /*  Author: Charles Bloom                                                               */
 /*  Description: List/Link/Node Primitives                                              */
@@ -18,10 +15,12 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
+#ifndef LIST_H
+#define LIST_H
 
 #include "BaseType.h"
 
@@ -175,10 +174,10 @@ uint32	Hash_StringToKey(const char * String);
 
 /******************************/
 
-struct LinkNode 
+struct LinkNode
 {
 	LinkNode *Next,*Prev;
-}; 
+};
 
 #define zLN_InitList(List)			do { (List)->Next = List; (List)->Prev = List; } while(0)
 #define zLN_Cut(Node)				do { (Node)->Prev->Next = (Node)->Next; (Node)->Next->Prev = (Node)->Prev; zLN_InitList(Node); } while(0)

@@ -1,8 +1,5 @@
-#ifndef TIMER_H
-#define TIMER_H
-
 /****************************************************************************************/
-/*  Timer                                                                               */
+/*  Timer.h                                                                             */
 /*                                                                                      */
 /*  Author: Charles Bloom                                                               */
 /*  Description: A nice little profiling utility                                        */
@@ -18,10 +15,12 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
+#ifndef TIMER_H
+#define TIMER_H
 
 #include <stdio.h>
 #include "TSC.h"
@@ -94,7 +93,7 @@ int i,j;
 			j = 99/(i+1);
 			TIMER_Q(test2);
 		}
-			
+
 		TIMER_Q(test1);
 
 	TIMER_COUNT();

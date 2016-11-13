@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  TClip                                                                               */
+/*  TClip.h                                                                             */
 /*                                                                                      */
 /*  Author: Mike Sandige & Charles Bloom                                                */
 /*  Description: Triangle Clipping to the screen rectangle                              */
@@ -17,10 +17,10 @@
 /*  basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See                */
 /*  the License for the specific language governing rights and limitations              */
 /*  under the License.                                                                  */
-/*                                                                                        */
+/*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
 /*  Copyright (C) 1996-1999 Eclipse Entertainment, L.L.C. All Rights Reserved           */
-/*                                                                                    */
+/*                                                                                      */
 /****************************************************************************************/
 
 #ifndef GE_TCLIP_H
@@ -36,7 +36,7 @@ extern "C" {
 #endif
 
 /*******
- 
+
 TClip is a state machine like OpenGL
 
 you should call it like :
@@ -55,7 +55,7 @@ you should call it like :
 ********/
 
 GENESISAPI void		GENESISCC geTClip_SetupEdges(geEngine *Engine,
-						geFloat	LeftEdge, 
+						geFloat	LeftEdge,
 						geFloat RightEdge,
 						geFloat TopEdge ,
 						geFloat BottomEdge,
@@ -71,7 +71,7 @@ GENESISAPI void		GENESISCC geTClip_SetRenderFlags(uint32 newflags);	// LA
 GENESISAPI void		GENESISCC geTClip_UnclippedTriangle(const GE_LVertex TriVertex[3]);	// LA
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) */
+	BUG FIX: Rendering Transparent Polys properly (2) */
 geBoolean GENESISCC geTClip_SetOverallAlpha ( const geFloat OverallAlpha );
 
 #ifdef __cplusplus

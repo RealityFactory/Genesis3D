@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_NETPLAY_H
@@ -54,7 +54,7 @@ typedef struct
 extern	SP_DESC					GlobalSP;			// Global info about the sp
 extern  SESSION_DESC*			GlobalSession;		// Global sessions availible
 extern	LPGUID					glpGuid;
-													
+
 void DoDPError(HRESULT Hr);
 BOOL InitNetPlay(LPGUID lpGuid);
 BOOL NetPlayEnumSession(LPSTR IPAdress, SESSION_DESC** SessionList, DWORD* SessionNum);

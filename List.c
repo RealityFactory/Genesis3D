@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  List                                                                                */
+/*  List.c                                                                              */
 /*                                                                                      */
 /*  Author: Charles Bloom                                                               */
 /*  Description: List/Link/Node Primitives                                              */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 
@@ -185,7 +185,7 @@ List * pNew;
 	pNew->Prev = pList->Prev;
 	pNew->Next->Prev = pNew;
 	pNew->Prev->Next = pNew;
-	
+
 	pNew->Data= Data;
 return pNew;
 }
@@ -503,7 +503,7 @@ void * RadixList_CutMax(RadixList *pRadixList,int *pKey)
 		if ( Data = List_CutHead(pRadixList->Lists[pRadixList->Max]) )
 		{
 			if ( pKey ) *pKey = pRadixList->Max;
-			return Data;	
+			return Data;
 		}
 		pRadixList->Max --;
 
@@ -523,7 +523,7 @@ void * RadixList_CutMin(RadixList *pRadixList,int *pKey)
 		if ( Data = List_CutHead(pRadixList->Lists[pRadixList->Min]) )
 		{
 			if ( pKey ) *pKey = pRadixList->Min;
-			return Data;	
+			return Data;
 		}
 		pRadixList->Min ++;
 
@@ -568,7 +568,7 @@ TIMER_P(List_RadixInit); // not counting the allocs, tracking in List_Ram
 	}
 	pRadixLN->Min = RadixLNMax;
 	pRadixLN->Max = 0;
-	
+
 TIMER_Q(List_RadixInit);
 
 return pRadixLN;
@@ -959,7 +959,7 @@ void Hash_Destroy(Hash *H)
 	}
 
 	destroy(H);
-}	
+}
 
 HashNode *	LISTCALL Hash_Add(Hash *H,uint32 Key,uint32 Data)
 {
@@ -1056,7 +1056,7 @@ uint32		LISTCALL Hash_NumMembers(Hash *pHash)
 #else //}{ the real thing
 
 #define HASH_MOD	(1009) // or 1013  , a nice prime
-#define HASH_SIZE	(HASH_MOD + 1) 
+#define HASH_SIZE	(HASH_MOD + 1)
 #define HASH(Key)	((( ((Key)>>15) ^ (Key) )%HASH_MOD)+1)
 
 struct Hash
@@ -1085,9 +1085,9 @@ Hash * pHash;
 HashNode *pHead,*pTail;
 
 	pHash = new(Hash);
-	if ( ! pHash ) 
+	if ( ! pHash )
 		return NULL;
-	
+
 	//memset(pHash,0,sizeof(Hash));
 
 	Debug( pHash->MySelf1 = pHash )
@@ -1119,7 +1119,7 @@ void Hash_Destroy(Hash *pHash)
 	if ( pHash )
 	{
 	HashNode *pList,*pNode,*pNext;
-	
+
 		assert( pHash->MySelf1 == pHash && pHash->MySelf2 == pHash );
 
 		Debug(pHash->Members += 2) // count Head & Tail
@@ -1193,10 +1193,10 @@ Debug( int ListLen1; int ListLen2; int HashLen1; int HashLen2; int WalkLen)
 		{
 			Prev = Node;
 			Node = LN_Next(Prev);
-		
+
 			assert(WalkLen < pHash->Members );
 			Debug( WalkLen ++)
-			
+
 			assert(Prev->Hash <= Node->Hash);
 			assert(Prev->Hash < HASH_SIZE );
 		}
@@ -1253,7 +1253,7 @@ Debug( int ListLen1; int ListLen2;int HashLen1; int HashLen2)
 	LN_Cut(pNode);
 
 	MemPool_FreeHunk(HashNodePool_g,pNode);
-	
+
 	Debug( HashLen2 = Hash_NumMembers(pHash) )
 	Debug( ListLen2 = Hash_ListLen(pHash,H) )
 	assert( HashLen2 == (HashLen1 - 1) );

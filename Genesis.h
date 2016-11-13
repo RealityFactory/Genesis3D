@@ -3,7 +3,7 @@
 /*                                                                                      */
 /*  Description: The master header for Genesis                                          */
 /*                                                                                      */
-/*  Edit History:                                                                       */ 
+/*  Edit History:                                                                       */
 /*   03/24/2004 Wendell Buckner                                                         */
 /*    BUG FIX: Rendering Transparent Polys properly (2)                                 */
 /*                                                                                      */
@@ -51,7 +51,7 @@ typedef struct		geSound_System		geSound_System;
 typedef struct		geSound_Cfg			geSound_Cfg;
 typedef struct		geSound_Def			geSound_Def;
 typedef struct		geSound				geSound;
-										
+
 typedef struct		geActor				geActor;
 typedef struct		geActor_Def			geActor_Def;		// the definition of an actor's geometry/bone structure
 
@@ -68,12 +68,12 @@ typedef struct		geCSNetMgr			geCSNetMgr;
 
 typedef struct		gePoly				gePoly;
 
-typedef struct		geLight				geLight;			
+typedef struct		geLight				geLight;
 
 typedef struct		geFog				geFog;
 
 typedef struct		geMesh_Def			geMesh_Def;			// Mesh def
-typedef struct		geMesh				geMesh;				
+typedef struct		geMesh				geMesh;
 
 #define GE_VERSION_MAJOR		(1UL)
 #define GE_VERSION_MINOR		(3UL)
@@ -93,7 +93,7 @@ typedef enum
 {
 	GE_TEXTURED_POLY,
 	GE_GOURAUD_POLY,
-	GE_TEXTURED_POINT					
+	GE_TEXTURED_POINT
 } gePoly_Type;
 
 // Poly Fx flags
@@ -198,7 +198,7 @@ typedef struct
 {
 	geWorld_Model	*Model;							// Pointer to what model was hit (if any)
 	geMesh			*Mesh;							// Pointer to what mesh was hit (if any)
-	geActor			*Actor;							// Pointer to what actor was hit (if any)	
+	geActor			*Actor;							// Pointer to what actor was hit (if any)
 	geVec3d			Impact;							// Impact Point
 	geFloat			Ratio;							// Percent from 0 to 1.0, how far along the line for the impact point
 	GE_Plane		Plane;							// Impact Plane
@@ -234,9 +234,9 @@ typedef struct
 //================================================================================
 
 
-#ifdef _INC_WINDOWS	
+#ifdef _INC_WINDOWS
 	// Windows.h must be included before genesis.h for this api to be exposed.
-	
+
 
 GENESISAPI	geEngine	*geEngine_CreateWithVersion(HWND hWnd, const char *AppName, const char *DriverDirectory, uint32 Version);
 							// use geEngine_Create, rather than calling this directly.
@@ -255,12 +255,12 @@ GENESISAPI geBoolean	geEngine_RemoveBitmap(geEngine *Engine, geBitmap *Bitmap);
 
 GENESISAPI geDriver_System *geEngine_GetDriverSystem(geEngine *Engine);
 
-GENESISAPI geBoolean	geEngine_SetDriverAndMode(	geEngine *Engine, 
-													geDriver *Driver, 
+GENESISAPI geBoolean	geEngine_SetDriverAndMode(	geEngine *Engine,
+													geDriver *Driver,
 													geDriver_Mode *DriverMode);
 
-GENESISAPI geBoolean	geEngine_SetDriverAndModeNoSplash(	geEngine *Engine, 
-													geDriver *Driver, 
+GENESISAPI geBoolean	geEngine_SetDriverAndModeNoSplash(	geEngine *Engine,
+													geDriver *Driver,
 													geDriver_Mode *DriverMode);
 
 GENESISAPI geBoolean	geEngine_ShutdownDriver(geEngine *Engine);
@@ -274,18 +274,18 @@ GENESISAPI geBoolean	geEngine_Printf(geEngine *Engine, int32 x, int32 y, const c
 GENESISAPI void			GENESISCC geEngine_RenderPoly(const geEngine *Engine, const GE_TLVertex *Points, int NumPoints, const geBitmap *Texture, uint32 Flags);
 							//RenderPoly : if Texture is null, we Gouraud shade
 
-GENESISAPI void			GENESISCC geEngine_RenderPolyArray(const geEngine *Engine, const GE_TLVertex ** pPoints, int * pNumPoints, int NumPolys, 
+GENESISAPI void			GENESISCC geEngine_RenderPolyArray(const geEngine *Engine, const GE_TLVertex ** pPoints, int * pNumPoints, int NumPolys,
 								const geBitmap *Texture, uint32 Flags);
 
 // changed QD Shadows
 GENESISAPI geBoolean	geEngine_SetStencilShadowsEnable(geEngine *Engine, geBoolean Enable, int NumLights, geFloat r, geFloat g, geFloat b, geFloat a);
 
-GENESISAPI void			GENESISCC geEngine_RenderPolyStencil(const geEngine *Engine, const geVec3d *Points, 
+GENESISAPI void			GENESISCC geEngine_RenderPolyStencil(const geEngine *Engine, const geVec3d *Points,
 								int NumPoints, uint32 Flags);
 GENESISAPI void			GENESISCC geEngine_DrawShadowPoly(geEngine *Engine, GE_RGBA ShadowColor);
 // end change
 
-GENESISAPI geBoolean GENESISCC geEngine_DrawAlphaBitmap(	
+GENESISAPI geBoolean GENESISCC geEngine_DrawAlphaBitmap(
 		geEngine * Engine,
 		geBitmap * pBitmap,
 		geVec3d * VertUVArray,
@@ -312,7 +312,7 @@ GENESISAPI geBoolean	geEngine_SetFogEnable(geEngine *Engine, geBoolean Enable, g
 						//  Start is how far out from the camera is not fogged - this is where the fog begins
 						//  End is how far out from the camera where the fog fully obscures things
 GENESISAPI geBoolean	geEngine_SetClearColor(geEngine *Engine, geFloat r, geFloat g, geFloat b);
-				
+
 
 GENESISAPI geBoolean	geEngine_ScreenShot(geEngine *Engine, const char *FileName);
 
@@ -347,36 +347,36 @@ GENESISAPI void			geSound_DestroySoundSystem(geSound_System *Sound);
 GENESISAPI geSound_Def	   *geSound_LoadSoundDef(geSound_System *SoundS, geVFile *File);
 GENESISAPI void				geSound_FreeSoundDef(geSound_System *SoundS, geSound_Def *SoundDef);
 
-GENESISAPI geSound		   *geSound_PlaySoundDef(geSound_System *SoundS, 
-									geSound_Def *SoundDef, 
-									geFloat Volume, 
-									geFloat Pan, 
-									geFloat Frequency, 
+GENESISAPI geSound		   *geSound_PlaySoundDef(geSound_System *SoundS,
+									geSound_Def *SoundDef,
+									geFloat Volume,
+									geFloat Pan,
+									geFloat Frequency,
 									geBoolean Loop);
 GENESISAPI geBoolean		geSound_StopSound(geSound_System *SoundS, geSound *Sound);
-GENESISAPI geBoolean		geSound_ModifySound(geSound_System *SoundS, 
-									geSound *Sound, 
-									geFloat Volume, 
-									geFloat Pan, 
+GENESISAPI geBoolean		geSound_ModifySound(geSound_System *SoundS,
+									geSound *Sound,
+									geFloat Volume,
+									geFloat Pan,
 									geFloat Frequency);
 GENESISAPI geBoolean		geSound_SoundIsPlaying(geSound_System *SoundS, geSound *Sound);
 GENESISAPI geBoolean		geSound_SetMasterVolume( geSound_System *SoundS, geFloat Volume );
 
 GENESISAPI void geSound3D_GetConfig(
-			const geWorld *World, 
-			const geXForm3d *CameraTransform, 
-			const geVec3d *SoundPos, 
-			geFloat Min, 
+			const geWorld *World,
+			const geXForm3d *CameraTransform,
+			const geVec3d *SoundPos,
+			geFloat Min,
 			geFloat Ds,
 			geFloat *Volume,
 			geFloat *Pan,
 			geFloat *Frequency);
 
 GENESISAPI	void geSound3D_GetConfigIgnoreObstructions(
-		const geWorld *World, 
-		const geXForm3d *MXForm, 
-		const geVec3d *SndPos, 
-		geFloat Min, 
+		const geWorld *World,
+		const geXForm3d *MXForm,
+		const geVec3d *SndPos,
+		geFloat Min,
 		geFloat Ds,
 		geFloat *Volume,
 		geFloat *Pan,
@@ -416,7 +416,7 @@ GENESISAPI void			geWorld_Free(geWorld *World);
 
 // World Actors
 GENESISAPI geBoolean	geWorld_RemoveActor    (geWorld *World, geActor *Actor);
-GENESISAPI geBoolean    geWorld_AddActor       (geWorld *World, geActor *Actor, uint32 Flags, uint32 UserFlags);
+GENESISAPI geBoolean	geWorld_AddActor       (geWorld *World, geActor *Actor, uint32 Flags, uint32 UserFlags);
 GENESISAPI geBoolean	geWorld_SetActorFlags  (geWorld *World, geActor *Actor, uint32 Flags);
 
 //MRB BEGIN
@@ -454,18 +454,18 @@ GENESISAPI uint32		geWorld_ModelGetFlags(geWorld_Model *Model);
 GENESISAPI geLight		*geWorld_AddLight(geWorld *World);
 GENESISAPI void			geWorld_RemoveLight(geWorld *World, geLight *Light);
 GENESISAPI geBoolean	geWorld_SetLightAttributes(	geWorld *World,
-										geLight		*Light, 
-										const		geVec3d *Pos, 
-										const		GE_RGBA *RGBA, 
+										geLight		*Light,
+										const		geVec3d *Pos,
+										const		GE_RGBA *RGBA,
 										geFloat		Radius,
 										geBoolean	CastShadow);
 GENESISAPI geBoolean	geWorld_SetLTypeTable(geWorld *World, int32 LType, const char *Table);
 
 // added QuestOfDreams DSpotLight
 GENESISAPI geBoolean	geWorld_SetSpotLightAttributes(	geWorld *World,
-										geLight		*Light, 
-										const		geVec3d *Pos, 
-										const		GE_RGBA *RGBA, 
+										geLight		*Light,
+										const		geVec3d *Pos,
+										const		GE_RGBA *RGBA,
 										geFloat		Radius,
 										geFloat		Arc,
 										const		geVec3d *Angles,
@@ -477,11 +477,11 @@ GENESISAPI geBoolean	geWorld_SetSpotLightAttributes(	geWorld *World,
 GENESISAPI geFog		*geWorld_AddFog(geWorld *World);
 GENESISAPI geBoolean	geWorld_RemoveFog(geWorld *World, geFog *Fog);
 
-GENESISAPI geBoolean geFog_SetAttributes(	geFog			*Fog, 
-											const geVec3d	*Pos, 
+GENESISAPI geBoolean geFog_SetAttributes(	geFog			*Fog,
+											const geVec3d	*Pos,
 											GE_RGBA			*Color,
-											geFloat			LightBrightness, 
-											geFloat			VolumeBrightness, 
+											geFloat			LightBrightness,
+											geFloat			VolumeBrightness,
 											geFloat			VolumeRadius);
 
 // World Classes/Entities
@@ -492,13 +492,13 @@ GENESISAPI void			*geEntity_GetUserData(geEntity *Entity);
 GENESISAPI void			geEntity_GetName(const geEntity *Entity, char *Buff, int MaxLen);
 
 // World collision
-GENESISAPI geBoolean	geWorld_ModelCollision(	geWorld			*World, 
-												geWorld_Model	*Model, 
-												const geXForm3d	*DXForm, 
+GENESISAPI geBoolean	geWorld_ModelCollision(	geWorld			*World,
+												geWorld_Model	*Model,
+												const geXForm3d	*DXForm,
 												GE_Collision	*Collision);
-GENESISAPI geBoolean geWorld_TestModelMove(	geWorld			*World, 
-											geWorld_Model	*Model, 
-											const geXForm3d	*DXForm, 
+GENESISAPI geBoolean geWorld_TestModelMove(	geWorld			*World,
+											geWorld_Model	*Model,
+											const geXForm3d	*DXForm,
 											const geVec3d	*Mins, const geVec3d *Maxs,
 											const geVec3d	*In, geVec3d *Out);
 
@@ -521,16 +521,16 @@ GENESISAPI geBoolean geWorld_GetTextureName(geWorld *World, const geVec3d *Pos, 
 // end change texture name
 
 // World Polys
-GENESISAPI	gePoly *geWorld_AddPolyOnce(geWorld *World, 
-										GE_LVertex *Verts, 
-										int32 NumVerts, 
+GENESISAPI	gePoly *geWorld_AddPolyOnce(geWorld *World,
+										GE_LVertex *Verts,
+										int32 NumVerts,
 										geBitmap *Bitmap,
-										gePoly_Type Type, 
+										gePoly_Type Type,
 										uint32 RenderFlags,
 										geFloat Scale);
-GENESISAPI	gePoly *geWorld_AddPoly(geWorld *World, 
-									GE_LVertex *Verts, 
-									int32 NumVerts, 
+GENESISAPI	gePoly *geWorld_AddPoly(geWorld *World,
+									GE_LVertex *Verts,
+									int32 NumVerts,
 									geBitmap *Bitmap,
 									gePoly_Type Type,
 									uint32 RenderFlags,
@@ -564,7 +564,7 @@ GENESISAPI void				GENESISCC geCamera_Destroy(geCamera **pCamera);
 GENESISAPI void				GENESISCC geCamera_SetZScale(geCamera *Camera, geFloat ZScale);
 GENESISAPI geFloat			GENESISCC geCamera_GetZScale(const geCamera *Camera);
 GENESISAPI void				GENESISCC geCamera_SetFarClipPlane(geCamera *Camera, geBoolean Enable, geFloat ZFar);
-							// sets a far clipping plane.  The world and objects aren't drawn if they lie beyond ZFar. 
+							// sets a far clipping plane.  The world and objects aren't drawn if they lie beyond ZFar.
 							// Zfar is the distance out from the camera.
 							// Polygons crossing the line are not nesessarily clipped exactly to the line.
 GENESISAPI void				GENESISCC geCamera_GetFarClipPlane(const geCamera *Camera, geBoolean *Enable, geFloat *ZFar);
@@ -575,34 +575,34 @@ GENESISAPI void				GENESISCC geCamera_ScreenPointToWorld(const geCamera	*Camera,
 										int32			 ScreenX,
 										int32			 ScreenY,
 										geVec3d			*Vector	);
-GENESISAPI void	GENESISCC geCamera_Project(const geCamera	*Camera, 
-										const geVec3d	*PointInCameraSpace, 
+GENESISAPI void	GENESISCC geCamera_Project(const geCamera	*Camera,
+										const geVec3d	*PointInCameraSpace,
 										geVec3d			*ProjectedPoint);
-GENESISAPI void GENESISCC geCamera_Transform(const geCamera *Camera, 
-										const geVec3d *WorldSpacePoint, 
+GENESISAPI void GENESISCC geCamera_Transform(const geCamera *Camera,
+										const geVec3d *WorldSpacePoint,
 										  geVec3d *CameraSpacePoint);
 
-GENESISAPI void GENESISCC geCamera_TransformArray(const geCamera *Camera, 
-										const geVec3d *WorldSpacePointPtr, 
-										      geVec3d *CameraSpacePointPtr,
+GENESISAPI void GENESISCC geCamera_TransformArray(const geCamera *Camera,
+										const geVec3d *WorldSpacePointPtr,
+											  geVec3d *CameraSpacePointPtr,
 											int count);
 
 GENESISAPI void GENESISCC geCamera_TransformAndProject(const geCamera *Camera,
-										const	geVec3d *Point, 
+										const	geVec3d *Point,
 												geVec3d *ProjectedPoint);
 
-GENESISAPI void GENESISCC geCamera_TransformAndProjectArray(const geCamera *Camera, 
-										const geVec3d *WorldSpacePointPtr, 
-										      geVec3d *ProjectedSpacePointPtr,
+GENESISAPI void GENESISCC geCamera_TransformAndProjectArray(const geCamera *Camera,
+										const geVec3d *WorldSpacePointPtr,
+											  geVec3d *ProjectedSpacePointPtr,
 											int count);
-	
+
 GENESISAPI void GENESISCC geCamera_TransformAndProjectL(const geCamera *Camera,
-										const GE_LVertex *Point, 
+										const GE_LVertex *Point,
 											GE_TLVertex *ProjectedPoint);
-		
-GENESISAPI void GENESISCC geCamera_TransformAndProjectLArray(const geCamera *Camera, 
-										const GE_LVertex *WorldSpacePointPtr, 
-										      GE_TLVertex *ProjectedSpacePointPtr,
+
+GENESISAPI void GENESISCC geCamera_TransformAndProjectLArray(const geCamera *Camera,
+										const GE_LVertex *WorldSpacePointPtr,
+											  GE_TLVertex *ProjectedSpacePointPtr,
 											int count);
 
 
@@ -617,7 +617,7 @@ GENESISAPI const geVec3d *GENESISCC geCamera_GetPov(const geCamera *Camera);
 
 
 GENESISAPI void		GENESISCC geTClip_SetupEdges(geEngine *Engine,
-						geFloat	LeftEdge, 
+						geFloat	LeftEdge,
 						geFloat RightEdge,
 						geFloat TopEdge ,
 						geFloat BottomEdge,
@@ -633,7 +633,7 @@ GENESISAPI void		GENESISCC geTClip_SetRenderFlags(uint32 newflags);	// LA
 GENESISAPI void		GENESISCC geTClip_UnclippedTriangle(const GE_LVertex TriVertex[3]);	// LA
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) */
+	BUG FIX: Rendering Transparent Polys properly (2) */
 geBoolean GENESISCC geTClip_SetOverallAlpha ( const geFloat OverallAlpha );
 
 //================================================================================
@@ -644,7 +644,7 @@ typedef uint32				geCSNetMgr_NetID;
 #define	MAX_CLIENT_NAME		256
 
 // Types for messages received from GE_ReceiveSystemMessage
-typedef enum 
+typedef enum
 {
 	NET_MSG_NONE,					// No msg
 	NET_MSG_USER,					// User message

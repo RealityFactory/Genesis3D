@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_SOUND3D_H
@@ -32,20 +32,20 @@ extern "C" {
 // GENESIS_PUBLIC_APIS
 
 GENESISAPI	void geSound3D_GetConfig(
-			const geWorld *World, 
-			const geXForm3d *CameraTransform, 
-			const geVec3d *SoundPos, 
-			geFloat Min, 
+			const geWorld *World,
+			const geXForm3d *CameraTransform,
+			const geVec3d *SoundPos,
+			geFloat Min,
 			geFloat Ds,
 			geFloat *Volume,
 			geFloat *Pan,
 			geFloat *Frequency);
 
 GENESISAPI	void geSound3D_GetConfigIgnoreObstructions(
-		const geWorld *World, 
-		const geXForm3d *MXForm, 
-		const geVec3d *SndPos, 
-		geFloat Min, 
+		const geWorld *World,
+		const geXForm3d *MXForm,
+		const geVec3d *SndPos,
+		geFloat Min,
 		geFloat Ds,
 		geFloat *Volume,
 		geFloat *Pan,

@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #define IDIRECTPLAY2_OR_GREATER
@@ -42,7 +42,7 @@
 
 LPGUID							glpGuid;
 
-SP_DESC							GlobalSP;				
+SP_DESC							GlobalSP;
 SESSION_DESC					*GlobalSession;			// Global sessions availible
 DWORD							gSessionCnt;
 BOOL							FoundSP = FALSE;		// If the provider was found
@@ -53,24 +53,24 @@ LPDIRECTPLAY4A					g_lpDP = NULL;
 
 BOOL							FoundConnection = FALSE;
 LPVOID							lpConnectionBuffer = NULL;
-	
+
 // ************************************************************************************
 //	Misc global functions
 // ************************************************************************************
 HRESULT DPlayCreateSession(LPTSTR lptszSessionName, DWORD MaxPlayers);
 HRESULT DPlayOpenSession(LPGUID lpSessionGuid);
-BOOL WINAPI EnumSession(LPCDPSESSIONDESC2 lpDPSessionDesc, LPDWORD lpdwTimeOut, DWORD dwFlags, 
-                        LPVOID lpContext);
-HRESULT DPlayEnumSessions(DWORD dwTimeout, LPDPENUMSESSIONSCALLBACK2 lpEnumCallback, 
-                          LPVOID lpContext, DWORD dwFlags);
-HRESULT DPlayCreatePlayer(LPDPID lppidID, LPTSTR lptszPlayerName, HANDLE hEvent, 
-                          LPVOID lpData, DWORD dwDataSize);
+BOOL WINAPI EnumSession(LPCDPSESSIONDESC2 lpDPSessionDesc, LPDWORD lpdwTimeOut, DWORD dwFlags,
+						LPVOID lpContext);
+HRESULT DPlayEnumSessions(DWORD dwTimeout, LPDPENUMSESSIONSCALLBACK2 lpEnumCallback,
+						  LPVOID lpContext, DWORD dwFlags);
+HRESULT DPlayCreatePlayer(LPDPID lppidID, LPTSTR lptszPlayerName, HANDLE hEvent,
+						  LPVOID lpData, DWORD dwDataSize);
 HRESULT DPlayDestroyPlayer(DPID pid);
 HRESULT DPlayRelease(void);
 
 static HRESULT DPlayCreate(void );
 
-// New dp3 Connection callback 
+// New dp3 Connection callback
 BOOL FAR PASCAL DPEnumConnectionsCallback(
 						LPCGUID			lpguidSP,
 						LPVOID			lpConnection,
@@ -92,7 +92,7 @@ BOOL InitNetPlay(LPGUID lpGuid)
 	HRESULT		Hr;
 
 	glpGuid = lpGuid;
-	
+
 	FoundSP = FALSE;
 
 	Hr = DPlayCreate();
@@ -102,7 +102,7 @@ BOOL InitNetPlay(LPGUID lpGuid)
 		DoDPError(Hr);
 		return FALSE;
 	}
-	
+
 	IDirectPlayX_EnumConnections( g_lpDP, glpGuid, DPEnumConnectionsCallback, NULL, 0);
 
 	if (!FoundConnection)
@@ -118,7 +118,7 @@ BOOL InitNetPlay(LPGUID lpGuid)
 //	 NetPlayEnumSession
 //====================================================================================================
 BOOL NetPlayEnumSession(LPSTR IPAdress, SESSION_DESC **SessionList, DWORD *SessionNum)
-{	
+{
 	HRESULT		hr;
 
 #if 1
@@ -127,7 +127,7 @@ BOOL NetPlayEnumSession(LPSTR IPAdress, SESSION_DESC **SessionList, DWORD *Sessi
 	LPDIRECTPLAYLOBBY2A		lpDPL = NULL;
 
 	// Free the old connection buffer
-	if(lpConnectionBuffer ) 
+	if(lpConnectionBuffer )
 	{
 		free( lpConnectionBuffer );
 		lpConnectionBuffer = NULL;
@@ -142,7 +142,7 @@ BOOL NetPlayEnumSession(LPSTR IPAdress, SESSION_DESC **SessionList, DWORD *Sessi
 		return( FALSE );
 	}
 
- 	hr = IDirectPlayLobby_CreateAddress(lpDPL, &DPSPGUID_TCPIP, &DPAID_INet, (LPVOID)IPAdress, strlen(IPAdress), tempBuf, &tempLng);
+	hr = IDirectPlayLobby_CreateAddress(lpDPL, &DPSPGUID_TCPIP, &DPAID_INet, (LPVOID)IPAdress, strlen(IPAdress), tempBuf, &tempLng);
 
 	if (hr != DP_OK)
 	{
@@ -153,7 +153,7 @@ BOOL NetPlayEnumSession(LPSTR IPAdress, SESSION_DESC **SessionList, DWORD *Sessi
 	if (lpDPL)
 	{
 		hr = IDirectPlayLobby_Release(lpDPL);
-		
+
 		if (hr != DP_OK)
 		{
 			DoDPError(hr);
@@ -172,15 +172,15 @@ BOOL NetPlayEnumSession(LPSTR IPAdress, SESSION_DESC **SessionList, DWORD *Sessi
 		DoDPError(hr);
 		return( FALSE );
 	}
-	
+
 	GlobalSession = NULL;
 	gSessionCnt = 0;
 
 	hr = DPlayEnumSessions(0, EnumSession, NULL, 0);
-	
+
 	*SessionList = GlobalSession;
 	*SessionNum = gSessionCnt;
-	
+
 	return( TRUE );
 
 }
@@ -219,8 +219,8 @@ BOOL NetPlayCreateSession(LPSTR SessionName, DWORD MaxPlayers)
 //==================================================================================================
 BOOL NetPlayJoinSession(SESSION_DESC *Session)
 {
-    HRESULT Hr;
-	
+	HRESULT Hr;
+
 	Hr = DPlayOpenSession(&Session->Guid);
 
 	if (Hr != DP_OK)
@@ -238,19 +238,19 @@ BOOL NetPlayJoinSession(SESSION_DESC *Session)
 //==================================================================================================
 BOOL NetPlayCreatePlayer(LPDPID lppidID, LPTSTR lptszPlayerName, HANDLE hEvent, LPVOID lpData, DWORD dwDataSize, geBoolean ServerPlayer)
 {
-    HRESULT		hr = DPERR_GENERIC;
-    DPNAME		name;
+	HRESULT		hr = DPERR_GENERIC;
+	DPNAME		name;
 	DWORD		Flags;
 
 	assert(g_lpDP);
-    
-    ZeroMemory(&name,sizeof(name));
-    name.dwSize = sizeof(DPNAME);
+
+	ZeroMemory(&name,sizeof(name));
+	name.dwSize = sizeof(DPNAME);
 
 #ifdef UNICODE
-    name.lpszShortName = lptszPlayerName;
+	name.lpszShortName = lptszPlayerName;
 #else
-    name.lpszShortNameA = lptszPlayerName;
+	name.lpszShortNameA = lptszPlayerName;
 #endif
 
 	Flags = 0;
@@ -275,7 +275,7 @@ BOOL NetPlayCreatePlayer(LPDPID lppidID, LPTSTR lptszPlayerName, HANDLE hEvent, 
 BOOL NetPlayDestroyPlayer(DPID pid)
 {
 	HRESULT Hr = DPlayDestroyPlayer(pid);
-	
+
 	if (Hr != DP_OK)
 	{
 		DoDPError(Hr);
@@ -291,7 +291,7 @@ BOOL NetPlayDestroyPlayer(DPID pid)
 HRESULT NetPlayReceive(LPDPID lpidFrom, LPDPID lpidTo, DWORD dwFlags, LPVOID lpData, LPDWORD lpdwDataSize)
 {
 	HRESULT		Hr;
-    assert(g_lpDP);
+	assert(g_lpDP);
 
 	Hr = IDirectPlayX_Receive(g_lpDP, lpidFrom, lpidTo, dwFlags, lpData, lpdwDataSize);
 
@@ -315,11 +315,11 @@ HRESULT NetPlaySend(DPID idFrom, DPID idTo, DWORD dwFlags, LPVOID lpData, DWORD 
 
 #if 0
 	dwFlags |= DPSEND_ASYNC;
-    Hr = IDirectPlayX_SendEx(g_lpDP, idFrom, idTo, dwFlags, lpData, dwDataSize, 0, 0, NULL, NULL);
+	Hr = IDirectPlayX_SendEx(g_lpDP, idFrom, idTo, dwFlags, lpData, dwDataSize, 0, 0, NULL, NULL);
 #else
 	Hr = IDirectPlayX_Send(g_lpDP, idFrom, idTo, dwFlags, lpData, dwDataSize);
 #endif
-	
+
 	if (Hr != DP_OK)
 	{
 		if (Hr == DPERR_PENDING)
@@ -346,9 +346,9 @@ BOOL DeInitNetPlay(void)
 
 	FoundConnection = FALSE;
 	FoundSP = FALSE;
-	
+
 	Hr = DPlayRelease();
-	
+
 	if (Hr != DP_OK)
 	{
 		DoDPError(Hr);
@@ -397,8 +397,8 @@ geBoolean NetPlayGetNumMessages(int32 *NumMsgSend, int32 *NumBytesSend, int32 *N
 //========================================================================================
 HRESULT DPlayCreate( void )
 {
-    HRESULT			hr=E_FAIL;
-    LPDIRECTPLAY	lpDP=NULL;
+	HRESULT			hr=E_FAIL;
+	LPDIRECTPLAY	lpDP=NULL;
 
 	CoInitialize( NULL );
 
@@ -407,7 +407,7 @@ HRESULT DPlayCreate( void )
 	//hr = CoCreateInstance(	&CLSID_DirectPlay, NULL, CLSCTX_INPROC_SERVER,
 	//						&IID_IDirectPlay3A, (LPVOID *) &g_lpDP );
 
-    return hr;
+	return hr;
 }
 
 //========================================================================================
@@ -415,19 +415,19 @@ HRESULT DPlayCreate( void )
 //========================================================================================
 HRESULT DPlayCreateSession(LPTSTR lptszSessionName, DWORD MaxPlayers)
 {
-    HRESULT hr = E_FAIL;
-    DPSESSIONDESC2 dpDesc;
+	HRESULT hr = E_FAIL;
+	DPSESSIONDESC2 dpDesc;
 
 	assert(g_lpDP);
 
-    ZeroMemory(&dpDesc, sizeof(dpDesc));
-    dpDesc.dwSize = sizeof(dpDesc);
-    
+	ZeroMemory(&dpDesc, sizeof(dpDesc));
+	dpDesc.dwSize = sizeof(dpDesc);
+
 	dpDesc.dwFlags = DPSESSION_KEEPALIVE;
 
 #if 0		// Just keeping these here for reference...
 	dpDesc.dwFlags |= DPSESSION_CLIENTSERVER;
-    dpDesc.dwFlags |= DPSESSION_MIGRATEHOST;
+	dpDesc.dwFlags |= DPSESSION_MIGRATEHOST;
 	dpDesc.dwFlags |= DPSESSION_OPTIMIZELATENCY;
 	dpDesc.dwFlags |= DPSESSION_DIRECTPLAYPROTOCOL;
 #endif
@@ -435,14 +435,14 @@ HRESULT DPlayCreateSession(LPTSTR lptszSessionName, DWORD MaxPlayers)
 	dpDesc.dwMaxPlayers = MaxPlayers;
 
 #ifdef UNICODE
-    dpDesc.lpszSessionName = lptszSessionName;
+	dpDesc.lpszSessionName = lptszSessionName;
 #else
-    dpDesc.lpszSessionNameA = lptszSessionName;
+	dpDesc.lpszSessionNameA = lptszSessionName;
 #endif
 
-    // set the application guid
-    if (glpGuid)
-        dpDesc.guidApplication = *glpGuid;
+	// set the application guid
+	if (glpGuid)
+		dpDesc.guidApplication = *glpGuid;
 
 	hr = IDirectPlayX_Open(g_lpDP, &dpDesc, DPOPEN_CREATE);
 
@@ -451,7 +451,7 @@ HRESULT DPlayCreateSession(LPTSTR lptszSessionName, DWORD MaxPlayers)
 		DoDPError(hr);
 	}
 
-    return hr;
+	return hr;
 }
 
 //========================================================================================================
@@ -459,61 +459,61 @@ HRESULT DPlayCreateSession(LPTSTR lptszSessionName, DWORD MaxPlayers)
 //========================================================================================================
 HRESULT DPlayOpenSession(LPGUID lpSessionGuid)
 {
-    HRESULT hr = E_FAIL;
-    DPSESSIONDESC2 dpDesc;
+	HRESULT hr = E_FAIL;
+	DPSESSIONDESC2 dpDesc;
 
 	assert(g_lpDP);
 
-    ZeroMemory(&dpDesc, sizeof(dpDesc));
-    dpDesc.dwSize = sizeof(dpDesc);
+	ZeroMemory(&dpDesc, sizeof(dpDesc));
+	dpDesc.dwSize = sizeof(dpDesc);
 
 	//dpDesc.dwFlags = DPSESSION_DIRECTPLAYPROTOCOL;
 
-    // set the session guid
-    if (lpSessionGuid)
-        dpDesc.guidInstance = *lpSessionGuid;
+	// set the session guid
+	if (lpSessionGuid)
+		dpDesc.guidInstance = *lpSessionGuid;
 
-    // Set the application guid
-    if (glpGuid)
-        dpDesc.guidApplication = *glpGuid;
+	// Set the application guid
+	if (glpGuid)
+		dpDesc.guidApplication = *glpGuid;
 
-    // open it
+	// open it
 	hr = IDirectPlayX_Open(g_lpDP, &dpDesc, DPOPEN_JOIN);
 
-    return hr;
+	return hr;
 }
 
 //========================================================================================================
 //	DPlayEnumSessions
 //========================================================================================================
-HRESULT DPlayEnumSessions(DWORD dwTimeout, LPDPENUMSESSIONSCALLBACK2 lpEnumCallback, 
-                          LPVOID lpContext, DWORD dwFlags)
+HRESULT DPlayEnumSessions(DWORD dwTimeout, LPDPENUMSESSIONSCALLBACK2 lpEnumCallback,
+						  LPVOID lpContext, DWORD dwFlags)
 {
-    HRESULT hr = E_FAIL;
-    DPSESSIONDESC2 dpDesc;
+	HRESULT hr = E_FAIL;
+	DPSESSIONDESC2 dpDesc;
 
-    ZeroMemory(&dpDesc, sizeof(dpDesc));
-    dpDesc.dwSize = sizeof(dpDesc);
+	ZeroMemory(&dpDesc, sizeof(dpDesc));
+	dpDesc.dwSize = sizeof(dpDesc);
 
-    if (glpGuid)
-        dpDesc.guidApplication = *glpGuid;
+	if (glpGuid)
+		dpDesc.guidApplication = *glpGuid;
 
-    if (g_lpDP)
-        hr = IDirectPlayX_EnumSessions(g_lpDP, &dpDesc, dwTimeout, lpEnumCallback,
-                                        lpContext, dwFlags);
-    return hr;
+	if (g_lpDP)
+		hr = IDirectPlayX_EnumSessions(g_lpDP, &dpDesc, dwTimeout, lpEnumCallback,
+										lpContext, dwFlags);
+	return hr;
 }
 
 //========================================================================================================
 //	Callback for enum session
 //========================================================================================================
-BOOL WINAPI EnumSession(LPCDPSESSIONDESC2 lpDPSessionDesc, LPDWORD lpdwTimeOut, DWORD dwFlags, 
-                        LPVOID lpContext)
+BOOL WINAPI EnumSession(LPCDPSESSIONDESC2 lpDPSessionDesc, LPDWORD lpdwTimeOut, DWORD dwFlags,
+						LPVOID lpContext)
 {
-    HWND hWnd = (HWND) lpContext;
+	HWND hWnd = (HWND) lpContext;
 	LPSTR Str = NULL;
 
-    if(dwFlags & DPESC_TIMEDOUT) 
+	if(dwFlags & DPESC_TIMEDOUT)
 		return FALSE;       // don't try again
 
 	gSessionCnt++;
@@ -531,32 +531,32 @@ BOOL WINAPI EnumSession(LPCDPSESSIONDESC2 lpDPSessionDesc, LPDWORD lpdwTimeOut, 
 	strcpy(GlobalSession[gSessionCnt-1].SessionName, lpDPSessionDesc->lpszSessionNameA);
 #endif
 
-    return(TRUE);
+	return(TRUE);
 }
 
 //====================================================================================================
 //	DPlayCreatePlayer
 //====================================================================================================
-HRESULT DPlayCreatePlayer(LPDPID lppidID, LPTSTR lptszPlayerName, HANDLE hEvent, 
-                          LPVOID lpData, DWORD dwDataSize)
+HRESULT DPlayCreatePlayer(LPDPID lppidID, LPTSTR lptszPlayerName, HANDLE hEvent,
+						  LPVOID lpData, DWORD dwDataSize)
 {
-    HRESULT		hr = DPERR_GENERIC;
-    DPNAME		name;
+	HRESULT		hr = DPERR_GENERIC;
+	DPNAME		name;
 
 	assert(g_lpDP);
-    
-    ZeroMemory(&name,sizeof(name));
-    name.dwSize = sizeof(DPNAME);
+
+	ZeroMemory(&name,sizeof(name));
+	name.dwSize = sizeof(DPNAME);
 
 #ifdef UNICODE
-    name.lpszShortName = lptszPlayerName;
+	name.lpszShortName = lptszPlayerName;
 #else
-    name.lpszShortNameA = lptszPlayerName;
+	name.lpszShortNameA = lptszPlayerName;
 #endif
 
 	hr = IDirectPlayX_CreatePlayer(g_lpDP, lppidID, &name, hEvent, lpData, dwDataSize, DPPLAYER_SERVERPLAYER);
-                                    
-    return hr;
+
+	return hr;
 }
 
 //====================================================================================================
@@ -567,7 +567,7 @@ HRESULT DPlayDestroyPlayer(DPID pid)
 	HRESULT hr=E_FAIL;
 
 	assert(g_lpDP);
-	
+
 	hr = IDirectPlayX_DestroyPlayer(g_lpDP, pid);
 
 	return hr;
@@ -578,7 +578,7 @@ HRESULT DPlayDestroyPlayer(DPID pid)
 //====================================================================================================
 HRESULT DPlayRelease(void)
 {
-    HRESULT hr = DP_OK;
+	HRESULT hr = DP_OK;
 
 	if (g_lpDP)
 	{
@@ -587,10 +587,10 @@ HRESULT DPlayRelease(void)
 		hr = IDirectPlayX_Release(g_lpDP);
 		g_lpDP = NULL;
 	}
-	
+
 	CoUninitialize();
 
-    return hr;
+	return hr;
 }
 
 //====================================================================================================
@@ -605,7 +605,7 @@ BOOL FAR PASCAL DPEnumConnectionsCallback(
 						LPVOID			lpContext)
 {
 	LPSTR Str;
-	
+
 	if (FoundConnection)
 		return TRUE;
 
@@ -623,7 +623,7 @@ BOOL FAR PASCAL DPEnumConnectionsCallback(
 				free(lpConnectionBuffer);
 				lpConnectionBuffer = NULL;
 			}
-	
+
 			// make space for Connection Shortcut
 			lpConnectionBuffer = (char*)malloc(dwSize);
 			if (lpConnectionBuffer == NULL)
@@ -637,7 +637,7 @@ BOOL FAR PASCAL DPEnumConnectionsCallback(
 	}
 
 FAILURE:
-    return (TRUE);
+	return (TRUE);
 }
 
 
@@ -661,7 +661,7 @@ static void DoDPError(HRESULT Hr)
 		break;
 
 	case DPERR_ACTIVEPLAYERS:
-		geErrorLog_AddString(-1, "The requested operation cannot be performed because there are existing active players.\n", NULL); 
+		geErrorLog_AddString(-1, "The requested operation cannot be performed because there are existing active players.\n", NULL);
 		break;
 
 	case DPERR_ALREADYINITIALIZED:
@@ -669,7 +669,7 @@ static void DoDPError(HRESULT Hr)
 		break;
 
 	case DPERR_APPNOTSTARTED:
-		geErrorLog_AddString(-1, "The application has not been started yet.\n", NULL); 
+		geErrorLog_AddString(-1, "The application has not been started yet.\n", NULL);
 		break;
 
 	case DPERR_AUTHENTICATIONFAILED:
@@ -756,19 +756,19 @@ static void DoDPError(HRESULT Hr)
 		geErrorLog_AddString(-1, "The DirectPlay object pointer is invalid. \n", NULL);
 		break;
 
-	case DPERR_INVALIDPARAMS: 
+	case DPERR_INVALIDPARAMS:
 		geErrorLog_AddString(-1, "One or more of the parameters passed to the method are invalid. \n", NULL);
 		break;
 
-	case DPERR_INVALIDPASSWORD: 
+	case DPERR_INVALIDPASSWORD:
 		geErrorLog_AddString(-1, "An invalid password was supplied when attempting to join a session that requires a password. \n", NULL);
 		break;
 
-	case DPERR_INVALIDPLAYER: 
+	case DPERR_INVALIDPLAYER:
 		geErrorLog_AddString(-1, "The player ID is not recognized as a valid player ID for this game session. \n", NULL);
 		break;
-	
-	case DPERR_LOGONDENIED: 
+
+	case DPERR_LOGONDENIED:
 		geErrorLog_AddString(-1, "The session could not be opened because credentials are required and either no credentials were supplied or the credentials were invalid. \n", NULL);
 		break;
 
@@ -776,11 +776,11 @@ static void DoDPError(HRESULT Hr)
 		geErrorLog_AddString(-1, "The communication link that DirectPlay is attempting to use is not capable of this function. \n", NULL);
 		break;
 
-	case DPERR_NOCONNECTION: 
+	case DPERR_NOCONNECTION:
 		geErrorLog_AddString(-1, "No communication link was established. \n", NULL);
 		break;
 
-	case DPERR_NOINTERFACE: 
+	case DPERR_NOINTERFACE:
 		geErrorLog_AddString(-1, "The interface is not supported. \n", NULL);
 		break;
 
@@ -792,27 +792,27 @@ static void DoDPError(HRESULT Hr)
 		geErrorLog_AddString(-1, "No name server (host) could be found or created. A host must exist to create a player. \n", NULL);
 		break;
 
-	case DPERR_NONEWPLAYERS: 
+	case DPERR_NONEWPLAYERS:
 		geErrorLog_AddString(-1, "The session is not accepting any new players. \n", NULL);
 		break;
 
-	case DPERR_NOPLAYERS: 
+	case DPERR_NOPLAYERS:
 		geErrorLog_AddString(-1, "There are no active players in the session. \n", NULL);
 		break;
 
-	case DPERR_NOSESSIONS: 
+	case DPERR_NOSESSIONS:
 		geErrorLog_AddString(-1, "There are no existing sessions for this game. \n", NULL);
 		break;
 
-	case DPERR_NOTLOBBIED: 
+	case DPERR_NOTLOBBIED:
 		geErrorLog_AddString(-1, "Returned by the IDirectPlayLobby2::Connect method if the application was not started by using the IDirectPlayLobby2::RunApplication method or if there is no DPLCONNECTION structure currently initialized for this DirectPlayLobby object. \n", NULL);
 		break;
 
-	case DPERR_NOTLOGGEDIN: 
+	case DPERR_NOTLOGGEDIN:
 		geErrorLog_AddString(-1, "An action cannot be performed because a player or client application is not logged in. Returned by the IDirectPlay3::Send method when the client application tries to send a secure message without being logged in. \n", NULL);
 		break;
 
-	case DPERR_OUTOFMEMORY: 
+	case DPERR_OUTOFMEMORY:
 		geErrorLog_AddString(-1, "There is insufficient memory to perform the requested operation. \n", NULL);
 		break;
 
@@ -820,31 +820,31 @@ static void DoDPError(HRESULT Hr)
 		geErrorLog_AddString(-1, "A player has lost the connection to the session. \n", NULL);
 		break;
 
-	case DPERR_SENDTOOBIG: 
+	case DPERR_SENDTOOBIG:
 		geErrorLog_AddString(-1, "The message being sent by the IDirectPlay3::Send method is too large. \n", NULL);
 		break;
 
-	case DPERR_SESSIONLOST: 
+	case DPERR_SESSIONLOST:
 		geErrorLog_AddString(-1, "The connection to the session has been lost. \n", NULL);
 		break;
 
-	case DPERR_SIGNFAILED: 
+	case DPERR_SIGNFAILED:
 		geErrorLog_AddString(-1, "The requested information could not be digitally signed. Digital signatures are used to establish the authenticity of messages. \n", NULL);
 		break;
 
-	case DPERR_TIMEOUT: 
+	case DPERR_TIMEOUT:
 		geErrorLog_AddString(-1, "The operation could not be completed in the specified time. \n", NULL);
 		break;
 
-	case DPERR_UNAVAILABLE: 
+	case DPERR_UNAVAILABLE:
 		geErrorLog_AddString(-1, "The requested function is not available at this time. \n", NULL);
 		break;
 
-	case DPERR_UNINITIALIZED: 
+	case DPERR_UNINITIALIZED:
 		geErrorLog_AddString(-1, "The requested object has not been initialized. \n", NULL);
 		break;
 
-	case DPERR_UNKNOWNAPPLICATION: 
+	case DPERR_UNKNOWNAPPLICATION:
 		geErrorLog_AddString(-1, "An unknown application was specified. \n", NULL);
 		break;
 
@@ -852,7 +852,7 @@ static void DoDPError(HRESULT Hr)
 		geErrorLog_AddString(-1, "The function is not available in this implementation. Returned from IDirectPlay3::GetGroupConnectionSettings and IDirectPlay3::SetGroupConnectionSettings if they are called from a session that is not a lobby session. \n", NULL);
 		break;
 
-	case DPERR_USERCANCEL: 
+	case DPERR_USERCANCEL:
 		geErrorLog_AddString(-1, "Can be returned in two ways. 1) The user canceled the connection process during a call to the IDirectPlay3::Open method. 2) The user clicked Cancel in one of the DirectPlay service provider dialog boxes during a call to IDirectPlay3::EnumSessions. \n", NULL);
 		break;
 

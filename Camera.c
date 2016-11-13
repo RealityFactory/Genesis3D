@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <math.h>
@@ -30,7 +30,7 @@
 
 #include "DCommon.h"
 
-typedef struct geCamera 
+typedef struct geCamera
 {
 	geFloat		Fov;						// Field of View for Camera
 	geFloat		Width;						// Width of viewport
@@ -178,7 +178,7 @@ void GENESISCC geCamera_GetWidthHeight(const geCamera *Camera,geFloat *Width,geF
 	*Width  = Camera->Width;
 	*Height = Camera->Height;
 }
-		
+
 //=====================================================================================
 //	geCamera_GetScale
 //=====================================================================================
@@ -227,7 +227,7 @@ GENESISAPI void GENESISCC geCamera_SetAttributes(geCamera *Camera, geFloat Fov, 
 
 	Camera->XRatio  = Width  * OneOverFov;
 	Camera->YRatio  = Height * OneOverFov;
-	
+
 	Camera->Scale   = max(Camera->XRatio, Camera->YRatio);
 	//Camera->YScale = Camera->XScale;
 
@@ -334,19 +334,19 @@ GENESISAPI void GENESISCC geCamera_Project(const geCamera *Camera,
 	assert( PointInCameraSpace != NULL );
 	assert( ProjectedPoint != NULL );
 
-	Z = -PointInCameraSpace->Z;   
+	Z = -PointInCameraSpace->Z;
 
 	if (Z < CAMERA_MINIMUM_PROJECTION_DISTANCE)
 	{
-		Z = CAMERA_MINIMUM_PROJECTION_DISTANCE; 
+		Z = CAMERA_MINIMUM_PROJECTION_DISTANCE;
 	}
 
 	ScaleOverZ = Camera->Scale / Z;
 
-	ProjectedPoint->Z = Z*Camera->ZScale;   
+	ProjectedPoint->Z = Z*Camera->ZScale;
 
 	ProjectedPoint->X = ( PointInCameraSpace->X * ScaleOverZ ) + Camera->XCenter;
-	
+
 	ProjectedPoint->Y = Camera->YCenter - ( PointInCameraSpace->Y * ScaleOverZ );
 }
 
@@ -369,20 +369,20 @@ GENESISAPI void GENESISCC geCamera_ProjectZ(const geCamera *Camera,
 	assert( PointInCameraSpace != NULL );
 	assert( ProjectedPoint != NULL );
 
-	Z = -PointInCameraSpace->Z;   
+	Z = -PointInCameraSpace->Z;
 
 	if (Z < CAMERA_MINIMUM_PROJECTION_DISTANCE)
 		{
-			Z = CAMERA_MINIMUM_PROJECTION_DISTANCE; 
+			Z = CAMERA_MINIMUM_PROJECTION_DISTANCE;
 		}
 
 	OneOverZ = 1.0f / Z;
 	ScaleOverZ = Camera->Scale *  (OneOverZ);
 
-	ProjectedPoint->Z = OneOverZ;   
+	ProjectedPoint->Z = OneOverZ;
 
 	ProjectedPoint->X = ( PointInCameraSpace->X * ScaleOverZ ) + Camera->XCenter;
-	
+
 	ProjectedPoint->Y = Camera->YCenter - ( PointInCameraSpace->Y * ScaleOverZ );
 }
 
@@ -406,33 +406,33 @@ void GENESISCC geCamera_ProjectAndClamp(const geCamera *Camera,
 	assert( PointInCameraSpace != NULL );
 	assert( ProjectedPoint != NULL );
 
-	Z = -PointInCameraSpace->Z;   
+	Z = -PointInCameraSpace->Z;
 
 	if (Z < CAMERA_MINIMUM_PROJECTION_DISTANCE)
 	{
-		Z = CAMERA_MINIMUM_PROJECTION_DISTANCE; 
+		Z = CAMERA_MINIMUM_PROJECTION_DISTANCE;
 	}
 
 	ScaleOverZ = Camera->Scale / Z;
 
-	ProjectedPoint->Z = Z*Camera->ZScale;   
+	ProjectedPoint->Z = Z*Camera->ZScale;
 
 	X = ( PointInCameraSpace->X * ScaleOverZ ) + Camera->XCenter;
-	
+
 	if (X < Camera->Left)
 		X = Camera->Left;
-	else if (X > Camera->Right)	
+	else if (X > Camera->Right)
 		X = Camera->Right;
 
 	ProjectedPoint->X = X;
-	
+
 	Y = Camera->YCenter - ( PointInCameraSpace->Y * ScaleOverZ );
 
 	if (Y < Camera->Top)
 		Y = Camera->Top;
-	else if (Y > Camera->Bottom) 
+	else if (Y > Camera->Bottom)
 		Y = Camera->Bottom;
-	
+
 	ProjectedPoint->Y = Y;
 }
 
@@ -620,7 +620,7 @@ GENESISAPI geBoolean GENESISCC geCamera_SetWorldSpaceXForm(geCamera *Camera, con
 GENESISAPI geBoolean GENESISCC geCamera_SetWorldSpaceVisXForm(geCamera *Camera, const geXForm3d *XForm)
 {
 	assert(Camera != NULL);
-		
+
 	if (XForm)
 	{
 		Camera->TransposeVisXForm = *XForm;		// Make a copy of the original XForm

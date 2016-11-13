@@ -1,8 +1,8 @@
 /****************************************************************************************/
-/*  SPRITE.H                                                                            */
+/*  Sprite.h                                                                            */
 /*                                                                                      */
-/*  Author: Michael R. Brumm	                                                          */
-/*  Description:  Sprite interface		                                                  */
+/*  Author: Michael R. Brumm                                                            */
+/*  Description:  Sprite interface                                                      */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -61,11 +61,11 @@ GENESISAPI int32 GENESISCC geSprite_GetCount();
 GENESISAPI geBoolean GENESISCC geSprite_IsValid(const geSprite *S);
 
 //---------------------------------------------------------------------------------
-//   Queries 
+//   Queries
 //---------------------------------------------------------------------------------
-	// In general: Objects retuned from Get functions should not not be destroyed. 
-	// if ownership is desired, call the objects _CreateRef() function to create another owner. 
-	// (An 'owner' has access to the object regardless of the number of other owners, and 
+	// In general: Objects retuned from Get functions should not not be destroyed.
+	// if ownership is desired, call the objects _CreateRef() function to create another owner.
+	// (An 'owner' has access to the object regardless of the number of other owners, and
 	// an owner must call the object's _Destroy() function to relinquish ownership )
 
 	// Returns the Bitmap associated with the sprite's front face
@@ -171,7 +171,7 @@ GENESISAPI void GENESISCC geSprite_SetLightingOptions(geSprite *S,
 									geFloat FillLightBlue,				// 0 .. 255
 									geBoolean UseLightFromFloor,	// GE_TRUE or GE_FALSE
 									int32 MaximumDynamicLightsToUse		// 0 for none
-									);			
+									);
 
 	// Gets the alpha transparency of the sprite
 GENESISAPI void GENESISCC geSprite_GetAlpha(const geSprite *S, geFloat *Alpha, geFloat *BackfaceAlpha);
@@ -194,7 +194,7 @@ GENESISAPI void GENESISCC geSprite_SetUserData(geSprite *S, void *UserData);
 
 #ifdef GE_WORLD_H
 	// Prepares the geSprite for rendering and posing.  Call Once once the sprite is fully created.
-	// Must be called prior to render/pose/setworldtransform 
+	// Must be called prior to render/pose/setworldtransform
 geBoolean GENESISCC geSprite_RenderPrep( geSprite *A, geWorld *World);
 
 	// Draws the geSprite.  (RenderPrep must be called first)

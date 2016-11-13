@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_CAMERA_H
@@ -57,34 +57,34 @@ GENESISAPI void GENESISCC geCamera_ScreenPointToWorld (	const geCamera	*Camera,
 														int32			 ScreenX,
 														int32			 ScreenY,
 														geVec3d			*Vector);
-GENESISAPI void GENESISCC geCamera_Project(const geCamera *Camera, 
-								const geVec3d *PointInCameraSpace, 
+GENESISAPI void GENESISCC geCamera_Project(const geCamera *Camera,
+								const geVec3d *PointInCameraSpace,
 								geVec3d *ProjectedPoint);
-GENESISAPI void GENESISCC geCamera_ProjectZ(const geCamera *Camera, 
-								const geVec3d *PointInCameraSpace, 
+GENESISAPI void GENESISCC geCamera_ProjectZ(const geCamera *Camera,
+								const geVec3d *PointInCameraSpace,
 								geVec3d *ProjectedPoint);
-void GENESISCC geCamera_ProjectAndClamp(const geCamera *Camera, 
-										const geVec3d *PointInCameraSpace, 
+void GENESISCC geCamera_ProjectAndClamp(const geCamera *Camera,
+										const geVec3d *PointInCameraSpace,
 										geVec3d *ProjectedPoint);
 void GENESISCC geCamera_GetViewAngleXSinCos( const geCamera *Camera, geFloat *SinAngle, geFloat *CosAngle );
 void GENESISCC geCamera_GetViewAngleYSinCos( const geCamera *Camera, geFloat *SinAngle, geFloat *CosAngle );
-GENESISAPI void GENESISCC geCamera_Transform(const geCamera *Camera, 
-						const geVec3d *WorldSpacePoint, 
-						      geVec3d *CameraSpacePoint);
-GENESISAPI void GENESISCC geCamera_TransformArray(const geCamera *Camera, 
-						const geVec3d *WorldSpacePointPtr, 
-						      geVec3d *CameraSpacePointPtr, int count);
-GENESISAPI void GENESISCC geCamera_TransformAndProjectArray(const geCamera *Camera, 
-						const geVec3d *WorldSpacePointPtr, 
-						      geVec3d *ProjectedSpacePointPtr, int count);
-GENESISAPI void GENESISCC geCamera_TransformAndProjectLArray(const geCamera *Camera, 
-						const GE_LVertex *WorldSpacePointPtr, 
-						      GE_TLVertex *ProjectedSpacePointPtr, int count);
+GENESISAPI void GENESISCC geCamera_Transform(const geCamera *Camera,
+						const geVec3d *WorldSpacePoint,
+							  geVec3d *CameraSpacePoint);
+GENESISAPI void GENESISCC geCamera_TransformArray(const geCamera *Camera,
+						const geVec3d *WorldSpacePointPtr,
+							  geVec3d *CameraSpacePointPtr, int count);
+GENESISAPI void GENESISCC geCamera_TransformAndProjectArray(const geCamera *Camera,
+						const geVec3d *WorldSpacePointPtr,
+							  geVec3d *ProjectedSpacePointPtr, int count);
+GENESISAPI void GENESISCC geCamera_TransformAndProjectLArray(const geCamera *Camera,
+						const GE_LVertex *WorldSpacePointPtr,
+							  GE_TLVertex *ProjectedSpacePointPtr, int count);
 GENESISAPI void GENESISCC geCamera_TransformAndProject(const geCamera *Camera,
-								const geVec3d *Point, 
+								const geVec3d *Point,
 								geVec3d *ProjectedPoint);
 GENESISAPI void GENESISCC geCamera_TransformAndProjectL(const geCamera *Camera,
-								const GE_LVertex *Point, 
+								const GE_LVertex *Point,
 								GE_TLVertex *ProjectedPoint);
 
 GENESISAPI geBoolean GENESISCC geCamera_SetWorldSpaceXForm(geCamera *Camera, const geXForm3d *XForm);

@@ -14,8 +14,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 
@@ -48,7 +48,7 @@ typedef	struct	Frustum_Info		Frustum_Info;
 typedef struct	World_BSP			World_BSP;
 typedef struct	geWorld_Leaf		geWorld_Leaf;
 
-				
+
 // Mesh.h
 typedef struct	Mesh_MeshInfo		Mesh_MeshInfo;
 typedef struct	Mesh_MeshDef		Mesh_MeshDef;

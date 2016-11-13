@@ -1,8 +1,5 @@
-
-//#define _TSC	// do this in the project settings!
-
 /****************************************************************************************/
-/*  TSC                                                                                 */
+/*  TSC.c                                                                               */
 /*                                                                                      */
 /*  Author: Charles Bloom                                                               */
 /*  Description: tsc accessors                                                          */
@@ -18,10 +15,13 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
+
+//#define _TSC	// do this in the project settings!
+
 
 typedef unsigned long ulong;
 
@@ -46,7 +46,7 @@ typedef unsigned long ulong;
 #include "TSC.h"
 
 typedef struct tscNode tscNode;
-struct tscNode 
+struct tscNode
 {
 	tscNode *next;
 	ulong tsc[2];
@@ -86,7 +86,7 @@ void showPopTSCper(const char *tag,int items,const char *itemTag)
 double time,per;
 	time = popTSC();
 	per = (time/(double)items);
-	if ( per < 0.000001 ) 
+	if ( per < 0.000001 )
 		Log_Printf("%s : %f = %e per %s\n",tag,time,per,itemTag);
 	else
 		Log_Printf("%s : %f = %f per %s\n",tag,time,per,itemTag);
@@ -95,7 +95,7 @@ double time,per;
 void readTSC(ulong *hi)
 {
 ulong *lo = hi + 1;
-	__asm 
+	__asm
 	{
 		_emit 0x0F;
 		_emit 0x31;	// rdtsc

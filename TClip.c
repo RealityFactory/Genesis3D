@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  TClip                                                                               */
+/*  TClip.c                                                                             */
 /*                                                                                      */
 /*  Author: Mike Sandige & Charles Bloom                                                */
 /*  Description: Triangle Clipping to the screen rectangle                              */
@@ -7,10 +7,10 @@
 /*  Edit History:                                                                       */
 /*                                                                                      */
 /*  Edit History:                                                                       */
-/*  08/08/2004 Wendell Buckner                                                          */ 
-/*   BUG FIX: Allways call geBitmap_SetRenderFlags() before calling a textured          */ 
-/*	 rendering function(for embm, dot3, & etc...).                                      */
-/*   03/24/2004 Wendell Buckner                                                         */
+/*  08/08/2004 Wendell Buckner                                                          */
+/*   BUG FIX: Allways call geBitmap_SetRenderFlags() before calling a textured          */
+/*   rendering function(for embm, dot3, & etc...).                                      */
+/*  03/24/2004 Wendell Buckner                                                          */
 /*    BUG FIX: Rendering Transparent Polys properly (2)                                 */
 /*  05/05/2003 Wendell Buckner                                                          */
 /*   BUMPMAPPING                                                                        */
@@ -38,7 +38,7 @@ Cbloom Jan 18
 TClip gained 2-3 fps
 (not counting the gains already from _SetTexture)
 
-I reorganized the TClip_Triangle function flow to early-out 
+I reorganized the TClip_Triangle function flow to early-out
 for triangles all-in or all-out.  The old code considered this
 case, but was not as lean as possible for these most-common cases.
 
@@ -79,7 +79,7 @@ TClip_Rasterize      : 0.006183 : 1.$ %
 #include <string.h>
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) */
+	BUG FIX: Rendering Transparent Polys properly (2) */
 #include "Puppet.h"
 
 #include "TClip.h"
@@ -94,8 +94,8 @@ TIMER_VARS(TClip_Triangle);
 
 //#define ONE_OVER_Z_PIPELINE	// this has more accuracy, but the slowness of doing 1/ divides
 
-typedef enum 
-{	
+typedef enum
+{
 	BACK_CLIPPING_PLANE = 0,
 	LEFT_CLIPPING_PLANE,
 	RIGHT_CLIPPING_PLANE,
@@ -112,8 +112,8 @@ typedef enum
 
 	// at a=0, result is l;  at a=1, result is h
 #define LINEAR_INTERPOLATE(a,l,h)     ((l)+(((h)-(l))*(a)))
- 
-#define RASTERIZECC 
+
+#define RASTERIZECC
 typedef void (RASTERIZECC *geTClip_Rasterize_FuncPtr) (const GE_LVertex * TriVtx);
 
 typedef struct geTClip_StaticsType
@@ -134,8 +134,8 @@ typedef struct geTClip_StaticsType
 	uint32 RenderFlags;		// LA
 
 	/* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) */
-    geFloat OverallAlpha;
+	BUG FIX: Rendering Transparent Polys properly (2) */
+	geFloat OverallAlpha;
 
 } geTClip_StaticsType;
 
@@ -175,7 +175,7 @@ geTClip_StaticsType * TCI;
 	{
 		List_Start();
 		geTClip_Link = Link_Create();
-		if ( ! geTClip_Link ) 
+		if ( ! geTClip_Link )
 			return GE_FALSE;
 	}
 
@@ -187,7 +187,7 @@ geTClip_StaticsType * TCI;
 	Link_Push( geTClip_Link , TCI );
 
 	geTClip_Statics.RenderFlags = 0;	// LA, this is needed to set RF = 0 for default after any _Push
-	
+
 	return GE_TRUE;
 }
 
@@ -210,12 +210,12 @@ geTClip_StaticsType * TCI;
 	}
 
 	ActiveRenderFlags = geTClip_Statics.RenderFlags; // LA, set ARF from newly pop'd statics
-	
+
 	return GE_TRUE;
 }
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) */
+	BUG FIX: Rendering Transparent Polys properly (2) */
 geBoolean GENESISCC geTClip_SetOverallAlpha ( const geFloat OverallAlpha )
 {
 	geTClip_Statics.OverallAlpha = OverallAlpha;
@@ -241,12 +241,12 @@ return GE_TRUE;
 
 void GENESISCC geTClip_SetupEdges(
 	geEngine *Engine,
-	geFloat LeftEdge, 
+	geFloat LeftEdge,
 	geFloat RightEdge,
 	geFloat TopEdge ,
 	geFloat BottomEdge,
 	geFloat BackEdge)
-{ 
+{
 	assert(Engine);
 	memset(&geTClip_Statics,0,sizeof(geTClip_Statics));
 	geTClip_Statics.Engine		= Engine;
@@ -282,7 +282,7 @@ void GENESISCC geTClip_Triangle(const GE_LVertex TriVertex[3])
 static void RASTERIZECC geTClip_Rasterize_Tex(const GE_LVertex * TriVtx)
 {
 /* 08/08/2004 Wendell Buckner
-     BUG FIX: Allways call geBitmap_SetRenderFlags() before calling a textured rendering function(for embm, dot3, & etc...). */
+	 BUG FIX: Allways call geBitmap_SetRenderFlags() before calling a textured rendering function(for embm, dot3, & etc...). */
 	geBitmap_SetRenderFlags(geTClip_Statics.Bitmap, &ActiveRenderFlags);
 
 	geTClip_Statics.Driver->RenderMiscTexturePoly((DRV_TLVertex *)TriVtx,
@@ -303,13 +303,13 @@ static void GENESISCC geTClip_Rasterize(const GE_LVertex * TriVtx)
 	if ( geTClip_Statics.THandle )
 	{
 /* 08/08/2004 Wendell Buckner
-     BUG FIX: Allways call geBitmap_SetRenderFlags() before calling a textured rendering function(for embm, dot3, & etc...). */
-	    geBitmap_SetRenderFlags(geTClip_Statics.Bitmap, &ActiveRenderFlags);
+	 BUG FIX: Allways call geBitmap_SetRenderFlags() before calling a textured rendering function(for embm, dot3, & etc...). */
+		geBitmap_SetRenderFlags(geTClip_Statics.Bitmap, &ActiveRenderFlags);
 
 		geTClip_Statics.Driver->RenderMiscTexturePoly((DRV_TLVertex *)TriVtx,
 			3,geTClip_Statics.THandle,ActiveRenderFlags);	// LA
 	}
-	else 
+	else
 	{
 		geTClip_Statics.Driver->RenderGouraudPoly((DRV_TLVertex *)TriVtx,
 			3,ActiveRenderFlags); // LA
@@ -322,7 +322,7 @@ static void GENESISCC geTClip_Split(GE_LVertex *NewVertex,const GE_LVertex *V1,c
 {
 	geFloat Ratio=0.0f;
 	geFloat OneOverZ1,OneOverZ2;
-	
+
 	Ratio=0.0f;
 
 	memset(NewVertex, 0, sizeof(GE_LVertex));
@@ -349,7 +349,7 @@ static void GENESISCC geTClip_Split(GE_LVertex *NewVertex,const GE_LVertex *V1,c
 			#else
 			NewVertex->Z = geTClip_Statics.BackEdge;
 			#endif
-		
+
 			break;
 		case (LEFT_CLIPPING_PLANE):
 			assert((V2->X - V1->X)!=0.0f);
@@ -362,7 +362,7 @@ static void GENESISCC geTClip_Split(GE_LVertex *NewVertex,const GE_LVertex *V1,c
 			#else
 			NewVertex->Z = 1.0f/LINEAR_INTERPOLATE(Ratio,OneOverZ2,OneOverZ1);
 			#endif
-	
+
 			break;
 		case (RIGHT_CLIPPING_PLANE):
 			assert((V2->X - V1->X)!=0.0f);
@@ -388,7 +388,7 @@ static void GENESISCC geTClip_Split(GE_LVertex *NewVertex,const GE_LVertex *V1,c
 			#else
 			NewVertex->Z = 1.0f/LINEAR_INTERPOLATE(Ratio,OneOverZ2,OneOverZ1);
 			#endif
-			
+
 			break;
 		case (BOTTOM_CLIPPING_PLANE):
 			assert((V2->Y - V1->Y)!=0.0f);
@@ -405,7 +405,7 @@ static void GENESISCC geTClip_Split(GE_LVertex *NewVertex,const GE_LVertex *V1,c
 			break;
 	}
 
-	
+
 	{
 	geFloat OneOverZ1_Ratio;
 	geFloat OneOverZ2_Ratio;
@@ -442,7 +442,7 @@ uint32 OutBits = 0;
 /*int8 szBug[128];*/
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) */
+	BUG FIX: Rendering Transparent Polys properly (2) */
 	geBoolean IsTransparent = GE_FALSE;
 
 	OutBits = 0;
@@ -517,7 +517,7 @@ uint32 OutBits = 0;
 					//	if ( ! (OutBits>>3) )
 					//		goto Rasterize
 					//	else
-					geTClip_TrianglePlane(NewTriVertex,ClippingPlane+1); 
+					geTClip_TrianglePlane(NewTriVertex,ClippingPlane+1);
 					return;
 
 				case (V1_OUT):
@@ -529,16 +529,16 @@ uint32 OutBits = 0;
 
 					NewTriVertex[0] = NewTriVertex[1];
 					geTClip_Split(&(NewTriVertex[1]),TriVertex+1,TriVertex+2,ClippingPlane);
-					
-					geTClip_TrianglePlane(NewTriVertex,ClippingPlane+1); 
+
+					geTClip_TrianglePlane(NewTriVertex,ClippingPlane+1);
 					return;
 
 				case (V0_OUT + V1_OUT):
 					NewTriVertex[0] = TriVertex[2];
 					geTClip_Split(&(NewTriVertex[1]),TriVertex+0,TriVertex+2,ClippingPlane);
 					geTClip_Split(&(NewTriVertex[2]),TriVertex+1,TriVertex+2,ClippingPlane);
-				
-					geTClip_TrianglePlane(NewTriVertex,ClippingPlane+1); 
+
+					geTClip_TrianglePlane(NewTriVertex,ClippingPlane+1);
 					return;
 
 				case (V2_OUT):
@@ -593,19 +593,19 @@ uint32 OutBits = 0;
 	}
 
 /* 03/24/2004 Wendell Buckner
-    BUG FIX: Rendering Transparent Polys properly (2) 
+	BUG FIX: Rendering Transparent Polys properly (2)
 	if ( geTClip_Statics.THandle ) */
 	if ( gePuppet_IsTransparent ( geTClip_Statics.OverallAlpha, &geTClip_Statics.Bitmap,&IsTransparent,1) )
 		gePuppet_AddToGList ( (GE_TLVertex *)TriVertex, 3, geTClip_Statics.Bitmap, 0, GE_TRUE );
-	else if ( geTClip_Statics.THandle ) 
+	else if ( geTClip_Statics.THandle )
 	{
-/*  05/05/2003 Wendell Buckner                                                          
-     BUMPMAPPING                                                                        	 
+/*  05/05/2003 Wendell Buckner
+	 BUMPMAPPING
 		geTClip_Statics.Driver->RenderMiscTexturePoly((DRV_TLVertex *)TriVertex,
 			3,geTClip_Statics.THandle,ActiveRenderFlags); // LA */
-	    uint32 Flags = 0;
+		uint32 Flags = 0;
 
-	    geBitmap_SetRenderFlags(geTClip_Statics.Bitmap, &Flags);
+		geBitmap_SetRenderFlags(geTClip_Statics.Bitmap, &Flags);
 
 		Flags |= ActiveRenderFlags;
 
@@ -613,7 +613,7 @@ uint32 OutBits = 0;
 			3,geTClip_Statics.THandle,Flags);
 
 	}
-	else 
+	else
 	{
 		geTClip_Statics.Driver->RenderGouraudPoly((DRV_TLVertex *)TriVertex,3,ActiveRenderFlags); // LA
 	}
@@ -625,13 +625,13 @@ void GENESISCC geTClip_UnclippedTriangle(const GE_LVertex TriVertex[3])
 {
 	if ( geTClip_Statics.THandle )
 	{
-/*  05/05/2003 Wendell Buckner                                                          
-     BUMPMAPPING    
+/*  05/05/2003 Wendell Buckner
+	 BUMPMAPPING
 		geTClip_Statics.Driver->RenderMiscTexturePoly((DRV_TLVertex *)TriVertex,
 			3,geTClip_Statics.THandle,ActiveRenderFlags);*/
-	    uint32 Flags = 0;
+		uint32 Flags = 0;
 
-	    geBitmap_SetRenderFlags(geTClip_Statics.Bitmap, &Flags);
+		geBitmap_SetRenderFlags(geTClip_Statics.Bitmap, &Flags);
 
 		Flags |= ActiveRenderFlags;
 

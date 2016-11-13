@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef	GE_SOUND_H
@@ -43,22 +43,22 @@ GENESISAPI	void			geSound_DestroySoundSystem(geSound_System *Sound);
 
 
 GENESISAPI	geSound_Def	   *geSound_LoadSoundDef(geSound_System *SoundS, geVFile *File);
-GENESISAPI	void			geSound_FreeSoundDef(geSound_System *SoundS, 
+GENESISAPI	void			geSound_FreeSoundDef(geSound_System *SoundS,
 									geSound_Def *SoundDef);
 
 GENESISAPI	void			geSound_FreeAllChannels(geSound_System *SoundS);
 
-GENESISAPI	geSound		   *geSound_PlaySoundDef(geSound_System *SoundS, 
-									geSound_Def *SoundDef, 
-									geFloat Volume, 
-									geFloat Pan, 
-									geFloat Frequency, 
+GENESISAPI	geSound		   *geSound_PlaySoundDef(geSound_System *SoundS,
+									geSound_Def *SoundDef,
+									geFloat Volume,
+									geFloat Pan,
+									geFloat Frequency,
 									geBoolean Loop);
 GENESISAPI	geBoolean		geSound_StopSound(geSound_System *SoundS, geSound *Sound);
-GENESISAPI	geBoolean		geSound_ModifySound(geSound_System *SoundS, 
-									geSound *Sound, 
-									geFloat Volume, 
-									geFloat Pan, 
+GENESISAPI	geBoolean		geSound_ModifySound(geSound_System *SoundS,
+									geSound *Sound,
+									geFloat Volume,
+									geFloat Pan,
 									geFloat Frequency);
 GENESISAPI	geBoolean		geSound_SoundIsPlaying(geSound_System *SoundS, geSound *Sound);
 GENESISAPI	geBoolean		geSound_SetMasterVolume( geSound_System *SoundS, geFloat Volume );

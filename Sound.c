@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include	<windows.h>
@@ -98,7 +98,7 @@ typedef struct	SoundManager
 
 	LPDIRECTSOUNDBUFFER 	smPrimaryChannel;
 	Channel*				smChannels;
-    //LPDIRECTSOUNDNOTIFY *   smNotify;
+	//LPDIRECTSOUNDNOTIFY *   smNotify;
 }   SoundManager;
 
 static	LPDIRECTSOUND			lpDirectSound;
@@ -128,7 +128,7 @@ GENESISAPI	geSound_System *geSound_CreateSoundSystem(HWND hWnd)
 	}
 
 	memset(SoundSystem, 0, sizeof(geSound_System));
-	
+
 	// Initialize the sound system
 	SoundSystem->SoundM = CreateSoundManager(hWnd);
 
@@ -171,7 +171,7 @@ GENESISAPI	geSound_Def *geSound_LoadSoundDef(geSound_System *SoundS, geVFile *Fi
 //	if (!FillSoundChannel(SoundS->SoundM, (char*)Path, (char*)FileName, &SoundDef))
 	if (!FillSoundChannel(SoundS->SoundM, File, &SoundDef))
 		return 0;
-	
+
 	return (geSound_Def *)SoundDef;
 }
 
@@ -190,7 +190,7 @@ GENESISAPI	geSound_Def *geSound_LoadSoundDefFromMemory(
 
 	if (!FillSoundChannelMemory(SoundS->SoundM, Buffer, &SoundDef))
 		return 0;
-	
+
 	return (geSound_Def *)SoundDef;
 }
 #endif
@@ -233,15 +233,15 @@ GENESISAPI	geBoolean geSound_SetMasterVolume( geSound_System *SoundS, geFloat Vo
 	SoundS->GlobalVolume = Volume;
 	return( GE_TRUE );
 }
-	
+
 //=====================================================================================
 //	Sound_PlaySound
 //=====================================================================================
-GENESISAPI	geSound *geSound_PlaySoundDef(geSound_System *SoundS, 
-							geSound_Def *SoundDef, 
-							geFloat Volume, 
-							geFloat Pan, 
-							geFloat Frequency, 
+GENESISAPI	geSound *geSound_PlaySoundDef(geSound_System *SoundS,
+							geSound_Def *SoundDef,
+							geFloat Volume,
+							geFloat Pan,
+							geFloat Frequency,
 							geBoolean Loop)
 {
 	unsigned int Sound;
@@ -259,7 +259,7 @@ GENESISAPI	geSound *geSound_PlaySoundDef(geSound_System *SoundS,
 
 	return (geSound *)Sound;
 }
-	
+
 //=====================================================================================
 //	Sound_StopSound
 //=====================================================================================
@@ -268,29 +268,29 @@ GENESISAPI	geBoolean geSound_StopSound(geSound_System *SoundS, geSound *Sound)
 	Channel*	Channel;
 
 	assert(SoundS != NULL);
-	assert(Sound  != NULL);	
+	assert(Sound  != NULL);
 
 	Channel = GetChannel(SoundS->SoundM, (unsigned int)Sound);
 
 	if (!Channel)
 		return GE_FALSE;
 
-	return StopSoundChannel(Channel);	
+	return StopSoundChannel(Channel);
 }
 
 //=====================================================================================
 //	Sound_ModifySound
 //=====================================================================================
-GENESISAPI	geBoolean geSound_ModifySound(geSound_System *SoundS, 
-								geSound *Sound,geFloat Volume, 
-								geFloat Pan, 
+GENESISAPI	geBoolean geSound_ModifySound(geSound_System *SoundS,
+								geSound *Sound,geFloat Volume,
+								geFloat Pan,
 								geFloat Frequency)
 {
 	Channel*	Channel;
 	geSound_Cfg	LocalCfg;
 
 	assert(SoundS != NULL);
-	assert(Sound  != NULL);	
+	assert(Sound  != NULL);
 
 	Channel = GetChannel(SoundS->SoundM, (unsigned int)Sound);
 
@@ -327,104 +327,104 @@ GENESISAPI	geBoolean geSound_SoundIsPlaying(geSound_System *SoundS, geSound *Sou
 //=====================================================================================
 
 static	BOOL DSParseWaveResource(const void *pvRes, WAVEFORMATEX **ppWaveHeader,
-                         BYTE **ppbWaveData,DWORD *pcbWaveSize)
+						 BYTE **ppbWaveData,DWORD *pcbWaveSize)
 {
-    DWORD *pdw;
-    DWORD *pdwEnd;
-    DWORD dwRiff;
-    DWORD dwType;
-    DWORD dwLength;
+	DWORD *pdw;
+	DWORD *pdwEnd;
+	DWORD dwRiff;
+	DWORD dwType;
+	DWORD dwLength;
 
-    if (ppWaveHeader)
-        *ppWaveHeader = NULL;
+	if (ppWaveHeader)
+		*ppWaveHeader = NULL;
 
-    if (ppbWaveData)
-        *ppbWaveData = NULL;
+	if (ppbWaveData)
+		*ppbWaveData = NULL;
 
-    if (pcbWaveSize)
-        *pcbWaveSize = 0;
+	if (pcbWaveSize)
+		*pcbWaveSize = 0;
 
-    pdw = (DWORD *)pvRes;
-    dwRiff = *pdw++;
-    dwLength = *pdw++;
-    dwType = *pdw++;
+	pdw = (DWORD *)pvRes;
+	dwRiff = *pdw++;
+	dwLength = *pdw++;
+	dwType = *pdw++;
 
-    if (dwRiff != mmioFOURCC('R', 'I', 'F', 'F'))
-        goto exit;      // not even RIFF
+	if (dwRiff != mmioFOURCC('R', 'I', 'F', 'F'))
+		goto exit;      // not even RIFF
 
-    if (dwType != mmioFOURCC('W', 'A', 'V', 'E'))
-        goto exit;      // not a WAV
+	if (dwType != mmioFOURCC('W', 'A', 'V', 'E'))
+		goto exit;      // not a WAV
 
-    pdwEnd = (DWORD *)((BYTE *)pdw + dwLength-4);
+	pdwEnd = (DWORD *)((BYTE *)pdw + dwLength-4);
 
-    while (pdw < pdwEnd)
-    {
-        dwType = *pdw++;
-        dwLength = *pdw++;
+	while (pdw < pdwEnd)
+	{
+		dwType = *pdw++;
+		dwLength = *pdw++;
 
-        switch (dwType)
-        {
-        case mmioFOURCC('f', 'm', 't', ' '):
-            if (ppWaveHeader && !*ppWaveHeader)
-            {
-                if (dwLength < sizeof(WAVEFORMAT))
-                    goto exit;      // not a WAV
+		switch (dwType)
+		{
+		case mmioFOURCC('f', 'm', 't', ' '):
+			if (ppWaveHeader && !*ppWaveHeader)
+			{
+				if (dwLength < sizeof(WAVEFORMAT))
+					goto exit;      // not a WAV
 
-                *ppWaveHeader = (WAVEFORMATEX *)pdw;
+				*ppWaveHeader = (WAVEFORMATEX *)pdw;
 
-                if ((!ppbWaveData || *ppbWaveData) &&
-                    (!pcbWaveSize || *pcbWaveSize))
-                {
-                    return TRUE;
-                }
-            }
-            break;
+				if ((!ppbWaveData || *ppbWaveData) &&
+					(!pcbWaveSize || *pcbWaveSize))
+				{
+					return TRUE;
+				}
+			}
+			break;
 
-        case mmioFOURCC('d', 'a', 't', 'a'):
-            if ((ppbWaveData && !*ppbWaveData) ||
-                (pcbWaveSize && !*pcbWaveSize))
-            {
-                if (ppbWaveData)
-                    *ppbWaveData = (LPBYTE)pdw;
+		case mmioFOURCC('d', 'a', 't', 'a'):
+			if ((ppbWaveData && !*ppbWaveData) ||
+				(pcbWaveSize && !*pcbWaveSize))
+			{
+				if (ppbWaveData)
+					*ppbWaveData = (LPBYTE)pdw;
 
-                if (pcbWaveSize)
-                    *pcbWaveSize = dwLength;
+				if (pcbWaveSize)
+					*pcbWaveSize = dwLength;
 
-                if (!ppWaveHeader || *ppWaveHeader)
-                    return TRUE;
-            }
-            break;
-        }
+				if (!ppWaveHeader || *ppWaveHeader)
+					return TRUE;
+			}
+			break;
+		}
 
-        pdw = (DWORD *)((BYTE *)pdw + ((dwLength+1)&~1));
-    }
+		pdw = (DWORD *)((BYTE *)pdw + ((dwLength+1)&~1));
+	}
 
 exit:
-    return FALSE;
+	return FALSE;
 }
 
 static	BOOL DSFillSoundBuffer(IDirectSoundBuffer *pDSB, BYTE *pbWaveData, DWORD cbWaveSize)
 {
 
-    if (pDSB && pbWaveData && cbWaveSize)
-    {
-        LPVOID pMem1, pMem2;
-        DWORD dwSize1, dwSize2;
+	if (pDSB && pbWaveData && cbWaveSize)
+	{
+		LPVOID pMem1, pMem2;
+		DWORD dwSize1, dwSize2;
 
-        if (SUCCEEDED(IDirectSoundBuffer_Lock(pDSB, 0, cbWaveSize,
-            &pMem1, &dwSize1, &pMem2, &dwSize2, 0)))
-        {
-            ZeroMemory(pMem1, dwSize1);
-            CopyMemory(pMem1, pbWaveData, dwSize1);
+		if (SUCCEEDED(IDirectSoundBuffer_Lock(pDSB, 0, cbWaveSize,
+			&pMem1, &dwSize1, &pMem2, &dwSize2, 0)))
+		{
+			ZeroMemory(pMem1, dwSize1);
+			CopyMemory(pMem1, pbWaveData, dwSize1);
 
-            if ( 0 != dwSize2 )
-                CopyMemory(pMem2, pbWaveData+dwSize1, dwSize2);
+			if ( 0 != dwSize2 )
+				CopyMemory(pMem2, pbWaveData+dwSize1, dwSize2);
 
-            IDirectSoundBuffer_Unlock(pDSB, pMem1, dwSize1, pMem2, dwSize2);
-            return TRUE;
-        }
-    }
-    return FALSE;
+			IDirectSoundBuffer_Unlock(pDSB, pMem1, dwSize1, pMem2, dwSize2);
+			return TRUE;
+		}
+	}
+	return FALSE;
 }
 
 
@@ -480,7 +480,7 @@ static	SoundManager *	CreateSoundManager(HWND hWnd )
 	//pcmwf.wf.nChannels = 1;
 	//pcmwf.wf.nSamplesPerSec = 44050;
 	//pcmwf.wf.nBlockAlign = 2;
-#if 1	
+#if 1
 	pcmwf.wf.nChannels = 2;
 	pcmwf.wf.nSamplesPerSec = 44100;
 	pcmwf.wf.nBlockAlign = 4;
@@ -562,7 +562,7 @@ static	BOOL GetSoundData( geVFile *File, unsigned char** dataPtr)
 
 #if 0
 	f = fopen(Name, "rb");
-	
+
 	if (!f)
 	{
 		geErrorLog_Add(GE_ERR_FILE_OPEN_ERROR, NULL);
@@ -582,12 +582,12 @@ static	BOOL GetSoundData( geVFile *File, unsigned char** dataPtr)
 
 	data = geRam_Allocate(Size);
 
-	if (!data) 
+	if (!data)
 	{
 		geErrorLog_Add(GE_ERR_OUT_OF_MEMORY, NULL);
 		return FALSE;
 	}
-	
+
 	if	(geVFile_Read(File, data, Size) == GE_FALSE)
 	{
 		geRam_Free(data);
@@ -660,7 +660,7 @@ static	BOOL FillSoundChannel(SoundManager *sm, geVFile *File, unsigned int* Hand
 	}
 
 	NumBytes = dsBD.dwBufferBytes;
-	
+
 	//Create the channel
 //	if( !CreateChannel( Name2, &dsBD, &channel ) )
 	if	(!CreateChannel(&dsBD, &channel))
@@ -678,7 +678,7 @@ static	BOOL FillSoundChannel(SoundManager *sm, geVFile *File, unsigned int* Hand
 	//Fill the channel
 	if (!DSFillSoundBuffer(channel->buffer, pbWaveData, NumBytes))
 		return FALSE;
-	
+
 //	free( data );
 //	geRam_Free(data);
 
@@ -708,7 +708,7 @@ static	BOOL FillSoundChannelMemory(SoundManager *sm, const void *Buffer, unsigne
 	if	(Name == NULL)
 		return FALSE;
 	sprintf(Name, "0x%8x", Buffer);
-	
+
 	//Create the channel
 //	if	(!CreateChannel(Name, &dsBD, &channel))
 	if	(!CreateChannel(&dsBD, &channel))
@@ -723,7 +723,7 @@ static	BOOL FillSoundChannelMemory(SoundManager *sm, const void *Buffer, unsigne
 	//Fill the channel
 	if	(!DSFillSoundBuffer(channel->buffer, pbWaveData, NumBytes))
 		return FALSE;
-	
+
 	*Handle = channel->ID;
 	return TRUE;
 }
@@ -774,7 +774,7 @@ static	void ClearDupBuffers( Channel* channel )
 static	BOOL FreeAllChannels(SoundManager *sm)
 {
 	int Error;
-	
+
 	Channel* channel, *nextChannel;
 
 	channel = sm->smChannels;
@@ -795,7 +795,7 @@ static	BOOL FreeAllChannels(SoundManager *sm)
 			geErrorLog_Add(GE_ERR_DS_ERROR, NULL);
 			return FALSE;
 		}
-		
+
 //		if( channel->name )
 //			geRam_Free(channel->name);
 //			free( channel->name );
@@ -876,7 +876,7 @@ static	Channel* ReloadData(void *Data)
 		return( NULL );
 
 	NumBytes = dsBD.dwBufferBytes;
-	
+
 	//Create the channel
 //	if( !CreateChannel( Name, &dsBD, &channel ) )
 	if( !CreateChannel(&dsBD, &channel ) )
@@ -885,7 +885,7 @@ static	Channel* ReloadData(void *Data)
 	//Fill the channel
 	if ( !DSFillSoundBuffer(channel->buffer, pbWaveData, NumBytes))
 		return NULL;
-	
+
 //	geRam_Free(data);
 //	free( data );
 	return( channel );
@@ -931,7 +931,7 @@ static	BOOL	StartSoundChannel( SoundManager *sm, unsigned int Handle, geSound_Cf
 {
 	HRESULT	hres;
 	Channel* channel, *dupChannel;
-	
+
 	if( Handle == 0 )
 		return( FALSE );
 	channel = GetChannel( sm, Handle );
@@ -949,9 +949,9 @@ static	BOOL	StartSoundChannel( SoundManager *sm, unsigned int Handle, geSound_Cf
 		return( FALSE );
 	IDirectSoundBuffer_SetCurrentPosition(channel->buffer, 0);
 	hres = IDirectSoundBuffer_Play( channel->buffer,
-				  				   0,
-				  				   0,
-				  				   loop ? DSBPLAY_LOOPING : 0);
+								   0,
+								   0,
+								   loop ? DSBPLAY_LOOPING : 0);
 
 	if	(hres == DS_OK)
 	{
@@ -959,7 +959,7 @@ static	BOOL	StartSoundChannel( SoundManager *sm, unsigned int Handle, geSound_Cf
 			*sfx = channel->ID;
 		return TRUE;
 	}
-	
+
 	geErrorLog_Add(GE_ERR_DS_ERROR, NULL);
 	return FALSE;
 }
@@ -998,7 +998,7 @@ static	BOOL	ModifyChannel( Channel *channel, geSound_Cfg *cfg )
 {
 	int Error, Vol, Pan, Freq;
 	assert(channel);
-	
+
 	if( !cfg )
 		return( TRUE );
 	ClearDupBuffers(channel);
@@ -1031,7 +1031,7 @@ static	BOOL	ModifyChannel( Channel *channel, geSound_Cfg *cfg )
 	{
 
 		Freq = (DWORD)(channel->BaseFreq * cfg->Frequency);
-		
+
 		if(Freq < 0)
 			Freq = 0;
 

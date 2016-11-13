@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 
@@ -275,9 +275,9 @@ GENESISAPI void geWorld_RemoveLight(geWorld *World, geLight *Light)
 //	geWorld_SetLightAttributes
 //========================================================================================
 GENESISAPI geBoolean geWorld_SetLightAttributes(	geWorld *World,
-										geLight		*Light, 
-										const		geVec3d *Pos, 
-										const		GE_RGBA *RGBA, 
+										geLight		*Light,
+										const		geVec3d *Pos,
+										const		GE_RGBA *RGBA,
 										geFloat		Radius,
 										geBoolean	CastShadow)
 {
@@ -285,7 +285,7 @@ GENESISAPI geBoolean geWorld_SetLightAttributes(	geWorld *World,
 	assert(Light != NULL);
 	assert(Pos != NULL);
 	assert(RGBA != NULL);
-	
+
 	return Light_SetAttributes((Light_DLight*)Light, Pos, RGBA, Radius, CastShadow);
 }
 
@@ -305,9 +305,9 @@ GENESISAPI geBoolean geWorld_SetLTypeTable(geWorld *World, int32 LType, const ch
 //	geWorld_SetSpotLightAttributes
 //========================================================================================
 GENESISAPI geBoolean geWorld_SetSpotLightAttributes(		geWorld *World,
-										geLight		*Light, 
-										const		geVec3d *Pos, 
-										const		GE_RGBA *RGBA, 
+										geLight		*Light,
+										const		geVec3d *Pos,
+										const		GE_RGBA *RGBA,
 										geFloat		Radius,
 										geFloat		Arc,
 										const		geVec3d *Angles,
@@ -327,13 +327,13 @@ GENESISAPI geBoolean geWorld_SetSpotLightAttributes(		geWorld *World,
 //========================================================================================
 // geWorld_TestModelMove
 //========================================================================================
-GENESISAPI geBoolean geWorld_TestModelMove(	geWorld			*World, 
-											geWorld_Model	*Model, 
-											const geXForm3d	*DXForm, 
+GENESISAPI geBoolean geWorld_TestModelMove(	geWorld			*World,
+											geWorld_Model	*Model,
+											const geXForm3d	*DXForm,
 											const geVec3d	*Mins, const geVec3d *Maxs,
 											const geVec3d	*In, geVec3d *Out)
 {
-	return Trace_TestModelMove(	World, Model, DXForm, 
+	return Trace_TestModelMove(	World, Model, DXForm,
 								Mins, Maxs,
 								In, Out);
 }
@@ -341,9 +341,9 @@ GENESISAPI geBoolean geWorld_TestModelMove(	geWorld			*World,
 //========================================================================================
 // geWorld_ModelCollision
 //========================================================================================
-GENESISAPI geBoolean geWorld_ModelCollision(geWorld			*World, 
-											geWorld_Model	*Model, 
-											const geXForm3d	*DXForm, 
+GENESISAPI geBoolean geWorld_ModelCollision(geWorld			*World,
+											geWorld_Model	*Model,
+											const geXForm3d	*DXForm,
 											GE_Collision	*Collision)
 {
 	Collision->Mesh  = NULL;

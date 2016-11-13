@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <math.h>
@@ -70,7 +70,7 @@ static void geSound3D_Pan(geSound3d_Cfg *Cfg, geFloat FaceOffset )
 }
 
 //=====================================================================================
-//	Mps is the reletive velocity in  meters per second 
+//	Mps is the relative velocity in  meters per second
 //=====================================================================================
 static void geSound3D_Doppler(geSound3d_Cfg *Cfg, geFloat Mps )
 {
@@ -85,10 +85,10 @@ static void geSound3D_Doppler(geSound3d_Cfg *Cfg, geFloat Mps )
 //	coordinate system
 //=====================================================================================
 GENESISAPI	void geSound3D_GetConfig(
-		const geWorld *World, 
-		const geXForm3d *MXForm, 
-		const geVec3d *SndPos, 
-		geFloat Min, 
+		const geWorld *World,
+		const geXForm3d *MXForm,
+		const geVec3d *SndPos,
+		geFloat Min,
 		geFloat Ds,
 		geFloat *Volume,
 		geFloat *Pan,
@@ -108,7 +108,7 @@ GENESISAPI	void geSound3D_GetConfig(
 	assert( Pan       != NULL );
 	assert( Frequency != NULL );
 
-	
+
 	LocalPos = MXForm->Translation;
 	// Transform the sound to view space
 	geCamera_ConvertWorldSpaceToCameraSpace(MXForm, &CXForm);
@@ -118,7 +118,7 @@ GENESISAPI	void geSound3D_GetConfig(
 		return;
 	if( !geWorld_GetLeaf((geWorld*)World, SndPos, &Leaf2) )
 		return;
-	
+
 	if (!geWorld_LeafMightSeeLeaf((geWorld*)World, Leaf1, Leaf2, 0))
 	{
 		Magnitude = 0.0f;
@@ -133,10 +133,10 @@ GENESISAPI	void geSound3D_GetConfig(
 		geVec3d_Subtract(&LocalPos, SndPos, &Dist);
 
 		Magnitude = geVec3d_Length(&Dist);
-		
+
 		if (Trace_GEWorldCollision((geWorld*)World, NULL, NULL, &LocalPos, SndPos, GE_CONTENTS_SOLID_CLIP, GE_COLLIDE_MODELS, 0, NULL, NULL, &Col))
 			Magnitude *= 1.5f;
-		
+
 		geSound3D_RollOut(&Cfg, Magnitude, Min, Min*10);
 	}
 
@@ -154,10 +154,10 @@ GENESISAPI	void geSound3D_GetConfig(
 //	geSound3D_GetConfigIgnoreObstructions()
 //=====================================================================================
 GENESISAPI	void geSound3D_GetConfigIgnoreObstructions(
-		const geWorld *World, 
-		const geXForm3d *MXForm, 
-		const geVec3d *SndPos, 
-		geFloat Min, 
+		const geWorld *World,
+		const geXForm3d *MXForm,
+		const geVec3d *SndPos,
+		geFloat Min,
 		geFloat Ds,
 		geFloat *Volume,
 		geFloat *Pan,
@@ -177,7 +177,7 @@ GENESISAPI	void geSound3D_GetConfigIgnoreObstructions(
 	assert( Pan       != NULL );
 	assert( Frequency != NULL );
 
-	
+
 	LocalPos = MXForm->Translation;
 	// Transform the sound to view space
 	geCamera_ConvertWorldSpaceToCameraSpace(MXForm, &CXForm);
@@ -187,7 +187,7 @@ GENESISAPI	void geSound3D_GetConfigIgnoreObstructions(
 		return;
 	if( !geWorld_GetLeaf((geWorld*)World, SndPos, &Leaf2) )
 		return;
-	
+
 	if (!geWorld_LeafMightSeeLeaf((geWorld*)World, Leaf1, Leaf2, 0))
 	{
 		Magnitude = 0.0f;
@@ -200,7 +200,7 @@ GENESISAPI	void geSound3D_GetConfigIgnoreObstructions(
 		geVec3d_Subtract(&LocalPos, SndPos, &Dist);
 
 		Magnitude = geVec3d_Length(&Dist);
-		
+
 		geSound3D_RollOut(&Cfg, Magnitude, Min, Min*10);
 	}
 

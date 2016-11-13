@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_CSNETMGR_H
@@ -41,7 +41,7 @@ typedef uint32				geCSNetMgr_NetID;
 #define	MAX_CLIENT_NAME		256
 
 // Types for messages received from GE_ReceiveSystemMessage
-typedef enum 
+typedef enum
 {
 	NET_MSG_NONE,					// No msg
 	NET_MSG_USER,					// User message
