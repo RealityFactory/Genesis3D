@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="include;World;Engine;Engine\Drivers;Actor;BSP;Math;Entities;Support;Physics;VFile;Bitmap;Bitmap\Compression"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -120,7 +120,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="include;World;Engine;Engine\Drivers;Actor;BSP;Math;Entities;Support;Physics;VFile;Bitmap;Bitmap\Compression"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="0"
 				PrecompiledHeaderFile=".\Release/Genesis.pch"
 				AssemblerListingLocation=".\Release/"
@@ -223,6 +223,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="CSNetMgr.h"
+				>
+			</File>
+			<File
 				RelativePath="Ge.c"
 				>
 				<FileConfiguration
@@ -319,6 +323,10 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="NetPlay.h"
+				>
 			</File>
 			<File
 				RelativePath="PtrTypes.h"
@@ -1870,32 +1878,6 @@
 				Name="VFile"
 				>
 				<File
-					RelativePath="VFile\DirTreeCommon.c"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="VFile\DirTreeCommon.h"
-					>
-				</File>
-				<File
 					RelativePath="VFile\DirTree.c"
 					>
 					<FileConfiguration
@@ -1919,6 +1901,32 @@
 				</File>
 				<File
 					RelativePath="VFile\DirTree.h"
+					>
+				</File>
+				<File
+					RelativePath="VFile\DirTreeCommon.c"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="VFile\DirTreeCommon.h"
 					>
 				</File>
 				<File
@@ -2318,14 +2326,6 @@
 					>
 				</File>
 			</Filter>
-			<File
-				RelativePath="CSNetMgr.h"
-				>
-			</File>
-			<File
-				RelativePath="NetPlay.h"
-				>
-			</File>
 		</Filter>
 	</Files>
 	<Globals>
