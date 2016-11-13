@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include	<stdio.h>
@@ -414,7 +414,7 @@ static	void	GENESISCC FSVFS_Close(void *Handle)
 	VFSFile *	File;
 
 	File = Handle;
-	
+
 	CHECK_HANDLE(File);
 
 	if	(File->Directory)
@@ -493,7 +493,7 @@ static	geBoolean	GENESISCC ForceFilePos(VFSFile *File)
 	assert(File);
 	assert(File->RWOps);
 	assert(!File->Directory);
-	
+
 	assert(File->CurrentRelPos >= 0);
 	assert(File->CurrentRelPos <= File->Length);
 

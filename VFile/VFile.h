@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  VFILE.H                                                                             */
+/*  VFile.h                                                                             */
 /*                                                                                      */
 /*  Author: Eli Boling                                                                  */
 /*  Description: Virtual file interface                                                 */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef	VFILE_H
@@ -71,7 +71,7 @@ GENESISAPI geVFile_Finder * GENESISCC geVFile_CreateFinder(
 	geVFile *		FileSystem,
 	const char *	FileSpec);
 	// Creates a finder object from which you can get iterated file names.
-	// This is findfirst/findnext functionality.  
+	// This is findfirst/findnext functionality.
 
 GENESISAPI void GENESISCC geVFile_DestroyFinder(geVFile_Finder *Finder);
 	// Destroys a Finder object
@@ -108,8 +108,8 @@ typedef	struct	geVFile_MemoryContext
 GENESISAPI geVFile * GENESISCC geVFile_OpenNewSystem(
 	geVFile *					FS,
 	geVFile_TypeIdentifier	FileSystemType,  // { DOS, MEMORY, ETC ... },
-	const char *			Name, 
-	void *					Context, 
+	const char *			Name,
+	void *					Context,
 	unsigned int 			OpenModeFlags);
 	// Opens a file / file system.
 
@@ -118,9 +118,9 @@ GENESISAPI geBoolean GENESISCC geVFile_UpdateContext(geVFile *FS, void *Context,
 GENESISAPI geVFile * GENESISCC geVFile_GetContext(const geVFile *File);
 	// Returns the outer context in which File was opened.
 
-GENESISAPI geVFile * GENESISCC geVFile_Open( 
+GENESISAPI geVFile * GENESISCC geVFile_Open(
 	geVFile *			FS,
-	const char *	Name, 
+	const char *	Name,
 	unsigned int 	OpenModeFlags);
 
 /*

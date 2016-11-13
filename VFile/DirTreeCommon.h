@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  DIRTREE-COMMON.H                                                                    */
+/*  DirTreeCommon.h                                                                     */
 /*                                                                                      */
 /*  Author: Samuel Seay                                                                 */
 /*  Description: Common functions between Dirtree files                                 */
@@ -29,7 +29,7 @@ typedef	struct	DirTree_Header
 {
 	unsigned long	Signature;
 	int				Size;
-	
+
 }	DirTree_Header;
 
 #define	DIRTREE_LIST_TERMINATED		0xffffffff

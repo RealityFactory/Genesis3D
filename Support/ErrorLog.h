@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  ERRORLOG.H                                                                          */
+/*  ErrorLog.h                                                                          */
 /*                                                                                      */
 /*  Author: Mike Sandige                                                                */
 /*  Description: Generic error logging system interface                                 */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_ERRORLOG_H
@@ -24,7 +24,7 @@
 
 #include "BaseType.h"
 
-#ifndef NDEBUG 
+#ifndef NDEBUG
 	#define ERRORLOG_FULL_REPORTING
 #endif
 
@@ -121,7 +121,7 @@ typedef enum
 	ERR_TKEVENTS_CREATE_ENOMEM,			// failure to create TKEvents object (memory allocation failed)
 	ERR_TKEVENTS_DELETE_NOT_FOUND,		// failure to delete from list because key was not found
 	ERR_TKEVENTS_INSERT_ENOMEM,			// failure to insert into list because of memory allocation failure
-	ERR_TKEVENTS_INSERT,				// failure to insert into list 
+	ERR_TKEVENTS_INSERT,				// failure to insert into list
 	ERR_TKEVENTS_FILE_READ,				// failure to read from data file
 	ERR_TKEVENTS_FILE_WRITE,			// failure to write to data file
 	ERR_TKEVENTS_FILE_VERSION,			// failure to read tkevents object: file has wrong version
@@ -138,16 +138,16 @@ typedef enum
 	ERR_BODY_BONEXFARRAY,				// XFArray object failed to return array, or array size doesn't match bone count
 	ERR_XFARRAY_ENOMEM,					// failure to create. (memory allocation failure)
 	ERR_PUPPET_ENOMEM,					// failure to create. (memory allocation failure)
-	ERR_PUPPET_RENDER,					// failure to render. 
+	ERR_PUPPET_RENDER,					// failure to render.
 	ERR_PUPPET_NO_MATERIALS,			// failure to create: associated body has no materials.
-	ERR_PUPPET_LOAD_TEXTURE,			// failure to load texture 
+	ERR_PUPPET_LOAD_TEXTURE,			// failure to load texture
 	ERR_TEXPOOL_ENOMEM,					// failure to create or add to. (memory allocation/reallocation failure)
 	ERR_TEXPOOL_TOO_BIG,				// failure to add to pool, pool is too large.
 	ERR_TEXPOOL_LOAD_TEXTURE,			// failure to load texture into pool
 	ERR_TEXPOOL_TEXTURE_NOT_FREE,		// texture pool destroyed without first freeing all it's shared textures
 	ERR_ACTOR_ENOMEM,					// failure to create. (memory allocation failure)
 	ERR_ACTOR_RENDER_PREP,				// failure to prepare actor for rendering (bad Body or allocation failure)
-	ERR_ACTOR_RENDER_FAILED,			// failure to render.  failure to get geometry from Body 
+	ERR_ACTOR_RENDER_FAILED,			// failure to render.  failure to get geometry from Body
 	ERR_ACTOR_TOO_MANY_MOTIONS,			// failure to add motion. too many.
 	ERR_ACTOR_FILE_READ,				// failure to read from data file.
 	ERR_ACTOR_FILE_PARSE,				// failure to parse reading from input file(unexpected format problem)
@@ -157,7 +157,7 @@ typedef enum
 //MRB BEGIN
 //geSprite
 	ERR_SPRITE_ENOMEM,					// failure to create. (memory allocation failure)
-	ERR_SPRITE_INVALIDBITMAP,		// failure to use bitmap because bitmap was invalid
+	ERR_SPRITE_INVALIDBITMAP,			// failure to use bitmap because bitmap was invalid
 //MRB END
 // changed QD Shadows
 	GE_ERR_BEGIN_SHADOWVOLUMES_FAILED,
@@ -166,21 +166,21 @@ typedef enum
 } geErrorLog_ErrorIDEnumType;
 
 
-typedef enum 
+typedef enum
 {
 	GE_ERR_MEMORY_RESOURCE,
 	GE_ERR_DISPLAY_RESOURCE,
 	GE_ERR_SOUND_RESOURCE,
 	GE_ERR_SYSTEM_RESOURCE,
 	GE_ERR_INTERNAL_RESOURCE,
-	
+
 	GE_ERR_FILEIO_OPEN,
 	GE_ERR_FILEIO_CLOSE,
 	GE_ERR_FILEIO_READ,
 	GE_ERR_FILEIO_WRITE,
 	GE_ERR_FILEIO_FORMAT,
 	GE_ERR_FILEIO_VERSION,
-	
+
 	GE_ERR_LIST_FULL,
 	GE_ERR_DATA_FORMAT,
 	GE_ERR_SEARCH_FAILURE,
@@ -205,11 +205,11 @@ GENESISAPI void geErrorLog_AddExplicit(geErrorLog_ErrorClassType,
 	// 'Debug' version includes a textual error id, and the user string
 
 	#define geErrorLog_Add(Error, Context) geErrorLog_AddExplicit(Error, #Error, __FILE__, __LINE__,"", Context)
-		// logs an error.  
+		// logs an error.
 
 	#define geErrorLog_AddString(Error,String, Context) geErrorLog_AddExplicit(Error, #Error, __FILE__,__LINE__, String, Context)
-		// logs an error with additional identifing string.  
-	
+		// logs an error with additional identifing string.
+
 GENESISAPI	geBoolean geErrorLog_AppendStringToLastError(const char *String);// use geErrorLog_AppendString
 
 	#define geErrorLog_AppendString(XXX) geErrorLog_AppendStringToLastError(XXX)
@@ -219,18 +219,18 @@ GENESISAPI	geBoolean geErrorLog_AppendStringToLastError(const char *String);// u
 	// 'Release' version does not include the textual error id, or the user string
 
 	#define geErrorLog_Add(Error, Context) geErrorLog_AddExplicit(Error, "", __FILE__, __LINE__,"", Context)
-		// logs an error.  
+		// logs an error.
 
 	#define geErrorLog_AddString(Error,String, Context) geErrorLog_AddExplicit(Error, "", __FILE__,__LINE__, "", Context)
-		// logs an error with additional identifing string.  
-	
+		// logs an error with additional identifing string.
+
 	#define geErrorLog_AppendString(XXX)
 		// adds text to the previous logged error
 
 #endif
 
 GENESISAPI geBoolean geErrorLog_Report(int History, geErrorLog_ErrorClassType *Error, const char **UserString);
-	// reports from the error log.  
+	// reports from the error log.
 	// history is 0 for most recent,  1.. for second most recent etc.
 	// returns GE_TRUE if report succeeded.  GE_FALSE if it failed.
 

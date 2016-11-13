@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  LOG.C                                                                               */
+/*  Log.c                                                                               */
 /*                                                                                      */
 /*  Author:                                                                             */
 /*  Description: Debugging logger implementation                                        */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <windows.h>
@@ -42,10 +42,10 @@ void Log_Puts(const char * string)
 void Log_Printf(const char * String, ...)
 {
 	va_list			ArgPtr;
-    char			TempStr[1024];
+	char			TempStr[1024];
 
 	va_start(ArgPtr, String);
-    vsprintf(TempStr, String, ArgPtr);
+	vsprintf(TempStr, String, ArgPtr);
 	va_end(ArgPtr);
 
 	Log_Out(TempStr);

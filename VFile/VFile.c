@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  VFILE.C                                                                             */
+/*  VFile.c                                                                             */
 /*                                                                                      */
 /*  Author: Eli Boling                                                                  */
 /*  Description: Virtual file implementation                                            */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #define	WIN32_LEAN_AND_MEAN
@@ -507,49 +507,49 @@ GENESISAPI geBoolean GENESISCC geVFile_Printf(geVFile *File, const char *Format,
 GENESISAPI geBoolean GENESISCC geVFile_EOF   (const geVFile *File)
 {
 	assert(File);
-	
+
 	return File->APIs->Eof(File->FSData);
 }
 
 GENESISAPI geBoolean GENESISCC geVFile_Tell  (const geVFile *File, long *Position)
 {
 	assert(File);
-	
+
 	return File->APIs->Tell(File->FSData, Position);
 }
 
 GENESISAPI geBoolean GENESISCC geVFile_Size  (const geVFile *File, long *Size)
 {
 	assert(File);
-	
+
 	return File->APIs->Size(File->FSData, Size);
 }
 
 GENESISAPI geBoolean GENESISCC geVFile_GetProperties(const geVFile *File, geVFile_Properties *Properties)
 {
 	assert(File);
-	
+
 	return File->APIs->GetProperties(File->FSData, Properties);
 }
 
 GENESISAPI geBoolean GENESISCC geVFile_SetSize(geVFile *File, long Size)
 {
 	assert(File);
-	
+
 	return File->APIs->SetSize(File->FSData, Size);
 }
 
 GENESISAPI geBoolean GENESISCC geVFile_SetAttributes(geVFile *File, geVFile_Attributes Attributes)
 {
 	assert(File);
-	
+
 	return File->APIs->SetAttributes(File->FSData, Attributes);
 }
 
 GENESISAPI geBoolean GENESISCC geVFile_SetTime(geVFile *File, const geVFile_Time *Time)
 {
 	assert(File);
-	
+
 	return File->APIs->SetTime(File->FSData, Time);
 }
 

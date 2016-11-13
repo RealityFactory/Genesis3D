@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  ERRORLOG.C                                                                          */
+/*  ErrorLog.c                                                                          */
 /*                                                                                      */
 /*  Author: Mike Sandige                                                                */
 /*  Description: Generic error logging system implementation                            */
@@ -15,18 +15,18 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <stdio.h>
-#include <assert.h>		// assert()	
+#include <assert.h>		// assert()
 #include <stdlib.h>
 #include <string.h>		// memmove(), strncpy() strncat()
 
-#include "ErrorLog.h"   
+#include "ErrorLog.h"
 
 #define MAX_ERRORS 30  //  ...
 
@@ -54,7 +54,7 @@ GENESISAPI void geErrorLog_Clear(void)
 {
 	geErrorLog_Locals.ErrorCount = 0;
 }
-	
+
 GENESISAPI int  geErrorLog_Count(void)
 	// reports size of current error log
 {
@@ -62,7 +62,7 @@ GENESISAPI int  geErrorLog_Count(void)
 }
 
 
-GENESISAPI void geErrorLog_AddExplicit(geErrorLog_ErrorClassType Error, 
+GENESISAPI void geErrorLog_AddExplicit(geErrorLog_ErrorClassType Error,
 	const char *ErrorIDString,
 	const char *ErrorFileString,
 	int LineNumber,
@@ -105,13 +105,13 @@ GENESISAPI void geErrorLog_AddExplicit(geErrorLog_ErrorClassType Error,
 			strncat(SDst,pModule,MAX_USER_NAME_LEN);
 			strncat(SDst," ",MAX_USER_NAME_LEN);
 		}
-	
+
 	{
 		char Number[20];
 		itoa(LineNumber,Number,10);
 		strncat(SDst,Number,MAX_USER_NAME_LEN);
 	}
-	
+
 	if (UserString != NULL)
 		{
 			if (UserString[0]!=0)
@@ -180,8 +180,8 @@ GENESISAPI geBoolean geErrorLog_Report(int history, geErrorLog_ErrorClassType *e
 		{
 			return GE_FALSE;
 		}
-	
-	
+
+
 	*error = geErrorLog_Locals.ErrorList[history].ErrorID;
 	*UserString = geErrorLog_Locals.ErrorList[history].String;
 	return GE_TRUE;

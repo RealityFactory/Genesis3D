@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  DIRTREE-COMMON.C                                                                    */
+/*  DirTreeCommon.c                                                                     */
 /*                                                                                      */
 /*  Author: Samuel Seay                                                                 */
 /*  Description: Common functions between Dirtree files                                 */

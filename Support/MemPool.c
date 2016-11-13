@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  MEMPOOL.C                                                                           */
+/*  MemPool.c                                                                           */
 /*                                                                                      */
 /*  Author: Charles Bloom                                                               */
 /*  Description: Fixed size block memory allocator implementation                       */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <string.h>
@@ -313,7 +313,7 @@ void * MemPool_WalkNext(MemPool *Pool,void *Hunk)
 		}
 	}
 
-	// must check to see if WalkPtr is in the FreedHunks ! 
+	// must check to see if WalkPtr is in the FreedHunks !
 	// this is so slow it makes this function worthless!
 	{
 	int i;

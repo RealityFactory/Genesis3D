@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  FSMEMORY.C                                                                          */
+/*  FSMemory.c                                                                          */
 /*                                                                                      */
 /*  Author: Eli Boling                                                                  */
 /*  Description: Memory file system implementation                                      */
@@ -16,8 +16,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #define	WIN32_LEAN_AND_MEAN
@@ -153,16 +153,16 @@ static	geBoolean	GENESISCC FSMemory_UpdateContext(
 
 	assert(FS);
 	assert(Context);
-	
+
 	File = Handle;
-	
+
 	CHECK_HANDLE(File);
 
 	if	(ContextSize != sizeof(geVFile_MemoryContext))
 		return GE_FALSE;
 
 	MemoryContext = Context;
-	
+
 	MemoryContext->Data		  = File->Memory;
 	MemoryContext->DataLength = File->Size;
 
@@ -172,9 +172,9 @@ static	geBoolean	GENESISCC FSMemory_UpdateContext(
 static	void	GENESISCC FSMemory_Close(void *Handle)
 {
 	MemoryFile *	File;
-	
+
 	File = Handle;
-	
+
 	CHECK_HANDLE(File);
 
 	if	(File->WeOwnMemory == GE_TRUE && File->Memory)
@@ -237,10 +237,10 @@ static	geBoolean	GENESISCC FSMemory_GetS(void *Handle, void *Buff, int MaxLen)
 		}
 		return GE_FALSE;
 	#endif
-	
+
 	*(pBuff + 1) = 0;
 	return GE_TRUE;
-	
+
 }
 
 static	geBoolean	GENESISCC FSMemory_Read(void *Handle, void *Buff, int Count)
@@ -310,7 +310,7 @@ static	geBoolean	GENESISCC FSMemory_Write(void *Handle, const void *Buff, int Co
 		return GE_FALSE;
 
 	memcpy(DataPtr(File), Buff, Count);
-	
+
 	File->Position += Count;
 	if	(File->Size < File->Position)
 		File->Size = File->Position;
@@ -367,7 +367,7 @@ static	geBoolean	GENESISCC FSMemory_Seek(void *Handle, int Where, geVFile_Whence
 
 	if	(File->Position > File->Size)
 		File->Size = File->Position;
-	
+
 	assert(File->Size <= File->AllocatedSize);
 	assert(File->Position <= File->AllocatedSize);
 
@@ -408,7 +408,7 @@ static	geBoolean	GENESISCC FSMemory_Size(const void *Handle, long *Size)
 	File = Handle;
 
 	CHECK_HANDLE(File);
-	
+
 	*Size = File->Size;
 
 	return GE_TRUE;

@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  RAM.H                                                                               */
+/*  Ram.h                                                                               */
 /*                                                                                      */
 /*  Author:                                                                             */
 /*  Description: Replacement for malloc, realloc and free                               */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_RAM_H
@@ -74,7 +74,7 @@ GENESISAPI void geRam_Free_(void *ptr);
 		extern void *StupidUnusedPointer;    // never used, except to mask the
 		// possible warning you get if you use the geRam_Free macro below, without
 		// using the xxx pointer again in the same block.  This is ugly.
- 
+
 #define geRam_Free(xxx) geRam_Free_(xxx) ,(xxx)=NULL, StupidUnusedPointer=(xxx)
 
 /*
@@ -101,7 +101,7 @@ GENESISAPI void geRam_ReportAllocations(void);
 
 #else
 
-#define geRam_ReportAllocations() 
+#define geRam_ReportAllocations()
 
 #endif
 

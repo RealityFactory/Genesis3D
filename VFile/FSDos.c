@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  FSDOS.C                                                                             */
+/*  FSDos.c                                                                             */
 /*                                                                                      */
 /*  Author: Eli Boling                                                                  */
 /*  Description: DOS file system implementation                                         */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #define	WIN32_LEAN_AND_MEAN
@@ -176,7 +176,7 @@ static	geBoolean	GENESISCC FSDos_FinderGetNextFile(void *Handle)
 		if	(Finder->FindData.cFileName[0] != '.')
 			return GE_TRUE;
 	}
-	
+
 	while	(FindNextFile(Finder->FindHandle, &Finder->FindData) == TRUE)
 	{
 		if	(Finder->FindData.cFileName[0] != '.')
@@ -421,9 +421,9 @@ static	geBoolean	GENESISCC FSDos_UpdateContext(
 static	void	GENESISCC FSDos_Close(void *Handle)
 {
 	DosFile *	File;
-	
+
 	File = Handle;
-	
+
 	CHECK_HANDLE(File);
 
 	if	(File->IsDirectory == GE_FALSE)
@@ -432,7 +432,7 @@ static	void	GENESISCC FSDos_Close(void *Handle)
 
 		CloseHandle(File->FileHandle);
 	}
-	
+
 	assert(File->FullPath);
 	File->Signature = 0;
 	geRam_Free(File->FullPath);
@@ -465,7 +465,7 @@ static	geBoolean	GENESISCC FSDos_GetS(void *Handle, void *Buff, int MaxLen)
 #if 0
 		if	(Result == FALSE)
 			return GE_FALSE;
-		
+
 		// The Win32 API is vague about this, so we're being weird with the asserts
 		assert(Result != TRUE);
 #endif
@@ -485,7 +485,7 @@ static	geBoolean	GENESISCC FSDos_GetS(void *Handle, void *Buff, int MaxLen)
 		if	(*p == '\r')
 		{
 			int Skip = 0;
-			
+
 			*p = '\n';		// set end of line
 			p++;			// and skip to next char
 			// If the next char is a newline, then skip it too  (\r\n case)
@@ -495,7 +495,7 @@ static	geBoolean	GENESISCC FSDos_GetS(void *Handle, void *Buff, int MaxLen)
 			}
 			*p = '\0';
 			// Set the file pointer back a bit since we probably overran
-			SetFilePointer(File->FileHandle, -(int)(BytesRead - ((p + Skip) - (char *)Buff)), NULL, FILE_CURRENT); 
+			SetFilePointer(File->FileHandle, -(int)(BytesRead - ((p + Skip) - (char *)Buff)), NULL, FILE_CURRENT);
 			assert(p - (char *)Buff <= MaxLen);
 			return GE_TRUE;
 		}
@@ -503,7 +503,7 @@ static	geBoolean	GENESISCC FSDos_GetS(void *Handle, void *Buff, int MaxLen)
 		{
 			// Set the file pointer back a bit since we probably overran
 			p++;
-			SetFilePointer(File->FileHandle, -(int)(BytesRead - (p - (char *)Buff)), NULL, FILE_CURRENT); 
+			SetFilePointer(File->FileHandle, -(int)(BytesRead - (p - (char *)Buff)), NULL, FILE_CURRENT);
 			*p = '\0';
 			assert(p - (char *)Buff <= MaxLen);
 			return GE_TRUE;
@@ -707,19 +707,19 @@ static	geBoolean	GENESISCC FSDos_GetProperties(const void *Handle, geVFile_Prope
 	else
 	{
 		assert(File->FileHandle != INVALID_HANDLE_VALUE);
-	
+
 		if	(GetFileInformationByHandle(File->FileHandle, &Info) == FALSE)
 			return GE_FALSE;
-	
+
 		Attribs = 0;
 		if	(Info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 			Attribs |= GE_VFILE_ATTRIB_DIRECTORY;
 		if	(Info.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
 			Attribs |= GE_VFILE_ATTRIB_READONLY;
-	
+
 		Properties->Time.Time1 = Info.ftLastWriteTime.dwLowDateTime;
 		Properties->Time.Time2 = Info.ftLastWriteTime.dwHighDateTime;
-	
+
 		Properties->AttributeFlags 		 = Attribs;
 		Properties->Size		  		 = Info.nFileSizeLow;
 		Properties->Hints.HintData		 = NULL;
@@ -745,10 +745,10 @@ static	geBoolean	GENESISCC FSDos_SetSize(void *Handle, long size)
 	if	(File->IsDirectory == GE_FALSE)
 	{
 		assert(File->FileHandle != INVALID_HANDLE_VALUE);
-	
+
 		if	(SetFilePointer(File->FileHandle, 0, NULL, FILE_END) == 0xffffffff)
 			return GE_FALSE;
-	
+
 		if	(SetEndOfFile(File->FileHandle) == FALSE)
 			return GE_FALSE;
 	}

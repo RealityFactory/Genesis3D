@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  GEASSERT.C                                                                          */
+/*  geAssert.c                                                                          */
 /*                                                                                      */
 /*  Author:                                                                             */
 /*  Description: Replacement for assert implementation                                  */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include "geAssert.h"
@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-	   
+
 // See geAssert.h for details.
 
 //void __cdecl _assertge (void *expr,void *filename,unsigned lineno);
@@ -52,7 +52,7 @@ void geAssertDefault( void *exp, void *file, unsigned line )
 
 // This might seem a little redundant, but I needed a unique name
 // for the place that all geAsserts would begin.  From here, I
-// call the geAssertCallback routine, whatever it has been 
+// call the geAssertCallback routine, whatever it has been
 // assigned to be. -Ken
 void geAssertEntryPoint( void *exp, void *file, unsigned line )
 {
@@ -80,7 +80,7 @@ void geAssert_SetCriticalShutdownCallback( geAssert_CriticalShutdownCallback CB 
 void __cdecl _assertge (void *expr,void *filename,unsigned lineno)
 {
 int nCode;
-char assertbuf[MAX_ASSERT_STRING_LENGTH];	
+char assertbuf[MAX_ASSERT_STRING_LENGTH];
 static int in_assert_cnt = 0; // a semaphore
 
 	if ( in_assert_cnt )
@@ -92,19 +92,19 @@ static int in_assert_cnt = 0; // a semaphore
 	else
 		sprintf(assertbuf," assert string longer than %d characters!\n",MAX_ASSERT_STRING_LENGTH);
 
-    nCode = MessageBox(NULL,assertbuf,
-        "Genesis3D Exception",
-        MB_ABORTRETRYIGNORE|MB_ICONHAND|MB_SETFOREGROUND|MB_TASKMODAL);
+	nCode = MessageBox(NULL,assertbuf,
+		"Genesis3D Exception",
+		MB_ABORTRETRYIGNORE|MB_ICONHAND|MB_SETFOREGROUND|MB_TASKMODAL);
 
-    if (nCode == IDIGNORE)
+	if (nCode == IDIGNORE)
 	{
 		in_assert_cnt --;
-        return;
+		return;
 	}
 
-    // Abort: abort the program
-    if (nCode == IDABORT)
-    {
+	// Abort: abort the program
+	if (nCode == IDABORT)
+	{
 		// CriticalCallBack does things like shut down the driver
 		// if we retry or ignore, don't do it, so..
 		if ( CriticalCallBack )
@@ -112,21 +112,21 @@ static int in_assert_cnt = 0; // a semaphore
 			CriticalCallBack(CriticalCallBackContext);
 		}
 
-       // raise abort signal
-       raise(SIGABRT);
+	   // raise abort signal
+	   raise(SIGABRT);
 
-        // We usually won't get here, but it's possible that
-        //   SIGABRT was ignored.  So exit the program anyway.
+		// We usually won't get here, but it's possible that
+		//   SIGABRT was ignored.  So exit the program anyway.
 
-        _exit(3);
-    }
+		_exit(3);
+	}
 
-    // Retry: call the debugger
+	// Retry: call the debugger
 	// minimal code from here out so that the debugger can easily step back
 	//	to the asserting line of code :
 
-    if (nCode == IDRETRY)
-        __asm { int 3 };
+	if (nCode == IDRETRY)
+		__asm { int 3 };
 
 	in_assert_cnt --;
 }

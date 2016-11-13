@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  RAMDLL.C                                                                            */
+/*  RamDLL.c                                                                            */
 /*                                                                                      */
 /*  Author:                                                                             */
 /*  Description: A tragic waste of real estate to make the DLL version of G3D work.     */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifdef	GENESISDLLVERSION

@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  DIRTREE.C                                                                           */
+/*  DirTree.c                                                                           */
 /*                                                                                      */
 /*  Author: Eli Boling                                                                  */
 /*  Description: Directory tree implementation                                          */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 
@@ -125,7 +125,7 @@ static	geBoolean	WriteTree(const DirTree *Tree, geVFile *File)
 
 	if	(geVFile_Write(File, &Tree->Offset, sizeof(Tree->Offset)) == GE_FALSE)
 		return GE_FALSE;
-	
+
 	if	(geVFile_Write(File, &Tree->Hints.HintDataLength, sizeof(Tree->Hints.HintDataLength)) == GE_FALSE)
 		return GE_FALSE;
 
@@ -133,7 +133,7 @@ static	geBoolean	WriteTree(const DirTree *Tree, geVFile *File)
 		//bug fix. someone got copy happy and forgot to remove the & from Tree->Hints.HintData
 		if	(geVFile_Write(File, Tree->Hints.HintData, Tree->Hints.HintDataLength) == GE_FALSE)
 			return GE_FALSE;
-	
+
 	// Write out the Children
 	if	(Tree->Children)
 	{
@@ -157,7 +157,7 @@ static	geBoolean	WriteTree(const DirTree *Tree, geVFile *File)
 		if	(geVFile_Write(File, &Terminator, sizeof(Terminator)) == GE_FALSE)
 			return GE_FALSE;
 	}
-	
+
 	return GE_TRUE;
 }
 
@@ -166,14 +166,14 @@ static	geBoolean DirTree_WriteToFile1(const DirTree *Tree, geVFile *File, long *
 	DirTree_Header	Header;
 	long			StartPosition;
 	long			EndPosition;
-	
+
 	if	(geVFile_Tell(File, &StartPosition) == GE_FALSE)
 		return GE_FALSE;
 
 	Header.Signature = DIRTREE_FILE_SIGNATURE;
 	if	(geVFile_Seek(File, sizeof(Header), GE_VFILE_SEEKCUR) == GE_FALSE)
 		return GE_FALSE;
-	
+
 	if	(WriteTree(Tree, File) == GE_FALSE)
 		return GE_FALSE;
 
@@ -283,7 +283,7 @@ static	geBoolean	ReadTree(geVFile *File, DirTree **TreePtr)
 		geRam_Free(Tree);
 		return GE_FALSE;
 	}
-	
+
 	if	(geVFile_Read(File, Tree->Name, Length) == GE_FALSE)
 		goto fail;
 
@@ -342,7 +342,7 @@ DirTree *DirTree_CreateFromFile(geVFile *File)
 	DirTree_Header	Header;
 	long			StartPosition;
 	long			EndPosition;
-	
+
 	if	(geVFile_Tell(File, &StartPosition) == GE_FALSE)
 		return GE_FALSE;
 
@@ -449,10 +449,10 @@ DirTree * DirTree_AddFile(DirTree *Tree, const char *Path, geBoolean IsDirectory
 		Tree = DirTree_FindPartial(Tree, Path, &LeftOvers);
 		if	(!Tree)
 			return NULL;
-	
+
 		if	(PathHasDir(LeftOvers))
 			return NULL;
-	
+
 		Path = LeftOvers;
 	}
 
