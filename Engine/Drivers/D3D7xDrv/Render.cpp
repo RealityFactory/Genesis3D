@@ -9,7 +9,7 @@
 /*   CONFIG DRIVER - Make the driver configurable by "ini" file settings                */
 /*  01/28/2003 Wendell Buckner                                                          */
 /*   Cache decals so that they can be drawn after all the 3d stuff...                   */
-/*	01/24/2002 Wendell Buckner                                                          */
+/*  01/24/2002 Wendell Buckner                                                          */
 /*   Change flags for speed...                                                          */
 /*  02/28/2001 Wendell Buckner                                                          */
 /*    These render states are unsupported d3d 7.0                                       */
@@ -25,15 +25,15 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <windows.h>
 #include <stdio.h>
 
 /* 07/16/2000 Wendell Buckner
-    Convert to Directx7...    
+	Convert to Directx7...
 #include "D3DDrv.h"           */
 #include "D3DDrv7x.h"
 
@@ -51,7 +51,7 @@
 #define SNAP_VERT(v)  ( ( v )  = ( float )( ( long )( ( v ) * 16 ) ) / 16.0f )
 
 /* 01/03/2004 Wendell Buckner
-    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
+	CONFIG DRIVER - Make the driver configurable by "ini" file settings */
 extern DWORD BltRtFlags;
 
 __inline DWORD F2DW(float f)
@@ -59,9 +59,9 @@ __inline DWORD F2DW(float f)
    DWORD            retval = 0;
 
    _asm {
-      fld            f
-      lea            eax, [retval]
-      fistp         dword ptr[eax]
+	  fld            f
+	  lea            eax, [retval]
+	  fistp         dword ptr[eax]
    }
 
    return retval;
@@ -87,7 +87,7 @@ geBoolean DRIVERCC RenderGouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint32
 	}
 
 	Alpha = Pnts->a;
-	
+
 	D3DBlendFunc (D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA);
 
 	D3DSetTexture(0, NULL);
@@ -98,7 +98,7 @@ geBoolean DRIVERCC RenderGouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint32
 		D3DZEnable(TRUE);
 
 	if(Flags & DRV_RENDER_NO_ZWRITE)	// We are assuming that this is not going to change all that much
-		D3DZWriteEnable(FALSE);	
+		D3DZWriteEnable(FALSE);
 	else
 		D3DZWriteEnable(TRUE);
 
@@ -126,15 +126,15 @@ geBoolean DRIVERCC RenderGouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint32
 				Val = AppInfo.FogEnd;
 
 			FogVal = F2DW((AppInfo.FogEnd-Val)/(AppInfo.FogEnd-AppInfo.FogStart)*255.0f);
-		
+
 			if (FogVal < 0)
 				FogVal = 0;
 			else if (FogVal > 255)
 				FogVal = 255;
-		
+
 			pD3DPnts->specular = (FogVal<<24);		// Alpha component in specular is the fog value (0...255)
 		}
-		else 
+		else
 			pD3DPnts->specular = 0;
 
 		pPnts++;
@@ -146,12 +146,12 @@ geBoolean DRIVERCC RenderGouraudPoly(DRV_TLVertex *Pnts, int32 NumPoints, uint32
 	// Turn z stuff back on...
 	D3DZWriteEnable (TRUE);
 	D3DZEnable(TRUE);
-	
+
 	if (Flags & DRV_RENDER_FLUSH)
 	{
 /* 02/28/2001 Wendell Buckner
-   These render states are unsupported d3d 7.0 
-	    AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FLUSHBATCH, 0);*/
+   These render states are unsupported d3d 7.0
+		AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FLUSHBATCH, 0);*/
 		AppInfo.lpD3DDevice->EndScene();
 		AppInfo.lpD3DDevice->BeginScene();
 	}
@@ -171,7 +171,7 @@ geBoolean DRIVERCC RenderWorldPoly(DRV_TLVertex *Pnts, int32 NumPoints, geRDrive
 	SPAN			*pSpans;
 	int32			WidthHeight;
 #endif
-	
+
 	if(!AppInfo.RenderingIsOK)
 	{
 		return	TRUE;
@@ -185,8 +185,8 @@ geBoolean DRIVERCC RenderWorldPoly(DRV_TLVertex *Pnts, int32 NumPoints, geRDrive
 #ifdef USE_SPANS
 	if (RenderMode != RENDER_WORLD)
 		goto NotWorld;
-	
-	CPnt = Pnts;						// Set to the first points in the array 
+
+	CPnt = Pnts;						// Set to the first points in the array
 
 	x1 = (int32)CPnt->x;
 	y1 = (int32)CPnt->y;
@@ -203,14 +203,14 @@ geBoolean DRIVERCC RenderWorldPoly(DRV_TLVertex *Pnts, int32 NumPoints, geRDrive
 
 		EdgeOutNoUV (x1, y1, x2, y2);
 
-		if (x2 > MaxX) 
+		if (x2 > MaxX)
 			MaxX = x2;
-		else if (x2 < MinX) 
+		else if (x2 < MinX)
 			MinX = x2;
-	
-		if (y2 > MaxY) 
+
+		if (y2 > MaxY)
 			MaxY = y2;
-		else if (y2 < MinY) 
+		else if (y2 < MinY)
 			MinY = y2;
 
 		// Swap
@@ -222,7 +222,7 @@ geBoolean DRIVERCC RenderWorldPoly(DRV_TLVertex *Pnts, int32 NumPoints, geRDrive
 	EdgeOutNoUV (x1, y1, FirstX, FirstY);
 
 	OldPixels = NumWorldPixels;
-	
+
 	pSpans = &SpanLines[MinY];
 
 	WidthHeight = ClientWindow.Width*ClientWindow.Height;
@@ -245,9 +245,9 @@ geBoolean DRIVERCC RenderWorldPoly(DRV_TLVertex *Pnts, int32 NumPoints, geRDrive
 
 	NotWorld:;
 #endif
-	
+
 	D3DDRV.NumRenderedPolys++;
-	
+
 	// Insert the poly into the world cache, for later rendering
 	PCache_InsertWorldPoly(Pnts, NumPoints, THandle, TexInfo, LInfo, Flags);
 
@@ -270,7 +270,7 @@ geBoolean DRIVERCC RenderMiscTexturePoly(DRV_TLVertex *Pnts, int32 NumPoints, ge
 	{
 		PCache_FlushMiscPolys();
 	}
-				
+
 	PCache_InsertMiscPoly(Pnts, NumPoints, THandle, Flags);
 
 	if (Flags & DRV_RENDER_FLUSH)
@@ -292,7 +292,7 @@ geBoolean DRIVERCC RenderStencilPoly(DRV_XYZVertex *Pnts, int32 NumPoints, uint3
 	{
 		PCache_FlushStencilPolys();
 	}
-				
+
 	PCache_InsertStencilPoly(Pnts, NumPoints, Flags);
 
 	if (Flags & DRV_RENDER_FLUSH)
@@ -338,7 +338,7 @@ geBoolean DRIVERCC DrawDecal(geRDriver_THandle *THandle, RECT *SRect, int32 x, i
 		Width = (pSRect->right - pSRect->left)+1;
 		Height = (pSRect->bottom - pSRect->top)+1;
 	}
-	
+
 	if (x + Width <= 0)
 		return TRUE;
 	if (y + Height <= 0)
@@ -346,10 +346,10 @@ geBoolean DRIVERCC DrawDecal(geRDriver_THandle *THandle, RECT *SRect, int32 x, i
 
 	if (x >= ClientWindow.Width)
 		return TRUE;
-	
+
 	if (y >= ClientWindow.Height)
 		return TRUE;
-	
+
 	if (x + Width >= (ClientWindow.Width-1))
 		pSRect->right -= ((x + Width) - (ClientWindow.Width-1));
 	if (y + Height >= (ClientWindow.Height-1))
@@ -365,17 +365,17 @@ geBoolean DRIVERCC DrawDecal(geRDriver_THandle *THandle, RECT *SRect, int32 x, i
 		pSRect->top += -y;
 		y=0;
 	}
-	
+
 #if 0
 
 /* 01/03/2004 Wendell Buckner
-    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
+	CONFIG DRIVER - Make the driver configurable by "ini" file settings */
 /*	01/24/2002 Wendell Buckner
-    Change flags for speed...
+	Change flags for speed...
 	AppInfo.lpBackBuffer->BltFast(x, y, THandle->MipData[0].Surface, pSRect, DDBLTFAST_SRCCOLORKEY | DDBLTFAST_WAIT);*
-    AppInfo.lpBackBuffer->BltFast(x, y, THandle->MipData[0].Surface, pSRect, DDBLTFAST_SRCCOLORKEY | DDBLTFAST_DONOTWAIT ); */
-    AppInfo.lpBackBuffer->BltFast(x, y, THandle->MipData[0].Surface, pSRect, DDBLTFAST_SRCCOLORKEY | BltSurfFlags ); 
-    
+	AppInfo.lpBackBuffer->BltFast(x, y, THandle->MipData[0].Surface, pSRect, DDBLTFAST_SRCCOLORKEY | DDBLTFAST_DONOTWAIT ); */
+	AppInfo.lpBackBuffer->BltFast(x, y, THandle->MipData[0].Surface, pSRect, DDBLTFAST_SRCCOLORKEY | BltSurfFlags );
+
 #else
 	RECT	DRect;
 
@@ -388,15 +388,15 @@ geBoolean DRIVERCC DrawDecal(geRDriver_THandle *THandle, RECT *SRect, int32 x, i
 	DRect.bottom = y+Height;
 
 /* 01/03/2004 Wendell Buckner
-    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
+	CONFIG DRIVER - Make the driver configurable by "ini" file settings */
 /*	01/24/2002 Wendell Buckner
-    Change flags for speed...
-    ddrval= AppInfo.lpBackBuffer->Blt(&DRect, THandle->MipData[0].Surface, pSRect, 
-		             (DDBLT_KEYSRC | DDBLT_WAIT), NULL);*
-	ddrval= AppInfo.lpBackBuffer->Blt(&DRect, THandle->MipData[0].Surface, pSRect, 
-		             (DDBLT_KEYSRC | DDBLT_DONOTWAIT | DDBLT_ASYNC ), NULL);	*/
-	ddrval= AppInfo.lpBackBuffer->Blt(&DRect, THandle->MipData[0].Surface, pSRect, 
-		             (DDBLT_KEYSRC | BltRtFlags ), NULL);	
+	Change flags for speed...
+	ddrval= AppInfo.lpBackBuffer->Blt(&DRect, THandle->MipData[0].Surface, pSRect,
+					 (DDBLT_KEYSRC | DDBLT_WAIT), NULL);*
+	ddrval= AppInfo.lpBackBuffer->Blt(&DRect, THandle->MipData[0].Surface, pSRect,
+					 (DDBLT_KEYSRC | DDBLT_DONOTWAIT | DDBLT_ASYNC ), NULL);	*/
+	ddrval= AppInfo.lpBackBuffer->Blt(&DRect, THandle->MipData[0].Surface, pSRect,
+					 (DDBLT_KEYSRC | BltRtFlags ), NULL);
 
 	if(ddrval==DDERR_SURFACELOST)
 	{
@@ -418,9 +418,9 @@ geBoolean DRIVERCC DrawDecalRect(geRDriver_THandle *THandle, RECT *SRect, int32 
 	BOOL InsertDrawDecalOk = FALSE;
 
 	if ( InScene )
-	 InsertDrawDecalOk = DCache_InsertDecalRect(THandle, SRect, x, y);	 
+	 InsertDrawDecalOk = DCache_InsertDecalRect(THandle, SRect, x, y);
 	else
-     InsertDrawDecalOk = DrawDecal(THandle, SRect, x, y);
+	 InsertDrawDecalOk = DrawDecal(THandle, SRect, x, y);
 
 	return InsertDrawDecalOk;
 }

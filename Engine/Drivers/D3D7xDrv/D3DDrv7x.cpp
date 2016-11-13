@@ -5,7 +5,7 @@
 /*  Description: D3D driver                                                             */
 /*                                                                                      */
 /*  Edit History:                                                                       */
-/*  01/04/2004 Wendell Buckner                                                          */ 
+/*  01/04/2004 Wendell Buckner                                                          */
 /*   CONFIG DRIVER - Make the driver configurable by "ini" file settings                */
 /*  05/19/2003 Wendell Buckner                                                          */
 /*   BUMPMAPPING                                                                        */
@@ -13,8 +13,8 @@
 /*   BUMPMAPPING                                                                        */
 /*  03/31/2003 Wendell Buckner                                                          */
 /*   BUMPMAPPING                                                                        */
-/*  01/28/2003 Wendell Buckner                                                          */                  
-/*    Cache decals so that they can be drawn after all the 3d stuff...                  */                  
+/*  01/28/2003 Wendell Buckner                                                          */
+/*    Cache decals so that they can be drawn after all the 3d stuff...                  */
 /*  12/28/2002 Wendell Buckner                                                          */
 /*    Allow/make 32-bit (ARGB) mode the default mode...                                 */
 /*    Give out the true 24-bit surface as well...                                       */
@@ -41,9 +41,9 @@
 #include <stdio.h>
 
 /* 07/16/2000 Wendell Buckner
-    Convert to Directx7...    
+	Convert to Directx7...
 #include "D3DDrv.h"           */
-#include "D3DDrv7x.h"           
+#include "D3DDrv7x.h"
 
 #include "DCommon.h"
 
@@ -64,7 +64,7 @@ geBoolean	DRIVERCC DrvShutdown(void);
 geBoolean	DRIVERCC ScreenShot(const char *Name);
 
 /* 01/04/2004 Wendell Buckner
-    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
+	CONFIG DRIVER - Make the driver configurable by "ini" file settings */
 extern int ExtraTextures;
 
 BOOL DRIVERCC DrvInit(DRV_DriverHook *Hook)
@@ -77,12 +77,12 @@ BOOL DRIVERCC DrvInit(DRV_DriverHook *Hook)
 		//SetLastDrvError(DRV_ERROR_INIT_ERROR, "D3D_DrvInit: Could not init driver.\n");
 		return FALSE;
 	}
-	
+
 	// If they are asking for a window mode, use there hWnd for the size
 	if (Hook->Width ==-1 && Hook->Height == -1)
 	{
 		GetClientRect(Hook->hWnd, &WRect);
-		
+
 		Hook->Width = (WRect.right - WRect.left);
 		Hook->Height = (WRect.bottom - WRect.top);
 	}
@@ -111,9 +111,9 @@ geBoolean DRIVERCC DrvResetAll(void)
 }
 
 /* 04/01/2003 Wendell Buckner
-    BUMPMAPPING
+	BUMPMAPPING
 geRDriver_PixelFormat	PixelFormat[10]; */
-#define MAX_PIXEL_FORMATS 25             
+#define MAX_PIXEL_FORMATS 25
 geRDriver_PixelFormat	PixelFormat[MAX_PIXEL_FORMATS];
 
 
@@ -125,9 +125,9 @@ geBoolean DRIVERCC EnumPixelFormats(DRV_ENUM_PFORMAT_CB *Cb, void *Context)
 	gePixelFormat	Format3d, Format2d;
 	uint32			CurrentBpp;
 	int32			j;
-    DDSURFACEDESC2 NoSurfDesc;
+	DDSURFACEDESC2 NoSurfDesc;
 
-    memset(&NoSurfDesc, 0, sizeof(DDSURFACEDESC2));
+	memset(&NoSurfDesc, 0, sizeof(DDSURFACEDESC2));
 
 	CurrentBpp = AppInfo.ddsd.ddpfPixelFormat.dwRGBBitCount;
 
@@ -144,16 +144,16 @@ geBoolean DRIVERCC EnumPixelFormats(DRV_ENUM_PFORMAT_CB *Cb, void *Context)
 		Format2d = GE_PIXELFORMAT_16BIT_565_RGB;
 
 /* 12/28/2002 Wendell Buckner
-    Allow/make 32-bit (ARGB) mode the default mode...  
+	Allow/make 32-bit (ARGB) mode the default mode...
 	if (AppInfo.ddTexFormat.ddpfPixelFormat.dwGBitMask == (31<<5)) */
-    if (CurrentBpp == 32 && AppInfo.ddTexFormat.ddpfPixelFormat.dwRGBAlphaBitMask == 0xff000000)		
+	if (CurrentBpp == 32 && AppInfo.ddTexFormat.ddpfPixelFormat.dwRGBAlphaBitMask == 0xff000000)
 		Format3d = GE_PIXELFORMAT_32BIT_ARGB;
 
 	else if (CurrentBpp == 32 && AppInfo.ddTexFormat.ddpfPixelFormat.dwBBitMask == 0xff)
 		Format2d = GE_PIXELFORMAT_32BIT_XRGB;
 
 /* 12/28/2002 Wendell Buckner
-    Give out the true 24-bit surface as well...  */
+	Give out the true 24-bit surface as well...  */
 	else if (CurrentBpp == 24 && AppInfo.ddTexFormat.ddpfPixelFormat.dwBBitMask == 0xff)
 		Format3d = GE_PIXELFORMAT_24BIT_RGB;
 
@@ -167,7 +167,7 @@ geBoolean DRIVERCC EnumPixelFormats(DRV_ENUM_PFORMAT_CB *Cb, void *Context)
 	// Create the surface formats now
 	PixelFormat[0].PixelFormat = Format3d;							// 3d 565/555 surface
 	PixelFormat[0].Flags = RDRIVER_PF_3D | RDRIVER_PF_COMBINE_LIGHTMAP;
-		
+
 	PixelFormat[1].PixelFormat = GE_PIXELFORMAT_16BIT_4444_ARGB;	// 3d 4444 surface
 	PixelFormat[1].Flags = RDRIVER_PF_3D | RDRIVER_PF_COMBINE_LIGHTMAP;
 
@@ -177,76 +177,76 @@ geBoolean DRIVERCC EnumPixelFormats(DRV_ENUM_PFORMAT_CB *Cb, void *Context)
 	PixelFormat[3].PixelFormat = Format3d;							// Lightmap 565/555 surface
 	PixelFormat[3].Flags = RDRIVER_PF_LIGHTMAP;
 
-	PixelFormat[4].PixelFormat = GE_PIXELFORMAT_16BIT_1555_ARGB;	
+	PixelFormat[4].PixelFormat = GE_PIXELFORMAT_16BIT_1555_ARGB;
 	PixelFormat[4].Flags = RDRIVER_PF_3D | RDRIVER_PF_COMBINE_LIGHTMAP;
 
 /* 12/28/2002 Wendell Buckner
-    Make sure the standard 16-bit is available...  	 */
+	Make sure the standard 16-bit is available...  	 */
 //  THIS KILLED ME BUT IT'S FIXED NOW, I NEED TO CHECK AND MAKE SURE IT'S 555 OR 565 THE CALLING
-//  PROGRAM KNOWS THE DIFFERENCE...	
+//  PROGRAM KNOWS THE DIFFERENCE...
 	// Setup the 3d (Texture) format
 	if (AppInfo.ddTexFormat16.ddpfPixelFormat.dwGBitMask == (31<<5))
-	 PixelFormat[5].PixelFormat = GE_PIXELFORMAT_16BIT_555_RGB;
+		PixelFormat[5].PixelFormat = GE_PIXELFORMAT_16BIT_555_RGB;
 	else
- 	 PixelFormat[5].PixelFormat = GE_PIXELFORMAT_16BIT_565_RGB;
-	
+		PixelFormat[5].PixelFormat = GE_PIXELFORMAT_16BIT_565_RGB;
+
 	PixelFormat[5].Flags = RDRIVER_PF_3D | RDRIVER_PF_COMBINE_LIGHTMAP;
 
-    j = 6;
+	j = 6;
 
 /* 12/28/2002 Wendell Buckner
-    Give out the true 24-bit or 32-bit XRGB surface as well...  */
-    if ( (AppInfo.ddTexFormat24.ddpfPixelFormat.dwRGBBitCount == 32) && (CurrentBpp == 32) )
-	{	 
-	 PixelFormat[j].PixelFormat = GE_PIXELFORMAT_32BIT_XRGB;;	// 3d X888 surface
-	 PixelFormat[j].Flags = RDRIVER_PF_3D | RDRIVER_PF_COMBINE_LIGHTMAP;	 
-	 j++;
-    }
+	Give out the true 24-bit or 32-bit XRGB surface as well...  */
+	if ( (AppInfo.ddTexFormat24.ddpfPixelFormat.dwRGBBitCount == 32) && (CurrentBpp == 32) )
+	{
+		PixelFormat[j].PixelFormat = GE_PIXELFORMAT_32BIT_XRGB;;	// 3d X888 surface
+		PixelFormat[j].Flags = RDRIVER_PF_3D | RDRIVER_PF_COMBINE_LIGHTMAP;
+		j++;
+	}
 
 /* 12/28/2002 Wendell Buckner
-    Allow/make 32-bit (ARGB) mode the default mode...  */
-    if ( (AppInfo.ddTexFormat32.ddpfPixelFormat.dwRGBBitCount == 32) && (CurrentBpp == 32) )
-	{	 
-	 PixelFormat[j].PixelFormat = GE_PIXELFORMAT_32BIT_ARGB;	// 3d 8888 surface
-	 PixelFormat[j].Flags = RDRIVER_PF_3D | RDRIVER_PF_COMBINE_LIGHTMAP;
-	 j++;
+	Allow/make 32-bit (ARGB) mode the default mode...  */
+	if ( (AppInfo.ddTexFormat32.ddpfPixelFormat.dwRGBBitCount == 32) && (CurrentBpp == 32) )
+	{
+		PixelFormat[j].PixelFormat = GE_PIXELFORMAT_32BIT_ARGB;	// 3d 8888 surface
+		PixelFormat[j].Flags = RDRIVER_PF_3D | RDRIVER_PF_COMBINE_LIGHTMAP;
+		j++;
 	}
 
 /* 01/04/2004 Wendell Buckner
-    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
+	CONFIG DRIVER - Make the driver configurable by "ini" file settings */
 	if( ExtraTextures )
 	{
 
 /* 03/31/2003 Wendell Buckner
-    BUMPMAPPING */
-    if ( (AppInfo.ddBumpMapNoLuminance.ddpfPixelFormat.dwBumpBitCount == 16)  )
-	{	 
-	 PixelFormat[j].PixelFormat = GE_PIXELFORMAT_16BIT_88_UV;	// 3d 88 bump surface
-	 PixelFormat[j].Flags = RDRIVER_PF_3D | RDRIVER_PF_BUMPMAP;
-	 j++;
+	BUMPMAPPING */
+	if ( (AppInfo.ddBumpMapNoLuminance.ddpfPixelFormat.dwBumpBitCount == 16)  )
+	{
+		PixelFormat[j].PixelFormat = GE_PIXELFORMAT_16BIT_88_UV;	// 3d 88 bump surface
+		PixelFormat[j].Flags = RDRIVER_PF_3D | RDRIVER_PF_BUMPMAP;
+		j++;
 	}
 
-    if ( (AppInfo.ddBumpMapSixBitLuminance.ddpfPixelFormat.dwBumpBitCount == 16)  )
-	{	 
-	 PixelFormat[j].PixelFormat = GE_PIXELFORMAT_16BIT_556_UVL;	// 3d 556 bump surface
-	 PixelFormat[j].Flags = RDRIVER_PF_3D | RDRIVER_PF_BUMPMAP;
-	 j++;
+	if ( (AppInfo.ddBumpMapSixBitLuminance.ddpfPixelFormat.dwBumpBitCount == 16)  )
+	{
+		PixelFormat[j].PixelFormat = GE_PIXELFORMAT_16BIT_556_UVL;	// 3d 556 bump surface
+		PixelFormat[j].Flags = RDRIVER_PF_3D | RDRIVER_PF_BUMPMAP;
+		j++;
 	}
 
-    if ( (AppInfo.ddBumpMapEightBitLuminance.ddpfPixelFormat.dwBumpBitCount == 24)  )
-	{	 
-	 PixelFormat[j].PixelFormat = GE_PIXELFORMAT_24BIT_888_UVL;	// 3d 888 bump surface
-	 PixelFormat[j].Flags = RDRIVER_PF_3D | RDRIVER_PF_BUMPMAP;
-	 j++;
+	if ( (AppInfo.ddBumpMapEightBitLuminance.ddpfPixelFormat.dwBumpBitCount == 24)  )
+	{
+		PixelFormat[j].PixelFormat = GE_PIXELFORMAT_24BIT_888_UVL;	// 3d 888 bump surface
+		PixelFormat[j].Flags = RDRIVER_PF_3D | RDRIVER_PF_BUMPMAP;
+		j++;
 	}
 
 /* 01/04/2004 Wendell Buckner
-    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
+	CONFIG DRIVER - Make the driver configurable by "ini" file settings */
 	}
 
 	// Then hand them off to the caller
 /* 12/28/2002 Wendell Buckner
-    Give out the true 24-bit or 32-bit XRGB surface as well...  
+	Give out the true 24-bit or 32-bit XRGB surface as well...
 	for (i=0; i<5; i++)   */
 	for (i=0; i<j; i++)
 	{
@@ -265,22 +265,22 @@ geBoolean DRIVERCC SetGamma(float Gamma)
 geBoolean DRIVERCC GetGamma(float *Gamma)
 {
 	*Gamma = 1.0f;
-		
+
 	return GE_TRUE;
 }
 
 BOOL DRIVERCC EnumSubDrivers2(DRV_ENUM_DRV_CB *Cb, void *Context);
 BOOL DRIVERCC EnumModes2(int32 Driver, char *DriverName, DRV_ENUM_MODES_CB *Cb, void *Context);
 
-DRV_Driver D3DDRV = 
+DRV_Driver D3DDRV =
 {
-    "D3D driver. v"DRV_VMAJS"."DRV_VMINS". Copyright 1999, WildTangent Inc.; All Rights Reserved.",
+	"D3D driver. v"DRV_VMAJS"."DRV_VMINS". Copyright 1999, WildTangent Inc.; All Rights Reserved.",
 	DRV_VERSION_MAJOR,
 	DRV_VERSION_MINOR,
 
 	DRV_ERROR_NONE,
 	NULL,
-	
+
 	EnumSubDrivers2,
 	EnumModes2,
 
@@ -327,13 +327,13 @@ DRV_Driver D3DDRV =
 	RenderStencilPoly,
 	DrawShadowPoly,
 // end change
-/*  01/28/2003 Wendell Buckner                                                          
-     Cache decals so that they can be drawn after all the 3d stuff...                   
-  	DrawDecal,                                                                          */
-    DrawDecalRect,
+/*  01/28/2003 Wendell Buckner
+	 Cache decals so that they can be drawn after all the 3d stuff...
+	DrawDecal,                                                                          */
+	DrawDecalRect,
 
 	0,0,0,
-	
+
 	&CacheInfo,
 
 	ScreenShot,
@@ -350,10 +350,10 @@ DRV_Driver D3DDRV =
 	NULL,
 #endif
 
-/* 05/19/2003 Wendell Buckner 
-    BUMPMAPPING */
+/* 05/19/2003 Wendell Buckner
+	BUMPMAPPING */
 	THandle_Combine,
-    THandle_UnCombine,
+	THandle_UnCombine,
 };
 
 DRV_EngineSettings EngineSettings;
@@ -364,11 +364,11 @@ DllExport BOOL DriverHook(DRV_Driver **Driver)
 	EngineSettings.PreferenceFlags = 0;//DRV_PREFERENCE_NO_MIRRORS;
 
 	D3DDRV.EngineSettings = &EngineSettings;
-    
+
 	*Driver = &D3DDRV;
 
 	// Make sure the error string ptr is not null, or invalid!!!
-    D3DDRV.LastErrorStr = LastErrorStr;
+	D3DDRV.LastErrorStr = LastErrorStr;
 
 	SetLastDrvError(DRV_ERROR_NONE, "D3DDrv:  No error.");
 
@@ -378,7 +378,7 @@ DllExport BOOL DriverHook(DRV_Driver **Driver)
 void SetLastDrvError(int32 Error, char *ErrorStr)
 {
 	LastError = Error;
-	
+
 	if (ErrorStr)
 	{
 		strcpy(LastErrorStr, ErrorStr);
@@ -386,120 +386,120 @@ void SetLastDrvError(int32 Error, char *ErrorStr)
 	else
 		LastErrorStr[0] = NULL;
 
-    D3DDRV.LastErrorStr = LastErrorStr;
-    D3DDRV.LastError = LastError;
+	D3DDRV.LastErrorStr = LastErrorStr;
+	D3DDRV.LastError = LastError;
 }
 
 BOOL DRIVERCC ScreenShot(const char *Name)
 {
-   DDSURFACEDESC2 ddsd;
-   BITMAPFILEHEADER bfh;
-   BITMAPINFOHEADER bih;
-   HRESULT result;
-   HDC surfDC = NULL;
-   HDC memDC = NULL;
-   HBITMAP bitmap = NULL;
-   HGDIOBJ oldbit = NULL;
-   FILE *file = NULL;
-   void *data= NULL;
-   int width, height, bpp;
-   int datasize;
-   BOOL success = FALSE;
+	DDSURFACEDESC2 ddsd;
+	BITMAPFILEHEADER bfh;
+	BITMAPINFOHEADER bih;
+	HRESULT result;
+	HDC surfDC = NULL;
+	HDC memDC = NULL;
+	HBITMAP bitmap = NULL;
+	HGDIOBJ oldbit = NULL;
+	FILE *file = NULL;
+	void *data= NULL;
+	int width, height, bpp;
+	int datasize;
+	BOOL success = FALSE;
 
-   memset(&ddsd,0,sizeof(ddsd));
-   ddsd.dwSize = sizeof(ddsd);
-   result = AppInfo.lpBackBuffer->GetSurfaceDesc(&ddsd);
+	memset(&ddsd,0,sizeof(ddsd));
+	ddsd.dwSize = sizeof(ddsd);
+	result = AppInfo.lpBackBuffer->GetSurfaceDesc(&ddsd);
 
-   if (FAILED(result))
-      goto cleanup;
+	if (FAILED(result))
+		goto cleanup;
 
-   width = ddsd.dwWidth;
-   height= ddsd.dwHeight;
-   bpp = ddsd.ddpfPixelFormat.dwRGBBitCount / 8;
+	width = ddsd.dwWidth;
+	height= ddsd.dwHeight;
+	bpp = ddsd.ddpfPixelFormat.dwRGBBitCount / 8;
 
-   if (bpp < 2) 
-      bpp = 2;
+	if (bpp < 2)
+		bpp = 2;
 
-   if (bpp > 3)
-      bpp = 3;
+	if (bpp > 3)
+		bpp = 3;
 
-   datasize = width * bpp * height;
+	datasize = width * bpp * height;
 
-   if (width * bpp % 4)
-      datasize += height * (4 - width * bpp % 4);
+	if (width * bpp % 4)
+		datasize += height * (4 - width * bpp % 4);
 
-   memset((void*)&bfh, 0, sizeof(bfh));
+	memset((void*)&bfh, 0, sizeof(bfh));
 
-   bfh.bfType = 'B'+('M'<<8);
-   bfh.bfSize = sizeof(bfh) + sizeof(bih) + datasize;
-   bfh.bfOffBits = sizeof(bfh) + sizeof(bih);
-                            
-   memset((void*)&bih, 0, sizeof(bih));
+	bfh.bfType = 'B'+('M'<<8);
+	bfh.bfSize = sizeof(bfh) + sizeof(bih) + datasize;
+	bfh.bfOffBits = sizeof(bfh) + sizeof(bih);
 
-   bih.biSize = sizeof(bih);
-   bih.biWidth = ddsd.dwWidth;
-   bih.biHeight = ddsd.dwHeight;
-   bih.biPlanes = 1;
-   bih.biBitCount = (unsigned short)(bpp * 8);
-   bih.biCompression = BI_RGB;
-                            
-   result = AppInfo.lpBackBuffer->GetDC(&surfDC);
+	memset((void*)&bih, 0, sizeof(bih));
 
-   if (FAILED(result))
-      goto cleanup;
+	bih.biSize = sizeof(bih);
+	bih.biWidth = ddsd.dwWidth;
+	bih.biHeight = ddsd.dwHeight;
+	bih.biPlanes = 1;
+	bih.biBitCount = (unsigned short)(bpp * 8);
+	bih.biCompression = BI_RGB;
 
-   bitmap = CreateDIBSection(NULL, (BITMAPINFO *)&bih, DIB_RGB_COLORS, &data, NULL, 0);
+	result = AppInfo.lpBackBuffer->GetDC(&surfDC);
 
-   if (!bitmap)
-      goto cleanup;
+	if (FAILED(result))
+		goto cleanup;
 
-   if (!data)
-      goto cleanup;
+	bitmap = CreateDIBSection(NULL, (BITMAPINFO *)&bih, DIB_RGB_COLORS, &data, NULL, 0);
 
-   memDC = CreateCompatibleDC(surfDC);
+	if (!bitmap)
+		goto cleanup;
 
-   if (!memDC)
-      goto cleanup;
+	if (!data)
+		goto cleanup;
 
-   oldbit = SelectObject(memDC, bitmap);
+	memDC = CreateCompatibleDC(surfDC);
 
-   if (!oldbit || FAILED(oldbit))
-      goto cleanup;
+	if (!memDC)
+		goto cleanup;
 
-   result = BitBlt(memDC, 0, 0, width, height, surfDC, 0, 0, SRCCOPY);
+	oldbit = SelectObject(memDC, bitmap);
 
-   if (!result)
-      goto cleanup;
+	if (!oldbit || FAILED(oldbit))
+		goto cleanup;
 
-   AppInfo.lpBackBuffer->ReleaseDC(surfDC); 
-   surfDC = NULL;                           
-   file = fopen(Name, "wb");
+	result = BitBlt(memDC, 0, 0, width, height, surfDC, 0, 0, SRCCOPY);
 
-   if (!file)
-      goto cleanup;
-                          
-   fwrite((void*)&bfh, sizeof(bfh), 1, file);
-   fwrite((void*)&bih, sizeof(bih), 1, file);
-   fwrite((void*)data, 1, datasize, file);
+	if (!result)
+		goto cleanup;
 
-   success = TRUE;
-                           
+	AppInfo.lpBackBuffer->ReleaseDC(surfDC);
+	surfDC = NULL;
+	file = fopen(Name, "wb");
+
+	if (!file)
+		goto cleanup;
+
+	fwrite((void*)&bfh, sizeof(bfh), 1, file);
+	fwrite((void*)&bih, sizeof(bih), 1, file);
+	fwrite((void*)data, 1, datasize, file);
+
+	success = TRUE;
+
 cleanup:
-                          
-   if (oldbit && !FAILED(oldbit))
-      SelectObject(memDC, oldbit);
 
-   if (memDC)
-      DeleteDC(memDC);
- 
-   if (surfDC)
-      AppInfo.lpBackBuffer->ReleaseDC(surfDC);
- 
-   if (bitmap)
-      DeleteObject(bitmap);
- 
-   if (file)
-      fclose(file);
+	if (oldbit && !FAILED(oldbit))
+		SelectObject(memDC, oldbit);
 
-   return success;
+	if (memDC)
+		DeleteDC(memDC);
+
+	if (surfDC)
+		AppInfo.lpBackBuffer->ReleaseDC(surfDC);
+
+	if (bitmap)
+		DeleteObject(bitmap);
+
+	if (file)
+		fclose(file);
+
+	return success;
 }

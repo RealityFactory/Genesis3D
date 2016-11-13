@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef D3DCache_H
@@ -27,7 +27,7 @@
 #include <d3d.h>
 
 #include "BaseType.h"
-#include "DDMemMgr.h"			
+#include "DDMemMgr.h"
 
 #define	D3DCACHE_MAX_NAME			256
 
@@ -36,7 +36,7 @@ typedef struct D3DCache_Type		D3DCache_Type;
 typedef struct D3DCache_Slot		D3DCache_Slot;
 
 /* 07/16/2000 Wendell Buckner
-    Convert to Directx7...    
+	Convert to Directx7...
 D3DCache	*D3DCache_Create(const char *Name, LPDIRECTDRAW4 lpDD, DDMemMgr_Partition *Partition, geBoolean UseStages); */
 D3DCache	*D3DCache_Create(const char *Name, LPDIRECTDRAW7 lpDD, DDMemMgr_Partition *Partition, geBoolean UseStages);
 
@@ -59,7 +59,7 @@ void		D3DCache_SlotSetLRU(D3DCache_Slot *Slot, uint32 LRU);
 uint32		D3DCache_SlotGetLRU(D3DCache_Slot *Slot);
 
 /* 07/16/2000 Wendell Buckner
-    Convert to Directx7...    
+	Convert to Directx7...
 LPDIRECT3DTEXTURE2 D3DCache_SlotGetTexture(D3DCache_Slot *Slot);
 LPDIRECTDRAWSURFACE4 D3DCache_SlotGetSurface(D3DCache_Slot *Slot); */
 LPDIRECTDRAWSURFACE7 D3DCache_SlotGetTexture(D3DCache_Slot *Slot);

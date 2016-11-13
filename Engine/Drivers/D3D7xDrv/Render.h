@@ -19,8 +19,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef RENDER_H
@@ -40,6 +40,6 @@ geBoolean DRIVERCC DrawShadowPoly(geFloat r, geFloat g, geFloat b, geFloat a);
 geBoolean DRIVERCC DrawDecal(geRDriver_THandle *THandle, RECT *SRect, int32 x, int32 y);
 
 /* 01/28/2003 Wendell Buckner
-     Cache decals so that they can be drawn after all the 3d stuff... */
+	 Cache decals so that they can be drawn after all the 3d stuff... */
 geBoolean DRIVERCC DrawDecalRect(geRDriver_THandle *THandle, RECT *SRect, int32 x, int32 y);
 #endif

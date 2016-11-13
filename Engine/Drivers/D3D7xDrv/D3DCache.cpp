@@ -5,9 +5,9 @@
 /*  Description: D3D cache manager                                                      */
 /*                                                                                      */
 /*  Edit History:                                                                       */
-/*  12/27/2003 Wendell Buckner                                                          */ 
+/*  12/27/2003 Wendell Buckner                                                          */
 /*   CONFIG DRIVER - Make the driver configurable by "ini" file settings                */
-/*  12/23/2003 Wendell Buckner                                                          */ 
+/*  12/23/2003 Wendell Buckner                                                          */
 /*   COMPRESSED TEXTURES - Select the best compressed texture format...                 */
 /*  02/25/2001 Wendell Buckner                                                          */
 /*   This texture pointer is no longer valid under directx 7.  Set it to TRUE so there  */
@@ -41,7 +41,7 @@
 // Cache types are just the different types of textures
 // Texutres may vary from width/height/num miplevels/etc...
 // Cache types is just a way to combine them to similar types...
-#define	D3DCACHE_MAX_CACHE_TYPES		128		
+#define	D3DCACHE_MAX_CACHE_TYPES		128
 
 /* 12/27/2003 Wendell Buckner
    CONFIG DRIVER - Make the driver configurable by "ini" file settings */
@@ -74,10 +74,10 @@ typedef struct D3DCache
 	char					Name[D3DCACHE_MAX_NAME];
 
 /* 07/16/2000 Wendell Buckner
-    Convert to Directx7...    
+	Convert to Directx7...
 	LPDIRECTDRAW4			lpDD;						// DD object for the cache manager */
 	LPDIRECTDRAW7			lpDD;						// DD object for the cache manager
-	
+
 
 	DDMemMgr_Partition		*Partition;
 
@@ -93,14 +93,14 @@ typedef struct D3DCache_Slot
 	D3DCache_Type			*CacheType;
 
 /* 07/16/2000 Wendell Buckner
-    Convert to Directx7...    
+	Convert to Directx7...
 	LPDIRECTDRAWSURFACE4	Surface;						// The DD surface for this slot
 	LPDIRECT3DTEXTURE2		Texture;						// The texture interface to the surface */
 	LPDIRECTDRAWSURFACE7	Surface;						// The DD surface for this slot
 	LPDIRECTDRAWSURFACE7	Texture;						// The texture interface to the surface
 
 	uint32					LRU;							// Current LRU for cache slot
-						
+
 	void					*UserData;
 
 } D3DCache_Slot;
@@ -113,7 +113,7 @@ typedef struct D3DCache_Slot
 //========================================================================================================
 
 /* 07/16/2000 Wendell Buckner
-    Convert to Directx7...    
+	Convert to Directx7...
 D3DCache *D3DCache_Create(const char *Name, LPDIRECTDRAW4 lpDD, DDMemMgr_Partition *Partition, geBoolean UseStages) */
 D3DCache *D3DCache_Create(const char *Name, LPDIRECTDRAW7 lpDD, DDMemMgr_Partition *Partition, geBoolean UseStages)
 {
@@ -191,7 +191,7 @@ geBoolean D3DCache_EvictAllSurfaces(D3DCache *Cache)
 			D3DCache_SlotSetUserData(pSlot, NULL);
 		}
 	}
-	
+
 	return GE_TRUE;
 }
 
@@ -226,7 +226,7 @@ D3DCache_Type *D3DCache_FindCacheType(D3DCache *Cache, int32 Width, int32 Height
 
 		if (memcmp(&pCacheType->ddsd, ddsd, sizeof(DDSURFACEDESC2)))
 			continue;
-		
+
 		return pCacheType;						// Found a match
 	}
 
@@ -511,7 +511,7 @@ geBoolean D3DCache_AdjustSlots(D3DCache *Cache, const int32 *MaxTable, geBoolean
 			Height = pCacheType->Height;
 
 			Size = Width*Height*(pCacheType->ddsd.ddpfPixelFormat.dwRGBBitCount>>3);  // (BitCount/8)
-		
+
 			if (UsePartition)
 			{
 				if (!DDMemMgr_PartitionAllocMem(Cache->Partition, Size))
@@ -553,7 +553,7 @@ geBoolean D3DCache_AdjustSlots(D3DCache *Cache, const int32 *MaxTable, geBoolean
 	}
 
 	pCacheType = Cache->CacheTypes;
-	
+
 	// Go through one last time, and make sure all got allocated
 	for (i=0; i< D3DCACHE_MAX_CACHE_TYPES; i++, pCacheType++)
 	{
@@ -563,7 +563,7 @@ geBoolean D3DCache_AdjustSlots(D3DCache *Cache, const int32 *MaxTable, geBoolean
 			continue;
 		}
 
-		if (pCacheType->NumUsedSlots <= 0)		
+		if (pCacheType->NumUsedSlots <= 0)
 		{
 			D3DMain_Log("D3DCache_AdjustSlots:  Out of ram creating surfaces for cache.\n");
 			D3DMain_Log("D3DCache_AdjustSlots:  Pick a display mode with a smaller resolution.\n");
@@ -602,25 +602,25 @@ geBoolean D3DCache_SlotIsValid(D3DCache_Slot *Slot)
 //=====================================================================================
 
 /* 12/23/2003 Wendell Buckner
-    COMPRESSED TEXTURES - Select the best compressed texture format... */
+	COMPRESSED TEXTURES - Select the best compressed texture format... */
 #include <d3d_main.h>
 
 int32 D3DCache_SetupSlot(D3DCache *Cache, D3DCache_Slot *Slot, int32 Width, int32 Height, const DDSURFACEDESC2 *SurfDesc, geBoolean UseStage, int32 Stage)
 {
 /* 07/16/2000 Wendell Buckner
-    Convert to Directx7...    
+	Convert to Directx7...
 	LPDIRECTDRAWSURFACE4 Surface; */
 	LPDIRECTDRAWSURFACE7 Surface;
-	
+
 	DDSURFACEDESC2		ddsd;
 	HRESULT				Hr;
-			
+
 	assert(D3DCache_IsValid(Cache));
 	assert(D3DCache_SlotIsValid(Slot));
 
-    memcpy(&ddsd, SurfDesc, sizeof(DDSURFACEDESC2));
+	memcpy(&ddsd, SurfDesc, sizeof(DDSURFACEDESC2));
 
-    
+
 	ddsd.dwSize = sizeof(DDSURFACEDESC2);
 	ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
 
@@ -633,63 +633,63 @@ int32 D3DCache_SetupSlot(D3DCache *Cache, D3DCache_Slot *Slot, int32 Width, int3
 	ddsd.ddsCaps.dwCaps4 = 0;
 	ddsd.dwHeight = Width;
 	ddsd.dwWidth = Height;
-	
+
 	ddsd.dwTextureStage = Stage;
 
 /* 12/23/2003 Wendell Buckner
-    COMPRESSED TEXTURES - Select the best compressed texture format... */
+	COMPRESSED TEXTURES - Select the best compressed texture format... */
 
 //***************************************
 
-    do
+	do
 	{
-     DWORD dwOldFourCC = ddsd.ddpfPixelFormat.dwFourCC;
-     DWORD dwOldFlags  = ddsd.ddpfPixelFormat.dwFlags;
-     DWORD dwOldHeight = ddsd.dwHeight;
-     DWORD dwOldWidth  = ddsd.dwWidth;
-     long NoAlpha = !(ddsd.ddpfPixelFormat.dwFlags & DDPF_ALPHAPIXELS);
+	 DWORD dwOldFourCC = ddsd.ddpfPixelFormat.dwFourCC;
+	 DWORD dwOldFlags  = ddsd.ddpfPixelFormat.dwFlags;
+	 DWORD dwOldHeight = ddsd.dwHeight;
+	 DWORD dwOldWidth  = ddsd.dwWidth;
+	 long NoAlpha = !(ddsd.ddpfPixelFormat.dwFlags & DDPF_ALPHAPIXELS);
 
 	 if (!CompressTextures) break;
 
 	 if( ddsd.ddpfPixelFormat.dwFlags & DDPF_BUMPDUDV ) break;
 
 //d3d requries divisible by 4
-	 if ( ddsd.dwWidth % 4) 
+	 if ( ddsd.dwWidth % 4)
 	 {
 	  ddsd.dwWidth /= 4;
-      ddsd.dwWidth++;
+	  ddsd.dwWidth++;
 	  ddsd.dwWidth *= 4;
-     }
+	 }
 
-	 if ( ddsd.dwHeight % 4) 
+	 if ( ddsd.dwHeight % 4)
 	 {
 	  ddsd.dwHeight /= 4;
-      ddsd.dwHeight++;
+	  ddsd.dwHeight++;
 	  ddsd.dwHeight *= 4;
-     }
+	 }
 
 	 ddsd.ddpfPixelFormat.dwFlags &= ~DDPF_RGB;
 	 ddsd.ddpfPixelFormat.dwFlags &= ~DDPF_ALPHAPIXELS;
-     ddsd.ddpfPixelFormat.dwFlags |=  DDPF_FOURCC;
-	 
-     ddsd.ddpfPixelFormat.dwFourCC = AppInfo.ddCompressedOneBitAlphaSurfFormat.ddpfPixelFormat.dwFourCC;
+	 ddsd.ddpfPixelFormat.dwFlags |=  DDPF_FOURCC;
 
-     if( ((ddsd.ddpfPixelFormat.dwRGBAlphaBitMask == 0x8000) || NoAlpha) && (ddsd.ddpfPixelFormat.dwFourCC) ) break;
+	 ddsd.ddpfPixelFormat.dwFourCC = AppInfo.ddCompressedOneBitAlphaSurfFormat.ddpfPixelFormat.dwFourCC;
 
-     if (AppInfo.ddCompressedFourBitAlphaSurfFormat.ddpfPixelFormat.dwFourCC ) ddsd.ddpfPixelFormat.dwFourCC = AppInfo.ddCompressedFourBitAlphaSurfFormat.ddpfPixelFormat.dwFourCC;
+	 if( ((ddsd.ddpfPixelFormat.dwRGBAlphaBitMask == 0x8000) || NoAlpha) && (ddsd.ddpfPixelFormat.dwFourCC) ) break;
+
+	 if (AppInfo.ddCompressedFourBitAlphaSurfFormat.ddpfPixelFormat.dwFourCC ) ddsd.ddpfPixelFormat.dwFourCC = AppInfo.ddCompressedFourBitAlphaSurfFormat.ddpfPixelFormat.dwFourCC;
 
 
 	 if ( ((ddsd.ddpfPixelFormat.dwRGBAlphaBitMask == 0x8000) || NoAlpha) && (ddsd.ddpfPixelFormat.dwFourCC) ) break;
-     if ( ((ddsd.ddpfPixelFormat.dwRGBAlphaBitMask == 0xf000) || NoAlpha) && (ddsd.ddpfPixelFormat.dwFourCC) ) break;
-    
-     if ( AppInfo.ddCompressedEightBitAlphaSurfFormat.ddpfPixelFormat.dwFourCC ) ddsd.ddpfPixelFormat.dwFourCC = AppInfo.ddCompressedEightBitAlphaSurfFormat.ddpfPixelFormat.dwFourCC;
+	 if ( ((ddsd.ddpfPixelFormat.dwRGBAlphaBitMask == 0xf000) || NoAlpha) && (ddsd.ddpfPixelFormat.dwFourCC) ) break;
 
-     if (ddsd.ddpfPixelFormat.dwFourCC) break; 
+	 if ( AppInfo.ddCompressedEightBitAlphaSurfFormat.ddpfPixelFormat.dwFourCC ) ddsd.ddpfPixelFormat.dwFourCC = AppInfo.ddCompressedEightBitAlphaSurfFormat.ddpfPixelFormat.dwFourCC;
+
+	 if (ddsd.ddpfPixelFormat.dwFourCC) break;
 
 	 ddsd.ddpfPixelFormat.dwFourCC = dwOldFourCC;
-     ddsd.ddpfPixelFormat.dwFlags = dwOldFlags;
+	 ddsd.ddpfPixelFormat.dwFlags = dwOldFlags;
 	 ddsd.dwHeight = dwOldHeight;
-     ddsd.dwWidth = dwOldWidth;
+	 ddsd.dwWidth = dwOldWidth;
 	}
 	while(FALSE);
 
@@ -697,8 +697,8 @@ int32 D3DCache_SetupSlot(D3DCache *Cache, D3DCache_Slot *Slot, int32 Width, int3
 
 	Hr = Cache->lpDD->CreateSurface(&ddsd, &Surface, NULL);
 
-	if(Hr != DD_OK) 
-	{ 
+	if(Hr != DD_OK)
+	{
 		if (Hr == DDERR_OUTOFVIDEOMEMORY)
 		{
 			return 0;
@@ -713,11 +713,11 @@ int32 D3DCache_SetupSlot(D3DCache *Cache, D3DCache_Slot *Slot, int32 Width, int3
 #if 0
 	{
 		DDCOLORKEY			CKey;
-		
+
 		// Create the color key for this surface
 		CKey.dwColorSpaceLowValue = 1;
 		CKey.dwColorSpaceHighValue = 1;
-		
+
 		if (Slot->Surface->SetColorKey(DDCKEY_SRCBLT , &CKey) != DD_OK)
 		{
 			Slot->Surface->Release();
@@ -730,14 +730,14 @@ int32 D3DCache_SetupSlot(D3DCache *Cache, D3DCache_Slot *Slot, int32 Width, int3
 /* 02/25/2001 Wendell Buckner
    This texture pointer is no longer valid under directx 7.  Set it to TRUE so there is
    something there when  the code does assert checks.
-	Hr = Surface->QueryInterface(IID_IDirect3DTexture2, (void**)&Slot->Texture);  
+	Hr = Surface->QueryInterface(IID_IDirect3DTexture2, (void**)&Slot->Texture);
 
-	if(Hr != DD_OK) 
-	{ 
+	if(Hr != DD_OK)
+	{
 		Surface->Release();
 		return -1;
 	}*/
-    Slot->Texture = Surface;
+	Slot->Texture = Surface;
 
 	return 1;		// All good dude
 }
@@ -818,7 +818,7 @@ uint32 D3DCache_SlotGetLRU(D3DCache_Slot *Slot)
 }
 
 /* 07/16/2000 Wendell Buckner
-    Convert to Directx7...    
+	Convert to Directx7...
 LPDIRECT3DTEXTURE2 D3DCache_SlotGetTexture(D3DCache_Slot *Slot)    */
 LPDIRECTDRAWSURFACE7  D3DCache_SlotGetTexture(D3DCache_Slot *Slot)
 {
@@ -828,7 +828,7 @@ LPDIRECTDRAWSURFACE7  D3DCache_SlotGetTexture(D3DCache_Slot *Slot)
 }
 
 /* 07/16/2000 Wendell Buckner
-    Convert to Directx7...    
+	Convert to Directx7...
 LPDIRECTDRAWSURFACE4 D3DCache_SlotGetSurface(D3DCache_Slot *Slot) */
 LPDIRECTDRAWSURFACE7 D3DCache_SlotGetSurface(D3DCache_Slot *Slot)
 {
@@ -845,7 +845,7 @@ uint32 Log2(uint32 P2)
 {
 	uint32		p = 0;
 	int32		i = 0;
-	
+
 	for (i = P2; i > 0; i>>=1)
 		p++;
 
@@ -870,25 +870,25 @@ int32 SnapToPower2(int32 Width)
 	else if (Width > 128 && Width <= 256) Width = 256;
 
 /* 11/25/2002 Wendell Buckner
-    Raise texture limits to 16384 x 16384. */
-    else if (Width > 256  && Width <=  512 ) Width = 512;
-    else if (Width > 512  && Width <= 1024 ) Width = 1024;
-    else if (Width > 1024 && Width <= 2048 ) Width = 2048;
-    else if (Width > 2048 && Width <= 4096 ) Width = 4096;
-    else if (Width > 4096 && Width <= 8192 ) Width = 8192;
-    else if (Width > 8192 && Width <= 16384) Width = 16384;
+	Raise texture limits to 16384 x 16384. */
+	else if (Width > 256  && Width <=  512 ) Width = 512;
+	else if (Width > 512  && Width <= 1024 ) Width = 1024;
+	else if (Width > 1024 && Width <= 2048 ) Width = 2048;
+	else if (Width > 2048 && Width <= 4096 ) Width = 4096;
+	else if (Width > 4096 && Width <= 8192 ) Width = 8192;
+	else if (Width > 8192 && Width <= 16384) Width = 16384;
 
-	else 
+	else
 		return -1;
 #else
-	
+
 	if (Width > 1 && Width <= 8) Width = 8;
 	else if (Width > 8 && Width <= 16) Width =16;
 	else if (Width > 16 && Width <= 32) Width = 32;
 	else if (Width > 32 && Width <= 64) Width = 64;
 	else if (Width > 64 && Width <= 128) Width = 128;
 	else if (Width > 128 && Width <= 256) Width = 256;
-	else 
+	else
 		return -1;
 #endif
 
@@ -901,7 +901,7 @@ int32 SnapToPower2(int32 Width)
 int32 GetLog(int32 Width, int32 Height)
 {
 	int32	LWidth = SnapToPower2(max(Width, Height));
-	
+
 	return Log2(LWidth);
 }
 

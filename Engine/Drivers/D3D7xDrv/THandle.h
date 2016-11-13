@@ -5,7 +5,7 @@
 /*  Description: THandle manager for D3DDrv                                             */
 /*                                                                                      */
 /*  Edit History:                                                                       */
-/*   05/19/2003 Wendell Buckner                                                         */  
+/*   05/19/2003 Wendell Buckner                                                         */
 /*    BUMPMAPPING                                                                       */
 /*   03/28/2003 Wendell Buckner                                                         */
 /*    BumpMapping                                                                       */
@@ -49,7 +49,7 @@
 typedef struct
 {
 /* 07/16/2000 Wendell Buckner
-    Convert to Directx7...    
+	Convert to Directx7...
 	LPDIRECTDRAWSURFACE4	Surface;			// The DD surface*/
 	LPDIRECTDRAWSURFACE7	Surface;			// The DD surface
 
@@ -57,9 +57,9 @@ typedef struct
 	D3DCache_Slot			*Slot;
 
 /* 07/16/2000 Wendell Buckner
-    Convert to Directx7...    
+	Convert to Directx7...
 	LPDIRECT3DTEXTURE2	    Texture;			// The DD surface*/
-	LPDIRECTDRAWSURFACE7	Texture;			// The texture interface to the surface	
+	LPDIRECTDRAWSURFACE7	Texture;			// The texture interface to the surface
 
 	uint8					Flags;
 } THandle_MipData;
@@ -87,7 +87,7 @@ typedef struct geRDriver_THandle
 
 /*03/28/2003 Wendell Buckner
    BumpMapping*/
-    geRDriver_THandle       *NextTHandle;
+	geRDriver_THandle       *NextTHandle;
 
 } geRDriver_THandle;
 
@@ -123,8 +123,8 @@ geBoolean THandle_CreateSurfaces(THandle_MipData *MipData, int32 Width, int32 He
 void THandle_DestroySurfaces(THandle_MipData *MipData);
 geBoolean THandle_CheckCache(void);
 
-/* 05/19/2003 Wendell Buckner 
-    BUMPMAPPING */
+/* 05/19/2003 Wendell Buckner
+	BUMPMAPPING */
 geBoolean DRIVERCC THandle_Combine ( geRDriver_THandle **THandle, int32 THandleCount);
 geBoolean DRIVERCC THandle_UnCombine ( geRDriver_THandle **THandle, int32 THandleCount);
 #endif

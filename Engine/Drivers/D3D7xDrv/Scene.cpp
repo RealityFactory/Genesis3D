@@ -7,11 +7,11 @@
 /*  Edit History:                                                                       */
 /*  01/28/2003 Wendell Buckner                                                          */
 /*   Cache decals so that they can be drawn after all the 3d stuff...                   */
-/*  02/28/2001 Wendell Buckner
-/*   These render states are unsupported d3d 7.0
-/*  07/16/2000 Wendell Buckner
-/*   Convert to Directx7...    */
-/*
+/*  02/28/2001 Wendell Buckner                                                          */
+/*   These render states are unsupported d3d 7.0                                        */
+/*  07/16/2000 Wendell Buckner                                                          */
+/*   Convert to Directx7...                                                             */
+/*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -23,15 +23,15 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <windows.h>
 #include <stdio.h>
 
 /*  07/16/2000 Wendell Buckner
-/*   Convert to Directx7...    
+/*   Convert to Directx7...
 #include "D3DDrv.h"             */
 #include "D3DDrv7x.h"
 
@@ -62,9 +62,9 @@ __inline DWORD F2DW(float f)
    DWORD            retval = 0;
 
    _asm {
-      fld            f
-      lea            eax, [retval]
-      fistp         dword ptr[eax]
+	  fld            f
+	  lea            eax, [retval]
+	  fistp         dword ptr[eax]
    }
 
    return retval;
@@ -104,9 +104,9 @@ BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, BOOL ClearStencil, RECT *World
 		}
 
 		D3DDRV.StencilTestMode = 1; // zpass=1, zfail=0
-// end change		
+// end change
 		D3DDRV.NumRenderedPolys = 0;
-		
+
 		Result = AppInfo.lpD3DDevice->BeginScene();
 //      D3DMain_Log("Begin Scene\n");
 
@@ -118,7 +118,7 @@ BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, BOOL ClearStencil, RECT *World
 
 		D3DBilinearFilter(D3DFILTER_LINEAR, D3DFILTER_LINEAR);
 		D3DPolygonMode (D3DFILL_SOLID);
-		
+
 		D3DZWriteEnable (TRUE);
 		D3DZEnable(TRUE);
 		D3DZFunc(D3DCMP_LESSEQUAL);
@@ -131,8 +131,8 @@ BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, BOOL ClearStencil, RECT *World
 		D3DBlendEnable(TRUE);
 
 /*	01/13/2003 Wendell Buckner
-    Optimization from GeForce_Optimization2.doc
-    9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. 
+	Optimization from GeForce_Optimization2.doc
+	9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed.
 		if (AppInfo.FogEnable)
 		{
 			AppInfo.lpD3DDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE , TRUE);
@@ -149,14 +149,14 @@ BOOL DRIVERCC BeginScene(BOOL Clear, BOOL ClearZ, BOOL ClearStencil, RECT *World
 		else
 		{
 			D3DFogEnable ( AppInfo.FogEnable, (F2DW(AppInfo.ClearR)<<16)|(F2DW(AppInfo.ClearG)<<8)|F2DW(AppInfo.ClearB) );
-		} 
+		}
 
-        
+
 	}
 
 /*  01/28/2003 Wendell Buckner                                                          */
 /*   Cache decals so that they can be drawn after all the 3d stuff...                   */
-    InScene = TRUE;
+	InScene = TRUE;
 	return TRUE;
 }
 
@@ -183,7 +183,7 @@ BOOL DRIVERCC EndScene(void)
 		}
 
 /* 01/28/2003 Wendell Buckner
-     Cache decals so that they can be drawn after all the 3d stuff... */
+	 Cache decals so that they can be drawn after all the 3d stuff... */
 		DCache_FlushDecalRects();
 
 		if (!Main_ShowBackBuffer())
@@ -192,7 +192,7 @@ BOOL DRIVERCC EndScene(void)
 
 /*  01/28/2003 Wendell Buckner                                                          */
 /*   Cache decals so that they can be drawn after all the 3d stuff...                   */
-    InScene = FALSE;
+	InScene = FALSE;
 	return TRUE;
 }
 

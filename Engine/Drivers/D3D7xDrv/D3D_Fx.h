@@ -4,10 +4,10 @@
 /*  Author: John Pollard                                                                */
 /*  Description: D3D renderstate wrapper                                                */
 /*                                                                                      */
-/*  Edit History:                                                                       */             
+/*  Edit History:                                                                       */
 /*  04/08/2003 Wendell Buckner                                                          */
-/*   BUMPMAPPING                                                                        */ 
-/*  01/28/2003 Wendell Buckner                                                          */             
+/*   BUMPMAPPING                                                                        */
+/*  01/28/2003 Wendell Buckner                                                          */
 /*   Moving ALL triangles into another buffer is resulting in minimum speed increase    */
 /*    (+1FPS increase)...	                                                            */
 /*  01/18/2003 Wendell Buckner                                                          */
@@ -32,8 +32,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef D3D_FX_H
@@ -49,7 +49,7 @@
 void D3DSetTexHandle(D3DTEXTUREHANDLE TexHandle);
 
 /*   07/16/2000 Wendell Buckner
-/*    Convert to Directx7...    
+/*    Convert to Directx7...
 void D3DSetTexture(int32 Stage, LPDIRECT3DTEXTURE2   Texture);  */
 void D3DSetTexture(int32 Stage, LPDIRECTDRAWSURFACE7 Texture);
 
@@ -60,7 +60,7 @@ void D3DDrawShadow(geFloat r, geFloat g, geFloat b, geFloat a);
 void D3DTexturedPolyOld(void *Pnts, int32 NumPoints);
 void D3DTexturedPoly(void *Pnts, int32 NumPoints);
 
-/* 01/28/2003 Wendell Buckner 
+/* 01/28/2003 Wendell Buckner
    Moving ALL triangles into another buffer is resulting in minimum speed increase (+1FPS increase)...	*/
 void D3DTexturedPoly3(void *Pnts, int32 NumPoints);
 
@@ -86,15 +86,15 @@ void D3DViewport (int32 x, int32 y, int32 width, int32 height);
 void D3DDepthRange (float zNear, float zFar);
 
 /* 01/13/2003 Wendell Buckner
-    Optimization from GeForce_Optimization2.doc  
+	Optimization from GeForce_Optimization2.doc
 9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. */
 void D3DFogEnable (BOOL Enable, DWORD Color);
 
 /* 04/08/2003 Wendell Buckner
-    BUMPMAPPING
+	BUMPMAPPING
 /* 01/18/2003 Wendell Buckner
-    Optimization from GeForce_Optimization2.doc  
-9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed. 
+	Optimization from GeForce_Optimization2.doc
+9.	Do not duplicate render state commands.  Worse is useless renderstates.  Do not set a renderstate unless it is needed.
 void D3DSetTextureStageState0(unsigned long ColorArg1, unsigned long ColorArg2,D3DTEXTUREOP ColorOp, unsigned long AlphaArg1, unsigned long AlphaArg2, D3DTEXTUREOP AlphaOp);
 void D3DSetTextureStageState1(unsigned long ColorArg1, unsigned long ColorArg2,D3DTEXTUREOP ColorOp, unsigned long AlphaArg1, unsigned long AlphaArg2, D3DTEXTUREOP AlphaOp);*/
 void D3DSetTextureStageState0(unsigned long ColorArg1, unsigned long ColorArg2,D3DTEXTUREOP ColorOp, unsigned long AlphaArg1, unsigned long AlphaArg2, D3DTEXTUREOP AlphaOp,unsigned long TexCoordTSS0);
@@ -103,7 +103,7 @@ void D3DSetTextureStageState2(unsigned long ColorArg1, unsigned long ColorArg2,D
 void D3DSetTextureStageState1BM (float BumpEnvMat00TSS1, float BumpEnvMat01TSS1, float BumpEnvMat10TSS1, float BumpEnvMat11TSS1, float BumpEnvLScaleTSS1, float BumpEnvLOffsetTSS1);
 
 /* 12/27/2003 Wendell Buckner
-    CONFIG DRIVER - Allow full-scene anti-aliasing  */
+	CONFIG DRIVER - Allow full-scene anti-aliasing  */
 void D3DFullSceneAntiAliasing ( BOOL Enable );
 
 #endif

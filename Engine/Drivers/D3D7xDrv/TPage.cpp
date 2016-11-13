@@ -4,11 +4,11 @@
 /*  Author: John Pollard                                                                */
 /*  Description: D3D cache manager using pages                                          */
 /*                                                                                      */
-/*   02/25/2001 Wendell Buckner
-/*    This texture pointer is no longer valid under directx 7.  Set it to TRUE so there is
-/*    something there when  the code does assert checks.	
-/*   07/16/2000 Wendell Buckner
-/*    Convert to Directx7...    
+/*   02/25/2001 Wendell Buckner                                                         */
+/*    This texture pointer is no longer valid under directx 7.  Set it to TRUE so there */
+/*    is something there when  the code does assert checks.                             */
+/*   07/16/2000 Wendell Buckner                                                         */
+/*    Convert to Directx7...                                                            */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
 /*  compliance with the License. You may obtain a copy of the License at                */
@@ -20,8 +20,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <windows.h>
@@ -45,12 +45,12 @@ typedef struct TPage_Block
 	int32					RefCount;			// Number of references to this object
 
 /* 07/16/2000 Wendell Buckner
-    Convert to Directx7...    
+	Convert to Directx7...
 	LPDIRECTDRAWSURFACE4	Surface;			// The DD surface for this Block
 	LPDIRECT3DTEXTURE2		Texture;			// The Texture interface to the surface*/
 	LPDIRECTDRAWSURFACE7	Surface;			// The DD surface for this Block
 	LPDIRECTDRAWSURFACE7	Texture;			// The Texture interface to the surface
-	
+
 	RECT					Rect;				// The Rect into the surface that this block can use
 
 	uint32					LRU;				// Set to the TPage->TPageMgr->LRU when accesed...
@@ -69,12 +69,12 @@ typedef struct TPage
 	DDSURFACEDESC2			SurfaceDesc;		// Surface description of this page (note all blocks must use this format!!!)
 
 /* 07/16/2000 Wendell Buckner
-    Convert to Directx7...    
+	Convert to Directx7...
 	LPDIRECTDRAWSURFACE4	Surface;			// The DD surface for this TPage
 	LPDIRECT3DTEXTURE2		Texture;			// The texture interface to the surface */
 	LPDIRECTDRAWSURFACE7	Surface;			// The DD surface for this TPage
 	LPDIRECTDRAWSURFACE7 	Texture;			// The texture interface to the surface
-	
+
 	TPage_Block				*Blocks;			//	Linked list of blocks
 
 	uint32					LRU;
@@ -90,10 +90,10 @@ typedef struct TPage_Mgr
 	TPage					*TPages;			// Linked list of TPages
 
 /* 07/16/2000 Wendell Buckner
-    Convert to Directx7...    
-    LPDIRECTDRAW4			lpDD;				// DD object used to create surfaces */
+	Convert to Directx7...
+	LPDIRECTDRAW4			lpDD;				// DD object used to create surfaces */
 	LPDIRECTDRAW7			lpDD;				// DD object used to create surfaces
-	
+
 } TPage_Mgr;
 
 //============================================================================
@@ -105,7 +105,7 @@ typedef struct TPage_Mgr
 //============================================================================
 
 /* 07/16/2000 Wendell Buckner
-    Convert to Directx7...    
+	Convert to Directx7...
 TPage_Mgr *TPage_MgrCreate(LPDIRECTDRAW4 lpDD, const DDSURFACEDESC2 *SurfaceDesc, int32 NumPages) */
 TPage_Mgr *TPage_MgrCreate(LPDIRECTDRAW7 lpDD, const DDSURFACEDESC2 *SurfaceDesc, int32 NumPages)
 
@@ -123,7 +123,7 @@ TPage_Mgr *TPage_MgrCreate(LPDIRECTDRAW7 lpDD, const DDSURFACEDESC2 *SurfaceDesc
 	// Remeber the DD object
 	TPageMgr->lpDD = lpDD;
 	// Ref the dd object
-	lpDD->AddRef();			
+	lpDD->AddRef();
 
 	TPageMgr->NumPages = NumPages;
 
@@ -164,7 +164,7 @@ void TPage_MgrDestroy(TPage_Mgr **TPageMgr)
 	Mgr = *TPageMgr;
 
 	assert(Mgr);
-	
+
 	// Free the pages
 	for (Page = Mgr->TPages; Page; Page = Next)
 	{
@@ -177,7 +177,7 @@ void TPage_MgrDestroy(TPage_Mgr **TPageMgr)
 	assert(Mgr->TPages == NULL);
 
 	// Release our ref on the DD object
-	Mgr->lpDD->Release();			
+	Mgr->lpDD->Release();
 
 	free(*TPageMgr);
 
@@ -201,7 +201,7 @@ geBoolean TPage_MgrHasTPage(TPage_Mgr *Mgr, TPage *Page)
 			return GE_TRUE;
 		}
 	}
-	
+
 	return GE_FALSE;
 }
 
@@ -330,7 +330,7 @@ TPage_Block *TPage_MgrFindOptimalBlock(TPage_Mgr *Mgr, uint32 LRU)
 //============================================================================
 
 /* 07/16/2000 Wendell Buckner
-    Convert to Directx7...    
+	Convert to Directx7...
 TPage *TPage_Create(LPDIRECTDRAW4 lpDD, const DDSURFACEDESC2 *SurfDesc) */
 TPage *TPage_Create(LPDIRECTDRAW7 lpDD, const DDSURFACEDESC2 *SurfDesc)
 
@@ -511,7 +511,7 @@ void TPage_DetachBlock(TPage *TPage, TPage_Block *Block)
 //=====================================================================================
 
 /* 07/16/2000 Wendell Buckner
-    Convert to Directx7...    
+	Convert to Directx7...
 geBoolean TPage_CreateSurfaces(TPage *Page, LPDIRECTDRAW4 lpDD, const DDSURFACEDESC2 *SurfDesc) */
 geBoolean TPage_CreateSurfaces(TPage *Page, LPDIRECTDRAW7 lpDD, const DDSURFACEDESC2 *SurfDesc)
 {
@@ -536,23 +536,23 @@ geBoolean TPage_CreateSurfaces(TPage *Page, LPDIRECTDRAW7 lpDD, const DDSURFACED
 
 	Hr = lpDD->CreateSurface(&ddsd, &Page->Surface, NULL);
 
-	if (Hr != DD_OK) 
+	if (Hr != DD_OK)
 		return GE_FALSE;
 
 /*   02/25/2001 Wendell Buckner
 /*    This texture pointer is no longer valid under directx 7.  Set it to TRUE so there is
-/*    something there when  the code does assert checks.	
-	Hr = Page->Surface->QueryInterface(IID_IDirect3DTexture2, (void**)&Page->Texture);  
+/*    something there when  the code does assert checks.
+	Hr = Page->Surface->QueryInterface(IID_IDirect3DTexture2, (void**)&Page->Texture);
 
-	if(Hr != DD_OK) 
-	{ 
+	if(Hr != DD_OK)
+	{
 		Page->Surface->Release();
 		Page->Surface = NULL;
 		Page->Texture = NULL;
 		return GE_FALSE;
 	}*/
 	Page->Texture = Page->Surface;
-	
+
 	return GE_TRUE;		// All good dude
 }
 
@@ -568,7 +568,7 @@ void TPage_DestroySurfaces(TPage *Page)
 	{
 /*   02/25/2001 Wendell Buckner
 /*    This texture pointer is no longer valid under directx 7.  Set it to TRUE so there is
-/*    something there when  the code does assert checks.	
+/*    something there when  the code does assert checks.
 		Page->Texture->Release();*/
 		Page->Texture = NULL;
 	}
@@ -589,7 +589,7 @@ void TPage_DestroySurfaces(TPage *Page)
 //============================================================================
 
 /* 07/16/2000 Wendell Buckner
-    Convert to Directx7...    
+	Convert to Directx7...
 TPage_Block *TPage_BlockCreate(LPDIRECTDRAWSURFACE4 Surface, LPDIRECT3DTEXTURE2   Texture, const RECT *Rect)  */
 TPage_Block *TPage_BlockCreate(LPDIRECTDRAWSURFACE7 Surface, LPDIRECTDRAWSURFACE7 Texture, const RECT *Rect)
 
@@ -607,7 +607,7 @@ TPage_Block *TPage_BlockCreate(LPDIRECTDRAWSURFACE7 Surface, LPDIRECTDRAWSURFACE
 
 /*   02/25/2001 Wendell Buckner
 /*    This texture pointer is no longer valid under directx 7.  Set it to TRUE so there is
-/*    something there when  the code does assert checks.	
+/*    something there when  the code does assert checks.
 	Texture->AddRef();		// Ditto...*/
 
 	// Save off the surface, texture, and rect into the surface
@@ -640,7 +640,7 @@ void TPage_BlockDestroy(TPage_Block **Block)
 	TPage_Block	*Block2;
 
 	assert(Block);
-	
+
 	Block2 = *Block;
 
 	assert(Block2);
@@ -657,11 +657,11 @@ void TPage_BlockDestroy(TPage_Block **Block)
 
 /*   02/25/2001 Wendell Buckner
 /*    This texture pointer is no longer valid under directx 7.  Set it to TRUE so there is
-/*    something there when  the code does assert checks.	
+/*    something there when  the code does assert checks.
 	if (Block2->Texture)
 		Block2->Texture->Release();*/
 
-	
+
 	// Free the block
 	free(Block2);
 
@@ -673,7 +673,7 @@ void TPage_BlockDestroy(TPage_Block **Block)
 //============================================================================
 
 /* 07/16/2000 Wendell Buckner
-    Convert to Directx7...    
+	Convert to Directx7...
 LPDIRECT3DTEXTURE2 TPage_BlockGetTexture(TPage_Block *Block)  */
 LPDIRECTDRAWSURFACE7 TPage_BlockGetTexture(TPage_Block *Block)
 
@@ -688,7 +688,7 @@ LPDIRECTDRAWSURFACE7 TPage_BlockGetTexture(TPage_Block *Block)
 //============================================================================
 
 /* 07/16/2000 Wendell Buckner
-    Convert to Directx7...    
+	Convert to Directx7...
 LPDIRECTDRAWSURFACE4 TPage_BlockGetSurface(TPage_Block *Block) */
 LPDIRECTDRAWSURFACE7 TPage_BlockGetSurface(TPage_Block *Block)
 

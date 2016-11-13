@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include <windows.h>
@@ -39,7 +39,7 @@ typedef struct DDMemMgr
 {
 	uint32				TotalMem;
 	uint32				FreeMem;
-	DDMemMgr_Partition	Partitions[DDMEMMGR_MAX_PARTITIONS];			
+	DDMemMgr_Partition	Partitions[DDMEMMGR_MAX_PARTITIONS];
 } DDMemMgr;
 
 //============================================================================
@@ -108,7 +108,7 @@ DDMemMgr_Partition *DDMemMgr_PartitionCreate(DDMemMgr *MemMgr, uint32 Size)
 
 	if (Size > MemMgr->FreeMem)
 		return NULL;
-		
+
 	pPartition = MemMgr->Partitions;
 
 	for (i=0; i< DDMEMMGR_MAX_PARTITIONS; i++, pPartition++)

@@ -4,10 +4,10 @@
 /*  Author: John Pollard                                                                */
 /*  Description: THandle manager for D3DDrv                                             */
 /*                                                                                      */
-/*  Edit History:                                                                       */ 
+/*  Edit History:                                                                       */
 /*  10/15/2003 Wendell Buckner                                                          */
 /*   Bumpmapping for the World                                                          */
-/*  05/19/2003 Wendell Buckner                                                          */  
+/*  05/19/2003 Wendell Buckner                                                          */
 /*   BUMPMAPPING                                                                        */
 /*  03/25/2003 Wendell Buckner                                                          */
 /*   BUMPMAPPING                                                                        */
@@ -17,7 +17,7 @@
 /*    Give out the true 24-bit surface as well...                                       */
 /*   02/25/2001 Wendell Buckner                                                         */
 /*    This texture pointer is no longer valid under directx 7.  Set it to TRUE so there */
-/*    is something there when  the code does assert checks.	                            */    
+/*    is something there when the code does assert checks.                              */
 /*   05/28/2000 Wendell Buckner                                                         */
 /*    Running out of texture handles...                                                 */
 /*  The contents of this file are subject to the Genesis3D Public License               */
@@ -43,7 +43,7 @@
 #include "BaseType.h"
 
 /* 07/16/2000 Wendell Buckner
-    Convert to Directx7...    
+	Convert to Directx7...
 #include "D3DDrv.h"           */
 #include "D3DDrv7x.h"
 
@@ -71,7 +71,7 @@
 #define TSTAGE_1			1
 
 /* 10/15/2003 Wendell Buckner
-    Bumpmapping for the World */
+	Bumpmapping for the World */
 #define TSTAGE_2			2
 
 //============================================================================================
@@ -89,13 +89,13 @@ TPage_Mgr			*TPageMgr;
 
 DDSURFACEDESC2		CurrentSurfDesc;
 
-THandle_MipData		SystemToVideo[MAX_LMAP_LOG_SIZE];	
+THandle_MipData		SystemToVideo[MAX_LMAP_LOG_SIZE];
 
 geBoolean			CacheNeedsUpdate;
 /*
 #ifdef D3D_MANAGE_TEXTURES
 	#define			NUM_LMAP_VIDEO_SURFACES		10;
-	THandle_MipData		SystemToVideo[MAX_LMAP_LOG_SIZE];	
+	THandle_MipData		SystemToVideo[MAX_LMAP_LOG_SIZE];
 #endif
 */
 
@@ -123,7 +123,7 @@ void FreeAllCaches(void)
 	if (MemMgr)
 		DDMemMgr_Destroy(MemMgr);
 
-	
+
 #ifdef USE_TPAGES
 	if (TPageMgr)
 	{
@@ -270,7 +270,7 @@ geRDriver_THandle *Create3DTHandle(geRDriver_THandle *THandle, int32 Width, int3
 	// Create the surfaces to hold all the mips
 	THandle->MipData = (THandle_MipData*)malloc(sizeof(THandle_MipData)*NumMipLevels);
 	memset(THandle->MipData, 0, sizeof(THandle_MipData)*NumMipLevels);
-	
+
 	if (!THandle->MipData)
 	{
 		THandle_Destroy(THandle);
@@ -322,7 +322,7 @@ geRDriver_THandle *CreateLightmapTHandle(geRDriver_THandle *THandle, int32 Width
 	assert(NumMipLevels < THANDLE_MAX_MIP_LEVELS);
 
 	assert(NumMipLevels == 1);
-	
+
 	// Save some info about the lightmap
 	THandle->Width = Width;
 	THandle->Height = Height;
@@ -357,9 +357,9 @@ geRDriver_THandle *CreateLightmapTHandle(geRDriver_THandle *THandle, int32 Width
 
 /*   02/25/2001 Wendell Buckner
 /*    This texture pointer is no longer valid under directx 7.  Set it to TRUE so there is
-/*    something there when  the code does assert checks.	
+/*    something there when  the code does assert checks.
 		D3DSetTexture(0, THandle->MipData[0].Texture); */
-		D3DSetTexture(0, THandle->MipData[0].Surface);		
+		D3DSetTexture(0, THandle->MipData[0].Surface);
 
 	}
 	#endif
@@ -403,13 +403,13 @@ geRDriver_THandle *Create2DTHandle(geRDriver_THandle *THandle, int32 Width, int3
 	// Create the surfaces to hold all the mips
 	THandle->MipData = (THandle_MipData*)malloc(sizeof(THandle_MipData)*NumMipLevels);
 	memset(THandle->MipData, 0, sizeof(THandle_MipData)*NumMipLevels);
-	
+
 	if (!THandle->MipData)
 	{
 		THandle_Destroy(THandle);
 		return NULL;
 	}
-	
+
 	if (!THandle_CreateSurfaces(&THandle->MipData[0], Width, Height, &CurrentSurfDesc, GE_TRUE, 0))
 	{
 		THandle_Destroy(THandle);
@@ -424,16 +424,16 @@ geRDriver_THandle *Create2DTHandle(geRDriver_THandle *THandle, int32 Width, int3
 //============================================================================================
 geBoolean SetupCurrent3dDesc(gePixelFormat PixelFormat)
 {
-    DDSURFACEDESC2 NoSurfDesc;
-    memset(&NoSurfDesc, 0, sizeof(DDSURFACEDESC2));
-	
+	DDSURFACEDESC2 NoSurfDesc;
+	memset(&NoSurfDesc, 0, sizeof(DDSURFACEDESC2));
+
 	switch (PixelFormat)
 	{
 		case GE_PIXELFORMAT_16BIT_555_RGB:
 		case GE_PIXELFORMAT_16BIT_565_RGB:
 		{
 /* 12/28/2002 Wendell Buckner
-    Allow/make 32-bit (ARGB) mode the default mode...  
+	Allow/make 32-bit (ARGB) mode the default mode...
 			memcpy(&CurrentSurfDesc, &AppInfo.ddTexFormat, sizeof(DDSURFACEDESC2)); */
 			memcpy(&CurrentSurfDesc, &AppInfo.ddTexFormat16, sizeof(DDSURFACEDESC2));
 			break;
@@ -452,12 +452,12 @@ geBoolean SetupCurrent3dDesc(gePixelFormat PixelFormat)
 		}
 
 /* 12/28/2002 Wendell Buckner
-    Give out the true 24-bit surface as well...  */		
+	Give out the true 24-bit surface as well...  */
 		case GE_PIXELFORMAT_32BIT_XRGB:
 		{
 			memcpy(&CurrentSurfDesc, &AppInfo.ddTexFormat24, sizeof(DDSURFACEDESC2));
 
-            if ( CurrentSurfDesc.ddpfPixelFormat.dwRGBBitCount != 32)
+			if ( CurrentSurfDesc.ddpfPixelFormat.dwRGBBitCount != 32)
 			{
 			 D3DMain_Log("SetupCurrent3dDesc:  Invalid pixel format (%i).\n",PixelFormat);
 			 return FALSE;
@@ -467,14 +467,14 @@ geBoolean SetupCurrent3dDesc(gePixelFormat PixelFormat)
 		}
 
 /* 12/28/2002 Wendell Buckner
-    Allow/make 32-bit (ARGB) mode the default mode...  */
-        case GE_PIXELFORMAT_32BIT_ARGB:
+	Allow/make 32-bit (ARGB) mode the default mode...  */
+		case GE_PIXELFORMAT_32BIT_ARGB:
 		{
 			memcpy(&CurrentSurfDesc, &AppInfo.ddEightBitAlphaSurfFormat, sizeof(DDSURFACEDESC2));
 
 			if ( CurrentSurfDesc.ddpfPixelFormat.dwRGBBitCount != 32 )
 			{
-             D3DMain_Log("SetupCurrent3dDesc:  Invalid pixel format (%i).\n",PixelFormat);
+			 D3DMain_Log("SetupCurrent3dDesc:  Invalid pixel format (%i).\n",PixelFormat);
 			 return FALSE;
 			}
 
@@ -482,41 +482,41 @@ geBoolean SetupCurrent3dDesc(gePixelFormat PixelFormat)
 		}
 
 /* 03/25/2003 Wendell Buckner
-    BUMPMAPPING */
+	BUMPMAPPING */
 
-        case GE_PIXELFORMAT_16BIT_88_UV:
+		case GE_PIXELFORMAT_16BIT_88_UV:
 		{
 			memcpy(&CurrentSurfDesc, &AppInfo.ddBumpMapNoLuminance, sizeof(DDSURFACEDESC2));
 
 			if ( CurrentSurfDesc.ddpfPixelFormat.dwBumpBitCount != 16 )
 			{
-             D3DMain_Log("SetupCurrent3dDesc:  Invalid pixel format (BUMPMAP 88) (%i).\n",PixelFormat);
+			 D3DMain_Log("SetupCurrent3dDesc:  Invalid pixel format (BUMPMAP 88) (%i).\n",PixelFormat);
 			 return FALSE;
 			}
 
 			break;
 		}
 
-        case GE_PIXELFORMAT_16BIT_556_UVL:
+		case GE_PIXELFORMAT_16BIT_556_UVL:
 		{
 			memcpy(&CurrentSurfDesc, &AppInfo.ddBumpMapSixBitLuminance, sizeof(DDSURFACEDESC2));
 
 			if ( CurrentSurfDesc.ddpfPixelFormat.dwBumpBitCount != 16 )
 			{
-             D3DMain_Log("SetupCurrent3dDesc:  Invalid pixel format (BUMPMAP 556) (%i).\n",PixelFormat);
+			 D3DMain_Log("SetupCurrent3dDesc:  Invalid pixel format (BUMPMAP 556) (%i).\n",PixelFormat);
 			 return FALSE;
 			}
 
 			break;
 		}
 
-        case GE_PIXELFORMAT_24BIT_888_UVL:
+		case GE_PIXELFORMAT_24BIT_888_UVL:
 		{
 			memcpy(&CurrentSurfDesc, &AppInfo.ddBumpMapEightBitLuminance, sizeof(DDSURFACEDESC2));
 
 			if ( CurrentSurfDesc.ddpfPixelFormat.dwBumpBitCount != 16 )
 			{
-             D3DMain_Log("SetupCurrent3dDesc:  Invalid pixel format (BUMPMAP 888) (%i).\n",PixelFormat);
+			 D3DMain_Log("SetupCurrent3dDesc:  Invalid pixel format (BUMPMAP 888) (%i).\n",PixelFormat);
 			 return FALSE;
 			}
 
@@ -604,7 +604,7 @@ geBoolean DRIVERCC THandle_Destroy(geRDriver_THandle *THandle)
 			CacheNeedsUpdate = GE_TRUE;
 			THandle->MipData[i].CacheType = NULL;
 		}
-		
+
 		if (THandle->MipData[i].Surface)
 		{
 			assert(THandle->MipData[i].Texture);
@@ -627,25 +627,25 @@ geBoolean DRIVERCC THandle_Destroy(geRDriver_THandle *THandle)
 //=====================================================================================
 geBoolean DRIVERCC THandle_Lock(geRDriver_THandle *THandle, int32 MipLevel, void **Bits)
 {
-    DDSURFACEDESC2		SurfDesc;
-    HRESULT				Result;
+	DDSURFACEDESC2		SurfDesc;
+	HRESULT				Result;
 
-    assert(!(THandle->MipData[MipLevel].Flags & THANDLE_LOCKED));
+	assert(!(THandle->MipData[MipLevel].Flags & THANDLE_LOCKED));
 
 	// Lock the surface so it can be filled with the data
-    memset(&SurfDesc, 0, sizeof(DDSURFACEDESC2));
-    SurfDesc.dwSize = sizeof(DDSURFACEDESC2);
+	memset(&SurfDesc, 0, sizeof(DDSURFACEDESC2));
+	SurfDesc.dwSize = sizeof(DDSURFACEDESC2);
 
 /* 03/10/2002 Wendell Buckner
-    Procedural Textures
-    if you must lock a texture specify the flags WRITEONLY and DISCARDCONTENTS when 
-    Result = THandle->MipData[MipLevel].Surface->Lock(NULL, &SurfDesc , DDLOCK_WAIT, NULL);*/
-    Result = THandle->MipData[MipLevel].Surface->Lock(NULL, &SurfDesc , DDLOCK_WAIT | DDLOCK_WRITEONLY | DDLOCK_DISCARDCONTENTS, NULL);
+	Procedural Textures
+	if you must lock a texture specify the flags WRITEONLY and DISCARDCONTENTS when
+	Result = THandle->MipData[MipLevel].Surface->Lock(NULL, &SurfDesc , DDLOCK_WAIT, NULL);*/
+	Result = THandle->MipData[MipLevel].Surface->Lock(NULL, &SurfDesc , DDLOCK_WAIT | DDLOCK_WRITEONLY | DDLOCK_DISCARDCONTENTS, NULL);
 
-    if (Result != DD_OK) 
+	if (Result != DD_OK)
 	{
-        return GE_FALSE;
-    }
+		return GE_FALSE;
+	}
 
 	THandle->MipData[MipLevel].Flags |= THANDLE_LOCKED;
 
@@ -659,18 +659,18 @@ geBoolean DRIVERCC THandle_Lock(geRDriver_THandle *THandle, int32 MipLevel, void
 //=====================================================================================
 geBoolean DRIVERCC THandle_UnLock(geRDriver_THandle *THandle, int32 MipLevel)
 {
-    HRESULT				Result;
+	HRESULT				Result;
 
-    assert(MipLevel <= THandle->NumMipLevels);
-    assert(THandle->MipData[MipLevel].Flags & THANDLE_LOCKED);
+	assert(MipLevel <= THandle->NumMipLevels);
+	assert(THandle->MipData[MipLevel].Flags & THANDLE_LOCKED);
 
 	// Unlock the surface
-    Result = THandle->MipData[MipLevel].Surface->Unlock(NULL);
+	Result = THandle->MipData[MipLevel].Surface->Unlock(NULL);
 
-    if (Result != DD_OK) 
+	if (Result != DD_OK)
 	{
-        return GE_FALSE;
-    }
+		return GE_FALSE;
+	}
 
 	THandle->MipData[MipLevel].Flags |= THANDLE_UPDATE;
 	THandle->MipData[MipLevel].Flags &= ~THANDLE_LOCKED;
@@ -727,7 +727,7 @@ geBoolean CreateSystemToVideoSurfaces(void)
 		int32		Size;
 
 		Size = 1<<i;
-		
+
 		if (!THandle_CreateSurfaces(&SystemToVideo[i], Size, Size, &SurfDesc, GE_FALSE, 1))
 		{
 			DestroySystemToVideoSurfaces();
@@ -761,7 +761,7 @@ geBoolean THandle_CreateSurfaces(THandle_MipData *Surf, int32 Width, int32 Heigh
 
 	DDSURFACEDESC2		ddsd;
 	HRESULT				Hr;
-			
+
 	memcpy(&ddsd, SurfDesc, sizeof(DDSURFACEDESC2));
 
 	ddsd.dwSize = sizeof(DDSURFACEDESC2);
@@ -786,31 +786,31 @@ geBoolean THandle_CreateSurfaces(THandle_MipData *Surf, int32 Width, int32 Heigh
 	ddsd.dwHeight = Height;
 
 	ddsd.dwTextureStage = Stage;
-			
+
 	Hr = AppInfo.lpDD->CreateSurface(&ddsd, &Surface, NULL);
 
-	if(Hr != DD_OK) 
-	{ 
+	if(Hr != DD_OK)
+	{
 		return FALSE;
 	}
 
 //	Hr = Surface->GetSurfaceDesc( &ddsd );
 
 	Surf->Surface = Surface;
-	
+
 /* 02/25/2001 Wendell Buckner
    This texture pointer is no longer valid under directx 7.  Set it to TRUE so there is
    something there when  the code does assert checks.
 	Surf->Texture = NULL; */
-    Surf->Texture = Surface;
+	Surf->Texture = Surface;
 
 /* 02/25/2001 Wendell Buckner
    This texture pointer is no longer valid under directx 7.  Set it to TRUE so there is
    something there when  the code does assert checks.
-	Hr = Surface->QueryInterface(IID_IDirect3DTexture2, (void**)&Surf->Texture);  
+	Hr = Surface->QueryInterface(IID_IDirect3DTexture2, (void**)&Surf->Texture);
 
-	if(Hr != DD_OK) 
-	{ 
+	if(Hr != DD_OK)
+	{
 		Surface->Release();
 		return GE_FALSE;
 	}*/
@@ -818,11 +818,11 @@ geBoolean THandle_CreateSurfaces(THandle_MipData *Surf, int32 Width, int32 Heigh
 	if (ColorKey)
 	{
 		DDCOLORKEY			CKey;
-		
+
 		// Create the color key for this surface
 		CKey.dwColorSpaceLowValue = 1;
 		CKey.dwColorSpaceHighValue = 1;
-		
+
 		if (Surf->Surface->SetColorKey(DDCKEY_SRCBLT , &CKey) != DD_OK)
 		{
 			SetLastDrvError(DRV_ERROR_GENERIC, "THandle_CreateSurfaces: SetColorKey failed for texture.");
@@ -830,10 +830,10 @@ geBoolean THandle_CreateSurfaces(THandle_MipData *Surf, int32 Width, int32 Heigh
 			Surf->Surface = NULL;
 
 /*   02/25/2001 Wendell Buckner
-      This texture pointer is no longer valid under directx 7.  Set it to TRUE so there is
+	  This texture pointer is no longer valid under directx 7.  Set it to TRUE so there is
 			Surf->Texture->Release();*/
 			Surf->Texture = NULL;
-			
+
 			return FALSE;
 		}
 	}
@@ -846,7 +846,7 @@ geBoolean THandle_CreateSurfaces(THandle_MipData *Surf, int32 Width, int32 Heigh
 void THandle_DestroySurfaces(THandle_MipData *Surf)
 {
 /*   02/25/2001 Wendell Buckner
-      This texture pointer is no longer valid under directx 7.  Set it to TRUE so there is
+	  This texture pointer is no longer valid under directx 7.  Set it to TRUE so there is
 	if (Surf->Texture)
 		Surf->Texture->Release();*/
 
@@ -865,9 +865,9 @@ geBoolean THandle_CheckCache(void)
 	int32				i, Stage0, Stage1;
 
 /* 11/25/2002 Wendell Buckner
-    Raise texture limits to 16384 x 16384. 
+	Raise texture limits to 16384 x 16384.
 	int32				MaxTable1[9],  MaxTable2[9]; */
-    int32				MaxTable1[14], MaxTable2[14];
+	int32				MaxTable1[14], MaxTable2[14];
 
 	if (!CacheNeedsUpdate)
 		return GE_TRUE;
@@ -888,12 +888,12 @@ geBoolean THandle_CheckCache(void)
 		MaxTable1[7] = 256;			//128x128
 		MaxTable1[8] = 256;			//256x256
 
-        MaxTable1[9]  = 64;			//  512x512
+		MaxTable1[9]  = 64;			//  512x512
 		MaxTable1[10] = 64;			// 1024x1024
 		MaxTable1[11] = 64;			// 2048x2048
 		MaxTable1[12] = 64;			// 4096x4096
-        MaxTable1[13] = 64;			// 8192x8192
-        MaxTable1[14] = 64;			//16384x1638
+		MaxTable1[13] = 64;			// 8192x8192
+		MaxTable1[14] = 64;			//16384x1638
 #else
 	if (AppInfo.DeviceIdentifier.dwVendorId == 4634)		// 3dfx series have a limit on the number of texture handles
 	{
@@ -936,12 +936,12 @@ geBoolean THandle_CheckCache(void)
 		MaxTable1[7] = 128;			//128x128
 		MaxTable1[8] = 128;			//256x256
 
-        MaxTable1[9]  = 64;			//  512x512
+		MaxTable1[9]  = 64;			//  512x512
 		MaxTable1[10] = 64;			// 1024x1024
 		MaxTable1[11] = 64;			// 2048x2048
 		MaxTable1[12] = 64;			// 4096x4096
-        MaxTable1[13] = 64;			// 8192x8192
-        MaxTable1[14] = 64;			//16384x16384
+		MaxTable1[13] = 64;			// 8192x8192
+		MaxTable1[14] = 64;			//16384x16384
 
 		MaxTable2[0] = 128;			//  1x1
 		MaxTable2[1] = 128;			//  2x2
@@ -953,12 +953,12 @@ geBoolean THandle_CheckCache(void)
 		MaxTable2[7] = 256;			//128x128
 		MaxTable2[8] = 256;			//256x256
 
-        MaxTable2[9]  = 64;			//  512x512
+		MaxTable2[9]  = 64;			//  512x512
 		MaxTable2[10] = 64;			// 1024x1024
 		MaxTable2[11] = 64;			// 2048x2048
 		MaxTable2[12] = 64;			// 4096x4096
-        MaxTable2[13] = 64;			// 8192x8192
-        MaxTable2[14] = 64;			//16384x16384
+		MaxTable2[13] = 64;			// 8192x8192
+		MaxTable2[14] = 64;			//16384x16384
 	}
 #endif
 
@@ -969,7 +969,7 @@ geBoolean THandle_CheckCache(void)
 	}
 	else
 	{
-		Stage0 = 0;							   
+		Stage0 = 0;
 		Stage1 = 0;
 	}
 
@@ -1008,8 +1008,8 @@ geBoolean THandle_CheckCache(void)
 	return GE_TRUE;
 }
 
-/* 05/19/2003 Wendell Buckner 
-    BUMPMAPPING */
+/* 05/19/2003 Wendell Buckner
+	BUMPMAPPING */
 geBoolean DRIVERCC THandle_Combine ( geRDriver_THandle **THandle, int32 THandleCount)
 {
  geRDriver_THandle *DriverHandle = NULL;
@@ -1028,10 +1028,10 @@ geBoolean DRIVERCC THandle_Combine ( geRDriver_THandle **THandle, int32 THandleC
    if ( !DriverHandle ) break;
 
    if(DriverHandleIndex < 2)
-    DriverHandleLink = THandle[DriverHandleIndex+1];
+	DriverHandleLink = THandle[DriverHandleIndex+1];
    else
-    DriverHandleLink = NULL;
-   
+	DriverHandleLink = NULL;
+
    DriverHandle->NextTHandle = DriverHandleLink;
   }
 
@@ -1042,8 +1042,8 @@ geBoolean DRIVERCC THandle_Combine ( geRDriver_THandle **THandle, int32 THandleC
  return THandleCombined;
 }
 
-/* 05/19/2003 Wendell Buckner 
-    BUMPMAPPING */
+/* 05/19/2003 Wendell Buckner
+	BUMPMAPPING */
 geBoolean DRIVERCC THandle_UnCombine ( geRDriver_THandle **THandle, int32 THandleCount)
 {
  geRDriver_THandle *DriverHandle = NULL;
@@ -1054,7 +1054,7 @@ geBoolean DRIVERCC THandle_UnCombine ( geRDriver_THandle **THandle, int32 THandl
  {
   if ( THandleCount < 2 ) break;
   if ( !THandle ) break;
-  
+
   for( ; DriverHandleIndex < THandleCount; DriverHandleIndex++ )
   {
    DriverHandle = THandle[DriverHandleIndex];
