@@ -112,48 +112,48 @@ gePath_StaticType gePath_Statics =
 static geVKFrame_InterpolationType GENESISCC gePath_PathToVKInterpolation(gePath_InterpolationType I)
 {
 	switch (I)
-		{
-			case (GE_PATH_VK_LINEAR):			  return VKFRAME_LINEAR;
-			case (GE_PATH_VK_HERMITE):			  return VKFRAME_HERMITE;
-			case (GE_PATH_VK_HERMITE_ZERO_DERIV): return VKFRAME_HERMITE_ZERO_DERIV;
-			default: assert(0);
-		}
+	{
+		case (GE_PATH_VK_LINEAR):			  return VKFRAME_LINEAR;
+		case (GE_PATH_VK_HERMITE):			  return VKFRAME_HERMITE;
+		case (GE_PATH_VK_HERMITE_ZERO_DERIV): return VKFRAME_HERMITE_ZERO_DERIV;
+		default: assert(0);
+	}
 	return VKFRAME_LINEAR;  // this is just for warning removal
 }
 
 static gePath_InterpolationType GENESISCC gePath_VKToPathInterpolation(geVKFrame_InterpolationType I)
 {
 	switch (I)
-		{
-			case (VKFRAME_LINEAR):				return GE_PATH_VK_LINEAR;
-			case (VKFRAME_HERMITE):				return GE_PATH_VK_HERMITE;
-			case (VKFRAME_HERMITE_ZERO_DERIV):  return GE_PATH_VK_HERMITE_ZERO_DERIV;
-			default: assert(0);
-		}
+	{
+		case (VKFRAME_LINEAR):				return GE_PATH_VK_LINEAR;
+		case (VKFRAME_HERMITE):				return GE_PATH_VK_HERMITE;
+		case (VKFRAME_HERMITE_ZERO_DERIV):  return GE_PATH_VK_HERMITE_ZERO_DERIV;
+		default: assert(0);
+	}
 	return GE_PATH_VK_LINEAR; // this is just for warning removal
 }
 
 static geQKFrame_InterpolationType GENESISCC gePath_PathToQKInterpolation(gePath_InterpolationType I)
 {
 	switch (I)
-		{
-			case (GE_PATH_QK_LINEAR):	return QKFRAME_LINEAR;
-			case (GE_PATH_QK_SLERP):	return QKFRAME_SLERP;
-			case (GE_PATH_QK_SQUAD):	return QKFRAME_SQUAD;
-			default: assert(0);
-		}
+	{
+		case (GE_PATH_QK_LINEAR):	return QKFRAME_LINEAR;
+		case (GE_PATH_QK_SLERP):	return QKFRAME_SLERP;
+		case (GE_PATH_QK_SQUAD):	return QKFRAME_SQUAD;
+		default: assert(0);
+	}
 	return QKFRAME_LINEAR;  // this is just for warning removal
 }
 
 static gePath_InterpolationType GENESISCC gePath_QKToPathInterpolation(geQKFrame_InterpolationType I)
 {
 	switch (I)
-		{
-			case (QKFRAME_LINEAR):	return GE_PATH_QK_LINEAR;
-			case (QKFRAME_SLERP):	return GE_PATH_QK_SLERP;
-			case (QKFRAME_SQUAD):	return GE_PATH_QK_SQUAD;
-			default: assert(0);
-		}
+	{
+		case (QKFRAME_LINEAR):	return GE_PATH_QK_LINEAR;
+		case (QKFRAME_SLERP):	return GE_PATH_QK_SLERP;
+		case (QKFRAME_SQUAD):	return GE_PATH_QK_SQUAD;
+		default: assert(0);
+	}
 	return GE_PATH_QK_LINEAR; // this is just for warning removal
 }
 
@@ -193,36 +193,36 @@ GENESISAPI gePath *GENESISCC gePath_Create(
 
 
 	switch (RotationInterpolation)
-		{
-			case (GE_PATH_INTERPOLATE_LINEAR):
-				P->Rotation.InterpolationType = GE_PATH_QK_LINEAR;
-				break;
-			case (GE_PATH_INTERPOLATE_SLERP):
-				P->Rotation.InterpolationType = GE_PATH_QK_SLERP;
-				break;
-			case (GE_PATH_INTERPOLATE_SQUAD):
-				P->Rotation.InterpolationType = GE_PATH_QK_SQUAD;
-				break;
-			default:
-				assert(0);
-		}
+	{
+		case (GE_PATH_INTERPOLATE_LINEAR):
+			P->Rotation.InterpolationType = GE_PATH_QK_LINEAR;
+			break;
+		case (GE_PATH_INTERPOLATE_SLERP):
+			P->Rotation.InterpolationType = GE_PATH_QK_SLERP;
+			break;
+		case (GE_PATH_INTERPOLATE_SQUAD):
+			P->Rotation.InterpolationType = GE_PATH_QK_SQUAD;
+			break;
+		default:
+			assert(0);
+	}
 
 	P->Rotation.KeyList = NULL;
 
 	switch (TranslationInterpolation)
-		{
-			case (GE_PATH_INTERPOLATE_LINEAR):
-				P->Translation.InterpolationType = GE_PATH_VK_LINEAR;
-				break;
-			case (GE_PATH_INTERPOLATE_HERMITE):
-				P->Translation.InterpolationType = GE_PATH_VK_HERMITE;
-				break;
-			case (GE_PATH_INTERPOLATE_HERMITE_ZERO_DERIV):
-				P->Translation.InterpolationType = GE_PATH_VK_HERMITE_ZERO_DERIV;
-				break;
-			default:
-				assert(0);
-		}
+	{
+		case (GE_PATH_INTERPOLATE_LINEAR):
+			P->Translation.InterpolationType = GE_PATH_VK_LINEAR;
+			break;
+		case (GE_PATH_INTERPOLATE_HERMITE):
+			P->Translation.InterpolationType = GE_PATH_VK_HERMITE;
+			break;
+		case (GE_PATH_INTERPOLATE_HERMITE_ZERO_DERIV):
+			P->Translation.InterpolationType = GE_PATH_VK_HERMITE_ZERO_DERIV;
+			break;
+		default:
+			assert(0);
+	}
 
 	P->Translation.KeyList = NULL;
 
@@ -233,23 +233,23 @@ static geBoolean GENESISCC gePath_SetupRotationKeyList(gePath *P)
 {
 	assert( P != NULL );
 	switch (P->Rotation.InterpolationType)
-		{
-			case (GE_PATH_QK_LINEAR):
-				P->Rotation.KeyList = geQKFrame_LinearCreate();
-				break;
-			case (GE_PATH_QK_SLERP):
-				P->Rotation.KeyList = geQKFrame_SlerpCreate();
-				break;
-			case (GE_PATH_QK_SQUAD):
-				P->Rotation.KeyList = geQKFrame_SquadCreate();
-				break;
-			default:
-				assert(0);
-		}
+	{
+		case (GE_PATH_QK_LINEAR):
+			P->Rotation.KeyList = geQKFrame_LinearCreate();
+			break;
+		case (GE_PATH_QK_SLERP):
+			P->Rotation.KeyList = geQKFrame_SlerpCreate();
+			break;
+		case (GE_PATH_QK_SQUAD):
+			P->Rotation.KeyList = geQKFrame_SquadCreate();
+			break;
+		default:
+			assert(0);
+	}
 	if (P->Rotation.KeyList == NULL)
-		{
-			return GE_FALSE;
-		}
+	{
+		return GE_FALSE;
+	}
 	return GE_TRUE;
 }
 
@@ -257,23 +257,23 @@ static geBoolean GENESISCC gePath_SetupTranslationKeyList(gePath *P)
 {
 	assert( P != NULL );
 	switch (P->Translation.InterpolationType)
-		{
-			case (GE_PATH_VK_LINEAR):
-				P->Translation.KeyList = geVKFrame_LinearCreate();
-				break;
-			case (GE_PATH_VK_HERMITE):
-				P->Translation.KeyList = geVKFrame_HermiteCreate();
-				break;
-			case (GE_PATH_VK_HERMITE_ZERO_DERIV):
-				P->Translation.KeyList = geVKFrame_HermiteCreate();
-				break;
-			default:
-				assert(0);
-		}
+	{
+		case (GE_PATH_VK_LINEAR):
+			P->Translation.KeyList = geVKFrame_LinearCreate();
+			break;
+		case (GE_PATH_VK_HERMITE):
+			P->Translation.KeyList = geVKFrame_HermiteCreate();
+			break;
+		case (GE_PATH_VK_HERMITE_ZERO_DERIV):
+			P->Translation.KeyList = geVKFrame_HermiteCreate();
+			break;
+		default:
+			assert(0);
+	}
 	if (P->Translation.KeyList == NULL)
-		{
-			return GE_FALSE;
-		}
+	{
+		return GE_FALSE;
+	}
 	return GE_TRUE;
 }
 
@@ -290,34 +290,34 @@ GENESISAPI gePath *GENESISCC gePath_CreateCopy(const gePath *Src)
 	assert ( Src != NULL );
 
 	switch (Src->Rotation.InterpolationType)
-		{
-			case (GE_PATH_QK_LINEAR):
-				RInterp = GE_PATH_INTERPOLATE_LINEAR;
-				break;
-			case (GE_PATH_QK_SLERP):
-				RInterp = GE_PATH_INTERPOLATE_SLERP;
-				break;
-			case (GE_PATH_QK_SQUAD):
-				RInterp = GE_PATH_INTERPOLATE_SQUAD;
-				break;
-			default:
-				assert(0);
-		}
+	{
+		case (GE_PATH_QK_LINEAR):
+			RInterp = GE_PATH_INTERPOLATE_LINEAR;
+			break;
+		case (GE_PATH_QK_SLERP):
+			RInterp = GE_PATH_INTERPOLATE_SLERP;
+			break;
+		case (GE_PATH_QK_SQUAD):
+			RInterp = GE_PATH_INTERPOLATE_SQUAD;
+			break;
+		default:
+			assert(0);
+	}
 
 	switch (Src->Translation.InterpolationType)
-		{
-			case (GE_PATH_VK_LINEAR):
-				TInterp = GE_PATH_INTERPOLATE_LINEAR;
-				break;
-			case (GE_PATH_VK_HERMITE):
-				TInterp = GE_PATH_INTERPOLATE_HERMITE;
-				break;
-			case (GE_PATH_VK_HERMITE_ZERO_DERIV):
-				TInterp = GE_PATH_INTERPOLATE_HERMITE_ZERO_DERIV;
-				break;
-			default:
-				assert(0);
-		}
+	{
+		case (GE_PATH_VK_LINEAR):
+			TInterp = GE_PATH_INTERPOLATE_LINEAR;
+			break;
+		case (GE_PATH_VK_HERMITE):
+			TInterp = GE_PATH_INTERPOLATE_HERMITE;
+			break;
+		case (GE_PATH_VK_HERMITE_ZERO_DERIV):
+			TInterp = GE_PATH_INTERPOLATE_HERMITE_ZERO_DERIV;
+			break;
+		default:
+			assert(0);
+	}
 
 	if (Src->Looped)
 		Looped = GE_TRUE;
@@ -326,69 +326,69 @@ GENESISAPI gePath *GENESISCC gePath_CreateCopy(const gePath *Src)
 
 	P = gePath_Create(TInterp, RInterp, Looped);
 	if (P == NULL)
-		{
-			geErrorLog_Add(ERR_PATH_CREATE_ENOMEM, NULL);
-			return NULL;
-		}
+	{
+		geErrorLog_Add(ERR_PATH_CREATE_ENOMEM, NULL);
+		return NULL;
+	}
 
 	{
 		geVec3d V;
 		Count = 0;
 		if (Src->Translation.KeyList != NULL)
-			{
-				Count = geTKArray_NumElements(Src->Translation.KeyList);
-			}
+		{
+			Count = geTKArray_NumElements(Src->Translation.KeyList);
+		}
 		if (Count>0)
+		{
+			if (gePath_SetupTranslationKeyList(P)==GE_FALSE)
 			{
-				if (gePath_SetupTranslationKeyList(P)==GE_FALSE)
-					{
-						geErrorLog_Add(ERR_PATH_CREATE_ENOMEM, NULL);
-						gePath_Destroy(&P);
-						return NULL;
-					}
-
-				for (i=0; i<Count; i++)
-					{
-						int Index;
-						geVKFrame_Query(Src->Translation.KeyList, i, &Time, &V);
-						if (geVKFrame_Insert(&(P->Translation.KeyList), Time, &V,&Index) == GE_FALSE)
-							{
-								geErrorLog_Add(ERR_PATH_CREATE_ENOMEM, NULL);
-								gePath_Destroy(&P);
-								return NULL;
-							}
-					}
+				geErrorLog_Add(ERR_PATH_CREATE_ENOMEM, NULL);
+				gePath_Destroy(&P);
+				return NULL;
 			}
+
+			for (i=0; i<Count; i++)
+			{
+				int Index;
+				geVKFrame_Query(Src->Translation.KeyList, i, &Time, &V);
+				if (geVKFrame_Insert(&(P->Translation.KeyList), Time, &V,&Index) == GE_FALSE)
+				{
+					geErrorLog_Add(ERR_PATH_CREATE_ENOMEM, NULL);
+					gePath_Destroy(&P);
+					return NULL;
+				}
+			}
+		}
 	}
 
 	{
 		geQuaternion Q;
 		Count = 0;
 		if (Src->Rotation.KeyList != NULL)
-			{
-				Count = geTKArray_NumElements(Src->Rotation.KeyList);
-			}
+		{
+			Count = geTKArray_NumElements(Src->Rotation.KeyList);
+		}
 		if (Count>0)
+		{
+			if (gePath_SetupRotationKeyList(P)==GE_FALSE)
 			{
-				if (gePath_SetupRotationKeyList(P)==GE_FALSE)
-					{
-						geErrorLog_Add(ERR_PATH_CREATE_ENOMEM, NULL);
-						gePath_Destroy(&P);
-						return NULL;
-					}
-
-				for (i=0; i<Count; i++)
-					{
-						int Index;
-						geQKFrame_Query(Src->Rotation.KeyList, i, &Time, &Q);
-						if (geQKFrame_Insert(&(P->Rotation.KeyList), Time, &Q, &Index) == GE_FALSE)
-							{
-								geErrorLog_Add(ERR_PATH_CREATE_ENOMEM, NULL);
-								gePath_Destroy(&P);
-								return NULL;
-							}
-					}
+				geErrorLog_Add(ERR_PATH_CREATE_ENOMEM, NULL);
+				gePath_Destroy(&P);
+				return NULL;
 			}
+
+			for (i=0; i<Count; i++)
+			{
+				int Index;
+				geQKFrame_Query(Src->Rotation.KeyList, i, &Time, &Q);
+				if (geQKFrame_Insert(&(P->Rotation.KeyList), Time, &Q, &Index) == GE_FALSE)
+				{
+					geErrorLog_Add(ERR_PATH_CREATE_ENOMEM, NULL);
+					gePath_Destroy(&P);
+					return NULL;
+				}
+			}
+		}
 	}
 	return P;
 }
@@ -405,10 +405,10 @@ GENESISAPI void GENESISCC gePath_Destroy(gePath **PP)
 	P = *PP;
 
 	if ( P->RefCount > 0)
-		{
-			P->RefCount -- ;
-			return;
-		}
+	{
+		P->RefCount -- ;
+		return;
+	}
 	if ( P->Rotation.KeyList != NULL)
 	{
 		geTKArray_Destroy(&(P->Rotation.KeyList));
@@ -513,33 +513,33 @@ GENESISAPI geBoolean GENESISCC gePath_InsertKeyframe(
 	{
 		geBoolean ErrorOccured = GE_FALSE;
 		if (P->Translation.KeyList == NULL)
+		{
+			if (gePath_SetupTranslationKeyList(P)==GE_FALSE)
 			{
-				if (gePath_SetupTranslationKeyList(P)==GE_FALSE)
-					{
-						geErrorLog_Add(ERR_PATH_INSERT_R_KEYFRAME, NULL);
-						ErrorOccured = GE_TRUE;
-					}
+				geErrorLog_Add(ERR_PATH_INSERT_R_KEYFRAME, NULL);
+				ErrorOccured = GE_TRUE;
 			}
+		}
 		if (ErrorOccured == GE_FALSE)
+		{
+			if (geVKFrame_Insert( &(P->Translation.KeyList), Time, &(Matrix->Translation), &VIndex) == GE_FALSE)
 			{
-				if (geVKFrame_Insert( &(P->Translation.KeyList), Time, &(Matrix->Translation), &VIndex) == GE_FALSE)
-					{
-						geErrorLog_Add(ERR_PATH_INSERT_T_KEYFRAME, NULL);
-						ErrorOccured = GE_TRUE;
-					}
+				geErrorLog_Add(ERR_PATH_INSERT_T_KEYFRAME, NULL);
+				ErrorOccured = GE_TRUE;
 			}
+		}
 		if (ErrorOccured != GE_FALSE)
-			{
-				if (ChannelMask & GE_PATH_ROTATION_CHANNEL)
-					{	// clean up previously inserted rotation
-						if (geTKArray_DeleteElement(&(P->Rotation.KeyList),QIndex)==GE_FALSE)
-							{
-								geErrorLog_Add(ERR_PATH_DELETE_T_KEYFRAME, NULL);
-							}
-					}
-				P->Dirty = FLAG_DIRTY;
-				return GE_FALSE;
+		{
+			if (ChannelMask & GE_PATH_ROTATION_CHANNEL)
+			{	// clean up previously inserted rotation
+				if (geTKArray_DeleteElement(&(P->Rotation.KeyList),QIndex)==GE_FALSE)
+				{
+					geErrorLog_Add(ERR_PATH_DELETE_T_KEYFRAME, NULL);
+				}
 			}
+			P->Dirty = FLAG_DIRTY;
+			return GE_FALSE;
+		}
 	}
 
 	P->Dirty = FLAG_DIRTY;
@@ -639,19 +639,19 @@ GENESISAPI geBoolean GENESISCC gePath_ModifyKeyframe(
 
 
 	if (ChannelMask & GE_PATH_ROTATION_CHANNEL)
-		{
-			geQuaternion Q;
-			assert( Index < geTKArray_NumElements(P->Rotation.KeyList) );
-			geQuaternion_FromMatrix(Matrix, &Q);
-			geQuaternion_Normalize(&Q);
-			geQKFrame_Modify(P->Rotation.KeyList, Index, &Q);
-		}
+	{
+		geQuaternion Q;
+		assert( Index < geTKArray_NumElements(P->Rotation.KeyList) );
+		geQuaternion_FromMatrix(Matrix, &Q);
+		geQuaternion_Normalize(&Q);
+		geQKFrame_Modify(P->Rotation.KeyList, Index, &Q);
+	}
 
 	if (ChannelMask & GE_PATH_TRANSLATION_CHANNEL)
-		{
-			assert( Index < geTKArray_NumElements(P->Translation.KeyList) );
-			geVKFrame_Modify(P->Translation.KeyList, Index, &(Matrix->Translation));
-		}
+	{
+		assert( Index < geTKArray_NumElements(P->Translation.KeyList) );
+		geVKFrame_Modify(P->Translation.KeyList, Index, &(Matrix->Translation));
+	}
 
 	P->Dirty = FLAG_DIRTY;
 	return GE_TRUE;
@@ -664,30 +664,30 @@ GENESISAPI int GENESISCC gePath_GetKeyframeCount(const gePath *P, int Channel)
 
 	switch (Channel)
 	{
-		case (GE_PATH_ROTATION_CHANNEL):
-			if (P->Rotation.KeyList!=NULL)
-				{
-					return geTKArray_NumElements(P->Rotation.KeyList);
-				}
-			else
-				{
-					return 0;
-				}
-			break;
+	case (GE_PATH_ROTATION_CHANNEL):
+		if (P->Rotation.KeyList!=NULL)
+		{
+			return geTKArray_NumElements(P->Rotation.KeyList);
+		}
+		else
+		{
+			return 0;
+		}
+		break;
 
-		case (GE_PATH_TRANSLATION_CHANNEL):
-			if (P->Translation.KeyList!=NULL)
-				{
-					return geTKArray_NumElements(P->Translation.KeyList);
-				}
-			else
-				{
-					return 0;
-				}
-			break;
+	case (GE_PATH_TRANSLATION_CHANNEL):
+		if (P->Translation.KeyList!=NULL)
+		{
+			return geTKArray_NumElements(P->Translation.KeyList);
+		}
+		else
+		{
+			return 0;
+		}
+		break;
 
-		default:
-			assert(0);
+	default:
+		assert(0);
 	}
 	return 0; // this is just for warning removal
 }
@@ -703,13 +703,13 @@ GENESISAPI int GENESISCC gePath_GetKeyframeIndex(const gePath *P, int Channel, g
 
 	switch (Channel)
 	{
-		case GE_PATH_ROTATION_CHANNEL :
-			Array = P->Rotation.KeyList;
-			break;
+	case GE_PATH_ROTATION_CHANNEL :
+		Array = P->Rotation.KeyList;
+		break;
 
-		case GE_PATH_TRANSLATION_CHANNEL :
-			Array = P->Translation.KeyList;
-			break;
+	case GE_PATH_TRANSLATION_CHANNEL :
+		Array = P->Translation.KeyList;
+		break;
 	}
 
 	// find the time in the channel's array
@@ -861,9 +861,9 @@ GENESISAPI void GENESISCC gePath_Sample(const gePath *P, gePath_TimeType Time, g
 
 
 	if (P->Dirty)
-		{
-			gePath_Recompute((gePath *)P);
-		}
+	{
+		gePath_Recompute((gePath *)P);
+	}
 	if (P->Looped)
 		Looped = GE_TRUE;
 	else
@@ -897,9 +897,9 @@ void GENESISCC gePath_SampleChannels(const gePath *P, gePath_TimeType Time, geQu
 	assert( Translation != NULL );
 
 	if (P->Dirty)
-		{
-			gePath_Recompute((gePath *)P);
-		}
+	{
+		gePath_Recompute((gePath *)P);
+	}
 
 	if (P->Looped)
 		Looped = GE_TRUE;
@@ -940,56 +940,56 @@ GENESISAPI geBoolean GENESISCC gePath_GetTimeExtents(const gePath *P, gePath_Tim
 		TCount = 0;
 
 	if (RCount>0)
+	{
+		RotStart = geTKArray_ElementTime(P->Rotation.KeyList, 0);
+		if (RCount>1)
 		{
-			RotStart = geTKArray_ElementTime(P->Rotation.KeyList, 0);
-			if (RCount>1)
-				{
-					RotEnd = geTKArray_ElementTime(P->Rotation.KeyList, RCount-1);
-				}
+			RotEnd = geTKArray_ElementTime(P->Rotation.KeyList, RCount-1);
+		}
+		else
+		{
+			RotEnd = RotStart;
+		}
+		if (TCount>0)
+		{	// Rotation and Translation keys
+			TransStart = geTKArray_ElementTime(P->Translation.KeyList, 0);
+			if (TCount>1)
+			{
+				TransEnd = geTKArray_ElementTime(P->Translation.KeyList,TCount-1);
+			}
 			else
-				{
-					RotEnd = RotStart;
-				}
-			if (TCount>0)
-				{	// Rotation and Translation keys
-					TransStart = geTKArray_ElementTime(P->Translation.KeyList, 0);
-					if (TCount>1)
-						{
-							TransEnd = geTKArray_ElementTime(P->Translation.KeyList,TCount-1);
-						}
-					else
-						{
-							TransEnd = TransStart;
-						}
+			{
+				TransEnd = TransStart;
+			}
 
-					*StartTime = min(TransStart,RotStart);
-					*EndTime   = max(TransEnd,RotEnd);
-				}
-			else
-				{	// No Translation Keys
-					*StartTime = RotStart;
-					*EndTime   = RotEnd;
-				}
+			*StartTime = min(TransStart,RotStart);
+			*EndTime   = max(TransEnd,RotEnd);
 		}
+		else
+		{	// No Translation Keys
+			*StartTime = RotStart;
+			*EndTime   = RotEnd;
+		}
+	}
 	else
-		{  // No Rotation Keys
-			if (TCount>0)
-				{
-					*StartTime = geTKArray_ElementTime(P->Translation.KeyList, 0);
-					if (TCount>1)
-						{
-							*EndTime = geTKArray_ElementTime(P->Translation.KeyList,TCount-1);
-						}
-					else
-						{
-							*EndTime = *StartTime;
-						}
-				}
+	{  // No Rotation Keys
+		if (TCount>0)
+		{
+			*StartTime = geTKArray_ElementTime(P->Translation.KeyList, 0);
+			if (TCount>1)
+			{
+				*EndTime = geTKArray_ElementTime(P->Translation.KeyList,TCount-1);
+			}
 			else
-				{	// No Rotation or Translation keys
-					return GE_FALSE;
-				}
+			{
+				*EndTime = *StartTime;
+			}
 		}
+		else
+		{	// No Rotation or Translation keys
+			return GE_FALSE;
+		}
+	}
 	return GE_TRUE;
 }
 
@@ -1070,36 +1070,36 @@ geBoolean GENESISCC gePath_ReadChannel_F0_(int ChannelMask, gePath_Channel *C, g
 	while(NumItemsRead < NumItemsNeeded)
 	{
 		if(geVFile_GetS(pFile, line, LINE_LENGTH) == GE_FALSE)
-			{
-				geErrorLog_Add( ERR_PATH_FILE_READ , NULL);
-				break;		 // got to read something
-			}
+		{
+			geErrorLog_Add( ERR_PATH_FILE_READ , NULL);
+			break;		 // got to read something
+		}
 
 		if(strnicmp(line, GE_PATH_CHANNEL_INTERPOLATE_ID, sizeof(GE_PATH_CHANNEL_INTERPOLATE_ID)-1) == 0)
 		{
 			if(sscanf(line + sizeof(GE_PATH_CHANNEL_INTERPOLATE_ID)-1, "%d", &Interp) != 1)
-				{
-					geErrorLog_Add( ERR_PATH_FILE_READ , NULL);
-					break;
-				}
+			{
+				geErrorLog_Add( ERR_PATH_FILE_READ , NULL);
+				break;
+			}
 			NumItemsRead++;
 		}
 		else if(strnicmp(line, GE_PATH_CHANNEL_STARTTIME_ID, sizeof(GE_PATH_CHANNEL_STARTTIME_ID)-1) == 0)
 		{
 			if(sscanf(line + sizeof(GE_PATH_CHANNEL_STARTTIME_ID)-1, "%f", &C->StartTime) != 1)
-				{
-					geErrorLog_Add( ERR_PATH_FILE_READ , NULL);
-					break;
-				}
+			{
+				geErrorLog_Add( ERR_PATH_FILE_READ , NULL);
+				break;
+			}
 			NumItemsRead++;
 		}
 		else if(strnicmp(line, GE_PATH_CHANNEL_ENDTIME_ID, sizeof(GE_PATH_CHANNEL_ENDTIME_ID)-1) == 0)
 		{
 			if(sscanf(line + sizeof(GE_PATH_CHANNEL_ENDTIME_ID)-1, "%f", &C->EndTime) != 1)
-				{
-					geErrorLog_Add( ERR_PATH_FILE_READ , NULL);
-					break;
-				}
+			{
+				geErrorLog_Add( ERR_PATH_FILE_READ , NULL);
+				break;
+			}
 			NumItemsRead++;
 		}
 		else if(strnicmp(line, GE_PATH_CHANNEL_KEYLIST_ID, sizeof(GE_PATH_CHANNEL_KEYLIST_ID)-1) == 0)
@@ -1108,10 +1108,10 @@ geBoolean GENESISCC gePath_ReadChannel_F0_(int ChannelMask, gePath_Channel *C, g
 
 			// v = number of elements
 			if(sscanf(line + sizeof(GE_PATH_CHANNEL_KEYLIST_ID)-1, "%d", &v) != 1)
-				{
-					geErrorLog_Add( ERR_PATH_FILE_READ , NULL);
-					break;
-				}
+			{
+				geErrorLog_Add( ERR_PATH_FILE_READ , NULL);
+				break;
+			}
 
 			if(ChannelMask == GE_PATH_ROTATION_CHANNEL)
 			{
@@ -1176,15 +1176,15 @@ geBoolean GENESISCC gePath_ReadChannel_F0_(int ChannelMask, gePath_Channel *C, g
 				v--;
 
 				if(geVFile_GetS(pFile, TimeString, sizeof(TimeString)) == GE_FALSE)
-					{
-						geErrorLog_Add( ERR_PATH_FILE_READ , NULL);
-						break;
-					}
+				{
+					geErrorLog_Add( ERR_PATH_FILE_READ , NULL);
+					break;
+				}
 				if(sscanf(TimeString, "%f ", &Time) != 1)
-					{
-						geErrorLog_Add( ERR_PATH_FILE_READ , NULL);
-						break;
-					}
+				{
+					geErrorLog_Add( ERR_PATH_FILE_READ , NULL);
+					break;
+				}
 
 				{
 					int NewlyAddedElement;  // u = newly added element
@@ -1213,14 +1213,14 @@ geBoolean GENESISCC gePath_ReadChannel_F0_(int ChannelMask, gePath_Channel *C, g
 		}
 	}
 	if (NumItemsNeeded == NumItemsRead)
-		{
-			return GE_TRUE;
-		}
+	{
+		return GE_TRUE;
+	}
 	else
-		{
-			geErrorLog_Add( ERR_PATH_FILE_PARSE , NULL);
-			return GE_FALSE;
-		}
+	{
+		geErrorLog_Add( ERR_PATH_FILE_PARSE , NULL);
+		return GE_FALSE;
+	}
 }
 
 
@@ -1248,9 +1248,9 @@ gePath* GENESISCC gePath_CreateFromFile_F0_(geVFile* pFile)
 
 	P = gePath_Create(0, 0, GE_FALSE);
 	if( P == NULL )
-		{
-			return NULL;	// error logged already in gePath_Create
-		}
+	{
+		return NULL;	// error logged already in gePath_Create
+	}
 
 	P->Translation.InterpolationType = 0;
 	P->Rotation.InterpolationType    = 0;
@@ -1264,9 +1264,9 @@ gePath* GENESISCC gePath_CreateFromFile_F0_(geVFile* pFile)
 		EXIT_ERROR
 
 	if (flag == GE_TRUE)
-		{
-			P->Looped = FLAG_LOOPED;
-		}
+	{
+		P->Looped = FLAG_LOOPED;
+	}
 
 	if(!geVFile_GetS(pFile, line, LINE_LENGTH) == GE_FALSE)
 		EXIT_ERROR
@@ -1276,10 +1276,10 @@ gePath* GENESISCC gePath_CreateFromFile_F0_(geVFile* pFile)
 	if(sscanf(line + sizeof(GE_PATH_ROTATION_ID)-1, "%d", &flag) != 1)
 		EXIT_ERROR
 	if (flag!=GE_FALSE)
-		{
-			if(!gePath_ReadChannel_F0_(GE_PATH_ROTATION_CHANNEL, &P->Rotation, pFile))
-				EXIT_ERROR
-		}
+	{
+		if(!gePath_ReadChannel_F0_(GE_PATH_ROTATION_CHANNEL, &P->Rotation, pFile))
+			EXIT_ERROR
+	}
 	if(geVFile_GetS(pFile, line, LINE_LENGTH) == GE_FALSE)
 		EXIT_ERROR
 	if(strnicmp(line, GE_PATH_TRANSLATION_ID, sizeof(GE_PATH_TRANSLATION_ID)-1) != 0)
@@ -1315,97 +1315,97 @@ GENESISAPI gePath* GENESISCC gePath_CreateFromFile(geVFile* pFile)
 
 
 	if(u != GE_PATH_ASCII_FILE_TYPE)
-		{
-			geErrorLog_Add( ERR_PATH_FILE_PARSE , NULL);
-			return NULL;
-		}
+	{
+		geErrorLog_Add( ERR_PATH_FILE_PARSE , NULL);
+		return NULL;
+	}
 
 	// Read the version.
 	if	(geVFile_GetS(pFile, line, LINE_LENGTH) == GE_FALSE)
-		{
-			geErrorLog_Add( ERR_PATH_FILE_READ , NULL);
-			return NULL;
-		}
+	{
+		geErrorLog_Add( ERR_PATH_FILE_READ , NULL);
+		return NULL;
+	}
 	if	(sscanf(line, "%X.%X\n", &u, &v) != 2)
-		{
-			geErrorLog_Add( ERR_PATH_FILE_PARSE , NULL);
-			return NULL;
-		}
+	{
+		geErrorLog_Add( ERR_PATH_FILE_PARSE , NULL);
+		return NULL;
+	}
 	v |= (u << 8);
 	if(v == GE_PATH_FILE_VERSION0)
 		return gePath_CreateFromFile_F0_(pFile);
 	if (! ((v == GE_PATH_FILE_VERSION1) || (v== GE_PATH_FILE_VERSION)) )
-		{
-			geErrorLog_Add( ERR_PATH_FILE_PARSE , NULL);
-			return NULL;
-		}
+	{
+		geErrorLog_Add( ERR_PATH_FILE_PARSE , NULL);
+		return NULL;
+	}
 
 	P = gePath_Create(0, 0, GE_FALSE);
 	if( P == NULL )
-		{
-			return NULL;	// error logged already in gePath_Create
-		}
+	{
+		return NULL;	// error logged already in gePath_Create
+	}
 
 	if(geVFile_GetS(pFile, line, LINE_LENGTH) == GE_FALSE)
 		EXIT_ERROR
 	if(strnicmp(line, GE_PATH_ROTATION_ID, sizeof(GE_PATH_ROTATION_ID)-1) != 0)
 		EXIT_ERROR
 	if (v==GE_PATH_FILE_VERSION1)
-		{
-			P->Rotation.InterpolationType    = 0;
-			if(sscanf(line + sizeof(GE_PATH_ROTATION_ID)-1, "%d", &flag) != 1)
-				EXIT_ERROR
-		}
+	{
+		P->Rotation.InterpolationType    = 0;
+		if(sscanf(line + sizeof(GE_PATH_ROTATION_ID)-1, "%d", &flag) != 1)
+			EXIT_ERROR
+	}
 	else
+	{
+		if (v==GE_PATH_FILE_VERSION)
 		{
-			if (v==GE_PATH_FILE_VERSION)
-				{
-					if(sscanf(line + sizeof(GE_PATH_ROTATION_ID)-1, "%d %d", &flag, &(P->Rotation.InterpolationType)) != 2)
-						EXIT_ERROR
-				}
-			else
+			if(sscanf(line + sizeof(GE_PATH_ROTATION_ID)-1, "%d %d", &flag, &(P->Rotation.InterpolationType)) != 2)
 				EXIT_ERROR
 		}
+		else
+			EXIT_ERROR
+	}
 	if (flag!=GE_FALSE)
-		{
-			P->Rotation.KeyList = geQKFrame_CreateFromFile(pFile,&Interp,&Loop);
-			if (P->Rotation.KeyList == NULL)
-				EXIT_ERROR
-			P->Rotation.InterpolationType = gePath_QKToPathInterpolation(Interp);
-			if (Loop)
-				P->Looped = FLAG_LOOPED;
-		}
+	{
+		P->Rotation.KeyList = geQKFrame_CreateFromFile(pFile,&Interp,&Loop);
+		if (P->Rotation.KeyList == NULL)
+			EXIT_ERROR
+		P->Rotation.InterpolationType = gePath_QKToPathInterpolation(Interp);
+		if (Loop)
+			P->Looped = FLAG_LOOPED;
+	}
 
 	if(geVFile_GetS(pFile, line, LINE_LENGTH) == GE_FALSE)
 		EXIT_ERROR
 	if(strnicmp(line, GE_PATH_TRANSLATION_ID, sizeof(GE_PATH_TRANSLATION_ID)-1) != 0)
 		EXIT_ERROR
 	if (v==GE_PATH_FILE_VERSION1)
-		{
-			P->Translation.InterpolationType = 0;
-			if(sscanf(line + sizeof(GE_PATH_TRANSLATION_ID)-1, "%d", &flag) != 1)
-				EXIT_ERROR
-		}
+	{
+		P->Translation.InterpolationType = 0;
+		if(sscanf(line + sizeof(GE_PATH_TRANSLATION_ID)-1, "%d", &flag) != 1)
+			EXIT_ERROR
+	}
 	else
+	{
+		if (v==GE_PATH_FILE_VERSION)
 		{
-			if (v==GE_PATH_FILE_VERSION)
-				{
-					if(sscanf(line + sizeof(GE_PATH_TRANSLATION_ID)-1, "%d %d", &flag, &(P->Translation.InterpolationType)) != 2)
-						EXIT_ERROR
-				}
-			else
+			if(sscanf(line + sizeof(GE_PATH_TRANSLATION_ID)-1, "%d %d", &flag, &(P->Translation.InterpolationType)) != 2)
 				EXIT_ERROR
 		}
+		else
+			EXIT_ERROR
+	}
 
 	if (flag!=GE_FALSE)
-		{
-			P->Translation.KeyList = geVKFrame_CreateFromFile(pFile,&Interp,&Loop);
-			if (P->Translation.KeyList == NULL)
-				EXIT_ERROR
-			P->Translation.InterpolationType = gePath_VKToPathInterpolation(Interp);
-			if (Loop)
-				P->Looped = FLAG_LOOPED;
-		}
+	{
+		P->Translation.KeyList = geVKFrame_CreateFromFile(pFile,&Interp,&Loop);
+		if (P->Translation.KeyList == NULL)
+			EXIT_ERROR
+		P->Translation.InterpolationType = gePath_VKToPathInterpolation(Interp);
+		if (Loop)
+			P->Looped = FLAG_LOOPED;
+	}
 
 	P->Dirty = FLAG_DIRTY;
 	return P;
@@ -1433,31 +1433,31 @@ GENESISAPI geBoolean GENESISCC gePath_WriteToFile(const gePath *P,geVFile *pFile
 	// Write the version
 	if	(geVFile_Printf(pFile, " %X.%.2X\n", (GE_PATH_FILE_VERSION & 0xFF00) >> 8,
 									GE_PATH_FILE_VERSION & 0x00FF) == GE_FALSE)
-		{
-			geErrorLog_Add( ERR_PATH_FILE_WRITE , NULL);
-			return GE_FALSE;
-		}
+	{
+		geErrorLog_Add( ERR_PATH_FILE_WRITE , NULL);
+		return GE_FALSE;
+	}
 
 	{
 		int flag;
 		flag = GE_FALSE;
 
 		if (P->Rotation.KeyList != NULL)
+		{
+			if (geTKArray_NumElements(P->Rotation.KeyList)>0)
 			{
-				if (geTKArray_NumElements(P->Rotation.KeyList)>0)
-					{
-						flag = GE_TRUE;
-					}
+				flag = GE_TRUE;
 			}
+		}
 		if	(geVFile_Printf(pFile,
 						  "%s %d %d\n",
 						  GE_PATH_ROTATION_ID,
 						  flag,
 						  P->Rotation.InterpolationType) == GE_FALSE)
-			{
-				geErrorLog_Add( ERR_PATH_FILE_WRITE , NULL);
-				return GE_FALSE;
-			}
+		{
+			geErrorLog_Add( ERR_PATH_FILE_WRITE , NULL);
+			return GE_FALSE;
+		}
 
 		if (P->Looped)
 			Looped = 1;
@@ -1466,35 +1466,35 @@ GENESISAPI geBoolean GENESISCC gePath_WriteToFile(const gePath *P,geVFile *pFile
 			if (geQKFrame_WriteToFile( pFile, P->Rotation.KeyList,
 										gePath_PathToQKInterpolation(P->Rotation.InterpolationType),
 										Looped)==GE_FALSE)
-				{
-					return GE_FALSE;
-				}
+			{
+				return GE_FALSE;
+			}
 
 		flag = GE_FALSE;
 		if (P->Translation.KeyList != NULL)
+		{
+			if (geTKArray_NumElements(P->Translation.KeyList)>0)
 			{
-				if (geTKArray_NumElements(P->Translation.KeyList)>0)
-					{
-						flag = GE_TRUE;
-					}
+				flag = GE_TRUE;
 			}
+		}
 		if	(geVFile_Printf(pFile,
 						  "%s %d %d\n",
 						  GE_PATH_TRANSLATION_ID,
 						  flag,
 						  P->Translation.InterpolationType) == GE_FALSE)
-			{
-				geErrorLog_Add( ERR_PATH_FILE_WRITE , NULL);
-				return GE_FALSE;
-			}
+		{
+			geErrorLog_Add( ERR_PATH_FILE_WRITE , NULL);
+			return GE_FALSE;
+		}
 
 		if (flag!=GE_FALSE)
 			if (geVKFrame_WriteToFile( pFile, P->Translation.KeyList,
 										gePath_PathToVKInterpolation(P->Translation.InterpolationType),
 										Looped)==GE_FALSE)
-				{
-					return GE_FALSE;
-				}
+			{
+				return GE_FALSE;
+			}
 	}
 
 
@@ -1523,20 +1523,20 @@ GENESISAPI geBoolean GENESISCC gePath_WriteToBinaryFile(const gePath *P, geVFile
 	R=T=0;
 
 	if (P->Rotation.KeyList != NULL)
+	{
+		if (geTKArray_NumElements(P->Rotation.KeyList)>0)
 		{
-			if (geTKArray_NumElements(P->Rotation.KeyList)>0)
-				{
-					R = GE_TRUE;
-				}
+			R = GE_TRUE;
 		}
+	}
 
 	if (P->Translation.KeyList != NULL)
+	{
+		if (geTKArray_NumElements(P->Translation.KeyList)>0)
 		{
-			if (geTKArray_NumElements(P->Translation.KeyList)>0)
-				{
-					T = GE_TRUE;
-				}
+			T = GE_TRUE;
 		}
+	}
 
 	if (P->Looped)
 		Looped = 1;
@@ -1553,31 +1553,31 @@ GENESISAPI geBoolean GENESISCC gePath_WriteToBinaryFile(const gePath *P, geVFile
 		(P->Rotation.InterpolationType    << GE_PATH_ROT_SHIFT_INTO_HEADER  );
 
 	if	(geVFile_Write(F, &Header,sizeof(uint32)) == GE_FALSE)
-		{
-			geErrorLog_AddString( -1 ,"Failure to write Path Binary File Header", NULL);
-			return GE_FALSE;
-		}
+	{
+		geErrorLog_AddString( -1 ,"Failure to write Path Binary File Header", NULL);
+		return GE_FALSE;
+	}
 
 	if (T==1)
-		{
-			if (geVKFrame_WriteToBinaryFile( F, P->Translation.KeyList,
+	{
+		if (geVKFrame_WriteToBinaryFile( F, P->Translation.KeyList,
 										gePath_PathToVKInterpolation(P->Translation.InterpolationType),
 										Looped)==GE_FALSE)
-				{
-					geErrorLog_AddString( -1 ,"Failure to write Path data", NULL);
-					return GE_FALSE;
-				}
-		}
-	if (R==1)
 		{
-			if (geQKFrame_WriteToBinaryFile( F, P->Rotation.KeyList,
+			geErrorLog_AddString( -1 ,"Failure to write Path data", NULL);
+			return GE_FALSE;
+		}
+	}
+	if (R==1)
+	{
+		if (geQKFrame_WriteToBinaryFile( F, P->Rotation.KeyList,
 										gePath_PathToQKInterpolation(P->Rotation.InterpolationType),
 										Looped)==GE_FALSE)
-				{
-					geErrorLog_AddString( -1 ,"Failure to write Path data", NULL);
-					return GE_FALSE;
-				}
+		{
+			geErrorLog_AddString( -1 ,"Failure to write Path data", NULL);
+			return GE_FALSE;
 		}
+	}
 
 	return GE_TRUE;
 }
@@ -1592,19 +1592,19 @@ static gePath * GENESISCC gePath_CreateFromBinaryFile(geVFile *F,uint32 Header)
 	assert( F != NULL );
 
 	if ((Header>>16) != GE_PATH_BINARY_FILE_VERSION)
-		{
-			geErrorLog_AddString( -1, "Bad path binary file version" , NULL);
-			return NULL;
-		}
+	{
+		geErrorLog_AddString( -1, "Bad path binary file version" , NULL);
+		return NULL;
+	}
 
 	P = geRam_Allocate(sizeof(gePath));
 	P->Translation.KeyList = NULL;
 	P->Rotation.KeyList = NULL;
 	if (P == NULL)
-		{
-			geErrorLog_AddString( -1, "Failure to allocate memory for path" , NULL);
-			return NULL;
-		}
+	{
+		geErrorLog_AddString( -1, "Failure to allocate memory for path" , NULL);
+		return NULL;
+	}
 
 	P->Translation.InterpolationType = (Header >> GE_PATH_TRANS_SHIFT_INTO_HEADER) & GE_PATH_MAX_INT_TYPE_COUNT;
 	P->Rotation.InterpolationType    = (Header >> GE_PATH_ROT_SHIFT_INTO_HEADER) & GE_PATH_MAX_INT_TYPE_COUNT;
@@ -1620,37 +1620,37 @@ static gePath * GENESISCC gePath_CreateFromBinaryFile(geVFile *F,uint32 Header)
 	P-> RefCount = 0;
 
 	if ((Header >> 1) & 0x1)
+	{
+		P->Translation.KeyList = geVKFrame_CreateFromBinaryFile(F,&Interp,&Looping);
+		if (P->Translation.KeyList == NULL)
 		{
-			P->Translation.KeyList = geVKFrame_CreateFromBinaryFile(F,&Interp,&Looping);
-			if (P->Translation.KeyList == NULL)
-				{
-					geErrorLog_AddString( -1, "Failure to read translation keys" , NULL);
-					geRam_Free(P);
-					return NULL;
-				}
-			P->Translation.InterpolationType = gePath_VKToPathInterpolation(Interp);
-			if( Looping != 0 )
-				P->Looped = FLAG_LOOPED;
+			geErrorLog_AddString( -1, "Failure to read translation keys" , NULL);
+			geRam_Free(P);
+			return NULL;
 		}
+		P->Translation.InterpolationType = gePath_VKToPathInterpolation(Interp);
+		if( Looping != 0 )
+			P->Looped = FLAG_LOOPED;
+	}
 
 	if (Header & 0x1)
+	{
+		P->Rotation.KeyList = geQKFrame_CreateFromBinaryFile(F,&Interp,&Looping);
+		if (P->Rotation.KeyList == NULL)
 		{
-			P->Rotation.KeyList = geQKFrame_CreateFromBinaryFile(F,&Interp,&Looping);
-			if (P->Rotation.KeyList == NULL)
-				{
-					geErrorLog_AddString( -1, "Failure to read rotation keys" , NULL);
-					if (P->Translation.KeyList != NULL)
-						{
-							geTKArray_Destroy(&P->Translation.KeyList);
-						}
-					geRam_Free(P);
-					return NULL;
-				}
-			P->Rotation.InterpolationType = gePath_QKToPathInterpolation(Interp);
-			if( Looping != 0 )
-				P->Looped = FLAG_LOOPED;
-
+			geErrorLog_AddString( -1, "Failure to read rotation keys" , NULL);
+			if (P->Translation.KeyList != NULL)
+			{
+				geTKArray_Destroy(&P->Translation.KeyList);
+			}
+			geRam_Free(P);
+			return NULL;
 		}
+		P->Rotation.InterpolationType = gePath_QKToPathInterpolation(Interp);
+		if( Looping != 0 )
+			P->Looped = FLAG_LOOPED;
+
+	}
 	P->Dirty = FLAG_DIRTY;
 	return P;
 }
