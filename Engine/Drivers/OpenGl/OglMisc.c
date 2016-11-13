@@ -29,18 +29,18 @@
 void InitMatrices(int width, int height)
 {
 	glMatrixMode(GL_PROJECTION);
- 	glLoadIdentity();
- 	glOrtho(0.0f, (GLfloat)width, 0.0f, (GLfloat)height, 0.0f, 1.0f);
- 	glMatrixMode(GL_MODELVIEW);
- 	glLoadIdentity();
- 	glViewport(0, 0, width, height);
+	glLoadIdentity();
+	glOrtho(0.0f, (GLfloat)width, 0.0f, (GLfloat)height, 0.0f, 1.0f);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glViewport(0, 0, width, height);
 
 	glScalef(1.0f, -1.0f, 1.0f);
 	glTranslatef(0, 0 - (GLfloat)height, 0.0);
 }
 
 
-// Checks to see if a specific OpenGL extention is present.  Used to look for multitexture 
+// Checks to see if a specific OpenGL extention is present.  Used to look for multitexture
 // support.
 geBoolean ExtensionExists(const char *extension)
 {
@@ -58,8 +58,8 @@ geBoolean ExtensionExists(const char *extension)
 	extensions = glGetString(GL_EXTENSIONS);
 
 	begin = extensions;
-	
-	while(GE_TRUE) 
+
+	while(GE_TRUE)
 	{
 		cursor = (GLubyte *) strstr((const char *) begin, extension);
 
@@ -77,7 +77,7 @@ geBoolean ExtensionExists(const char *extension)
 				return GE_TRUE;
 			}
 		}
-		
+
 		begin = end;
 	}
 
@@ -87,7 +87,7 @@ geBoolean ExtensionExists(const char *extension)
 
 // Takes a GE_PIXELFORMAT_24BIT_RGB bitmap and converts it to a GE_PIXELFORMAT_32BIT_ABGR,
 // replacing colorkey pixels with alpha information.
-void CkBlit24_32(GLubyte *dstPtr, GLint dstWidth, GLint dstHeight, GLubyte *srcPtr, GLint srcWidth, 
+void CkBlit24_32(GLubyte *dstPtr, GLint dstWidth, GLint dstHeight, GLubyte *srcPtr, GLint srcWidth,
 				 GLint srcHeight)
 {
 	GLint width, height;

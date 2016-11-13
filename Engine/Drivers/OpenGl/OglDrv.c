@@ -30,7 +30,7 @@
 
 
 int32 LastError;
-char LastErrorStr[255];		
+char LastErrorStr[255];
 
 GLfloat	CurrentGamma = 1.0f;
 DRV_Window	ClientWindow;
@@ -48,7 +48,7 @@ PFNGLMULTITEXCOORD4FARBPROC glMultiTexCoord4fARB;
 
 
 
-DRV_Driver OGLDRV = 
+DRV_Driver OGLDRV =
 {
 
 	"OpenGL driver. v"DRV_VMAJS"."DRV_VMINS". Copyright 1999, Eclipse Inc.; All Rights Reserved.",
@@ -58,10 +58,10 @@ DRV_Driver OGLDRV =
 
 	DRV_ERROR_NONE,
 	NULL,
-	
+
 	EnumSubDrivers,
 	EnumModes,
-	
+
 	EnumPixelFormats,
 
 	DrvInit,
@@ -76,11 +76,11 @@ DRV_Driver OGLDRV =
 	THandle_Lock,
 	THandle_UnLock,
 
-	NULL, 
-	NULL, 
+	NULL,
+	NULL,
 
-	NULL, 
-	NULL, 
+	NULL,
+	NULL,
 
 	THandle_GetInfo,
 
@@ -114,7 +114,7 @@ DRV_Driver OGLDRV =
 
 	ScreenShot,
 
-	SetGamma, 
+	SetGamma,
 	GetGamma,
 
 	SetFogEnable,
@@ -141,13 +141,13 @@ geBoolean DRIVERCC SetFogEnable(geBoolean Enable, float r, float g, float b, flo
 		glFogfv(GL_FOG_COLOR, fogColor);
 		//glFogf(GL_FOG_DENSITY, 1.0f); // changed QD Fog: only used for exponential fogmode
 		glHint(GL_FOG_HINT, GL_FASTEST);
-		
+
 		// changed QD Fog
 		if(Start < 1.0f)
 			Start = 1.0f;
 		if(End < 1.0f)
 			End = 1.0f;
-		glFogf(GL_FOG_START, 1.0f- 1.0f/Start); 
+		glFogf(GL_FOG_START, 1.0f- 1.0f/Start);
 		glFogf(GL_FOG_END, 1.0f - 1.0f/End);
 		FogEnabled = GE_TRUE;
 		glClearColor(fogColor[0], fogColor[1], fogColor[2], 1.0); /* fog color */
@@ -202,25 +202,25 @@ geBoolean DRIVERCC DrvInit(DRV_DriverHook *Hook)
 	}
 
 	WindowSetup(Hook);
-	
+
 	if(Hook->Width == -1 && Hook->Height == -1)
 	{
 		GetClientRect(Hook->hWnd, &WRect);
-		
+
 		Hook->Width = (WRect.right - WRect.left);
 		Hook->Height = (WRect.bottom - WRect.top);
 	}
 	else if(!SetFullscreen(Hook))
 	{
 		return GE_FALSE;
-	} 
+	}
 
 	SetGLPixelFormat(Hook);
 
 	ClientWindow.Width = Hook->Width;
 	ClientWindow.Height = Hook->Height;
 	ClientWindow.hWnd = Hook->hWnd;
-	
+
 #ifdef USE_LIGHTMAPS
 	if(ExtensionExists("GL_ARB_multitexture"))
 	{
@@ -232,11 +232,11 @@ geBoolean DRIVERCC DrvInit(DRV_DriverHook *Hook)
 			multitexture = GL_TRUE;
 		}
 	}
-	else 
+	else
 #endif
 	{
 		multitexture = GL_FALSE;
-	} 
+	}
 
 
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
@@ -245,7 +245,7 @@ geBoolean DRIVERCC DrvInit(DRV_DriverHook *Hook)
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
 
-	glEnable(GL_BLEND);    
+	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glShadeModel(GL_SMOOTH);
@@ -256,10 +256,10 @@ geBoolean DRIVERCC DrvInit(DRV_DriverHook *Hook)
 		glActiveTextureARB(GL_TEXTURE1_ARB);
 
 		glDisable(GL_TEXTURE_1D);
-		glDisable(GL_TEXTURE_2D);		
+		glDisable(GL_TEXTURE_2D);
 
 		glActiveTextureARB(GL_TEXTURE0_ARB);
-	} 
+	}
 
 	SetFogEnable(GE_FALSE, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 
@@ -310,13 +310,13 @@ geBoolean	DRIVERCC DrvSetActive(geBoolean Active)
 
 
 geBoolean DRIVERCC SetGamma(float Gamma)
-{	
- 	GLfloat lut[256];
+{
+	GLfloat lut[256];
 	GLint	i;
-	
+
 	CurrentGamma = Gamma;
-	
- 	for(i = 0; i < 256; i++)
+
+	for(i = 0; i < 256; i++)
 	{
 		lut[i] = (GLfloat)pow(i / 255.0, 1.0 / CurrentGamma);
 	}
@@ -324,7 +324,7 @@ geBoolean DRIVERCC SetGamma(float Gamma)
 	glPixelTransferi(GL_MAP_COLOR, GL_TRUE);
 	glPixelMapfv(GL_PIXEL_MAP_R_TO_R, 256, lut);
 	glPixelMapfv(GL_PIXEL_MAP_G_TO_G, 256, lut);
-	glPixelMapfv(GL_PIXEL_MAP_B_TO_B, 256, lut); 
+	glPixelMapfv(GL_PIXEL_MAP_B_TO_B, 256, lut);
 
 	return GE_TRUE;
 }
@@ -333,7 +333,7 @@ geBoolean DRIVERCC SetGamma(float Gamma)
 geBoolean DRIVERCC GetGamma(float *Gamma)
 {
 	*Gamma = CurrentGamma;
-	
+
 	return TRUE;
 }
 
@@ -347,11 +347,11 @@ DllExport BOOL DriverHook(DRV_Driver **Driver)
 	EngineSettings.PreferenceFlags = 0;
 
 	OGLDRV.EngineSettings = &EngineSettings;
-    
+
 	*Driver = &OGLDRV;
 
 	// Make sure the error string ptr is not null, or invalid!!!
-    OGLDRV.LastErrorStr = LastErrorStr;
+	OGLDRV.LastErrorStr = LastErrorStr;
 
 	SetLastDrvError(DRV_ERROR_NONE, "OGL:  No error.");
 
@@ -359,7 +359,7 @@ DllExport BOOL DriverHook(DRV_Driver **Driver)
 }
 
 
-geBoolean DRIVERCC EnumModes(int32 Driver, char *DriverName, DRV_ENUM_MODES_CB *Cb, 
+geBoolean DRIVERCC EnumModes(int32 Driver, char *DriverName, DRV_ENUM_MODES_CB *Cb,
 							 void *Context)
 {
 	GLint modeCount = 0;
@@ -382,11 +382,11 @@ geBoolean DRIVERCC EnumSubDrivers(DRV_ENUM_DRV_CB *Cb, void *Context)
 }
 
 
-// For now, we keep it simple. In the future, we may want to added paletted support 
+// For now, we keep it simple. In the future, we may want to added paletted support
 // (or maybe not)...and also check for OpenGL extentions, like GL_EXT_abgr, GL_EXT_bgra, etc.
-// Note: OpenGL is traditionally RGBA based.  ABGR is used here because of endian-oddness in 
+// Note: OpenGL is traditionally RGBA based.  ABGR is used here because of endian-oddness in
 // the naming of Genesis's pixel formats.
-// See: (Genesis Engine's) Bitmap/pixelformat.h for more information. 
+// See: (Genesis Engine's) Bitmap/pixelformat.h for more information.
 geRDriver_PixelFormat	PixelFormats[] =
 {
 	{GE_PIXELFORMAT_32BIT_ABGR,		RDRIVER_PF_3D | RDRIVER_PF_COMBINE_LIGHTMAP},
@@ -416,7 +416,7 @@ geBoolean DRIVERCC EnumPixelFormats(DRV_ENUM_PFORMAT_CB *Cb, void *Context)
 void SetLastDrvError(int32 Error, char *ErrorStr)
 {
 	LastError = Error;
-	
+
 	if(ErrorStr)
 	{
 		strcpy(LastErrorStr, ErrorStr);
@@ -442,13 +442,13 @@ geBoolean DRIVERCC ScreenShot(const char *Name)
 	char *newName;
 	int nameLen;
 
-	buffer = (GLubyte *)malloc(sizeof(GLubyte) * ClientWindow.Width * ClientWindow.Height * 3);	
+	buffer = (GLubyte *)malloc(sizeof(GLubyte) * ClientWindow.Width * ClientWindow.Height * 3);
 
 	glFinish();
 
-	glReadPixels(0, 0, ClientWindow.Width, ClientWindow.Height, 
+	glReadPixels(0, 0, ClientWindow.Width, ClientWindow.Height,
 		GL_BGR_EXT, GL_UNSIGNED_BYTE, buffer);
- 
+
 	memset(tgaHeader, 0, sizeof(tgaHeader));
 	tgaHeader[2] = 2;
 	tgaHeader[12] = (unsigned char)ClientWindow.Width;
@@ -456,7 +456,7 @@ geBoolean DRIVERCC ScreenShot(const char *Name)
 	tgaHeader[14] = (unsigned char)ClientWindow.Height;
 	tgaHeader[15] = (unsigned char)((unsigned long)ClientWindow.Height >> 8);
 	tgaHeader[16] = 24;
- 
+
 	// Convert the extention (if one exists) to .tga.  They probably expect a .bmp.
 	newName = strdup(Name);
 
@@ -470,22 +470,22 @@ geBoolean DRIVERCC ScreenShot(const char *Name)
 		}
 	}
 
-    fp = fopen(newName, "wb");
-    
+	fp = fopen(newName, "wb");
+
 	free(newName);
 
-	if(fp == NULL) 
+	if(fp == NULL)
 	{
 		free(buffer);
-        return GE_FALSE;
-    }
- 
-    fwrite(tgaHeader, 1, 18, fp);
-    fwrite(buffer, 3, ClientWindow.Width * ClientWindow.Height, fp);
-    fclose(fp);
- 
+		return GE_FALSE;
+	}
+
+	fwrite(tgaHeader, 1, 18, fp);
+	fwrite(buffer, 3, ClientWindow.Width * ClientWindow.Height, fp);
+	fclose(fp);
+
 	free(buffer);
-	
+
 	return GE_TRUE;
 }
 

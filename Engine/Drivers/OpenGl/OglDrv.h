@@ -27,7 +27,7 @@
 // These should, in the future, really be handled at run-time as opposed to compile-time.
 // The defaults work well with TNT2 based cards.
 unsigned int COLOR_DEPTH;	// Bits per pixel to use for OpenGL Window/Context
-unsigned int ZBUFFER_DEPTH;		// Depth of the ZBuffer to use in OpenGL.   
+unsigned int ZBUFFER_DEPTH;		// Depth of the ZBuffer to use in OpenGL.
 
 #define USE_LIGHTMAPS					// Render lightmaps
 #define USE_LINEAR_INTERPOLATION		// Comment out to use nearest neighbor interpolation
@@ -38,7 +38,7 @@ extern		DRV_Driver	OGLDRV;
 extern		DRV_Window	ClientWindow;
 
 extern		PFNGLACTIVETEXTUREARBPROC glActiveTextureARB;
-extern      PFNGLMULTITEXCOORD4FARBPROC glMultiTexCoord4fARB;
+extern		PFNGLMULTITEXCOORD4FARBPROC glMultiTexCoord4fARB;
 extern		GLboolean multitexture;
 
 extern		maxTextureSize;

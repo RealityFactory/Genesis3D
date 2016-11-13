@@ -24,7 +24,7 @@
 
 #include "DCommon.h"
 
-struct 
+struct
 {
 	GLuint width;
 	GLuint height;
