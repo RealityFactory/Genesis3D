@@ -184,7 +184,7 @@ const uint32 geEngine_Version_OldestSupported =
 
 geEngine *Sys_EngineCreate(HWND hWnd, const char *AppName, const char *DriverDirectory, uint32 Version)
 {
-	int32			i;
+	int16			i;
 	geEngine		*NewEngine;
 	int				Length;
 
