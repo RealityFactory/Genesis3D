@@ -161,7 +161,7 @@ typedef enum
 //MRB END
 // changed QD Shadows
 	GE_ERR_BEGIN_SHADOWVOLUMES_FAILED,
-	GE_ERR_END_SHADOWVOLUMES_FAILED,
+	GE_ERR_END_SHADOWVOLUMES_FAILED
 // end change
 } geErrorLog_ErrorIDEnumType;
 
@@ -183,7 +183,7 @@ typedef enum
 
 	GE_ERR_LIST_FULL,
 	GE_ERR_DATA_FORMAT,
-	GE_ERR_SEARCH_FAILURE,
+	GE_ERR_SEARCH_FAILURE
 } geErrorLog_ErrorClassType;
 
 GENESISAPI void geErrorLog_Clear(void);

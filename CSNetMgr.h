@@ -49,7 +49,7 @@ typedef enum
 	NET_MSG_DESTROY_CLIENT,			// An existing client has left
 	NET_MSG_HOST,					// We are the server now
 	NET_MSG_SESSIONLOST,			// Connection was lost
-	NET_MSG_SERVER_ID,				// Internal, for hand shaking process
+	NET_MSG_SERVER_ID				// Internal, for hand shaking process
 } geCSNetMgr_NetMsgType;
 
 typedef struct
