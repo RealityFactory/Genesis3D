@@ -6,10 +6,9 @@
 /*                                                                                      */
 /* Edit History:                                                                        */
 /*  01/20/2004 Wendell Buckner                                                          */
-/*   LOGO CRASH BUG - On some machines with fast proccessors (2.0ghz or better,         */  
-/*   typically intel) the value return                                                  */
-/*   value return by Sys_GetCPUFreq is to large for the following variable make it a    */
-/*   large_integer                                                                      */
+/*   LOGO CRASH BUG - On some machines with fast proccessors (2.0ghz or better,         */
+/*   typically intel) the value returned by Sys_GetCPUFreq is too large for the         */
+/*   following variable - make it a large_integer                                       */
 /*   Fix provided by Latex and IronDragon from the genesis3d forum                      */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
@@ -54,7 +53,7 @@ extern "C" {
 typedef enum
 {
 	FrameState_None = 0,
-	FrameState_Begin,
+	FrameState_Begin
 } geEngine_FrameState;
 
 //=====================================================================================
@@ -64,7 +63,7 @@ typedef enum
 #define MAX_CLIENT_STRING_LEN	80
 #define MAX_CLIENT_STRINGS		20
 
-typedef struct 
+typedef struct
 {
 	int32			x,y;
 	char			String[MAX_CLIENT_STRING_LEN];
@@ -82,7 +81,7 @@ typedef struct
 typedef struct
 {
 /* 01/20/2004 Wendell Buckner
-    LOGO CRASH BUG - On some machines with fast proccessors (2.0ghz or better, typically intel) the value return
+	LOGO CRASH BUG - On some machines with fast proccessors (2.0ghz or better, typically intel) the value return
 	by Sys_GetCPUFreq is to large for the following variable make it a large_integer
 	Fix provide by Latex and IronDragon from the genesis3d forum
 	int32		  Freq; */
@@ -117,9 +116,9 @@ typedef struct
 
 	//	Data for current driver
 	geBoolean		Active;				// GE_TRUE if a driver and mode has been initialized
-	
+
 	HINSTANCE		DriverHandle;		// CurrentDriver Handle (for DLL)
-	
+
 	geDriver		*CurDriver;			// Current driver
 	geDriver_Mode	*CurMode;			// Current mode
 	DRV_Driver		*RDriver;			// Current driver function hook
@@ -192,7 +191,7 @@ typedef struct geEngine
 
 	int32				NumWorlds;						// Number of active worlds in world list
 	geWorld				*Worlds[ENGINE_MAX_WORLDS];		// Linear array of worlds contained in WorldList
-	
+
 	// Light module info
 	uint8				StyleLUT1[64][256];	// Style intensity table (StyleLUT1[Intensity][Number]);
 

@@ -4,7 +4,7 @@
 /*  Author: John Pollard                                                                */
 /*  Description: Header file for all driver modules.                                    */
 /*                                                                                      */
-/* Edit History:                                                                        */ 
+/* Edit History:                                                                        */
 /*  05/04/2004 Wendell Buckner                                                          */
 /*   TODO: CUBEMAPPING                                                                  */
 /*  02/21/2004 Wendell Buckner                                                          */
@@ -15,7 +15,7 @@
 /*   DOT3 BUMPMAPPING                                                                   */
 /*  05/19/2003 Wendell Buckner                                                          */
 /*   BUMPMAPPING                                                                        */
-/*  04/09/2003 Wendell Buckner                                                          */ 
+/*  04/09/2003 Wendell Buckner                                                          */
 /*   BUMPMAPPING                                                                        */
 /*  04/07/2003 Wendell Buckner                                                          */
 /*   BUMPMAPPING                                                                        */
@@ -89,15 +89,19 @@ typedef geFloat               FLOAT;
 
 typedef struct tagRECT
 {
-    LONG    left;
-    LONG    top;
-    LONG    right;
-    LONG    bottom;
+	LONG    left;
+	LONG    top;
+	LONG    right;
+	LONG    bottom;
 } RECT;
 
 #endif // WINVER
 
-#define	DRIVERCC _fastcall
+#if defined(__linux__)
+	#define	DRIVERCC	__attribute__((fastcall))
+#elif defined _WIN32 || defined _WIN64
+	#define	DRIVERCC	_fastcall
+#endif
 
 #ifndef __cplusplus
 	#define DllImport	__declspec( dllimport )
@@ -136,52 +140,52 @@ typedef struct geRDriver_THandle	geRDriver_THandle;
 #define RDRIVER_PF_OPTIONAL_SHIFT			(16)
 #define RDRIVER_PF_HAS_ALPHA_SHIFT			(RDRIVER_PF_OPTIONAL_SHIFT + 0)		// Surface can take an alpha map
 #define RDRIVER_PF_CAN_DO_COLORKEY_SHIFT	(RDRIVER_PF_OPTIONAL_SHIFT + 1)		// Surface supports colorkeying
-#define RDRIVER_PF_COMBINE_LIGHTMAP_SHIFT	(RDRIVER_PF_OPTIONAL_SHIFT + 2)			// Supports being rendered with a lightmap (3d will be set as well)
+#define RDRIVER_PF_COMBINE_LIGHTMAP_SHIFT	(RDRIVER_PF_OPTIONAL_SHIFT + 2)		// Supports being rendered with a lightmap (3d will be set as well)
 
 /* 04/07/2003 Wendell Buckner
-    BUMPMAPPING */
+	BUMPMAPPING */
 #define RDRIVER_PF_BUMPMAP_SHIFT             (RDRIVER_PF_OPTIONAL_SHIFT + 3)
 #define RDRIVER_PF_COMBINE_BUMPMAP_SHIFT     (RDRIVER_PF_OPTIONAL_SHIFT + 4)
 
 /* 02/17/2004 Wendell Buckner
-    DOT3 BUMPMAPPING  */
+	DOT3 BUMPMAPPING  */
 #define RDRIVER_PF_COMBINE_EMBMBUMPMAP_SHIFT   (RDRIVER_PF_OPTIONAL_SHIFT + 4)
 #define RDRIVER_PF_COMBINE_DOT3BUMPMAP_SHIFT   (RDRIVER_PF_OPTIONAL_SHIFT + 5)
 #define RDRIVER_PF_COMBINE_EMBOSSBUMPMAP_SHIFT (RDRIVER_PF_OPTIONAL_SHIFT + 6)
 
 /* 05/04/2004 Wendell Buckner
-    TODO: CUBEMAPPING 
+	TODO: CUBEMAPPING
 #define RDRIVER_PF_COMBINE_CUBEMAP_SHIFT       (RDRIVER_PF_OPTIONAL_SHIFT + 7) */
 
-#define RDRIVER_PF_2D					(1<<RDRIVER_PF_2D_SHIFT)				
-#define RDRIVER_PF_3D					(1<<RDRIVER_PF_3D_SHIFT)				
-#define RDRIVER_PF_LIGHTMAP				(1<<RDRIVER_PF_LIGHTMAP_SHIFT)			
-#define RDRIVER_PF_COMBINE_LIGHTMAP		(1<<RDRIVER_PF_COMBINE_LIGHTMAP_SHIFT)	
-#define RDRIVER_PF_PALETTE				(1<<RDRIVER_PF_PALETTE_SHIFT)			
-#define RDRIVER_PF_ALPHA				(1<<RDRIVER_PF_ALPHA_SHIFT)			
+#define RDRIVER_PF_2D					(1<<RDRIVER_PF_2D_SHIFT)
+#define RDRIVER_PF_3D					(1<<RDRIVER_PF_3D_SHIFT)
+#define RDRIVER_PF_LIGHTMAP				(1<<RDRIVER_PF_LIGHTMAP_SHIFT)
+#define RDRIVER_PF_COMBINE_LIGHTMAP		(1<<RDRIVER_PF_COMBINE_LIGHTMAP_SHIFT)
+#define RDRIVER_PF_PALETTE				(1<<RDRIVER_PF_PALETTE_SHIFT)
+#define RDRIVER_PF_ALPHA				(1<<RDRIVER_PF_ALPHA_SHIFT)
 #define RDRIVER_PF_CAN_DO_COLORKEY		(1<<RDRIVER_PF_CAN_DO_COLORKEY_SHIFT)
-#define RDRIVER_PF_HAS_ALPHA			(1<<RDRIVER_PF_HAS_ALPHA_SHIFT)		
+#define RDRIVER_PF_HAS_ALPHA			(1<<RDRIVER_PF_HAS_ALPHA_SHIFT)
 #define RDRIVER_PF_MAJOR_MASK			((1<<RDRIVER_PF_OPTIONAL_SHIFT)-1)
 
 /* 04/07/2003 Wendell Buckner
-    BUMPMAPPING */
+	BUMPMAPPING */
 #define RDRIVER_PF_BUMPMAP				(1<<RDRIVER_PF_BUMPMAP_SHIFT)
 #define RDRIVER_PF_COMBINE_BUMPMAP		(1<<RDRIVER_PF_COMBINE_BUMPMAP_SHIFT)
 
 /* 02/17/2004 Wendell Buckner
-    DOT3 BUMPMAPPING  */
+	DOT3 BUMPMAPPING  */
 #define RDRIVER_PF_COMBINE_EMBMBUMPMAP	 (1<<RDRIVER_PF_COMBINE_BUMPMAP_SHIFT)
 #define RDRIVER_PF_COMBINE_DOT3BUMPMAP	 (1<<RDRIVER_PF_COMBINE_DOT3BUMPMAP_SHIFT)
 #define RDRIVER_PF_COMBINE_EMBOSSBUMPMAP (1<<RDRIVER_PF_COMBINE_EMBOSSBUMPMAP_SHIFT)
 
 /* 05/04/2004 Wendell Buckner
-    TODO: CUBEMAPPING 
+	TODO: CUBEMAPPING
 #define RDRIVER_PF_CUBEMAP		(1<<RDRIVER_PF_COMBINE_CUBEMAP_SHIFT)	*/
 
 typedef struct
 {
 	gePixelFormat	PixelFormat;
-	uint32			Flags;				
+	uint32			Flags;
 } geRDriver_PixelFormat;
 
 #define RDRIVER_THANDLE_HAS_COLORKEY	(1<<0)		// The thandle is using color keying
@@ -216,7 +220,7 @@ typedef struct
 typedef struct
 {
 	HWND		hWnd;
-	
+
 	U8			*Buffer;
 
 	S32			Width;
@@ -238,9 +242,9 @@ typedef struct
 	S32			B_width;
 } DRV_Window;
 
-typedef struct 
+typedef struct
 {
-    U8 r, g, b;								// RGB components for RGB lightmaps
+	U8 r, g, b;								// RGB components for RGB lightmaps
 } DRV_RGB;
 
 //===========================================================================================
@@ -273,8 +277,8 @@ typedef struct
 typedef struct
 {
 	S16					Width, Height;				// lightmap width/height / 16 +1
-    S32					MinU, MinV;					// Min U,V values
-    DRV_RGB				*RGBLight[2];				// Pointer to RGB light map data
+	S32					MinU, MinV;					// Min U,V values
+	DRV_RGB				*RGBLight[2];				// Pointer to RGB light map data
 
 	S32					Face;						// Face that this map belongs too
 	geRDriver_THandle	*THandle;
@@ -282,13 +286,13 @@ typedef struct
 
 typedef struct
 {
-	geFloat		ShiftU;						// How much to shift right before draw
+	geFloat		ShiftU;							// How much to shift right before draw
 	geFloat		ShiftV;
 
 	geFloat		DrawScaleU;						// How much to scale right before draw
 	geFloat		DrawScaleV;
 } DRV_TexInfo;
-    
+
 // Render Flags for ALL render functions
 #define DRV_RENDER_ALPHA		(1<<0)	// Render function should expect alpha set in vertices
 #define DRV_RENDER_FLUSH		(1<<1)	// Render function should gaurentee that this render happens NOW
@@ -298,17 +302,17 @@ typedef struct
 #define DRV_RENDER_POLY_NO_FOG	(1<<5)	// Don't render fog render state
 
 /* 04/09/2003 Wendell Buckner
-    BUMPMAPPING  */
+	BUMPMAPPING  */
 #define DRV_RENDER_BUMPMAP (1<<6)
 
 /* 01/01/2004 Wendell Buckner
-    DOT3 BUMPMAPPING  */
+	DOT3 BUMPMAPPING  */
 #define DRV_RENDER_EMBMBUMPMAP     (1<<6)
 #define DRV_RENDER_DOT3BUMPMAP     (1<<7)
 #define DRV_RENDER_EMBOSSBUMPMAP   (1<<8)
 
 /* 05/04/2004 Wendell Buckner
-    TODO: CUBEMAPPING  
+	TODO: CUBEMAPPING
 #define DRV_RENDER_CUBEMAP   (1<<8) */
 
 //
@@ -384,8 +388,8 @@ typedef struct
 #define DRV_SUPPORT_COLORKEY				(1<<1)		// Driver can do pixel masking
 #define DRV_SUPPORT_GAMMA					(1<<2)		// Gamma function works with the driver
 
-/* 02/21/2004 Wendell Buckner                                                         
-    DOT3 BUMPMAPPING                                                                  */
+/* 02/21/2004 Wendell Buckner
+	DOT3 BUMPMAPPING                                                                  */
 #define DRV_SUPPORT_EMBM					(1<<3)		// Gamma function works with the driver
 #define DRV_SUPPORT_DOT3					(1<<4)		// Gamma function works with the driver
 // changed QD
@@ -409,11 +413,11 @@ typedef struct
 typedef geBoolean DRV_ENUM_MODES_CB( S32 Mode, char *ModeName, S32 Width, S32 Height, void *Context);
 typedef geBoolean DRV_ENUM_DRV_CB( S32 Driver, char *DriverName, void *Context);
 
-typedef geBoolean DRIVERCC DRV_ENUM_DRIVER(DRV_ENUM_DRV_CB *Cb, void *Context); 
-typedef geBoolean DRIVERCC DRV_ENUM_MODES(S32 Driver, char *DriverName, DRV_ENUM_MODES_CB *Cb, void *Context); 
+typedef geBoolean DRIVERCC DRV_ENUM_DRIVER(DRV_ENUM_DRV_CB *Cb, void *Context);
+typedef geBoolean DRIVERCC DRV_ENUM_MODES(S32 Driver, char *DriverName, DRV_ENUM_MODES_CB *Cb, void *Context);
 
 typedef geBoolean DRV_ENUM_PFORMAT_CB(geRDriver_PixelFormat *Format, void *Context);
-typedef geBoolean DRIVERCC DRV_ENUM_PFORMAT(DRV_ENUM_PFORMAT_CB *Cb, void *Context); 
+typedef geBoolean DRIVERCC DRV_ENUM_PFORMAT(DRV_ENUM_PFORMAT_CB *Cb, void *Context);
 
 // Create/Destroy/Etc Driver functions
 typedef geBoolean DRIVERCC DRV_INIT(DRV_DriverHook *Hook);
@@ -438,7 +442,7 @@ typedef geRDriver_THandle *DRIVERCC GET_ALPHA(geRDriver_THandle *THandle);
 typedef geBoolean DRIVERCC THANDLE_GET_INFO(geRDriver_THandle *THandle, int32 MipLevel, geRDriver_THandleInfo *Info);
 
 /* 05/19/2003 Wendell Buckner
-    BUMPMAPPING */
+	BUMPMAPPING */
 typedef geBoolean DRIVERCC COMBINE_TEXTURE(geRDriver_THandle **THandle,int32 THandleCount);
 typedef geBoolean DRIVERCC UNCOMBINE_TEXTURE(geRDriver_THandle **THandle,int32 THandleCount);
 
@@ -487,11 +491,11 @@ typedef struct
 	// Error handling hooks set by driver
 	S32					LastError;							// Last error driver made
 	char				*LastErrorStr;						// NULL terminated error string
-	
+
 	// Enum Modes/Drivers
 	DRV_ENUM_DRIVER		*EnumSubDrivers;
 	DRV_ENUM_MODES		*EnumModes;
-	
+
 	DRV_ENUM_PFORMAT	*EnumPixelFormats;
 
 	// Init/DeInit functions
@@ -500,7 +504,7 @@ typedef struct
 	DRV_RESET					*Reset;
 	DRV_UPDATE_WINDOW			*UpdateWindow;
 	DRV_SET_ACTIVE				*SetActive;
-	
+
 	// Create/Destroy texture functions
 	CREATE_TEXTURE		*THandle_Create;
 	DESTROY_TEXTURE		*THandle_Destroy;
@@ -533,7 +537,7 @@ typedef struct
 	END_SHADOWVOLUMES	*EndShadowVolumes;
 	S32					StencilTestMode; // zpass = 1 or zfail = 0?
 // end change
-	
+
 	// Render functions
 	RENDER_G_POLY		*RenderGouraudPoly;
 	RENDER_W_POLY		*RenderWorldPoly;
@@ -558,7 +562,7 @@ typedef struct
 
 	DRV_SET_FOG_ENABLE	*SetFogEnable;
 	DRV_SET_CLEARCOLOR	*SetClearColor;
-	
+
 	// Driver preferences
 	DRV_EngineSettings	*EngineSettings;
 
@@ -570,8 +574,8 @@ typedef struct
 	GInfo				*GlobalInfo;
 #endif
 
-/* 05/19/2003 Wendell Buckner 
-    BUMPMAPPING */
+/* 05/19/2003 Wendell Buckner
+	BUMPMAPPING */
 	COMBINE_TEXTURE		*THandle_Combine;
 	UNCOMBINE_TEXTURE	*THandle_UnCombine;
 } DRV_Driver;
@@ -589,7 +593,7 @@ typedef geBoolean DRV_Hook(DRV_Driver **Hook);
 #define DRV_ERROR_INVALID_REGISTER_MODE	4	// Invalid register mode
 #define DRV_ERROR_NO_MEMORY				5	// Not enough ram
 #define DRV_ERROR_MAX_TEXTURES			6	// Max texture capacity has been exceeded...
-#define DRV_ERROR_GENERIC				7	// Generic error	 
+#define DRV_ERROR_GENERIC				7	// Generic error
 #define DRV_ERROR_UNDEFINED				8	// An undefined error has occured
 #define DRV_ERROR_INVALID_WINDOW_MODE	9	// Requested window/full not supported
 

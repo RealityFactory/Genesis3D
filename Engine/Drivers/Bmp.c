@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #define	WIN32_LEAN_AND_MEAN
@@ -27,7 +27,7 @@
 #define	WIDTH			640
 #define HEIGHT			480
 
-BITMAPFILEHEADER	bfh = 
+BITMAPFILEHEADER	bfh =
 {
 	((unsigned short)'B' | ((unsigned short)'M' << 8)),
 	sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFO) + WIDTH * HEIGHT * 2,
@@ -92,12 +92,12 @@ int WriteBMP(unsigned short *ScreenBuffer, const char *Name)
 		{
 			#ifdef BIT16
 				unsigned short	c;
-			
+
 				c = p[i];
 				c = (RED(c) << 10) + (GREEN(c) << 5) + BLUE(c);
 				p[i] = c;
 			#else
-				
+
 				#ifdef VER1
 				char c[3];
 				c = (char)(GREEN(p[i]) << 2);
@@ -120,7 +120,7 @@ int WriteBMP(unsigned short *ScreenBuffer, const char *Name)
 				*BuffPtr++ = (char)(GREEN(p[i]) << 2);
 				*BuffPtr++ = (char)(RED(p[i]) << 3);
 //				fwrite(&c[0], 3, 1, out);
- 				#endif
+				#endif
 				#endif
 			#endif
 		}

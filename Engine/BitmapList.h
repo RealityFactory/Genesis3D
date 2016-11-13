@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef BITMAPLIST_H
@@ -40,7 +40,7 @@ geBoolean BitmapList_SetGamma(BitmapList *pList, geFloat Gamma);
 geBoolean BitmapList_AttachAll(BitmapList *pList, DRV_Driver *Drivera, geFloat Gamma);
 geBoolean BitmapList_DetachAll(BitmapList *pList);
 
-	// _Add & _Remove do NOT return Ok/NOk	
+	// _Add & _Remove do NOT return Ok/NOk
 geBoolean BitmapList_Add(BitmapList *pList, geBitmap *Bitmap);	// returns Was It New ?
 geBoolean BitmapList_Remove(BitmapList *pList,geBitmap *Bitmap);// returns Was It Removed ?
 	// _Add & _Remove also do not do any Attach or Detach

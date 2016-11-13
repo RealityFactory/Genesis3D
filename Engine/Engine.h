@@ -2,8 +2,8 @@
 /*  Engine.h                                                                            */
 /*                                                                                      */
 /*  Author: Charles Bloom/John Pollard                                                  */
-/*  Description: Maintains the driver interface, as well as the bitmaps attached		*/
-/*					to the driver.														*/
+/*  Description: Maintains the driver interface, as well as the bitmaps attached        */
+/*                  to the driver                                                       */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -16,8 +16,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*  Genesis3D Version 1.1 released November 15, 1999                                 */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #ifndef GE_ENGINE_H
@@ -85,12 +85,12 @@ HINSTANCE geEngine_LoadLibrary( const char * lpLibFileName, const char *DriverDi
 geBoolean geEngine_ResetDriver(geEngine *Engine);
 GENESISAPI geDriver_System *geEngine_GetDriverSystem(geEngine *Engine);
 
-GENESISAPI geBoolean geEngine_SetDriverAndMode(	geEngine *Engine, 
-												geDriver *Driver, 
+GENESISAPI geBoolean geEngine_SetDriverAndMode(	geEngine *Engine,
+												geDriver *Driver,
 												geDriver_Mode *DriverMode);
 
-GENESISAPI geBoolean geEngine_SetDriverAndModeNoSplash(	geEngine *Engine, 
-												geDriver *Driver, 
+GENESISAPI geBoolean geEngine_SetDriverAndModeNoSplash(	geEngine *Engine,
+												geDriver *Driver,
 												geDriver_Mode *DriverMode);
 
 //-------- drawing with the engine (Decals & Misc Polys)
@@ -99,7 +99,7 @@ GENESISAPI geBoolean GENESISCC geEngine_DrawBitmap(const geEngine *Engine,
 	const geBitmap *Bitmap,
 	const geRect * Source, uint32 x, uint32 y);
 
-GENESISAPI geBoolean GENESISCC geEngine_DrawAlphaBitmap(	
+GENESISAPI geBoolean GENESISCC geEngine_DrawAlphaBitmap(
 		geEngine * Engine,
 		geBitmap * pBitmap,
 		geVec3d * VertUVArray,
@@ -110,16 +110,16 @@ GENESISAPI geBoolean GENESISCC geEngine_DrawAlphaBitmap(
 		GE_RGBA * RGBA_Array
 		);
 
-GENESISAPI void GENESISCC geEngine_RenderPoly(const geEngine *Engine, const GE_TLVertex *Points, 
+GENESISAPI void GENESISCC geEngine_RenderPoly(const geEngine *Engine, const GE_TLVertex *Points,
 						int NumPoints, const geBitmap *Texture, uint32 Flags);
 
-GENESISAPI void GENESISCC geEngine_RenderPolyArray(const geEngine *Engine, const GE_TLVertex ** pPoints, int * pNumPoints, int NumPolys, 
+GENESISAPI void GENESISCC geEngine_RenderPolyArray(const geEngine *Engine, const GE_TLVertex ** pPoints, int * pNumPoints, int NumPolys,
 								const geBitmap *Texture, uint32 Flags);
 
 // changed QD Shadows
 GENESISAPI geBoolean geEngine_SetStencilShadowsEnable(geEngine *Engine, geBoolean Enable, int NumLights, geFloat r, geFloat g, geFloat b, geFloat a);
 
-GENESISAPI void GENESISCC geEngine_RenderPolyStencil(const geEngine *Engine, const geVec3d *Points, 
+GENESISAPI void GENESISCC geEngine_RenderPolyStencil(const geEngine *Engine, const geVec3d *Points,
 						int NumPoints, uint32 Flags);
 
 GENESISAPI void GENESISCC geEngine_DrawShadowPoly(geEngine *Engine, GE_RGBA ShadowColor);

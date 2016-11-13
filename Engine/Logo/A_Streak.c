@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  A_STREAK.C                                                                          */
+/*  A_Streak.c                                                                          */
 /*                                                                                      */
 /*  Author:                                                                             */
 /*  Description: Embedded alpha mask streak bitmap                                      */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 unsigned char	A_Streak_bmp[] = {

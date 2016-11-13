@@ -2,16 +2,16 @@
 /*  Engine.c                                                                            */
 /*                                                                                      */
 /*  Author: Charles Bloom/John Pollard                                                  */
-/*  Description: Maintains the driver interface, as well as the bitmaps attached		*/
-/*					to the driver.														*/
+/*  Description: Maintains the driver interface, as well as the bitmaps attached        */
+/*                  to the driver.                                                      */
 /*                                                                                      */
 /* Edit History:                                                                        */
 /*  11/02/2004 Wendell Buckner                                                          */
-/*   DOT3 BUG FIX - Crashes the 16-bit because not getting the right driver flags       */  
+/*   DOT3 BUG FIX - Crashes the 16-bit because not getting the right driver flags       */
 /*  08/08/2004 Wendell Buckner                                                          */
-/*   BUG FIX: Allways call geBitmap_SetRenderFlags() before calling a textured rendering*/ 
+/*   BUG FIX: Allways call geBitmap_SetRenderFlags() before calling a textured rendering*/
 /*   function(for embm, dot3, & etc...).                                                */
-/*  08/06/2004 Wendell Buckner                                                          */   
+/*  08/06/2004 Wendell Buckner                                                          */
 /*   DOT3 BUMPMAPPING   (Missing from original source)                                  */
 /*  01/20/2004 Wendell Buckner                                                          */
 /*   On some machines with fast proccessors (2.0ghz or better, typically intel) the     */
@@ -19,11 +19,10 @@
 /*   value return by Sys_GetCPUFreq is to large for the following variable make it a    */
 /*   large_integer                                                                      */
 /*   Fix provided by Latex and IronDragon from the genesis3d forum                      */
-/*  Edit History:                                                                       */
-/*  05/26/2003 Wendell Buckner                                                          */   
+/*  05/26/2003 Wendell Buckner                                                          */
 /*   BUMPMAPPING                                                                        */
-/*  05/05/2003 Wendell Buckner                                                          */   
-/*   BUMPMAPPING                                                                       	*/
+/*  05/05/2003 Wendell Buckner                                                          */
+/*   BUMPMAPPING                                                                        */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
 /*  Version 1.01 (the "License"); you may not use this file except in                   */
@@ -36,7 +35,7 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                                      */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
@@ -70,7 +69,7 @@ extern	geBoolean	DoSplashScreen(geEngine *Engine, geDriver_Mode *Mode);
 //	Internal Protos
 //============================
 
-static geBoolean Engine_InitDriver(	geEngine *Engine, 
+static geBoolean Engine_InitDriver(	geEngine *Engine,
 									geDriver *Driver,
 									geDriver_Mode *DriverMode);
 
@@ -121,11 +120,11 @@ static geBoolean geEngine_UpdateFogEnable(geEngine *Engine)
 {
 	if (Engine->DriverInfo.RDriver)
 	{
-		return Engine->DriverInfo.RDriver->SetFogEnable(Engine->FogEnable, 
-														Engine->FogR, 
-														Engine->FogG, 
-														Engine->FogB, 
-														Engine->FogStart, 
+		return Engine->DriverInfo.RDriver->SetFogEnable(Engine->FogEnable,
+														Engine->FogR,
+														Engine->FogG,
+														Engine->FogB,
+														Engine->FogStart,
 														Engine->FogEnd);
 	}
 
@@ -138,7 +137,7 @@ static geBoolean geEngine_UpdateFogEnable(geEngine *Engine)
 GENESISAPI geBoolean geEngine_SetFogEnable(geEngine *Engine, geBoolean Enable, geFloat r, geFloat g, geFloat b, geFloat Start, geFloat End)
 {
 	Engine->FogEnable = Enable;
-	
+
 	Engine->FogR = r;
 	Engine->FogG = g;
 	Engine->FogB = b;
@@ -157,7 +156,7 @@ static geBoolean geEngine_UpdateClearColor(geEngine *Engine)
 	if(Engine->DriverInfo.RDriver)
 	{
 		return Engine->DriverInfo.RDriver->SetClearColor(Engine->ClearR,
-														Engine->ClearG, 
+														Engine->ClearG,
 														Engine->ClearB);
 	}
 
@@ -289,8 +288,8 @@ GENESISAPI geBoolean geEngine_AddBitmap(geEngine *Engine, geBitmap *Bitmap)
 	if ( BitmapList_Add(Engine->AttachedBitmaps, (geBitmap *)Bitmap) )
 	{
 		Engine->Changed = GE_TRUE;
-		
-		#ifdef DO_ADDREMOVE_MESSAGES	
+
+		#ifdef DO_ADDREMOVE_MESSAGES
 		{
 		char str[100];
 			sprintf(str,"Engine_AddBitmap : %08X : new\n",Bitmap);
@@ -300,7 +299,7 @@ GENESISAPI geBoolean geEngine_AddBitmap(geEngine *Engine, geBitmap *Bitmap)
 	}
 	else
 	{
-		#ifdef DO_ADDREMOVE_MESSAGES	
+		#ifdef DO_ADDREMOVE_MESSAGES
 		{
 		char str[100];
 			sprintf(str,"Engine_AddBitmap : %08X : old\n",Bitmap);
@@ -329,14 +328,14 @@ GENESISAPI geBoolean geEngine_RemoveBitmap(geEngine *Engine, geBitmap *Bitmap)
 	if ( BitmapList_Remove(Engine->AttachedBitmaps,Bitmap) )
 	{
 		Engine->Changed = GE_TRUE;
-		
+
 		if (!geBitmap_DetachDriver(Bitmap, GE_TRUE))
 		{
 			geErrorLog_AddString(-1, "geEngine_RemoveBitmap:  geBitmap_DetachDriver failed...", NULL);
 			return GE_FALSE;
 		}
 
-		#ifdef DO_ADDREMOVE_MESSAGES	
+		#ifdef DO_ADDREMOVE_MESSAGES
 		{
 		char str[100];
 			sprintf(str,"Engine_RemoveBitmap : %08X : removed\n",Bitmap);
@@ -346,7 +345,7 @@ GENESISAPI geBoolean geEngine_RemoveBitmap(geEngine *Engine, geBitmap *Bitmap)
 	}
 	else
 	{
-		#ifdef DO_ADDREMOVE_MESSAGES	
+		#ifdef DO_ADDREMOVE_MESSAGES
 		{
 		char str[100];
 			sprintf(str,"Engine_RemoveBitmap : %08X : left\n",Bitmap);
@@ -354,21 +353,21 @@ GENESISAPI geBoolean geEngine_RemoveBitmap(geEngine *Engine, geBitmap *Bitmap)
 		}
 		#endif
 	}
-	
+
 	return GE_TRUE;
 }
 
 //	DrawAlphaBitmap
 
 ///////////////////////////////////////////////////////////////
-//  
+//
 //  geEngine_DrawAlphaBitmap()
-//  
+//
 //  Draw a btimap with alpha transparancy
-//  
+//
 ///////////////////////////////////////////////////////////////
 
-GENESISAPI geBoolean GENESISCC geEngine_DrawAlphaBitmap(	
+GENESISAPI geBoolean GENESISCC geEngine_DrawAlphaBitmap(
 		geEngine * Engine,
 		geBitmap * pBitmap,
 		geVec3d * VertUVArray,
@@ -380,18 +379,18 @@ GENESISAPI geBoolean GENESISCC geEngine_DrawAlphaBitmap(
 		)
 {
 // set up variables
-  GE_TLVertex vertex[4];
-  geFloat fUVAdd = 0.0f;
-  geFloat fWidthBmp = 0;
-  geFloat fHeightBmp = 0;
-  GE_Rect ClipRect = {0,0,0,0};
+	GE_TLVertex vertex[4];
+	geFloat fUVAdd = 0.0f;
+	geFloat fWidthBmp = 0;
+	geFloat fHeightBmp = 0;
+	GE_Rect ClipRect = {0,0,0,0};
 	GE_Rect UseRect = {0,0,0,0};
 	geVec3d DefaultUVArray[4] = {{0,0,0},{1,0,0},{1,1,0},{0,1,0}};
 	GE_RGBA DefaultRGBA_Array[4] =
 		{{255,255,255,Alpha},
 		{255,255,255,Alpha},
 		{255,255,255,Alpha},
-		{255,255,255,Alpha}};	
+		{255,255,255,Alpha}};
 	geBitmap_Info TempInfo, TempInfo2;
 	geFloat UVbreak = 0.0f;
 
@@ -410,54 +409,54 @@ GENESISAPI geBoolean GENESISCC geEngine_DrawAlphaBitmap(
 #if 0
 //	eaa3 01/14/2001 Right now, you have to pass the camera in.
 //	..I'll fix it eventually...
-  if(!ClipCamera )
-    {
+	if(!ClipCamera )
+	{
 		ClipRect.Top = 0;
 		ClipRect.Left = 0;
 		ClipRect.Bottom = CHeight-1;
 		ClipRect.Right = CWidth-1;
-    }
-  else
+	}
+	else
 #endif
-    geCamera_GetClippingRect( ClipCamera, &ClipRect );
+	geCamera_GetClippingRect( ClipCamera, &ClipRect );
 
 	if(!VertUVArray)
 		VertUVArray = &DefaultUVArray[0];
 	if(!RGBA_Array)
 		RGBA_Array = &DefaultRGBA_Array[0];
 	if(PixelRect)
-	  {
+	{
 		UseRect.Top = PixelRect->Top + ClipRect.Top;
 		UseRect.Left = PixelRect->Left + ClipRect.Left;
 		UseRect.Bottom = PixelRect->Bottom + ClipRect.Top;
 		UseRect.Right = PixelRect->Right + ClipRect.Left;
-	  }
+	}
 	else
-	  {
+	{
 		if(PercentRect)
-		  {
+		{
 			UseRect.Top		= ClipRect.Top
-				+ (int32)(0.01f * PercentRect->Top	
+				+ (int32)(0.01f * PercentRect->Top
 				* (ClipRect.Bottom - ClipRect.Top));
 			UseRect.Left	= ClipRect.Left
 				+ (int32)(0.01f * PercentRect->Left
 				* (ClipRect.Right	- ClipRect.Left));
-			UseRect.Bottom	= ClipRect.Bottom	
+			UseRect.Bottom	= ClipRect.Bottom
 				+ (int32)(0.01f * PercentRect->Bottom
 				* (ClipRect.Bottom - ClipRect.Top));
-			UseRect.Right	= ClipRect.Right	
-				+ (int32)(0.01f * PercentRect->Right	
+			UseRect.Right	= ClipRect.Right
+				+ (int32)(0.01f * PercentRect->Right
 				* (ClipRect.Right	- ClipRect.Left));
-		  }
+		}
 		else
-		  {
+		{
 			UseRect = ClipRect;
-		  }
-	  }
+		}
+	}
 
 	vertex[0].x = (geFloat)UseRect.Left;
 	vertex[0].y = (geFloat)UseRect.Top;
-	vertex[0].z = 1.0f;	
+	vertex[0].z = 1.0f;
 	vertex[0].r = RGBA_Array[0].r;
 	vertex[0].g = RGBA_Array[0].g;
 	vertex[0].b = RGBA_Array[0].b;
@@ -474,7 +473,7 @@ GENESISAPI geBoolean GENESISCC geEngine_DrawAlphaBitmap(
 	vertex[1].a = RGBA_Array[1].a;
 	vertex[1].u = VertUVArray[1].X - UVbreak/fWidthBmp;
 	vertex[1].v = VertUVArray[1].Y + UVbreak/fHeightBmp;
-	
+
 	vertex[2].x = (geFloat)UseRect.Right;
 	vertex[2].y = (geFloat)UseRect.Bottom;
 	vertex[2].z = vertex[0].z;
@@ -492,78 +491,78 @@ GENESISAPI geBoolean GENESISCC geEngine_DrawAlphaBitmap(
 	vertex[3].g = RGBA_Array[3].g;
 	vertex[3].b = RGBA_Array[3].b;
 	vertex[3].a = RGBA_Array[3].a;
-	vertex[3].u = VertUVArray[3].X + UVbreak/fWidthBmp;	
+	vertex[3].u = VertUVArray[3].X + UVbreak/fWidthBmp;
 	vertex[3].v = VertUVArray[3].Y - UVbreak/fHeightBmp;
 
-  if(vertex[0].x < ClipRect.Left )
-    {
-    if(vertex[1].x <= ClipRect.Left )
-      {
+	if(vertex[0].x < ClipRect.Left )
+	{
+		if(vertex[1].x <= ClipRect.Left )
+		{
 			geErrorLog_AddString(-1, "Clipping Rect has negative dimension",
 				NULL);
 			return GE_FALSE;
-      }
-    fUVAdd = ( ClipRect.Left - vertex[0].x ) / fWidthBmp;
-    fWidthBmp -= ( ClipRect.Left - vertex[0].x );
-    vertex[0].u += fUVAdd;
-    vertex[3].u = vertex[0].u;
-    vertex[0].x = (geFloat)ClipRect.Left;
-    vertex[3].x = vertex[0].x;
-    }
+		}
+		fUVAdd = ( ClipRect.Left - vertex[0].x ) / fWidthBmp;
+		fWidthBmp -= ( ClipRect.Left - vertex[0].x );
+		vertex[0].u += fUVAdd;
+		vertex[3].u = vertex[0].u;
+		vertex[0].x = (geFloat)ClipRect.Left;
+		vertex[3].x = vertex[0].x;
+	}
 
-  if( vertex[0].y < ClipRect.Top )
-    {
-    if( vertex[2].y <= ClipRect.Top )
-      {
+	if( vertex[0].y < ClipRect.Top )
+	{
+		if( vertex[2].y <= ClipRect.Top )
+		{
 			geErrorLog_AddString(-1, "Clipping Rect has negative dimension",
 				NULL);
 			return GE_FALSE;
-      }
-    fUVAdd = ( ClipRect.Top - vertex[0].y ) / fHeightBmp;
-    fHeightBmp -= ( ClipRect.Top - vertex[0].y );
-    vertex[0].v += fUVAdd;
-    vertex[1].v = vertex[0].v;
-    vertex[0].y = (geFloat)ClipRect.Top;
-    vertex[1].y = vertex[0].y;
-    }
+		}
+		fUVAdd = ( ClipRect.Top - vertex[0].y ) / fHeightBmp;
+		fHeightBmp -= ( ClipRect.Top - vertex[0].y );
+		vertex[0].v += fUVAdd;
+		vertex[1].v = vertex[0].v;
+		vertex[0].y = (geFloat)ClipRect.Top;
+		vertex[1].y = vertex[0].y;
+	}
 
-  if(vertex[1].x > ClipRect.Right )
-    {
-    if( vertex[0].x >= ClipRect.Right )
-      {
-			geErrorLog_AddString(-1, "Clipping Rect has negative dimension",
-				NULL);
-      return GE_FALSE;
-      }
-    fUVAdd = ( vertex[1].x - ClipRect.Right ) / fWidthBmp;
-    vertex[1].u -= fUVAdd;
-    vertex[2].u = vertex[1].u;
-    vertex[1].x = (geFloat)ClipRect.Right - 1;
-    vertex[2].x = vertex[1].x;
-    }
-
-  if( vertex[2].y > ClipRect.Bottom )
-    {
-    if( vertex[0].y >= ClipRect.Bottom )
-      {
+	if(vertex[1].x > ClipRect.Right )
+	{
+		if( vertex[0].x >= ClipRect.Right )
+		{
 			geErrorLog_AddString(-1, "Clipping Rect has negative dimension",
 				NULL);
 			return GE_FALSE;
-      }
-    fUVAdd = ( vertex[2].y - ClipRect.Bottom ) / fHeightBmp;
-    vertex[2].v -= fUVAdd;
-    vertex[3].v = vertex[2].v;
-    vertex[2].y = (geFloat)ClipRect.Bottom - 1;
-    vertex[3].y = vertex[2].y;
-    }
+		}
+		fUVAdd = ( vertex[1].x - ClipRect.Right ) / fWidthBmp;
+		vertex[1].u -= fUVAdd;
+		vertex[2].u = vertex[1].u;
+		vertex[1].x = (geFloat)ClipRect.Right - 1;
+		vertex[2].x = vertex[1].x;
+	}
 
-  geEngine_RenderPoly( Engine, 
-                         vertex, 
-                         4, 
-                         pBitmap,
-                         ( Alpha != 255 ? DRV_RENDER_ALPHA : 0 ) | 
-			DRV_RENDER_CLAMP_UV | DRV_RENDER_FLUSH | 
-			DRV_RENDER_NO_ZMASK | DRV_RENDER_NO_ZWRITE ); 
+	if( vertex[2].y > ClipRect.Bottom )
+	{
+		if( vertex[0].y >= ClipRect.Bottom )
+		{
+			geErrorLog_AddString(-1, "Clipping Rect has negative dimension",
+				NULL);
+			return GE_FALSE;
+		}
+		fUVAdd = ( vertex[2].y - ClipRect.Bottom ) / fHeightBmp;
+		vertex[2].v -= fUVAdd;
+		vertex[3].v = vertex[2].v;
+		vertex[2].y = (geFloat)ClipRect.Bottom - 1;
+		vertex[3].y = vertex[2].y;
+	}
+
+	geEngine_RenderPoly( Engine,
+						 vertex,
+						 4,
+						 pBitmap,
+						 ( Alpha != 255 ? DRV_RENDER_ALPHA : 0 ) |
+						 DRV_RENDER_CLAMP_UV | DRV_RENDER_FLUSH |
+						 DRV_RENDER_NO_ZMASK | DRV_RENDER_NO_ZWRITE );
 
 	return GE_TRUE;
 }
@@ -571,8 +570,8 @@ GENESISAPI geBoolean GENESISCC geEngine_DrawAlphaBitmap(
 //=====================================================================================
 //	geEngine_SetDriverAndMode
 //=====================================================================================
-GENESISAPI geBoolean geEngine_SetDriverAndMode(	geEngine *Engine, 
-												geDriver *Driver, 
+GENESISAPI geBoolean geEngine_SetDriverAndMode(	geEngine *Engine,
+												geDriver *Driver,
 												geDriver_Mode *DriverMode)
 {
 	assert(Engine);
@@ -605,8 +604,8 @@ GENESISAPI geBoolean geEngine_SetDriverAndMode(	geEngine *Engine,
 	return GE_TRUE;
 }
 
-GENESISAPI geBoolean geEngine_SetDriverAndModeNoSplash(	geEngine *Engine, 
-												geDriver *Driver, 
+GENESISAPI geBoolean geEngine_SetDriverAndModeNoSplash(	geEngine *Engine,
+												geDriver *Driver,
 												geDriver_Mode *DriverMode)
 {
 	assert(Engine);
@@ -647,7 +646,7 @@ GENESISAPI geDriver_System *geEngine_GetDriverSystem(geEngine *Engine)
 GENESISAPI geBoolean geEngine_Activate(geEngine *Engine, geBoolean bActive)
 {
 	DRV_Driver	*RDriver;
-	
+
 	assert(Engine);
 
 	RDriver	=Engine->DriverInfo.RDriver;
@@ -672,7 +671,7 @@ GENESISAPI geBoolean geEngine_Activate(geEngine *Engine, geBoolean bActive)
 GENESISAPI geBoolean geEngine_UpdateWindow(geEngine *Engine)
 {
 	DRV_Driver	*RDriver;
-		
+
 	RDriver	= Engine->DriverInfo.RDriver;
 
 	if(Engine->DriverInfo.Active && RDriver)
@@ -700,7 +699,7 @@ Sys_DriverInfo *DrvInfo;
 	if (!DrvInfo->Active)
 		return GE_TRUE;			// Just return true, and don't do nothing
 
-	#if 0 // <>	
+	#if 0 // <>
 	#ifdef _DEBUG
 	OutputDebugString("geEngine_ShutdownDriver\n");
 	#endif
@@ -741,7 +740,7 @@ GENESISAPI void GENESISCC geEngine_RenderPoly(const geEngine *Engine,
 	if(Texture)
 	{
 		geRDriver_THandle * TH;
-	
+
 //		assert(World);
 //		assert(geEngine_HasWorld(Engine, World) == GE_TRUE);
 //		assert(World->AttachedBitmaps);
@@ -750,9 +749,9 @@ GENESISAPI void GENESISCC geEngine_RenderPoly(const geEngine *Engine,
 		TH = geBitmap_GetTHandle(Texture);
 		assert(TH);
 
-/*  05/05/2003 Wendell Buckner                                                          
-     BUMPMAPPING                                                                       	*/
-        geBitmap_SetRenderFlags(Texture, &Flags);
+/*  05/05/2003 Wendell Buckner
+	 BUMPMAPPING                                                                       	*/
+		geBitmap_SetRenderFlags(Texture, &Flags);
 
 		assert(Engine);
 
@@ -782,7 +781,7 @@ GENESISAPI void GENESISCC geEngine_RenderPoly(const geEngine *Engine,
 	assert(Ret == GE_TRUE);
 }
 
-GENESISAPI void GENESISCC geEngine_RenderPolyArray(const geEngine *Engine, const GE_TLVertex ** pPoints, int * pNumPoints, int NumPolys, 
+GENESISAPI void GENESISCC geEngine_RenderPolyArray(const geEngine *Engine, const GE_TLVertex ** pPoints, int * pNumPoints, int NumPolys,
 								const geBitmap *Texture, uint32 Flags)
 {
 geBoolean	Ret;
@@ -797,7 +796,7 @@ DRV_Driver * Driver;
 	if ( Texture )
 	{
 	geRDriver_THandle * TH;
-	
+
 		TH = geBitmap_GetTHandle(Texture);
 		assert(TH);
 
@@ -806,7 +805,7 @@ DRV_Driver * Driver;
 			assert(pPoints[pn]);
 
 /* 08/08/2004 Wendell Buckner
-     BUG FIX: Allways call geBitmap_SetRenderFlags() before calling a textured rendering function(for embm, dot3, & etc...). */
+	 BUG FIX: Allways call geBitmap_SetRenderFlags() before calling a textured rendering function(for embm, dot3, & etc...). */
 			geBitmap_SetRenderFlags(Texture, &Flags);
 
 			Ret = Driver->RenderMiscTexturePoly((DRV_TLVertex *)pPoints[pn],
@@ -845,7 +844,7 @@ GENESISAPI geBoolean geEngine_SetStencilShadowsEnable(geEngine *Engine, geBoolea
 	return GE_TRUE;
 }
 
-GENESISAPI void GENESISCC geEngine_RenderPolyStencil(const geEngine *Engine, const geVec3d *Points, 
+GENESISAPI void GENESISCC geEngine_RenderPolyStencil(const geEngine *Engine, const geVec3d *Points,
 						int NumPoints, uint32 Flags)
 {
 	geBoolean	Ret;
@@ -878,7 +877,7 @@ GENESISAPI geBoolean GENESISCC geEngine_DrawBitmap(const geEngine *Engine,
 {
 geRDriver_THandle * TH;
 geBoolean Ret;
-	
+
 	//#pragma message("make geRect the same as RECT, or don't use RECT!?")
 	// The drivers once did not include genesis .h's
 	// (D3D uses RECT so thats why the drivers adopted RECT's...)
@@ -886,7 +885,7 @@ geBoolean Ret;
 
 	assert(Engine);
 	assert(Bitmap);
-	
+
 	assert(Engine->AttachedBitmaps);
 	assert(BitmapList_Has(Engine->AttachedBitmaps, (geBitmap *)Bitmap) == GE_TRUE);
 
@@ -911,7 +910,7 @@ geBoolean Ret;
 
 	if ( ! Ret )
 	{
-		geErrorLog_AddString(-1,"geEngine_DrawBitmap : DrawDecal failed", NULL);	
+		geErrorLog_AddString(-1,"geEngine_DrawBitmap : DrawDecal failed", NULL);
 	}
 
 return Ret;
@@ -963,8 +962,8 @@ GENESISAPI geBoolean geEngine_AddWorld(geEngine *Engine, geWorld *World)
 		{
 			assert(pWorldList->RefCount > 0);		// There should allready be a ref count!!!
 			pWorldList->RefCount++;
-				
-			#ifdef DO_ADDREMOVE_MESSAGES	
+
+			#ifdef DO_ADDREMOVE_MESSAGES
 			{
 			char str[100];
 				sprintf(str,"Engine_AddWorld : %08X : old\n",World);
@@ -977,7 +976,7 @@ GENESISAPI geBoolean geEngine_AddWorld(geEngine *Engine, geWorld *World)
 
 	}
 
-	#ifdef DO_ADDREMOVE_MESSAGES	
+	#ifdef DO_ADDREMOVE_MESSAGES
 	{
 	char str[100];
 		sprintf(str,"Engine_AddWorld : %08X : new\n",World);
@@ -997,7 +996,7 @@ GENESISAPI geBoolean geEngine_AddWorld(geEngine *Engine, geWorld *World)
 	{
 		geErrorLog_AddString(-1, "geEngine_AddWorld:  Out of slots.", NULL);
 		return GE_FALSE;
-	}	
+	}
 
 	// Save the info for the first time
 	pWorldList->World = World;
@@ -1028,11 +1027,11 @@ GENESISAPI geBoolean geEngine_RemoveWorld(geEngine *Engine, geWorld *World)
 	assert(Engine);
 	assert(World);
 
-	// Try to find it in the list 
+	// Try to find it in the list
 	pWorldList = Engine->WorldList;
 	for (i=0; i< ENGINE_MAX_WORLDS; i++, pWorldList++)
 	{
-		if (pWorldList->World == World)	
+		if (pWorldList->World == World)
 			break;
 	}
 
@@ -1040,7 +1039,7 @@ GENESISAPI geBoolean geEngine_RemoveWorld(geEngine *Engine, geWorld *World)
 	{
 		geErrorLog_AddString(-1, "geEngine_RemoveWorld:  World not found.", NULL);
 		return GE_FALSE;
-	}	
+	}
 
 	assert(pWorldList->RefCount > 0);
 
@@ -1048,10 +1047,10 @@ GENESISAPI geBoolean geEngine_RemoveWorld(geEngine *Engine, geWorld *World)
 	pWorldList->RefCount--;
 
 	// When the ref count gos to zero, remove the world for good
-	if (pWorldList->RefCount == 0)		
+	if (pWorldList->RefCount == 0)
 	{
-	
-		#ifdef DO_ADDREMOVE_MESSAGES	
+
+		#ifdef DO_ADDREMOVE_MESSAGES
 		{
 		char str[100];
 			sprintf(str,"Engine_RemoveWorld : %08X : removed\n",World);
@@ -1071,19 +1070,19 @@ GENESISAPI geBoolean geEngine_RemoveWorld(geEngine *Engine, geWorld *World)
 
 		// Clear this pWorldList slot
 		memset(pWorldList, 0, sizeof(*pWorldList));
-		
+
 		// Re-build the fast list of worlds
 		geEngine_RebuildFastWorldList(Engine);
 
 		// Force an update
 		Engine->Changed = GE_TRUE;
-		
+
 		// Free the world (decrease it's reference count)
 		geWorld_Free(World);
 	}
 	else
 	{
-		#ifdef DO_ADDREMOVE_MESSAGES	
+		#ifdef DO_ADDREMOVE_MESSAGES
 		{
 		char str[100];
 			sprintf(str,"Engine_RemoveWorld : %08X : left\n",World);
@@ -1107,7 +1106,7 @@ geBoolean geEngine_RemoveAllWorlds(geEngine *Engine)
 
 	assert(Engine);
 
-	// Try to find it in the list 
+	// Try to find it in the list
 	pWorldList = Engine->WorldList;
 	for (i=0; i< ENGINE_MAX_WORLDS; i++, pWorldList++)
 	{
@@ -1132,7 +1131,7 @@ geBoolean geEngine_RemoveAllWorlds(geEngine *Engine)
 		}
 		memset(pWorldList, 0, sizeof(*pWorldList));
 	}
-		
+
 	// Force an update
 	geEngine_RebuildFastWorldList(Engine);
 	Engine->Changed = GE_TRUE;
@@ -1151,17 +1150,17 @@ geBoolean geEngine_HasWorld(const geEngine *Engine, const geWorld *World)
 	assert(Engine);
 	assert(World);
 
-	// Try to find it in the list 
+	// Try to find it in the list
 	pWorldList = Engine->WorldList;
 	for (i=0; i< ENGINE_MAX_WORLDS; i++, pWorldList++)
 	{
-		if (pWorldList->World == World)	
+		if (pWorldList->World == World)
 		{
 			assert(pWorldList->RefCount > 0);
 			return GE_TRUE;
 		}
 	}
-	
+
 	return GE_FALSE;
 }
 
@@ -1182,7 +1181,7 @@ geBoolean geEngine_DetachAllWorlds(geEngine *Engine)
 			geErrorLog_AddString(-1, "geEngine_DetachAllWorlds:  geWorld_DetachAll failed.", NULL);
 			Ret =  GE_FALSE;
 		}
-		
+
 		if (!geEngine_DestroyWorldLightmapTHandles(Engine, Engine->Worlds[i]))
 		{
 			geErrorLog_AddString(-1, "geEngine_DetachAllWorlds:  geEngine_DestroyWorldLightmapTHandles failed.", NULL);
@@ -1204,7 +1203,7 @@ geBoolean geEngine_CreateWorldLightmapTHandles(geEngine *Engine, geWorld *World)
 	GBSP_BSPData		*BSPData;
 	#ifdef _DEBUG
 	int	CreatedCount = 0;
-	#endif	
+	#endif
 
 	assert(Engine);
 	assert(World);
@@ -1234,10 +1233,10 @@ geBoolean geEngine_CreateWorldLightmapTHandles(geEngine *Engine, geWorld *World)
 			continue;
 
 		assert(!pLInfo->THandle);		// This should be true!!!
-		
+
 		if (pLInfo->THandle)
 			continue;
-		
+
 		Light_SetupLightmap(pLInfo, &D);
 
 		// {} _LIGHTMAP_
@@ -1248,18 +1247,18 @@ geBoolean geEngine_CreateWorldLightmapTHandles(geEngine *Engine, geWorld *World)
 			geErrorLog_AddString(-1, RDriver->LastErrorStr, NULL);
 			geErrorLog_AddString(-1, "geEngine_CreateWorldTHandles: Engine_CreateTHandle failed...\n", NULL);
 			return GE_FALSE;
-		}	
-		
+		}
+
 		#ifdef _DEBUG
 		CreatedCount ++;
-		#endif	
+		#endif
 	}
 
 #ifdef _DEBUG
 	Log_Printf("geEngine_CreateWorldLightmapTHandles:Created %d of %d\n",CreatedCount,BSPData->NumGFXFaces);
 #endif
 
-	return GE_TRUE; 
+	return GE_TRUE;
 }
 
 //=====================================================================================
@@ -1276,7 +1275,7 @@ geBoolean geEngine_DestroyWorldLightmapTHandles(geEngine *Engine, geWorld *World
 	int32				Handle2=0x21657370;
 	#ifdef _DEBUG
 	int	DestroyedCount = 0;
-	#endif	
+	#endif
 
 	assert(Engine);
 	assert(World);
@@ -1308,15 +1307,15 @@ geBoolean geEngine_DestroyWorldLightmapTHandles(geEngine *Engine, geWorld *World
 
 		if (!pLInfo->THandle)
 			continue;
-		
+
 		if (!RDriver->THandle_Destroy(pLInfo->THandle))
 			Ret = GE_FALSE;
 
 		pLInfo->THandle = NULL;
-		
+
 		#ifdef _DEBUG
 		DestroyedCount ++;
-		#endif	
+		#endif
 	}
 
 #ifdef _DEBUG
@@ -1369,9 +1368,9 @@ geBoolean geEngine_AttachAll(geEngine *Engine)
 	RDriver = Engine->DriverInfo.RDriver;
 	assert( RDriver );
 
-    // If current driver is not active, then split
+	// If current driver is not active, then split
 	if (!Engine->DriverInfo.Active)
-        return GE_TRUE;
+		return GE_TRUE;
 
 	// Attach all the bitmaps for the engine
 	if (!BitmapList_AttachAll(Engine->AttachedBitmaps, RDriver, Engine->BitmapGamma))
@@ -1526,7 +1525,7 @@ geBoolean geEngine_InitFonts(geEngine *Engine)
 		return GE_FALSE;
 
 		success:
-		
+
 		geVFile_Close(MemFile);
 	}
 
@@ -1661,7 +1660,7 @@ HINSTANCE geEngine_LoadLibrary( const char * lpLibFileName, const char *DriverDi
 
 return NULL;
 }
- 
+
 #ifdef GLOBALINFO
 extern GInfo GlobalInfo;		// AHH!!!  Get rid of this!!!
 #endif
@@ -1670,7 +1669,7 @@ extern GInfo GlobalInfo;		// AHH!!!  Get rid of this!!!
 //	EngineInitDriver
 //=====================================================================================
 
-static geBoolean Engine_InitDriver(	geEngine *Engine, 
+static geBoolean Engine_InitDriver(	geEngine *Engine,
 								geDriver *Driver,
 								geDriver_Mode *DriverMode)
 {
@@ -1699,7 +1698,7 @@ static geBoolean Engine_InitDriver(	geEngine *Engine,
 		geErrorLog_Add(GE_ERR_DRIVER_ALLREADY_INITIALIZED, NULL);
 		return GE_FALSE;
 	}
-	
+
 	DrvInfo->CurDriver = Driver;
 	DrvInfo->CurMode = DriverMode;
 
@@ -1719,7 +1718,7 @@ static geBoolean Engine_InitDriver(	geEngine *Engine,
 	#else
 	Hook = (DRV_Hook*)GetProcAddress(DrvInfo->DriverHandle, "DriverHook");
 	#endif
-	
+
 	if (!Hook)
 	{
 		geErrorLog_Add(GE_ERR_INVALID_DRIVER, NULL);
@@ -1761,7 +1760,7 @@ static geBoolean Engine_InitDriver(	geEngine *Engine,
 	DLLDriverHook.Height = DriverMode->Height;
 	DLLDriverHook.hWnd = Engine->hWnd;
 	strcpy(DLLDriverHook.ModeName, DriverMode->Name);
-	
+
 	if (!RDriver->Init(&DLLDriverHook))
 	{
 		geErrorLog_Add(GE_ERR_DRIVER_INIT_FAILED, NULL);
@@ -1798,7 +1797,7 @@ static	geBoolean geEngine_Prep(geEngine *Engine)
 	}
 
 	// Check to see if the world has changed
-	if (!WorldChanged && !Engine->Changed)		
+	if (!WorldChanged && !Engine->Changed)
 		return GE_TRUE;		// Nothing to do if any of the worlds (and engine) has not changed
 
 	// Throw everything off the card...
@@ -1807,18 +1806,18 @@ static	geBoolean geEngine_Prep(geEngine *Engine)
 		geErrorLog_AddString(-1,"geEngine_Prep : geEngine_ResetDriver", NULL);
 		return GE_FALSE;
 	}
-	
+
 	// Attach all the current bitmaps to the current driver
 	if (!geEngine_AttachAll(Engine))
 	{
 		geErrorLog_AddString(-1,"geEngine_Prep : geEngine_AttachAll failed", NULL);
 		return GE_FALSE;
 	}
-	
+
 	// Reset all the changed flags
 	geEngine_SetAllWorldChangedFlag(Engine, GE_FALSE);
 	Engine->Changed = GE_FALSE;
-	
+
 	return GE_TRUE;
 }
 
@@ -1829,7 +1828,7 @@ GENESISAPI geBoolean geEngine_RenderWorld(geEngine *Engine, geWorld *World, geCa
 {
 	Sys_DriverInfo	*DInfo;
 	int32			Width, Height;
- 
+
 	assert(Engine != NULL);
 	assert(World != NULL);
 	assert(Camera != NULL);
@@ -1865,7 +1864,7 @@ GENESISAPI geBoolean geEngine_RenderWorld(geEngine *Engine, geWorld *World, geCa
 			return GE_FALSE;
 		}
 	}
-	
+
 	if (!World_WorldRenderQ(Engine, World, Camera))
 		return GE_FALSE;
 
@@ -1881,18 +1880,18 @@ GENESISAPI geBoolean geEngine_BeginFrame(geEngine *Engine, geCamera *Camera, geB
 	geRect	gDrvRect;
 
 	assert(Engine != NULL);
-	
+
 	assert(Engine->FrameState == FrameState_None);
 
 	Engine->FrameState = FrameState_Begin;
-	
+
 	// Make sure the driver is avtive
 	if (!Engine->DriverInfo.Active)
 	{
 		geErrorLog_Add(GE_ERR_DRIVER_NOT_INITIALIZED, NULL);
 		return GE_FALSE;
 	}
-	
+
 	assert(Engine->DriverInfo.RDriver != NULL);
 
 	// Make sure we have everything finalized with this world so the engine can render it
@@ -1908,7 +1907,7 @@ GENESISAPI geBoolean geEngine_BeginFrame(geEngine *Engine, geCamera *Camera, geB
 	if(Camera)
 	{
 		geCamera_GetClippingRect(Camera, &gDrvRect);
-	
+
 		DrvRect.left	=gDrvRect.Left;
 		DrvRect.top		=gDrvRect.Top;
 		DrvRect.right	=gDrvRect.Right;
@@ -1943,7 +1942,7 @@ GENESISAPI geBoolean geEngine_EndFrame(geEngine *Engine)
 	//DRV_Debug			*Debug;
 
 	assert(Engine != NULL);
-	
+
 	assert(Engine->FrameState == FrameState_Begin);
 
 	Engine->FrameState = FrameState_None;
@@ -1953,7 +1952,7 @@ GENESISAPI geBoolean geEngine_EndFrame(geEngine *Engine)
 		geErrorLog_Add(GE_ERR_DRIVER_NOT_INITIALIZED, NULL);
 		return GE_FALSE;
 	}
-	
+
 	assert(Engine->DriverInfo.RDriver != NULL);
 
 	//Debug = (DRV_Debug*)Engine->DriverInfo.RDriver->LoadMiscTexture;
@@ -1975,13 +1974,13 @@ GENESISAPI geBoolean geEngine_EndFrame(geEngine *Engine)
 	if (DeltaTic.LowPart > 0)
 
 /* 01/20/2004 Wendell Buckner
-    LOGO CRASH BUG - On some machines with fast proccessors (2.0ghz or better, typically intel) the value return
+	LOGO CRASH BUG - On some machines with fast proccessors (2.0ghz or better, typically intel) the value return
 	by Sys_GetCPUFreq is to large for the following variable make it a large_integer
-	Fix provided by Latex and IronDragon from the genesis3d forum 
+	Fix provided by Latex and IronDragon from the genesis3d forum
 		Fps =  (geFloat)Engine->CPUInfo.Freq / (geFloat)DeltaTic.LowPart; */
-        Fps =  (geFloat)Engine->CPUInfo.Freq.QuadPart / (geFloat)DeltaTic.LowPart;
+		Fps =  (geFloat)Engine->CPUInfo.Freq.QuadPart / (geFloat)DeltaTic.LowPart;
 
-	else 
+	else
 		Fps = 100.0f;
 
 	if (Engine->DisplayFrameRateCounter == GE_TRUE)			// Dieplay debug info
@@ -1995,7 +1994,7 @@ GENESISAPI geBoolean geEngine_EndFrame(geEngine *Engine)
 
 		// Changed Average Fps to go accross last n frames, JP...
 		FpsArray[(NumFps++) % MAX_FPS_ARRAY] = Fps;
-		
+
 		for (AverageFps = 0.0f, i=0; i<MAX_FPS_ARRAY; i++)
 			AverageFps += FpsArray[i];
 
@@ -2013,13 +2012,13 @@ GENESISAPI geBoolean geEngine_EndFrame(geEngine *Engine)
 
 		if (pCacheInfo)
 		{
-			geEngine_Printf(Engine, 2, 2+15*3, "Cache:  %4i/%4i/%4i/%4i/%4i", 
+			geEngine_Printf(Engine, 2, 2+15*3, "Cache:  %4i/%4i/%4i/%4i/%4i",
 											pCacheInfo->CacheFull,
 											pCacheInfo->CacheRemoved,
 											pCacheInfo->CacheFlushes,
 											pCacheInfo->TexMisses,
 											pCacheInfo->LMapMisses);
-																			
+
 		}
 */
 		geEngine_Printf(Engine, 2,2+15*3, "Actors : %3i, Models: %3i", Engine->DebugInfo.NumActors, Engine->DebugInfo.NumModels);
@@ -2031,7 +2030,7 @@ GENESISAPI geBoolean geEngine_EndFrame(geEngine *Engine)
 		if (Engine->NumWorlds)
 		{
 			geWorld_DebugInfo	*Info;
-			
+
 			Info = &Engine->Worlds[0]->DebugInfo;
 			geEngine_Printf(Engine, 2, 2+15*8, "Nodes: %3i/%3i, Leafs: %3i/%3i, Userp: %3i/%3i", Info->NumNodesTraversed1, Info->NumNodesTraversed2, Info->NumLeafsHit1, Info->NumLeafsHit2, Info->NumLeafsWithUserPolys, Info->NumUserPolys);
 			geEngine_Printf(Engine, 2, 2+15*9, "Cast: %3i/%3i, GetC: %3i: %i",  NumExactCast, NumBBoxCast, NumGetContents);
@@ -2088,15 +2087,15 @@ static void Engine_DrawFontBuffer(geEngine *Engine)
 	Sys_FontInfo	*Fi;
 	char			*Str;
 	int32			FontWidth,FontHeight;
-	
+
 	Fi = &Engine->FontInfo;
 
-	if ( Fi->NumStrings == 0) 
+	if ( Fi->NumStrings == 0)
 		return;
 
 	FontWidth	= 8;
 	FontHeight	= 15;
-		
+
 	for (i=0; i< Fi->NumStrings; i++)
 	{
 		x = Fi->ClientStrings[i].x;
@@ -2161,13 +2160,13 @@ geBoolean geEngine_Puts(geEngine *Engine, int32 x, int32 y, const char *String)
 
 	if (strlen(String) > MAX_CLIENT_STRING_LEN)
 		return GE_FALSE;
-					 
+
 	if (Fi->NumStrings >= MAX_CLIENT_STRINGS)
 		return GE_FALSE;
 
 	strcpy(Fi->ClientStrings[Fi->NumStrings].String, String);
 
-	Fi->ClientStrings[Fi->NumStrings].x = x;	
+	Fi->ClientStrings[Fi->NumStrings].x = x;
 	Fi->ClientStrings[Fi->NumStrings].y = y;
 
 	Fi->NumStrings++;
@@ -2181,10 +2180,10 @@ geBoolean geEngine_Puts(geEngine *Engine, int32 x, int32 y, const char *String)
 GENESISAPI geBoolean geEngine_Printf(geEngine *Engine, int32 x, int32 y, const char *String, ...)
 {
 	va_list			ArgPtr;
-    char			TempStr[1024];
+	char			TempStr[1024];
 
 	va_start(ArgPtr, String);
-    vsprintf(TempStr, String, ArgPtr);
+	vsprintf(TempStr, String, ArgPtr);
 	va_end(ArgPtr);
 
 	return geEngine_Puts(Engine, x, y, TempStr);
@@ -2263,22 +2262,22 @@ geBoolean Engine_SetupPixelFormats(geEngine *Engine)
 	PixelFormatsLen = ((uint32)PixelArrayPtr - (uint32)PixelFormatsArray)/sizeof(geRDriver_PixelFormat);
 	assert(PixelFormatsLen > 0);
 
-/*  11/02/2004 Wendell Buckner                                                          
-     DOT3 BUG FIX - Crashes the 16-bit because not getting the right driver flags */  
-/*  08/06/2004 Wendell Buckner                                                           
-     DOT3 BUMPMAPPING   (Missing from original source)  
-    geBitmap_GetEngineSupport(&Engine->DriverInfo.RDriver->EngineSettings, 0);*/
-    geBitmap_GetEngineSupport(Engine->DriverInfo.RDriver->EngineSettings, 0);
+/*  11/02/2004 Wendell Buckner
+	 DOT3 BUG FIX - Crashes the 16-bit because not getting the right driver flags */
+/*  08/06/2004 Wendell Buckner
+	 DOT3 BUMPMAPPING   (Missing from original source)
+	geBitmap_GetEngineSupport(&Engine->DriverInfo.RDriver->EngineSettings, 0);*/
+	geBitmap_GetEngineSupport(Engine->DriverInfo.RDriver->EngineSettings, 0);
 
 /* 05/26/2003 Wendell Buckner
-    BUMPMAPPING */
+	BUMPMAPPING */
 	{
-     gePixelFormat PixelFormats[100];
+	 gePixelFormat PixelFormats[100];
 	 int i;
 	 for(i=0; i < PixelFormatsLen; i++)
-      PixelFormats[i] = PixelFormatsArray[i].PixelFormat; 
+	  PixelFormats[i] = PixelFormatsArray[i].PixelFormat;
 
-     geBitmap_GetBumpMapPixelFormats ( PixelFormats, NULL, &PixelFormatsLen );
+	 geBitmap_GetBumpMapPixelFormats ( PixelFormats, NULL, &PixelFormatsLen );
 	}
 
 	#define SetupPF( type, flag, alpha )	\
@@ -2291,7 +2290,7 @@ geBoolean Engine_SetupPixelFormats(geEngine *Engine)
 		{													\
 			Engine->HasPixelFormat[type] = GE_FALSE;		\
 		}
-		
+
 	SetupPF( ENGINE_PF_WORLD,		RDRIVER_PF_COMBINE_LIGHTMAP,0);
 	SetupPF( ENGINE_PF_LIGHTMAP,	RDRIVER_PF_LIGHTMAP,0);
 	SetupPF( ENGINE_PF_USER,		RDRIVER_PF_3D,0);

@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/*  ELECTRIC.C                                                                          */
+/*  Electric.c                                                                          */
 /*                                                                                      */
 /*  Author: Eli Boling                                                                  */
 /*  Description: Animated electrical bolt special effect implementation                 */
@@ -15,8 +15,8 @@
 /*  under the License.                                                                  */
 /*                                                                                      */
 /*  The Original Code is Genesis3D, released March 25, 1999.                            */
-/*Genesis3D Version 1.1 released November 15, 1999                            */
-/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved           */
+/*  Genesis3D Version 1.1 released November 15, 1999                                    */
+/*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
 #include	<windows.h>
@@ -61,8 +61,8 @@ static	geBoolean	IsPowerOf2(int n)
 }
 
 _Electric_BoltEffect * _Electric_BoltEffectCreate(
- 	int NumPolys,
- 	int Width,
+	int NumPolys,
+	int Width,
 	geFloat Wildness)
 {
 	_Electric_BoltEffect *	be;
@@ -137,7 +137,7 @@ static	void	subdivide(
 		*be->beCurrentPoint = *end;
 		return;
 	}
-	
+
 	tmp.X = (end->X + start->X) / 2 + s * GaussRand();
 	tmp.Y = (end->Y + start->Y) / 2 + s * GaussRand();
 	tmp.Z = (end->Z + start->Z) / 2 + s * GaussRand();

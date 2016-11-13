@@ -1,15 +1,14 @@
 /****************************************************************************************/
-/*  LOGO.C                                                                              */
+/*  Logo.c                                                                              */
 /*                                                                                      */
 /*  Author: Eli Boling                                                                  */
 /*  Description: The Genesis3D Logo implementation                                      */
 /*                                                                                      */
-/*  Edit History:                                                                       */    
+/*  Edit History:                                                                       */
 /*  1/20/2004 Wendell Buckner                                                           */
-/*   LOGO CRASH BUG - On some machines with fast proccessors (2.0ghz or better,         */  
-/*   typically intel) the value return                                                  */
-/*   value return by Sys_GetCPUFreq is to large for the following variable make it a    */
-/*   large_integer.                                                                     */
+/*   LOGO CRASH BUG - On some machines with fast proccessors (2.0ghz or better,         */
+/*   typically intel) the value returned by Sys_GetCPUFreq is to large for the          */
+/*   value return  following variable - make it a large_integer.                        */
 /*   Fix provide by Latex and IronDragon from the genesis3d forum                       */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
@@ -85,7 +84,7 @@ static	geBoolean	GetBonePosition(geActor *Actor, const char *BoneName, geVec3d *
 	return Result;
 }
 
-static	geLight *AddBoneLight(geWorld *World, geActor *Actor, const char *BoneName, 
+static	geLight *AddBoneLight(geWorld *World, geActor *Actor, const char *BoneName,
 							 geFloat R, geFloat G, geFloat B, int Intensity)
 {
 	geXForm3d	BoneXForm;
@@ -113,7 +112,7 @@ static	geBitmap *	GetABitmap(void *BmpData, int BmpLength, void *AlphaData, int 
 
 	Context.Data	   = BmpData;
 	Context.DataLength = BmpLength;
-	
+
 	MemFile = geVFile_OpenNewSystem(NULL, GE_VFILE_TYPE_MEMORY, NULL, &Context, GE_VFILE_OPEN_READONLY);
 	if	(!MemFile)
 		return NULL;
@@ -124,7 +123,7 @@ static	geBitmap *	GetABitmap(void *BmpData, int BmpLength, void *AlphaData, int 
 
 	Context.Data	   = AlphaData;
 	Context.DataLength = AlphaLength;
-	
+
 	MemFile = geVFile_OpenNewSystem(NULL, GE_VFILE_TYPE_MEMORY, NULL, &Context, GE_VFILE_OPEN_READONLY);
 	if	(!MemFile)
 	{
@@ -191,7 +190,7 @@ static	geBoolean		DisplayedOnceAlready = GE_FALSE;
 
 	if	(DisplayedOnceAlready == GE_TRUE)
 		return GE_TRUE;
-		
+
 	DisplayedOnceAlready = GE_TRUE;
 
 	Actor = NULL;
@@ -203,9 +202,9 @@ static	geBoolean		DisplayedOnceAlready = GE_FALSE;
 	if (Width == -1)
 	{
 		RECT	R;
-	
+
 		GetClientRect(Engine->hWnd, &R);
-		
+
 		Rect.Left = R.left;
 		Rect.Right = R.right;
 		Rect.Top = R.top;
@@ -237,25 +236,25 @@ static	geBoolean		DisplayedOnceAlready = GE_FALSE;
 	MemFile = geVFile_OpenNewSystem(NULL, GE_VFILE_TYPE_MEMORY, NULL, &Context, GE_VFILE_OPEN_READONLY);
 	if	(!MemFile)
 		return GE_FALSE;
-	
+
 	// Create the actor def
 	ActorDef = geActor_DefCreateFromFile(MemFile);
 	geVFile_Close(MemFile);
 	if	(!ActorDef)
 		return GE_FALSE;
-	
+
 	// Create the actor form the actor def
 	Actor = geActor_Create(ActorDef);
 	// Remove the ref count that was just added by geACtor_Create
 	geActor_DefDestroy(&ActorDef);
 	if	(!Actor)
 		goto fail;	// Oops
-	
+
 	// Add the actor to the NULL world
 	Result = geWorld_AddActor(World, Actor, GE_ACTOR_RENDER_ALWAYS, 0xffffffff);
 	if	(Result == GE_FALSE)
 		goto fail;
-	
+
 	Motion = geActor_GetMotionByIndex(ActorDef, 0);
 	if	(!Motion)
 		goto fail;
@@ -385,7 +384,7 @@ static	geBoolean		DisplayedOnceAlready = GE_FALSE;
 		LARGE_INTEGER		NowTic, DeltaTic;
 		geFloat				CoronaScale;
 		geFloat				StreakScale;
-					 
+
 		if	(CurrentTime >= EndTime)
 		{
 			CurrentTime = EndTime;
@@ -393,7 +392,7 @@ static	geBoolean		DisplayedOnceAlready = GE_FALSE;
 		}
 
 		geActor_SetPose(Actor, Motion, CurrentTime, &ActorXForm);
-		
+
 		if	(!geEngine_BeginFrame(Engine, Camera, GE_TRUE))
 			goto fail;
 
@@ -418,7 +417,7 @@ static	geBoolean		DisplayedOnceAlready = GE_FALSE;
 							&Color,	CORONALIGHT_RADIUS,GE_FALSE);
 			}
 
-		
+
 		if (CurrentTime < 1.0f)
 			{
 				_Electric_BoltEffectAnimate(Bolt, &BoltStart, &BoltEnd);
@@ -468,9 +467,9 @@ static	geBoolean		DisplayedOnceAlready = GE_FALSE;
 //		CurrentTime += ((geFloat)DeltaTic.LowPart / (geFloat)Engine->CPUInfo.Freq) / 45.0f;
 
 /* 01/20/2004 Wendell Buckner
-    LOGO CRASH BUG - On some machines with fast proccessors (2.0ghz or better, typically intel) the value return
+	LOGO CRASH BUG - On some machines with fast proccessors (2.0ghz or better, typically intel) the value return
 	by Sys_GetCPUFreq is to large for the following variable make it a large_integer
-	Fix provided by Latex and IronDragon from the genesis3d forum 
+	Fix provided by Latex and IronDragon from the genesis3d forum
 		CurrentTime += ((geFloat)DeltaTic.LowPart / (geFloat)Engine->CPUInfo.Freq) / 75.0f;*/
 		CurrentTime += ((geFloat)DeltaTic.LowPart / (geFloat)Engine->CPUInfo.Freq.QuadPart) / 75.0f;
 
@@ -485,7 +484,7 @@ static	geBoolean		DisplayedOnceAlready = GE_FALSE;
 	geWorld_RemoveBitmap(World, Corona);
 	geWorld_RemoveBitmap(World, Streak);
 	geWorld_RemoveBitmap(World, WebUrl);
-	
+
 	// Destroy Bmps
 	geBitmap_Destroy(&Corona);
 	geBitmap_Destroy(&Streak);
@@ -508,7 +507,7 @@ static	geBoolean		DisplayedOnceAlready = GE_FALSE;
 	geWorld_Free(World);
 	// Destroy the camera
 	geCamera_Destroy(&Camera);
-	
+
 	return GE_TRUE;
 
 fail:
@@ -522,7 +521,7 @@ fail:
 		geCamera_Destroy(&Camera);
 
 	Engine->Changed = GE_TRUE;
-	
+
 	return GE_FALSE;
 }
 

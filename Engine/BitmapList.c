@@ -7,7 +7,7 @@
 /*  Edit History:                                                                       */
 /*  02/18/2004 Wendell Buckner                                                          */
 /*   DOT3 BUMPMAPPING                                                                   */
-/*  11/28/2003 Wendell Buckner 	                                                        */ 
+/*  11/28/2003 Wendell Buckner                                                          */
 /*    Bumpmapping for the World                                                         */
 /*  04/07/2003 Wendell Buckner                                                          */
 /*   BUMPMAPPING                                                                        */
@@ -97,7 +97,7 @@ geBoolean	Ret = GE_TRUE;
 	{
 	HashNode	*pNode;
 		pNode = NULL;
-		
+
 		while( (pNode = Hash_WalkNext(pList->Hash,pNode)) != NULL )
 		{
 		geBitmap *Bmp;
@@ -106,12 +106,12 @@ geBoolean	Ret = GE_TRUE;
 			HashNode_GetData(pNode,(uint32 *)&Bmp,&TimesAdded);
 
 /* 02/18/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
-            geBitmap_DetachBumpmapFromDriverDot3(Bmp );
+	DOT3 BUMPMAPPING */
+			geBitmap_DetachBumpmapFromDriverDot3(Bmp );
 
 /* 04/07/2003 Wendell Buckner
-    BUMPMAPPING */
-            geBitmap_DetachBumpmapFromDriver(Bmp );
+	BUMPMAPPING */
+			geBitmap_DetachBumpmapFromDriver(Bmp );
 
 			if (!geBitmap_DetachDriver(Bmp, GE_TRUE))
 				Ret = GE_FALSE;
@@ -123,17 +123,17 @@ geBoolean	Ret = GE_TRUE;
 			assert( TimesAdded >= 1 );
 
 /* 02/18/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
-            geBitmap_DestroyBumpmapDot3 ( Bmp );
+	DOT3 BUMPMAPPING */
+			geBitmap_DestroyBumpmapDot3 ( Bmp );
 
-/* 11/28/2003 Wendell Buckner 	
-    Bumpmapping for the World */
+/* 11/28/2003 Wendell Buckner
+	Bumpmapping for the World */
 			{
-             geBitmap *BumpBmpAlt = NULL;
-             BumpBmpAlt = geBitmap_DestroyBumpmap ( Bmp );
+				geBitmap *BumpBmpAlt = NULL;
+				BumpBmpAlt = geBitmap_DestroyBumpmap ( Bmp );
 
-             if ( BumpBmpAlt ) geBitmap_Destroy( &(BumpBmpAlt) );
-            }
+				if ( BumpBmpAlt ) geBitmap_Destroy( &(BumpBmpAlt) );
+			}
 
 			while(TimesAdded --)
 			{
@@ -177,7 +177,7 @@ HashNode *pNode;
 			return GE_FALSE;
 		}
 	}
-	
+
 #ifdef _DEBUG
 	//showPopTSCper("BitmapList_SetGamma",pList->MembersAttached,"bitmap");
 #endif
@@ -225,22 +225,22 @@ int MembersAttached;
 	assert( MembersAttached == pList->Members );
 
 /* 04/07/2003 Wendell Buckner
-    BUMPMAPPING 
-     HAVE TO WAIT UNTIL ALL BUMPMAPS HAVE BEEN ATTACHED BEFORE LINKING DRIVERHANDLES TOGETHER...
-     THAT'S WHY WE HAVE TO GO THROUGH THE LIST AGAIN... */
+	BUMPMAPPING
+	 HAVE TO WAIT UNTIL ALL BUMPMAPS HAVE BEEN ATTACHED BEFORE LINKING DRIVERHANDLES TOGETHER...
+	 THAT'S WHY WE HAVE TO GO THROUGH THE LIST AGAIN... */
 	pNode = NULL;
 	while( (pNode = Hash_WalkNext(pList->Hash,pNode)) != NULL )
 	{
-	 geBitmap *Bmp;
+	geBitmap *Bmp;
 
- 	 Bmp = (geBitmap *)HashNode_Key(pNode);
+		Bmp = (geBitmap *)HashNode_Key(pNode);
 
 /* 02/18/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
-     geBitmap_AttachBumpmapToDriverDot3(Bmp);
+	DOT3 BUMPMAPPING */
+		geBitmap_AttachBumpmapToDriverDot3(Bmp);
 
-	 geBitmap_AttachBumpmapToDriver(Bmp);
-	}	
+		geBitmap_AttachBumpmapToDriver(Bmp);
+	}
 
 	return GE_TRUE;
 }
@@ -265,12 +265,12 @@ int MembersAttached;
 		HashNode_GetData(pNode,(uint32 *)&Bmp,&TimesAdded);
 
 /* 02/18/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
-        geBitmap_DetachBumpmapFromDriverDot3(Bmp );
+	DOT3 BUMPMAPPING */
+		geBitmap_DetachBumpmapFromDriverDot3(Bmp );
 
 /* 04/07/2003 Wendell Buckner
-    BUMPMAPPING */
-        geBitmap_DetachBumpmapFromDriver(Bmp );
+	BUMPMAPPING */
+		geBitmap_DetachBumpmapFromDriver(Bmp );
 
 		if (!geBitmap_DetachDriver(Bmp, GE_TRUE))
 			Ret = GE_FALSE;
@@ -349,7 +349,7 @@ return (pNode && TimesAdded) ? GE_TRUE : GE_FALSE;
 //	BitmapList_Add
 //================================================================================
 geBoolean BitmapList_Add(BitmapList *pList, geBitmap *Bitmap)
-{	
+{
 HashNode *pNode;
 uint32 TimesAdded;
 
@@ -397,12 +397,12 @@ uint32 Key;
 	if ( TimesAdded <= 0 )
 	{
 /* 02/18/2004 Wendell Buckner
-    DOT3 BUMPMAPPING */
+	DOT3 BUMPMAPPING */
 		geBitmap_DetachBumpmapFromDriverDot3(Bitmap );
 
 /* 04/07/2003 Wendell Buckner
-    BUMPMAPPING*/
-        geBitmap_DetachBumpmapFromDriver(Bitmap );
+	BUMPMAPPING*/
+		geBitmap_DetachBumpmapFromDriver(Bitmap );
 
 		if ( ! geBitmap_DetachDriver(Bitmap, GE_TRUE) )
 		{
@@ -412,17 +412,17 @@ uint32 Key;
 	}
 
 	/* 02/18/2004 Wendell Buckner
-    DOT3 BUMPMAPPING*/
-    geBitmap_DestroyBumpmapDot3 ( Bitmap );
+	DOT3 BUMPMAPPING*/
+	geBitmap_DestroyBumpmapDot3 ( Bitmap );
 
-/* 11/28/2003 Wendell Buckner 	
-    Bumpmapping for the World */
+/* 11/28/2003 Wendell Buckner
+	Bumpmapping for the World */
 	{
-     geBitmap *BumpBmpAlt = NULL;
-     BumpBmpAlt = geBitmap_DestroyBumpmap ( Bitmap );
+		geBitmap *BumpBmpAlt = NULL;
+		BumpBmpAlt = geBitmap_DestroyBumpmap ( Bitmap );
 
-     if ( BumpBmpAlt ) geBitmap_Destroy( &(BumpBmpAlt) );
-    }
+		if ( BumpBmpAlt ) geBitmap_Destroy( &(BumpBmpAlt) );
+	}
 
 	geBitmap_Destroy(&Bitmap);
 
@@ -442,9 +442,9 @@ uint32 Key;
 
 geBoolean BitmapList_IsValid(BitmapList *pList)
 {
-	if ( ! pList ) 
+	if ( ! pList )
 		return GE_FALSE;
-		
+
 	if ( pList->Adds < pList->Members )
 		return GE_FALSE;
 

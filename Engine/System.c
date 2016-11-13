@@ -5,10 +5,9 @@
 /*  Description: Friend of engine.c.  Takes care of some of the driver work.            */
 /*  Edit History:                                                                       */
 /*  01/20/2004 Wendell Buckner                                                          */
-/*   LOGO CRASH BUG - On some machines with fast proccessors (2.0ghz or better,         */  
-/*   typically intel) the value return                                                  */
-/*   value return by Sys_GetCPUFreq is to large for the following variable make it a    */
-/*   large_integer                                                                      */
+/*   LOGO CRASH BUG - On some machines with fast proccessors (2.0ghz or better,         */
+/*   typically intel) the value returned by Sys_GetCPUFreq is too large for the         */
+/*   following variable - make it a large_integer                                       */
 /*   Fix provided by Latex and IronDragon from the genesis3d forum                      */
 /*                                                                                      */
 /*  The contents of this file are subject to the Genesis3D Public License               */
@@ -58,7 +57,7 @@
 //=====================================================================================
 //	Local static globals
 //=====================================================================================
-static char DriverFileNames[][200] = 
+static char DriverFileNames[][200] =
 {
 	{"D3D7xDrv.dll"},
 	{"D3DDrv.dll"},
@@ -88,7 +87,7 @@ GENESISAPI geDriver *geDriver_SystemGetNextDriver(geDriver_System *DriverSystem,
 	geDriver		*Last;
 
 	assert(DriverSystem != NULL);
-	
+
 	DriverInfo = (Sys_DriverInfo*)DriverSystem;
 
 	if (!DriverInfo->NumSubDrivers)
@@ -180,7 +179,7 @@ GENESISAPI geBoolean geDriver_ModeGetWidthHeight(geDriver_Mode *Mode, int32 *Wid
 //=====================================================================================
 
 const uint32 geEngine_Version = GE_VERSION;
-const uint32 geEngine_Version_OldestSupported = 
+const uint32 geEngine_Version_OldestSupported =
 	( (GE_VERSION_MAJOR << GE_VERSION_MAJOR_SHIFT) + GE_VERSION_MINOR_MIN );
 
 geEngine *Sys_EngineCreate(HWND hWnd, const char *AppName, const char *DriverDirectory, uint32 Version)
@@ -219,7 +218,7 @@ geEngine *Sys_EngineCreate(HWND hWnd, const char *AppName, const char *DriverDir
 		geErrorLog_Add(GE_ERR_OUT_OF_MEMORY, NULL);
 		goto ExitWithError;
 	}
-	
+
 	// Clear the engine structure...
 	memset(NewEngine, 0, sizeof(geEngine));
 
@@ -227,7 +226,7 @@ geEngine *Sys_EngineCreate(HWND hWnd, const char *AppName, const char *DriverDir
 	{
 		geErrorLog_Add(GE_ERR_OUT_OF_MEMORY, NULL);
 		goto ExitWithError;
-	}	
+	}
 
 	Length = strlen(DriverDirectory) + 1;
 	NewEngine->DriverDirectory = geRam_Allocate(Length);
@@ -236,14 +235,14 @@ geEngine *Sys_EngineCreate(HWND hWnd, const char *AppName, const char *DriverDir
 		goto ExitWithError;
 
 	memcpy(NewEngine->DriverDirectory, DriverDirectory, Length);
-	
+
 	NewEngine->hWnd = hWnd;
 	strcpy(NewEngine->AppName, AppName);
 
 	// Get cpu info
 	if (!Sys_GetCPUFreq(&NewEngine->CPUInfo))
 		goto ExitWithError;
-	
+
 	// Build the wavetable
 	for (i = 0; i < 20; i++)
 		NewEngine->WaveTable[i] = ((i * 65)%200) + 50;
@@ -268,7 +267,7 @@ geEngine *Sys_EngineCreate(HWND hWnd, const char *AppName, const char *DriverDir
 	NewEngine->DisplayFrameRateCounter = GE_TRUE;	// Default to showing the FPS counter
 
 	geAssert_SetCriticalShutdownCallback( geEngine_ShutdownDriver , NewEngine );
-	
+
 	NewEngine->CurrentGamma = 1.0f;
 
 	//geEngine_SetFogEnable(NewEngine, GE_TRUE, 255.0f, 0.0f, 0.0f, 250.0f, 1000.0f);
@@ -348,11 +347,11 @@ geBoolean Sys_GetCPUFreq(Sys_CPUInfo *Info)
 	}
 
 /* 01/20/2004 Wendell Buckner
-    LOGO CRASH BUG - On some machines with fast proccessors (2.0ghz or better, typically intel) the value return
+	LOGO CRASH BUG - On some machines with fast proccessors (2.0ghz or better, typically intel) the value return
 	by Sys_GetCPUFreq is to large for the following variable make it a large_integer
-	Fix provided by Latex and IronDragon from the genesis3d forum 
+	Fix provided by Latex and IronDragon from the genesis3d forum
 	Info->Freq = Freq.LowPart; */
-    Info->Freq.QuadPart = Freq.LowPart;
+	Info->Freq.QuadPart = Freq.LowPart;
 
 	return GE_TRUE;
 }
@@ -398,12 +397,12 @@ static BOOL EnumSubDriversCB(S32 DriverId, char *Name, void *Context)
 
 	if (strlen(Name) >=	DRV_STR_SIZE)
 		return TRUE;		// Ignore
-	
+
 	if (DriverInfo->NumSubDrivers+1 >= MAX_SUB_DRIVERS)
 		return FALSE;		// Stop when no more driver slots available
 
 	Driver = &DriverInfo->SubDrivers[DriverInfo->NumSubDrivers];
-	
+
 	Driver->Id = DriverId;
 	strcpy(Driver->Name, Name);
 	strcpy(Driver->FileName, DriverInfo->CurFileName);
@@ -412,7 +411,7 @@ static BOOL EnumSubDriversCB(S32 DriverId, char *Name, void *Context)
 
 	// Store this, so enum modes know what driver we are working on...
 	DriverInfo->CurDriver = Driver;
-	
+
 	if (!RDriver->EnumModes(Driver->Id, Driver->Name, EnumModesCB, (void*)DriverInfo))
 		return FALSE;
 
@@ -436,7 +435,7 @@ static BOOL EnumModesCB(S32 ModeId, char *Name, S32 Width, S32 Height, void *Con
 	DriverInfo = (Sys_DriverInfo*)Context;
 
 	Driver = DriverInfo->CurDriver;
-	
+
 	if (Driver->NumModes+1 >= MAX_DRIVER_MODES)
 		return FALSE;
 
@@ -501,7 +500,7 @@ static geBoolean EnumSubDrivers(Sys_DriverInfo *DriverInfo, const char *DriverDi
 		}
 
 		DriverInfo->RDriver = RDriver;
-		
+
 		if (!RDriver->EnumSubDrivers(EnumSubDriversCB, (void*)DriverInfo))
 		{
 			FreeLibrary(Handle);
