@@ -728,7 +728,7 @@ geBoolean THandle_CheckCache(void)
 /* 11/25/2002 Wendell Buckner
 	Raise texture limits to 16384 x 16384.
 	int32				MaxTable1[9],  MaxTable2[9]; */
-	int32				MaxTable1[14], MaxTable2[14];
+	int32				MaxTable1[15], MaxTable2[15];
 
 	if (!CacheNeedsUpdate)
 		return GE_TRUE;
