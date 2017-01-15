@@ -74,10 +74,16 @@ int WriteBMP(unsigned short *ScreenBuffer, const char *Name)
 		return 0;
 
 	if	(fwrite(&bfh, sizeof(bfh), 1, out) != 1)
+	{
+		fclose(out);
 		return 0;
+	}
 
 	if	(fwrite(&bi, sizeof(bi), 1, out) != 1)
+	{
+		fclose(out);
 		return 0;
+	}
 
 	for	(y = HEIGHT-1; y >= 0; y--)
 	{
