@@ -689,8 +689,6 @@ GENESISAPI geBoolean		GENESISCC geCSNetMgr_StopSession(geCSNetMgr *M);
 GENESISAPI geBoolean		GENESISCC geCSNetMgr_SendToServer(geCSNetMgr *M, geBoolean Guaranteed, uint8 *Data, int32 DataSize);
 GENESISAPI geBoolean		GENESISCC geCSNetMgr_SendToClient(geCSNetMgr *M, geCSNetMgr_NetID To, geBoolean Guaranteed, uint8 *Data, int32 DataSize);
 
-#include "xtra_g3d.h"
-
 #ifdef __cplusplus
 }
 #endif
