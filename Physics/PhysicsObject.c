@@ -23,10 +23,10 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include "genesis.h"
-#include "ram.h"
-#include "matrix33.h"
-#include "quatern.h"
+#include "Genesis.h"
+#include "Ram.h"
+#include "Matrix33.h"
+#include "Quatern.h"
 
 
 #include "PhysicsObject.h"
@@ -288,7 +288,6 @@ GENESISAPI geBoolean GENESISCC gePhysicsObject_Integrate(
 	geQuaternion qdot;
 	geFloat G[3][4], Gt[4][3];
 	int i, j;
-	static int M[]={0x696C6345,0x21657370};
 	geFloat dt2 = 0.5f * (dt * dt);
 
 	assert( sourceConfigIndex >= 0 );
@@ -368,6 +367,7 @@ GENESISAPI geBoolean GENESISCC gePhysicsObject_Integrate(
 	pTargetConfig->xform.Translation.Z =
 		pSourceConfig->xform.Translation.Z + dt * pSourceConfig->linearVelocity.Z + dt2 * a.Z;
 
+	(void)qmag;
 	return GE_TRUE;
 }
 

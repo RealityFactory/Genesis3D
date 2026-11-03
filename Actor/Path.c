@@ -33,6 +33,10 @@
 #include "QKFrame.h"
 #include "Vec3d.h"
 
+#if defined(__linux__)
+#define strnicmp strncasecmp
+#endif
+
 #define min(aa,bb)  (( (aa)>(bb) ) ? (bb) : (aa) )
 #define max(aa,bb)  (( (aa)>(bb) ) ? (aa) : (bb) )
 

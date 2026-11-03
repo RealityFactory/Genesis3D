@@ -41,7 +41,7 @@
 
 typedef struct gePose_Joint
 {
-	int			 ParentJoint;		// parent of path
+	int32		 ParentJoint;		// parent of path
 	geXForm3d    *Transform;		// matrix for path	(pointer into TransformArray)
 	geQuaternion Rotation;			// quaternion representation for orientation of above Transform
 
@@ -55,26 +55,26 @@ typedef struct gePose_Joint
 
 	geBoolean    Touched;			// if this joint has been touched and needs recomputation
 	geBoolean    NoAttachmentRotation; // GE_TRUE if there is no attachment rotation.
-	int			 Covered;			// if joint has been 100% set (no blending)
+	int32		 Covered;			// if joint has been 100% set (no blending)
 } gePose_Joint;						// structure to bind a name and a path for a joint
 
 typedef struct gePose
 {
-	int				  JointCount;	// number of joints in the motion
+	int32			  JointCount;	// number of joints in the motion
 	int32			  NameChecksum;	// checksum based on joint names and list order
 	geBoolean		  Touched;		// if any joint has been touched & needs recomputation
 	geStrBlock		 *JointNames;
 	geVec3d			  Scale;		// current scaling. Used for scaling motion samples
 
 	geBoolean		  Slave;			// if pose is 'slaved' to parent -vs- attached.
-	int				  SlaveJointIndex;	// index of 'slaved' joint
+	int32			  SlaveJointIndex;	// index of 'slaved' joint
 	gePose			 *Parent;
 	gePose_Joint	  RootJoint;
 	geXForm3d		  ParentsLastTransform;	// Compared to parent's transform to see if it changed: recompute is needed
 	geXForm3d		  RootTransform;
 	geXFArray		 *TransformArray;
 	gePose_Joint	 *JointArray;
-	int				  OnlyThisJoint;		// update only this joint (and it's parents) if this is >0
+	int32			  OnlyThisJoint;		// update only this joint (and it's parents) if this is >0
 } gePose;
 
 

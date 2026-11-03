@@ -33,15 +33,19 @@
 #include "Ram.h"
 #include "ErrorLog.h"
 
+#if defined(__linux__)
+#define strnicmp strncasecmp
+#endif
+
 #define STRBLOCK_MAX_STRINGLEN 255
 
 typedef struct geStrBlock
 {
-	int Count;
+	int32 Count;
 	geStrBlock *SanityCheck;
 	union
 		{
-			int IntArray[1];		// char offset into CharArray for string[n]
+			int32 IntArray[1];		// char offset into CharArray for string[n]
 			char CharArray[1];
 		} Data;
 
@@ -50,11 +54,11 @@ typedef struct geStrBlock
 
 int GENESISCC geStrBlock_GetChecksum(const geStrBlock *SB)
 {
-	int Count;
-	int Len;
-	int i,j;
+	int32 Count;
+	int32 Len;
+	int32 i,j;
 	const char *Str;
-	int Checksum=0;
+	int32 Checksum=0;
 	assert( SB != NULL );
 
 	Count = geStrBlock_GetCount(SB);
@@ -101,7 +105,7 @@ void GENESISCC geStrBlock_Destroy(geStrBlock **SB)
 
 static int GENESISCC geStrBlock_BlockSize(const geStrBlock *B)
 {
-	int Offset;
+	int32 Offset;
 	const char *LastStr;
 	assert( B != NULL );
 	assert( B->SanityCheck == B );
@@ -117,9 +121,9 @@ static int GENESISCC geStrBlock_BlockSize(const geStrBlock *B)
 
 void GENESISCC geStrBlock_Delete(geStrBlock **ppSB,int Nth)
 {
-	int BlockSize;
-	int StringLen;
-	int CloseSize;
+	int32 BlockSize;
+	int32 StringLen;
+	int32 CloseSize;
 	const char *String;
 	assert(  ppSB  != NULL );
 	assert( *ppSB  != NULL );
@@ -137,7 +141,7 @@ void GENESISCC geStrBlock_Delete(geStrBlock **ppSB,int Nth)
 		geStrBlock *B = *ppSB;
 		char *ToBeReplaced;
 		char *Replacement=NULL;
-		int i;
+		int32 i;
 		ToBeReplaced = &((*ppSB)->Data.CharArray[(*ppSB)->Data.IntArray[Nth]]);
 		if (Nth< (*ppSB)->Count-1)
 			Replacement  = &((*ppSB)->Data.CharArray[(*ppSB)->Data.IntArray[Nth+1]]);
@@ -288,8 +292,8 @@ geBoolean GENESISCC geStrBlock_Insert(geStrBlock **ppSB,int InsertAfterIndex,con
 
 geBoolean GENESISCC geStrBlock_FindString(const geStrBlock* pSB, const char* String, int* pIndex)
 {
-	int i;
-	int Count;
+	int32 i;
+	int32 Count;
 	const char *Str;
 
 	assert(pSB != NULL);
@@ -313,7 +317,7 @@ geBoolean GENESISCC geStrBlock_FindString(const geStrBlock* pSB, const char* Str
 
 geBoolean GENESISCC geStrBlock_Append(geStrBlock **ppSB,const char *String)
 {
-	int BlockSize;
+	int32 BlockSize;
 	assert(  ppSB  != NULL );
 	assert( *ppSB  != NULL );
 	assert( String != NULL );
@@ -334,7 +338,7 @@ geBoolean GENESISCC geStrBlock_Append(geStrBlock **ppSB,const char *String)
 			BlockSize				// size of data block
 			+ sizeof(geStrBlock)		// size of strblock structure
 			+ strlen(String) + 1		// size of new string
-			+ sizeof(int) );		// size of new index to string
+			+ sizeof(int32) );		// size of new index to string
 		if ( NewgeStrBlock == NULL )
 			{
 				geErrorLog_Add(ERR_STRBLOCK_ENOMEM, NULL);
@@ -349,15 +353,15 @@ geBoolean GENESISCC geStrBlock_Append(geStrBlock **ppSB,const char *String)
 		int i;
 		for (i=0; i<B->Count; i++)
 			{
-				B->Data.IntArray[i] += sizeof(int);
+				B->Data.IntArray[i] += sizeof(int32);
 			}
 		if (B->Count > 0)
 			{
 				memmove(&(B->Data.IntArray[B->Count+1]),
 						&(B->Data.IntArray[B->Count]),
-						BlockSize - sizeof(int) * B->Count);
+						BlockSize - sizeof(int32) * B->Count);
 			}
-		B->Data.IntArray[B->Count] = BlockSize + sizeof(int);
+		B->Data.IntArray[B->Count] = BlockSize + sizeof(int32);
 		strcpy(&(B->Data.CharArray[B->Data.IntArray[B->Count]]),String);
 	}
 	(*ppSB)->Count++;
@@ -409,8 +413,8 @@ geStrBlock* GENESISCC geStrBlock_CreateFromFile(geVFile* pFile)
 
 	if(u == STRBLOCK_ASCII_FILE_TYPE)
 	{
-		int NumItemsNeeded=0;
-		int NumItemsRead = 0;
+		int32 NumItemsNeeded=0;
+		int32 NumItemsRead = 0;
 		char line[STRBLOCK_MAX_STRINGLEN];
 
 		SB = geStrBlock_Create();
@@ -508,7 +512,7 @@ geStrBlock* GENESISCC geStrBlock_CreateFromFile(geVFile* pFile)
 geBoolean GENESISCC geStrBlock_WriteToFile(const geStrBlock *SB,geVFile *pFile)
 {
 	uint32 u;
-	int i,count;
+	int32 i,count;
 
 	assert( SB != NULL );
 	assert( pFile != NULL );
@@ -551,7 +555,7 @@ geBoolean GENESISCC geStrBlock_WriteToFile(const geStrBlock *SB,geVFile *pFile)
 
 typedef struct
 {
-	int Count;
+	int32 Count;
 	uint32 Size;
 } geStrBlock_BinaryFileHeader;
 

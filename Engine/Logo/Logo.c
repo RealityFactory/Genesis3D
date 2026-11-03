@@ -26,11 +26,22 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
+#if defined(__linux__)
+#include <unistd.h>
+#include <sys/time.h>
+#include <X11/Xlib.h>
+typedef struct
+{
+	Display * display;
+	Window win;
+} glxWnd;
+
+#elif defined _WIN32 || defined _WIN64
 #define WIN32_LEAN_AND_MEAN
 #pragma warning(disable : 4201 4214 4115)
 #include <windows.h>
-#include <mmsystem.h> //timeGetTime
 #pragma warning(default : 4201 4214 4115)
+#endif
 
 #include	<math.h>
 
@@ -54,6 +65,7 @@ extern	int				A_Corona_bmp_Length;
 extern	unsigned char	A_Streak_bmp[];
 extern	int				A_Streak_bmp_Length;
 
+#if defined _WIN32 || defined _WIN64
 #pragma warning (disable:4514)	// unreferenced inline function (caused by Windows)
 
 static void SubLarge(LARGE_INTEGER *start, LARGE_INTEGER *end, LARGE_INTEGER *delta)
@@ -73,6 +85,7 @@ static void SubLarge(LARGE_INTEGER *start, LARGE_INTEGER *end, LARGE_INTEGER *de
 		mov dword ptr [ebx+4],edx
 	}
 }
+#endif
 
 static	geBoolean	GetBonePosition(geActor *Actor, const char *BoneName, geVec3d *Pos)
 {
@@ -162,7 +175,7 @@ geBoolean DoSplashScreen(geEngine *Engine, geDriver_Mode *DriverMode)
 	geActor *			Actor;
 	geWorld *			World;
 	geFloat				StartTime;
-	geFloat				CurrentTime;
+	geFloat				CurrentTime_;
 	geFloat				EndTime;
 	geMotion *			Motion;
 	geXForm3d			CameraXForm;
@@ -172,7 +185,11 @@ geBoolean DoSplashScreen(geEngine *Engine, geDriver_Mode *DriverMode)
 	int32				Width, Height;
 
 	geVec3d				LightingNormal;
+#if defined(__linux__)
+	struct timeval		CurrentTic;
+#elif defined _WIN32 || defined _WIN64
 	LARGE_INTEGER		CurrentTic;
+#endif
 
 	_Electric_BoltEffect *Bolt=NULL;
 	geVec3d				BoltStart;
@@ -201,14 +218,24 @@ static	geBoolean		DisplayedOnceAlready = GE_FALSE;
 
 	if (Width == -1)
 	{
+#if defined(__linux__)
+		Window root;//, child;
+		int x, y;//, left, top;
+		unsigned int width, height, border_width, depth;
+		glxWnd *Wnd = (glxWnd*)(Engine->hWnd);
+		XGetGeometry(Wnd->display, Wnd->win, &root, &x, &y, &width, &height, &border_width, &depth);
+		Rect.Left = 0;
+		Rect.Right = width-1;
+		Rect.Top = 0;
+		Rect.Bottom = height-1;
+#elif defined _WIN32 || defined _WIN64
 		RECT	R;
-
 		GetClientRect(Engine->hWnd, &R);
-
 		Rect.Left = R.left;
 		Rect.Right = R.right;
 		Rect.Top = R.top;
 		Rect.Bottom = R.bottom;
+#endif
 	}
 	else
 	{
@@ -231,7 +258,7 @@ static	geBoolean		DisplayedOnceAlready = GE_FALSE;
 	}
 
 	// Open the actor def file
-	Context.Data = LogoActor_act;
+	Context.Data = (void*)LogoActor_act;
 	Context.DataLength = LogoActor_act_Length;
 	MemFile = geVFile_OpenNewSystem(NULL, GE_VFILE_TYPE_MEMORY, NULL, &Context, GE_VFILE_OPEN_READONLY);
 	if	(!MemFile)
@@ -261,7 +288,7 @@ static	geBoolean		DisplayedOnceAlready = GE_FALSE;
 
 	if	(geMotion_GetTimeExtents(Motion, &StartTime, &EndTime) == GE_FALSE)
 		goto fail;
-	CurrentTime = StartTime;
+	CurrentTime_ = StartTime;
 
 	Camera = geCamera_Create(2.0f, &Rect);
 	if	(!Camera)
@@ -375,23 +402,32 @@ static	geBoolean		DisplayedOnceAlready = GE_FALSE;
 	CoronaVertex.Z += 100.0f;
 	CoronaVertex.X += 30.0f;
 
+#if defined(__linux__)
+	gettimeofday(&CurrentTic, NULL);
+#elif defined _WIN32 || defined _WIN64
 	QueryPerformanceCounter(&CurrentTic);
+#endif
 
 	KeepGoing = GE_TRUE;
 
 	while	(KeepGoing)		// Play the entire animation
 	{
+#if defined(__linux__)
+		struct timeval		NowTic;
+		unsigned long		DeltaTic;
+#elif defined _WIN32 || defined _WIN64
 		LARGE_INTEGER		NowTic, DeltaTic;
+#endif
 		geFloat				CoronaScale;
 		geFloat				StreakScale;
 
-		if	(CurrentTime >= EndTime)
+		if	(CurrentTime_ >= EndTime)
 		{
-			CurrentTime = EndTime;
+			CurrentTime_ = EndTime;
 			KeepGoing = GE_FALSE;
 		}
 
-		geActor_SetPose(Actor, Motion, CurrentTime, &ActorXForm);
+		geActor_SetPose(Actor, Motion, CurrentTime_, &ActorXForm);
 
 		if	(!geEngine_BeginFrame(Engine, Camera, GE_TRUE))
 			goto fail;
@@ -400,36 +436,36 @@ static	geBoolean		DisplayedOnceAlready = GE_FALSE;
 		GetBonePosition(Actor, "BONE28", &BoltEnd);
 
 		if (CoronaLight)
-			{
-				static geFloat Random = 0.76324f;
-				GE_RGBA Color;
-				geFloat Attenuation = 0.97f * CurrentTime;
-				Attenuation += (Random*0.15f)*(CurrentTime>1.0f?0:(1.0f-CurrentTime));
-				Random = 1.0f - Random*Random;
-				Color.r = CORONALIGHT1_R * Attenuation;
-				Color.g = CORONALIGHT1_G * Attenuation;
-				Color.b = CORONALIGHT1_B * Attenuation;
-				if (Color.r>200.0f) Color.r = 200.0f;
-				if (Color.g>200.0f) Color.g = 200.0f;
-				if (Color.b>255.0f) Color.b = 255.0f;
-				Color.a = 255.0f;
-				geWorld_SetLightAttributes(	World,CoronaLight,&CoronaVertex,
-							&Color,	CORONALIGHT_RADIUS,GE_FALSE);
-			}
-
-
-		if (CurrentTime < 1.0f)
-			{
-				_Electric_BoltEffectAnimate(Bolt, &BoltStart, &BoltEnd);
-				_Electric_BoltEffectRender(World, Bolt, &CameraXForm);
-			}
-		if	(CurrentTime > 1.0f)
 		{
-			CoronaScale = (CurrentTime - 1.0f) * 1.75f;
+			static geFloat Random = 0.76324f;
+			GE_RGBA Color;
+			geFloat Attenuation = 0.97f * CurrentTime_;
+			Attenuation += (Random*0.15f)*(CurrentTime_>1.0f?0:(1.0f-CurrentTime_));
+			Random = 1.0f - Random*Random;
+			Color.r = CORONALIGHT1_R * Attenuation;
+			Color.g = CORONALIGHT1_G * Attenuation;
+			Color.b = CORONALIGHT1_B * Attenuation;
+			if (Color.r>200.0f) Color.r = 200.0f;
+			if (Color.g>200.0f) Color.g = 200.0f;
+			if (Color.b>255.0f) Color.b = 255.0f;
+			Color.a = 255.0f;
+			geWorld_SetLightAttributes(	World,CoronaLight,&CoronaVertex,
+						&Color,	CORONALIGHT_RADIUS,GE_FALSE);
+		}
+
+
+		if (CurrentTime_ < 1.0f)
+		{
+			_Electric_BoltEffectAnimate(Bolt, &BoltStart, &BoltEnd);
+			_Electric_BoltEffectRender(World, Bolt, &CameraXForm);
+		}
+		else if	(CurrentTime_ > 1.0f)
+		{
+			CoronaScale = (CurrentTime_ - 1.0f) * 1.75f;
 			if	(CoronaScale > 1.0f)
 				CoronaScale = 1.0f;
 			CoronaVert.a = 255.0f * CoronaScale;
-			StreakScale = CurrentTime * 5.0f;
+			StreakScale = CurrentTime_ * 5.0f;
 			if	(StreakScale > 10.0f)
 				StreakScale = 10.0f;
 			geWorld_AddPolyOnce(World, &CoronaVert, 1, Corona, GE_TEXTURED_POINT, GE_RENDER_DO_NOT_OCCLUDE_OTHERS | GE_RENDER_DO_NOT_OCCLUDE_SELF, 3.0f);
@@ -459,6 +495,12 @@ static	geBoolean		DisplayedOnceAlready = GE_FALSE;
 		if	(!geEngine_EndFrame(Engine))
 			goto fail;
 
+#if defined(__linux__)
+		gettimeofday(&NowTic, NULL);
+		DeltaTic = (NowTic.tv_sec-CurrentTic.tv_sec)*1000000+(NowTic.tv_usec-CurrentTic.tv_usec); // time in microseconds
+		CurrentTime_ += (DeltaTic / 1000000.f); // time in seconds / 75.f??
+		CurrentTic = NowTic;
+#elif defined _WIN32 || defined _WIN64
 		QueryPerformanceCounter(&NowTic);
 
 		SubLarge(&CurrentTic, &NowTic, &DeltaTic);
@@ -471,11 +513,15 @@ static	geBoolean		DisplayedOnceAlready = GE_FALSE;
 	by Sys_GetCPUFreq is to large for the following variable make it a large_integer
 	Fix provided by Latex and IronDragon from the genesis3d forum
 		CurrentTime += ((geFloat)DeltaTic.LowPart / (geFloat)Engine->CPUInfo.Freq) / 75.0f;*/
-		CurrentTime += ((geFloat)DeltaTic.LowPart / (geFloat)Engine->CPUInfo.Freq.QuadPart) / 75.0f;
-
+		CurrentTime_ += ((geFloat)DeltaTic.LowPart / (geFloat)Engine->CPUInfo.Freq.QuadPart) / 75.0f;
+#endif
 	}
 
-	Sleep(500);
+#if defined(__linux__)
+	usleep(500000); // microseconds
+#elif defined _WIN32 || defined _WIN64
+	Sleep(500); // milliseconds
+#endif
 
 	// Remove Bolt and Bitmaps that were causing leak
 	if (Bolt)
@@ -496,7 +542,7 @@ static	geBoolean		DisplayedOnceAlready = GE_FALSE;
 	// Utterly Destroy the actor
 	geActor_DestroyDirect(&Actor);
 
-	// Rmeove the world from the engine
+	// Remove the world from the engine
 	if (!geEngine_RemoveWorld(Engine, World))
 	{
 		geErrorLog_AddString(-1, "DoSplashScreen:  geEngine_RemoveWorld failed.", NULL);

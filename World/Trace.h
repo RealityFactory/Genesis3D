@@ -23,7 +23,6 @@
 #define GE_TRACE_H
 
 #include <assert.h>
-#include <windows.h>
 
 #include "Genesis.h"
 #include "BaseType.h"

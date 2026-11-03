@@ -25,6 +25,7 @@
 /*                                                                                      */
 /****************************************************************************************/
 #include <assert.h>						//assert()
+#include <stddef.h> // NULL
 
 #include "Body._h"
 #include "BodyInst.h"
@@ -140,6 +141,7 @@ static geBodyInst_Geometry *GENESISCC geBodyInst_GetGeometryPrep(
 {
 	const geBody *B;
 	geBodyInst_Geometry *G;
+	(void)LevelOfDetail;
 
 	assert( BI != NULL );
 	assert( geBody_IsValid(BI->BodyTemplate) != GE_FALSE );
@@ -223,7 +225,6 @@ const geBodyInst_Geometry *GENESISCC geBodyInst_GetGeometry(
 	int      BoneXFCount;
 	geBody_Index BoneIndex;
 
-	geBoolean GottaUpdateFaces = GE_FALSE;
 	assert( BI != NULL );
 	assert( BoneTransformArray != NULL );
 	assert( geBody_IsValid(BI->BodyTemplate) != GE_FALSE );

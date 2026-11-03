@@ -20,8 +20,8 @@
 #ifndef OGLDRV_H
 #define OGLDRV_H
 
+#include <GL/glext.h>
 #include "DCommon.h"
-#include "glext.h"
 
 // Here are some useful values you can change to meet your needs.
 // These should, in the future, really be handled at run-time as opposed to compile-time.
@@ -37,13 +37,11 @@ unsigned int ZBUFFER_DEPTH;		// Depth of the ZBuffer to use in OpenGL.
 extern		DRV_Driver	OGLDRV;
 extern		DRV_Window	ClientWindow;
 
-extern		PFNGLACTIVETEXTUREARBPROC glActiveTextureARB;
-extern		PFNGLMULTITEXCOORD4FARBPROC glMultiTexCoord4fARB;
 extern		GLboolean multitexture;
 
-extern		maxTextureSize;
-extern		FogEnabled;
-extern		RenderingIsOK;
+extern		GLint maxTextureSize;
+extern		geBoolean FogEnabled;
+extern		geBoolean RenderingIsOK;
 
 geBoolean DRIVERCC SetFogEnable(geBoolean Enable, float r, float g, float b, float Start, float End);
 geBoolean DRIVERCC SetClearColor(float r, float g, float b);

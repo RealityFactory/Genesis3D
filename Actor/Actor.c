@@ -50,7 +50,9 @@
 #include "ErrorLog.h"
 #include "StrBlock.h"
 #ifdef _DEBUG
+#if defined _WIN32 || defined _WIN64
 #include <crtdbg.h>
+#endif
 #endif
 
 /* to do:
@@ -72,12 +74,12 @@ typedef struct geActor
 	geMotion			*CueMotion;
 	geVec3d				BoundingBoxMinCorner;
 	geVec3d				BoundingBoxMaxCorner;
-	int					BoundingBoxCenterBoneIndex;
-	int					StepBoneIndex;			// used for single-bone motion optimization.
+	int32				BoundingBoxCenterBoneIndex;
+	int32				StepBoneIndex;			// used for single-bone motion optimization.
 	void *				UserData;
 
 	geExtBox			RenderHintExtBox;
-	int					RenderHintExtBoxCenterBoneIndex;
+	int32				RenderHintExtBoxCenterBoneIndex;
 	geBoolean			RenderHintExtBoxEnabled;
 } geActor;
 
@@ -442,7 +444,11 @@ GENESISAPI geBoolean GENESISCC geActor_DestroyDirect(geActor **pA)
 		gePose_Destroy( &( CurrentActor->Pose ) );
 		geMotion_Destroy(&(CurrentActor->CueMotion));
 
+#if defined(__linux__)
+		assert(CurrentActor->ActorDefinition != NULL);
+#elif defined _WIN32 || defined _WIN64
 		assert( _CrtIsValidPointer( &CurrentActor->ActorDefinition, sizeof(CurrentActor->ActorDefinition), FALSE ) );
+#endif
 
 		if(geActor_DefIsValid(CurrentActor->ActorDefinition)==GE_TRUE )
 		{
@@ -683,6 +689,7 @@ static geActor_Def * GENESISCC geActor_DefCreateHeader(geVFile *pFile, geBoolean
 
 	if(geVFile_Read(pFile, &u, sizeof(u)) == GE_FALSE)
 		{	geErrorLog_Add( ERR_ACTOR_FILE_READ , NULL);	return NULL;}
+
 	if (u != ACTOR_FILE_TYPE)
 		{	geErrorLog_Add( ERR_ACTOR_FILE_READ , NULL);	return NULL;}
 
@@ -1438,6 +1445,7 @@ static void GENESISCC geActor_KillCue( geActor *A, int Index )
 	assert( geActor_IsValid(A) != GE_FALSE);
 	assert( (Index>=0) && (Index<geMotion_GetSubMotionCount(A->CueMotion)));
 	M  = geMotion_RemoveSubMotion(A->CueMotion,Index);
+	(void)M;
 }
 
 GENESISAPI geBoolean GENESISCC geActor_AnimationNudge(geActor *A, geXForm3d *Offset)
@@ -1718,6 +1726,7 @@ GENESISAPI geBoolean GENESISCC geActor_GetAnimationEvent(
 
 
 #ifndef NDEBUG
+#if 0
 static geBoolean GENESISCC geActor_TransformCompare(const geXForm3d *T1, const geXForm3d *T2)
 {
 	#define SINGLE_TERM_ERROR_THRESHOLD (0.0001f)
@@ -1736,6 +1745,7 @@ static geBoolean GENESISCC geActor_TransformCompare(const geXForm3d *T1, const g
 	if (fabs(T1->Translation.Z - T2->Translation.Z)>SINGLE_TERM_ERROR_THRESHOLD) return GE_FALSE;
 	return GE_TRUE;
 }
+#endif
 #endif
 
 

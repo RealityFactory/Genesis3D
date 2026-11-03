@@ -28,7 +28,11 @@
 extern "C" {
 #endif
 
-#define LISTCALL	__fastcall
+#if defined(__linux__)
+	#define	LISTCALL
+#else
+	#define	LISTCALL	__fastcall
+#endif
 
 /*******************************************/
 /** you must wrap any calls to this module with these: **/
@@ -156,9 +160,9 @@ typedef struct HashNode HashNode;
 
 extern Hash *	Hash_Create(void);
 extern void		Hash_Destroy(Hash *pHash);
-HashNode *	LISTCALL Hash_Add(Hash *pHash,uint32 Key,uint32 Data);
+HashNode *	LISTCALL Hash_Add(Hash *pHash,unsigned long Key,uint32 Data);
 void		LISTCALL Hash_DeleteNode(Hash *pHash,HashNode *pNode);
-HashNode *	LISTCALL Hash_Get(Hash *pHash,uint32 Key,uint32 *pData);
+HashNode *	LISTCALL Hash_Get(Hash *pHash,unsigned long Key,uint32 *pData);
 							// pdata is optional
 HashNode *	LISTCALL Hash_WalkNext(Hash *pHash,HashNode *pCur);
 							//use pCur == NULL to start walking
@@ -166,7 +170,7 @@ HashNode *	LISTCALL Hash_WalkNext(Hash *pHash,HashNode *pCur);
 uint32		LISTCALL Hash_NumMembers(Hash *pHash);
 
 void	HashNode_SetData(HashNode *pNode,uint32 Data);
-void	HashNode_GetData(HashNode *pNode,uint32 *pKey,uint32 *pData);
+void	HashNode_GetData(HashNode *pNode,unsigned long *pKey,uint32 *pData);
 uint32	HashNode_Key(HashNode *pNode);
 uint32	HashNode_Data(HashNode *pNode);
 
@@ -184,7 +188,11 @@ struct LinkNode
 #define zLN_Fix(Node)				do { (Node)->Prev->Next = Node; (Node)->Next->Prev = Node; } while(0)
 #define zLN_AddAfter(Node,List)		do { (Node)->Prev = List; (Node)->Next = (List)->Next; LN_Fix(Node); } while(0)
 #define zLN_AddBefore(Node,List)	do { (Node)->Next = List; (Node)->Prev = (List)->Prev; LN_Fix(Node); } while(0)
-#define zLN_Walk_Editting(Node,List,Holder)	for( Node = (List)->Next; (Node) != (List) && ((Holder) = (Node)->Next) != NULL ; Node = Holder )
+#define zLN_Walk_Editing(Node,List,Holder) for( (Node) = (List)->Next; \
+											(Node) != (List) && \
+											((Holder) = (Node)->Next) != NULL ;\
+											(Node) = (Holder) )
+/*											*/
 #define zLN_Walk(Node,List)			for( Node = (List)->Next; (Node) != (List) ; Node = (Node)->Next )
 #define zLN_EmptyList(List)			( (List)->Next == (List) )
 
@@ -193,8 +201,9 @@ struct LinkNode
 #define LN_Fix(Node)				zLN_Fix((LinkNode *)Node)
 #define LN_AddAfter(Node,List)		zLN_AddAfter((LinkNode *)Node,(LinkNode *)List)
 #define LN_AddBefore(Node,List)		zLN_AddBefore((LinkNode *)Node,(LinkNode *)List)
-#define LN_Walk(Node,List)			zLN_Walk((LinkNode *)Node,(LinkNode *)List)
-#define LN_Walk_Editting(Node,List,Holder)			zLN_Walk_Editting((LinkNode *)Node,(LinkNode *)List,((LinkNode *)Holder))
+#define LN_Walk(Node,List)			zLN_Walk(Node,(LinkNode *)List)
+// TODO: might cause problems strict aliasing/compiler optimizations:
+#define LN_Walk_Editing(Node,List,Holder)		zLN_Walk_Editing(*(LinkNode**)&Node,(LinkNode *)List,*(LinkNode**)&Holder)
 #define LN_EmptyList(List)			zLN_EmptyList((LinkNode *)List)
 #define LN_Prev(Node)				(void *)(((LinkNode *)Node)->Prev)
 #define LN_Next(Node)				(void *)(((LinkNode *)Node)->Next)

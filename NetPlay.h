@@ -23,6 +23,7 @@
 #ifndef GE_NETPLAY_H
 #define GE_NETPLAY_H
 
+#if defined _WIN32 || defined _WIN64
 #include <windows.h>
 #include <dplay.h>
 
@@ -74,6 +75,9 @@ BOOL			AFX_CPrintfC(char *String);
 }
 #endif
 
-#endif
+#endif // _WIN32 || defined _WIN64
 
-#endif
+#endif // GE_NETPLAY_H
+
+#endif // USE_DPLAY
+

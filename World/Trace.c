@@ -20,6 +20,8 @@
 /*                                                                                      */
 /****************************************************************************************/
 #include <assert.h>
+#include <stdio.h>
+#include <string.h> //memset
 
 #include "XForm3d.h"
 #include "BaseType.h"
@@ -52,10 +54,9 @@ static	GBSP_BSPData	*BSPData;
 // Globals passed to the bsp subdivision code
 static	uint32			gContents;			// Contents that we should collide with for the current collision tests...
 
-static	BOOL			UseMinsMaxs;		// If MiscCollision should use mins maxs...
+static	geBoolean		UseMinsMaxs;		// If MiscCollision should use mins maxs...
 
-static	BOOL			HitSet;
-static  int32			GlobalNNode[2]={0x696C6345,0x21657370};
+static	geBoolean		HitSet;
 
 int32	NumExactCast;
 int32	NumBBoxCast;
@@ -325,7 +326,7 @@ geBoolean Trace_WorldCollisionExact(geWorld *World,
 		geVec3d_Add(&NewFront2, &Models->Pivot, &NewFront1);
 		geVec3d_Add(&NewBack2 , &Models->Pivot, &NewBack1);
 
-		HitSet = FALSE;
+		HitSet = GE_FALSE;
 
 		if (BSPIntersect(&NewFront1, &NewBack1, BSPData->GFXModels[i].RootNode[0]))
 		{
@@ -433,12 +434,12 @@ geBoolean Trace_WorldCollisionExact2(	geWorld *World,
 		geVec3d_Add(&NewFront2, &Models[i].Pivot, &NewFront1);
 		geVec3d_Add(&NewBack2 , &Models[i].Pivot, &NewBack1);
 
-		HitSet = FALSE;
+		HitSet = GE_FALSE;
 
 		if (BSPIntersect(&NewFront1, &NewBack1, BSPData->GFXModels[i].RootNode[0]))
 		{
 			if (GPlaneNum == -1)
-				return FALSE;
+				return GE_FALSE;
 
 			if (Impact) *Impact = GlobalI;
 			if (Node) *Node = GlobalNode;
@@ -494,12 +495,12 @@ geBoolean Trace_WorldCollisionExact3(geWorld *World,
 		geVec3d_Add(&NewFront2, &Models[i].Pivot, &NewFront1);
 		geVec3d_Add(&NewBack2 , &Models[i].Pivot, &NewBack1);
 
-		HitSet = FALSE;
+		HitSet = GE_FALSE;
 
 		if (BSPIntersect(&NewFront1, &NewBack1, BSPData->GFXModels[i].RootNode[0]))
 		{
 			if (GPlaneNum == -1)
-				return FALSE;
+				return GE_FALSE;
 
 			if (Impact) *Impact = GlobalI;
 			if (Node) *Node = GlobalNode;
@@ -573,7 +574,7 @@ static geBoolean BSPIntersect(geVec3d *Front, geVec3d *Back, int32 Node)
 			GlobalI = I;
 			GlobalNode = Node;
 			GRatio = Dist;
-			HitSet = TRUE;
+			HitSet = GE_TRUE;
 		}
 		return GE_TRUE;
 	}
@@ -593,7 +594,7 @@ static GFX_LeafSide		*MiscSides;
 static geVec3d			GMins1, GMaxs1;
 static geVec3d			GMins2, GMaxs2;
 static geVec3d			GFront, GBack;
-static BOOL				LeafHit;
+static geBoolean		LeafHit;
 static geFloat			BestDist;
 
 static geBoolean BSPIntersectMisc(geVec3d *Front, geVec3d *Back, int32 Node)
@@ -649,7 +650,7 @@ static geBoolean BSPIntersectMisc(geVec3d *Front, geVec3d *Back, int32 Node)
 	// ray that is in empty space.  Once we find this, and see that the back half is in
 	// solid space, then we found the front intersection point...
 	if (BSPIntersectMisc(Front, &I, MiscBNodes[Node].Children[Side]))
-		return TRUE;
+		return GE_TRUE;
 	else if (BSPIntersectMisc(&I, Back, MiscBNodes[Node].Children[!Side]))
 	{
 		if (!HitSet)
@@ -659,7 +660,7 @@ static geBoolean BSPIntersectMisc(geVec3d *Front, geVec3d *Back, int32 Node)
 			GlobalSide = Side;
 			GlobalI = I;
 			GRatio = Dist;
-			HitSet = TRUE;
+			HitSet = GE_TRUE;
 		}
 		return GE_TRUE;
 	}
@@ -688,10 +689,10 @@ geBoolean Trace_MiscCollision(GFX_BNode *BNodes, GFX_Plane *Planes, const geVec3
 	{
 		GMins1 = *Mins;
 		GMaxs1 = *Maxs;
-		UseMinsMaxs = TRUE;
+		UseMinsMaxs = GE_TRUE;
 	}
 	else
-		UseMinsMaxs = FALSE;
+		UseMinsMaxs = GE_FALSE;
 
 	// Move ray into tree space
 	Trans.X = XForm->Translation.X;
@@ -701,7 +702,7 @@ geBoolean Trace_MiscCollision(GFX_BNode *BNodes, GFX_Plane *Planes, const geVec3
 	geVec3d_Subtract(Front, &Trans, &NewFront);
 	geVec3d_Subtract(Back, &Trans, &NewBack);
 
-	HitSet = FALSE;
+	HitSet = GE_FALSE;
 
 	if (BSPIntersectMisc(&NewFront, &NewBack, 0))
 	{
@@ -762,7 +763,7 @@ static geBoolean BSPIntersectMisc2(const geVec3d *Front, const geVec3d *Back, in
 	// ray that is in empty space.  Once we find this, and see that the back half is in
 	// solid space, then we found the front intersection point...
 	if (BSPIntersectMisc2(Front, &I, MiscBNodes[Node].Children[Side]))
-		return TRUE;
+		return GE_TRUE;
 	else if (BSPIntersectMisc2(&I, Back, MiscBNodes[Node].Children[!Side]))
 	{
 		if (!HitSet)
@@ -772,7 +773,7 @@ static geBoolean BSPIntersectMisc2(const geVec3d *Front, const geVec3d *Back, in
 			GlobalSide = Side;
 			GlobalI = I;
 			GRatio = Dist;
-			HitSet = TRUE;
+			HitSet = GE_TRUE;
 		}
 		return GE_TRUE;
 	}
@@ -791,7 +792,7 @@ geBoolean Trace_MiscCollision2(GFX_BNode *BNodes, GFX_Plane *Planes, const geVec
 	MiscBNodes = BNodes;
 	MiscPlanes = Planes;
 
-	HitSet = FALSE;
+	HitSet = GE_FALSE;
 
 	if (BSPIntersectMisc2(Front, Back, 0))
 	{
@@ -922,7 +923,7 @@ static geBoolean PointInLeafSides(const geVec3d *Pos, const GFX_Leaf *Leaf)
 //=====================================================================================
 //	IntersectLeafSides
 //=====================================================================================
-BOOL IntersectLeafSides_r(geVec3d *Front, geVec3d *Back, int32 Leaf, int32 Side, int32 PSide)
+geBoolean IntersectLeafSides_r(geVec3d *Front, geVec3d *Back, int32 Leaf, int32 Side, int32 PSide)
 {
 	geFloat		Fd, Bd, Dist;
 	GFX_Plane	Plane;
@@ -930,10 +931,10 @@ BOOL IntersectLeafSides_r(geVec3d *Front, geVec3d *Back, int32 Leaf, int32 Side,
 	geVec3d		I, Vec;
 
 	if (!PSide)
-		return FALSE;
+		return GE_FALSE;
 
 	if (Side >= MiscLeafs[Leaf].NumSides)
-		return TRUE;		// if it lands behind all planes, it is inside
+		return GE_TRUE;		// if it lands behind all planes, it is inside
 
 	RSide = MiscLeafs[Leaf].FirstSide + Side;
 
@@ -990,8 +991,8 @@ BOOL IntersectLeafSides_r(geVec3d *Front, geVec3d *Back, int32 Leaf, int32 Side,
 	// Only go down the back side, since the front side is empty in a convex tree
 	if (IntersectLeafSides_r(Front, &I, Leaf, Side+1, Side2))
 	{
-		LeafHit = TRUE;
-		return TRUE;
+		LeafHit = GE_TRUE;
+		return GE_TRUE;
 	}
 	else if (IntersectLeafSides_r(&I, Back, Leaf, Side+1, !Side2))
 	{
@@ -1006,19 +1007,19 @@ BOOL IntersectLeafSides_r(geVec3d *Front, geVec3d *Back, int32 Leaf, int32 Side,
 			BestDist = Dist;
 			GlobalPlane = Plane;
 			GRatio = Dist;
-			HitSet = TRUE;
+			HitSet = GE_TRUE;
 		}
-		LeafHit = TRUE;
-		return TRUE;
+		LeafHit = GE_TRUE;
+		return GE_TRUE;
 	}
 
-	return FALSE;
+	return GE_FALSE;
 }
 
 //=====================================================================================
 //	IntersectLeafSides2
 //=====================================================================================
-BOOL IntersectLeafSides2(geVec3d *Pos, int32 Leaf)
+geBoolean IntersectLeafSides2(geVec3d *Pos, int32 Leaf)
 {
 	GFX_Plane	Plane;
 	int32		i;
@@ -1037,11 +1038,11 @@ BOOL IntersectLeafSides2(geVec3d *Pos, int32 Leaf)
 		Dist = geVec3d_DotProduct(&Plane.Normal, Pos) - Plane.Dist;
 
 		if (Dist >= 25.0f)
-			return FALSE;
+			return GE_FALSE;
 	}
 
-	LeafHit = TRUE;
-	return TRUE;
+	LeafHit = GE_TRUE;
+	return GE_TRUE;
 }
 
 //=====================================================================================
@@ -1060,7 +1061,7 @@ static	void FindClosestLeafIntersection_r(int32 Node)
 		if (!(Contents & gContents))
 			return;		// Only solid leafs contain side info...
 
-		HitSet = FALSE;
+		HitSet = GE_FALSE;
 
 		if (!MiscLeafs[Leaf].NumSides)
 			return;
@@ -1207,7 +1208,7 @@ geBoolean Trace_WorldCollisionBBox(	geWorld	*World,
 
 		// Reset flags
 		BestDist = 9999.0f;
-		LeafHit = FALSE;
+		LeafHit = GE_FALSE;
 
 		geVec3d_Subtract(Front, &Models->Pivot, &GFront);
 		geVec3d_Subtract(Back , &Models->Pivot, &GBack);
@@ -1329,7 +1330,7 @@ geBoolean Trace_TestModelMove(	geWorld			*World,
 	Trace_GetMoveBox(Mins, Maxs, &GFront, &GBack, &GMins2, &GMaxs2);
 
 	BestDist = 9999.0f;
-	LeafHit = FALSE;
+	LeafHit = GE_FALSE;
 
 	FindClosestLeafIntersection_r(BSPData->GFXModels[Model->GFXModelNum].RootNode[0]);
 
@@ -1414,7 +1415,7 @@ geBoolean Trace_ModelCollisionBBox(geWorld *World,
 	Trace_GetMoveBox(Mins, Maxs, &GFront, &GBack, &GMins2, &GMaxs2);
 
 	BestDist = 9999.0f;
-	LeafHit = FALSE;
+	LeafHit = GE_FALSE;
 	FindClosestLeafIntersection_r(BSPData->GFXModels[Model->GFXModelNum].RootNode[0]);
 	if (LeafHit)
 	{
@@ -1455,7 +1456,7 @@ geBoolean Trace_ModelCollision(geWorld *World,
 	Mesh_RenderQ * CollidableMesh;
 	Mesh_CollidableMeshIterator Iter;
 #endif
-  gContents = GE_CONTENTS_SOLID_CLIP;		// eaa3 from G3D BBS posting 01/29/2001
+	gContents = GE_CONTENTS_SOLID_CLIP;		// eaa3 from G3D BBS posting 01/29/2001
 	memset(Collision, 0, sizeof(GE_Collision));
 	// Fixed bug that mike pointed out. I was using 0, instead of 0xffffffff
 #ifdef MESHES
@@ -1576,7 +1577,7 @@ static void BBoxInVisibleLeaf_r(geWorld *World, geVec3d *Mins, geVec3d *Maxs, in
 		Leaf = -(Node+1);
 
 		if (World->CurrentBSP->LeafData[Leaf].VisFrame == World->CurFrameStatic)
-			VisibleLeaf = TRUE;
+			VisibleLeaf = GE_TRUE;
 
 		return;
 	}
@@ -1593,7 +1594,7 @@ static void BBoxInVisibleLeaf_r(geWorld *World, geVec3d *Mins, geVec3d *Maxs, in
 
 geBoolean Trace_BBoxInVisibleLeaf(geWorld *World, geVec3d *Mins, geVec3d *Maxs)
 {
-	VisibleLeaf = FALSE;
+	VisibleLeaf = GE_FALSE;
 
 	MiscNodes = World->CurrentBSP->BSPData.GFXNodes;
 	MiscPlanes = World->CurrentBSP->BSPData.GFXPlanes;
@@ -1952,7 +1953,7 @@ geBoolean Trace_CollideBeam(int32 Node, geVec3d *s, geVec3d *e, geFloat Radius)
 {
 	geFloat		dd, sDist, eDist;
 	geVec3d		tempVec, tempVec2;
-	geBoolean	FrontLeaf, BackLeaf;
+	geBoolean	FrontLeaf = GE_FALSE, BackLeaf = GE_FALSE;
 	GFX_Plane	*Plane;
 
 	if(Node < 0)
@@ -2316,7 +2317,11 @@ static void FillContents_tr(geWorld *World, int32 Node, const geVec3d *Pos, char
 				//char *name = geWBitmap_Pool_GetWNameByBitmap(World->CurrentBSP->WBitmapPool, Bitmap);
 				char str[100];
 				sprintf(str,"Leaf : %d\n",Leaf);
+#if defined(__linux__)
+				fprintf(stderr, "%s", str);
+#elif defined _WIN32 || defined _WIN64
 				OutputDebugString(str);
+#endif
 				//if(name)
 				//{
 				//	strcpy(str, name);

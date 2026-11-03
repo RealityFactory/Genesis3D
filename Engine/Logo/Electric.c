@@ -19,15 +19,20 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
-#include	<windows.h>
-#include	<math.h>
-#include	<assert.h>
+#include <math.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <string.h> //memset
 
 #include	"Genesis.h"
 #include	"ErrorLog.h"
 
 #include	"Electric.h"
 #include	"Ram.h"
+
+#if defined(__linux__)
+int max(int a, int b) { return a>b?a:b; }
+#endif
 
 static	int		logBase2(int n)
 {
@@ -46,6 +51,7 @@ static	int		logBase2(int n)
 	return i;
 }
 
+#ifdef _DEBUG
 static	geBoolean	IsPowerOf2(int n)
 {
 	if	(n == 0)
@@ -59,6 +65,7 @@ static	geBoolean	IsPowerOf2(int n)
 
 	return GE_TRUE;
 }
+#endif
 
 _Electric_BoltEffect * _Electric_BoltEffectCreate(
 	int NumPolys,

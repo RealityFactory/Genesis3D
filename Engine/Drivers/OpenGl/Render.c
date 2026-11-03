@@ -17,14 +17,17 @@
 /*                                                                                      */
 /****************************************************************************************/
 
-#include <windows.h>
 #include <GL/gl.h>
 
 #include "Render.h"
 #include "OglDrv.h"
 #include "OglMisc.h"
 #include "THandle.h"
+#if defined(__linux__)
+#include "GLX.h"
+#elif defined _WIN32 || defined _WIN64
 #include "Win32.h"
+#endif
 
 
 DRV_RENDER_MODE		RenderMode = RENDER_NONE;
@@ -245,7 +248,7 @@ geBoolean DRIVERCC Render_WorldPoly(DRV_TLVertex *Pnts, int32 NumPoints, geRDriv
 	{
 		OGLDRV.SetupLightmap(LInfo, &Dynamic);
 
-		if(Dynamic || LInfo->THandle->Flags & THANDLE_UPDATE_LM)
+		if(Dynamic || (LInfo->THandle->Flags & THANDLE_UPDATE_LM))
 		{
 			THandle_DownloadLightmap(LInfo);
 
@@ -629,7 +632,7 @@ geBoolean DRIVERCC BeginWorld(void)
 	OGLDRV.NumWorldPixels = 0;
 	OGLDRV.NumWorldSpans = 0;
 
-	return TRUE;
+	return GE_TRUE;
 }
 
 
@@ -638,7 +641,7 @@ geBoolean DRIVERCC EndWorld(void)
 	RenderMode = RENDER_NONE;
 
 
-	return TRUE;
+	return GE_TRUE;
 }
 
 
@@ -646,7 +649,7 @@ geBoolean DRIVERCC BeginMeshes(void)
 {
 	RenderMode = RENDER_MESHES;
 
-	return TRUE;
+	return GE_TRUE;
 }
 
 
@@ -654,7 +657,7 @@ geBoolean DRIVERCC EndMeshes(void)
 {
 	RenderMode = RENDER_NONE;
 
-	return TRUE;
+	return GE_TRUE;
 }
 
 
@@ -662,7 +665,7 @@ geBoolean DRIVERCC BeginModels(void)
 {
 	RenderMode = RENDER_MODELS;
 
-	return TRUE;
+	return GE_TRUE;
 }
 
 
@@ -670,17 +673,17 @@ geBoolean DRIVERCC EndModels(void)
 {
 	RenderMode = RENDER_NONE;
 
-	return TRUE;
+	return GE_TRUE;
 }
 
 // changed QD Shadows
 geBoolean DRIVERCC BeginShadowVolumes(void)
 {
-	return TRUE;
+	return GE_TRUE;
 }
 
 geBoolean DRIVERCC EndShadowVolumes(void)
 {
-	return TRUE;
+	return GE_TRUE;
 }
 // end change

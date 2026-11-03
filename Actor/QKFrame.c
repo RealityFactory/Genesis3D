@@ -49,6 +49,10 @@
 #include "ErrorLog.h"
 #include "Ram.h"
 
+#if defined(__linux__)
+#define strnicmp strncasecmp
+#endif
+
 #define LINEAR_BLEND(a,b,t)  ( (t)*((b)-(a)) + (a) )
 			// linear blend of a and b  0<t<1 where  t=0 ->a and t=1 ->b
 
@@ -794,7 +798,7 @@ geBoolean GENESISCC geQKFrame_WriteToFile(geVFile *pFile, geTKArray *KeyList,
 geTKArray *GENESISCC geQKFrame_CreateFromFile(geVFile *pFile, geQKFrame_InterpolationType *InterpolationType, int *Looping)
 {
 	int i,u,NumElements;
-	int Compression;
+	int Interp, Compression;
 	geFloat StartTime=0.0f;
 	geFloat DeltaTime=0.0f;
 
@@ -813,9 +817,10 @@ geTKArray *GENESISCC geQKFrame_CreateFromFile(geVFile *pFile, geQKFrame_Interpol
 		ERROREXIT;
 
 	if(sscanf(line + sizeof(QKFRAME_KEYLIST_ID)-1, "%d %d %d %d",
-					&NumElements,InterpolationType,&Compression,Looping) != 4)
+					&NumElements,&Interp,&Compression,Looping) != 4)
 		ERROREXIT;
 
+	*InterpolationType = Interp;
 	if (!( (*InterpolationType == QKFRAME_LINEAR) || (*InterpolationType == QKFRAME_SLERP) || (*InterpolationType == QKFRAME_SQUAD) ))
 		ERROREXIT;
 

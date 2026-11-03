@@ -20,9 +20,8 @@
 /*                                                                                      */
 /****************************************************************************************/
 #include <assert.h>
-#include <windows.h>
 #include <math.h>
-
+#include <string.h> //memset
 
 #include "BaseType.h"
 #include "System.h"
@@ -56,6 +55,7 @@ static geBoolean GetRGBVerts(World_BSP *BSP);
 //=====================================================================================
 geBoolean Surf_EngineInit(geEngine *Engine)
 {
+	(void)Engine;
 	return GE_TRUE;
 }
 
@@ -64,6 +64,7 @@ geBoolean Surf_EngineInit(geEngine *Engine)
 //=====================================================================================
 void Surf_EngineShutdown(geEngine *Engine)
 {
+	(void)Engine;
 	CEngine = NULL;
 	CWorld = NULL;
 	BSPData = NULL;
@@ -179,7 +180,7 @@ void Surf_WorldShutdown(geWorld *World)
 //================================================================================
 //	Surf_InSurfBoundingBox
 //================================================================================
-BOOL Surf_InSurfBoundingBox(Surf_SurfInfo *Surf, geVec3d *Pos, geFloat Box)
+geBoolean Surf_InSurfBoundingBox(Surf_SurfInfo *Surf, geVec3d *Pos, geFloat Box)
 {
    assert(Surf != NULL);
    assert(Pos != NULL);
@@ -192,7 +193,7 @@ BOOL Surf_InSurfBoundingBox(Surf_SurfInfo *Surf, geVec3d *Pos, geFloat Box)
 		  {
 			if(Pos->X+Box >= Surf->VMins.X && Pos->X-Box <= Surf->VMaxs.X)
 			  {
-				return TRUE;
+				return GE_TRUE;
 				}
 			}
 		}
@@ -200,10 +201,10 @@ BOOL Surf_InSurfBoundingBox(Surf_SurfInfo *Surf, geVec3d *Pos, geFloat Box)
    if (Pos->X+Box >= Surf->VMins.X && Pos->X-Box <= Surf->VMaxs.X)
    if (Pos->Y+Box >= Surf->VMins.Y && Pos->Y-Box <= Surf->VMaxs.Y)
    if (Pos->Z+Box >= Surf->VMins.Z && Pos->Z-Box <= Surf->VMaxs.Z)
-        return TRUE;
+		return TRUE;
 */
 
-   return FALSE;
+   return GE_FALSE;
 }
 
 //================================================================================

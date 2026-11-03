@@ -51,6 +51,9 @@
 #include	"Timer.h"
 #endif
 
+#if defined(__linux__)
+#define DONT_USE_ASM
+#endif
 //#define DONT_USE_ASM
 
 /*}{*********************************************************************/
@@ -412,15 +415,15 @@ return Ret;
 geBoolean BlitData_Raw(void)
 {
 int x,y;
-char *SrcPtr,*DstPtr;
+uint8 *SrcPtr,*DstPtr;
 int R,G,B,A;
 uint32 ColorKey,Pixel;
 
 	if ( ! SrcOps || ! DstOps )
 		return GE_FALSE;
 
-	SrcPtr = (char *)SrcData;
-	DstPtr = (char *)DstData;
+	SrcPtr = (uint8 *)SrcData;
+	DstPtr = (uint8 *)DstData;
 
 	// this generic converter is pretty slow.
 	// fortunately genesis uses mostly the (Pal -> UnPal) conversion
@@ -1092,9 +1095,7 @@ return GE_FALSE;
 geBoolean BlitData_SameFormat(void)
 {
 char *SrcPtr,*DstPtr;
-gePixelFormat Format;
 
-	Format = SrcFormat;
 	SrcPtr = (char *)SrcData;
 	DstPtr = (char *)DstData;
 

@@ -27,7 +27,6 @@
 #include "System.h"
 #include "World.h"
 #include "Bitmap.h"
-#include "BitmapList.h"
 
 #ifdef __cplusplus
 extern "C" {

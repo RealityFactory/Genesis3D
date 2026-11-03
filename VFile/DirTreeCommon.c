@@ -26,9 +26,10 @@
 #include	"Ram.h"
 #include	"DirTreeCommon.h"
 
+
 char *	DuplicateString(const char *String)
 {
-	int		Length;
+	int32	Length;
 	char *	NewString;
 
 	Length = strlen(String) + 1;
@@ -40,11 +41,11 @@ char *	DuplicateString(const char *String)
 
 const char *GetNextDir(const char *Path, char *Buff)
 {
-	while	(*Path && *Path != '\\')
+	while	(*Path && *Path != DIRECTORY_SEPARATOR)
 		*Buff++ = *Path++;
 	*Buff = '\0';
 
-	if	(*Path == '\\')
+	if	(*Path == DIRECTORY_SEPARATOR)
 		Path++;
 
 	return Path;
@@ -91,7 +92,7 @@ geBoolean	MatchPattern(const char *Source, const char *Pattern)
 
 geBoolean	PathHasDir(const char *Path)
 {
-	if	(strchr(Path, '\\'))
+	if	(strchr(Path, DIRECTORY_SEPARATOR))
 		return GE_TRUE;
 
 	return GE_FALSE;

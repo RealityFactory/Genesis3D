@@ -20,6 +20,7 @@
 /*                                                                                      */
 /****************************************************************************************/
 #include <assert.h>
+#include <string.h> //memset
 
 #include "BaseType.h"
 #include "World.h"
@@ -51,7 +52,6 @@ geBoolean Vis_WorldInit(geWorld *World)
 {
 	World_BSP	*BSP;
 	int32		i;
-	static int32 StartupParams[]={0x696C6345,0x21657370};
 
 	assert(World  != NULL);
 
@@ -216,6 +216,7 @@ geBoolean Vis_VisWorld(geEngine *Engine, geWorld *World, const geCamera *Camera,
 	GFXVisData = BSPData->GFXVisData;
 	GFXModels = BSPData->GFXModels;
 	GFXLeafFaces = BSPData->GFXLeafFaces;
+	(void)GFXNodes;
 
 	SurfInfo = World->CurrentBSP->SurfInfo;
 

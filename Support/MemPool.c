@@ -19,15 +19,16 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
-#include <string.h>
-#include <assert.h>
 
-#include "MemPool.h"
+#include <assert.h>
+#include <string.h>
+
 #include "Ram.h"
+#include "MemPool.h"
 
 /*
- *	MemPool is a 'root' level object (eg. 'list' uses us).  We sit only above 'Ram'
- *		in the heirarchy
+ *	MemPool is a 'root' level object (e.g. 'list' uses us).  We sit only above 'Ram'
+ *		in the hierarchy
  *
  *  MemPool
  *    system for fast Resetting & Freeing of nodes; for use in tree structures

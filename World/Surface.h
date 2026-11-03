@@ -23,7 +23,6 @@
 #define GE_SURFACE_H
 
 #include <assert.h>
-#include <windows.h>
 
 #include "BaseType.h"
 #include "PtrTypes.h"
@@ -107,7 +106,7 @@ geBoolean Surf_SetGBSP(World_BSP *BSP);
 geBoolean Surf_WorldInit(geWorld *World);
 void Surf_WorldShutdown(geWorld *World);
 
-BOOL Surf_InSurfBoundingBox(Surf_SurfInfo *Surf, geVec3d *Pos, geFloat Box);
+geBoolean Surf_InSurfBoundingBox(Surf_SurfInfo *Surf, geVec3d *Pos, geFloat Box);
 
 #ifdef __cplusplus
 }

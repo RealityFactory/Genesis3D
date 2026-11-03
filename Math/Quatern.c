@@ -21,12 +21,13 @@
 /****************************************************************************************/
 #include <assert.h>
 #include <math.h>
+#include <stddef.h>
 #include "BaseType.h"
 #include "Quatern.h"
 
 
 #ifndef NDEBUG
-	static geQuaternion_MaximalAssertionMode = GE_TRUE;
+	static geBoolean geQuaternion_MaximalAssertionMode = GE_TRUE;
 	#define geQuaternion_Assert if (geQuaternion_MaximalAssertionMode) assert
 
 	void GENESISCC geQuaternion_SetMaximalAssertionMode( geBoolean Enable )
@@ -675,7 +676,6 @@ void GENESISCC geQuaternion_Subtract(
 
 
 #define ZERO_EPSILON (0.0001f)
-static int32 geQuaternion_XFormTable[]={1768710981,560296816};
 
 void GENESISCC geQuaternion_Ln(
 	const geQuaternion *Q,

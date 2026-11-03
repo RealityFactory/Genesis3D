@@ -20,8 +20,8 @@
 /*                                                                                      */
 /****************************************************************************************/
 #include <assert.h>
-#include <windows.h>
 #include <math.h>
+#include <string.h> //memset
 
 #include "BaseType.h"
 #include "Ram.h"
@@ -89,19 +89,21 @@ int32 SqrtTab[SQRT_TAB_SIZE];
 //	Local Static Function prototypes
 //=====================================================================================
 static void UpdateLTypeTables(geWorld *World);
+#if 0
 static int32 FastDist(int32 dx, int32 dy, int32 dz);
 static void SetupWavyColorLight1(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32 lh);
 static void SetupWavyColorLight2(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32 lh);
 static void SetupColorLight1(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32 lh, geFloat intensity);
 static void SetupColorLight2(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32 lh, geFloat intensity);
-static BOOL CombineDLightWithRGBMap(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo);
-static BOOL CombineDLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo);
+#endif
+static geBoolean CombineDLightWithRGBMap(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo);
+static geBoolean CombineDLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo);
 static void BuildLightLUTS(geEngine *Engine);
 static void SetupDynamicLight_r(Light_DLight *pLight, geVec3d *Pos, int32 LNum, int32 Node);
 // added QuestOfDreams DSpotLight
-static BOOL CombineDSpotLightWithRGBMap(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo);
+static geBoolean CombineDSpotLightWithRGBMap(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo);
 
-static BOOL CombineDSpotLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo);
+static geBoolean CombineDSpotLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo);
 // end change QuestOfDreams
 static void AddLightType0(int32 *LightDest, uint8 *LightData, int32 lw, int32 lh);
 static void AddLightType(int32 *LightDest, uint8 *LightData, int32 lw, int32 lh, int32 Intensity);
@@ -132,6 +134,7 @@ geBoolean Light_EngineInit(geEngine *Engine)
 //=====================================================================================
 void Light_EngineShutdown(geEngine *Engine)
 {
+	(void)Engine;
 	CEngine = NULL;
 	CWorld = NULL;
 	BSPData = NULL;
@@ -331,6 +334,7 @@ static geBoolean FogLightmap1(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 	geFloat		RadiusSq, FogRayDot, Radius2;
 	geVec3d		UAdd, VAdd, FogPos;
 	int32		Width, Height;
+	(void)Face;
 
 	Hit = GE_FALSE;
 
@@ -346,6 +350,7 @@ static geBoolean FogLightmap1(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 	Radius = Fog->VolumeRadius;
 	RadiusSq = Fog->VolumeRadiusSquared;
 	Radius2 = Fog->VolumeRadius2;
+	(void)Radius2;
 
 	FogRayDot = geVec3d_DotProduct(&FogRay,&FogRay);
 
@@ -546,6 +551,7 @@ static geBoolean FogLightmap2(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 	geFloat		RadiusSq, FogRayDot, Radius2;
 	geVec3d		UAdd, VAdd, FogPos;
 	int32		LightAdd, Width, Height;
+	(void)Face;
 
 	Hit = GE_FALSE;
 
@@ -561,6 +567,7 @@ static geBoolean FogLightmap2(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 	Radius = Fog->VolumeRadius;
 	RadiusSq = Fog->VolumeRadiusSquared;
 	Radius2 = Fog->VolumeRadius2;
+	(void)Radius2;
 
 	FogRayDot = geVec3d_DotProduct(&FogRay,&FogRay);
 
@@ -750,7 +757,7 @@ static geBoolean FogLightmap2(geFog *Fog, int32 *LightData, GFX_Face *Face, Surf
 //=====================================================================================
 //	Light_SetupLightmap
 //=====================================================================================
-void Light_SetupLightmap(DRV_LInfo *LInfo, BOOL *Dynamic)
+void Light_SetupLightmap(DRV_LInfo *LInfo, geBoolean *Dynamic)
 {
 	int32			LightOffset;
 	geBoolean		IsDyn, HasDLight;
@@ -775,6 +782,7 @@ void Light_SetupLightmap(DRV_LInfo *LInfo, BOOL *Dynamic)
 	Face = &BSPData->GFXFaces[LInfo->Face];
 
 	NumLTypes = SInfo->NumLTypes;
+	(void)NumLTypes;
 
 	LightOffset = Face->LightOfs;
 
@@ -986,7 +994,7 @@ void Light_SetupLightmap(DRV_LInfo *LInfo, BOOL *Dynamic)
 
 				pRGB2++;
 			}
-			IsDyn = TRUE;			// Force this face to be dynamic
+			IsDyn = GE_TRUE;			// Force this face to be dynamic
 			LInfo->RGBLight[1] = TempRGBFog;
 		}
 	}
@@ -1055,9 +1063,9 @@ static void AddLightType1(int32 *LightDest, uint8 *LightData, int32 lw, int32 lh
 //=====================================================================================
 //	CombineDLightWithRGBMap
 //=====================================================================================
-static BOOL CombineDLightWithRGBMap(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo)
+static geBoolean CombineDLightWithRGBMap(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo)
 {
-	BOOL		Hit;
+	geBoolean	Hit;
 	geFloat		Radius, Dist;
 	GFX_Plane	*Plane;
 	GFX_TexInfo	*TexInfo;
@@ -1083,7 +1091,7 @@ static BOOL CombineDLightWithRGBMap(int32 *LightData, Light_DLight *Light, GFX_F
 	Radius -= (geFloat)fabs(Dist);
 
 	if (Radius <= 0)		// We can leave now if the dist is > radius
-		return FALSE;
+		return GE_FALSE;
 
 	// Calculate where light is projected onto the 2d-plane
 	Sx = (int32)(geVec3d_DotProduct(&LPos, &TexInfo->Vecs[0]));
@@ -1097,7 +1105,7 @@ static BOOL CombineDLightWithRGBMap(int32 *LightData, Light_DLight *Light, GFX_F
 	Sx *= SInfo->XScale;
 	Sy *= SInfo->YScale;
 
-	Hit = FALSE;
+	Hit = GE_FALSE;
 
 	ColorR = Light->FColorR;
 	ColorG = Light->FColorG;
@@ -1133,7 +1141,7 @@ static BOOL CombineDLightWithRGBMap(int32 *LightData, Light_DLight *Light, GFX_F
 
 			if (Dist2 < Radius2)
 			{
-				Hit = TRUE;
+				Hit = GE_TRUE;
 
 				Val = (Radius2 - Dist2);
 
@@ -1156,9 +1164,9 @@ static BOOL CombineDLightWithRGBMap(int32 *LightData, Light_DLight *Light, GFX_F
 //=====================================================================================
 //	CombineDLightWithRGBMap
 //=====================================================================================
-static BOOL CombineDLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo)
+static geBoolean CombineDLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo)
 {
-	BOOL		Hit;
+	geBoolean	Hit;
 	geFloat		Radius, Dist;
 	GFX_Plane	*Plane;
 	GFX_TexInfo	*TexInfo;
@@ -1184,7 +1192,7 @@ static BOOL CombineDLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Li
 	Radius -= (geFloat)fabs(Dist);
 
 	if (Radius <= 0)		// We can leave now if the dist is > radius
-		return FALSE;
+		return GE_FALSE;
 
 	// Calculate where light is projected onto the 2d-plane
 	Sx = (int32)(geVec3d_DotProduct(&LPos, &TexInfo->Vecs[0]));// + TexInfo->Shift[0]);
@@ -1198,7 +1206,7 @@ static BOOL CombineDLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Li
 	Sx *= SInfo->XScale;
 	Sy *= SInfo->YScale;
 
-	Hit = FALSE;
+	Hit = GE_FALSE;
 
 	ColorR = Light->FColorR;
 	ColorG = Light->FColorG;
@@ -1248,7 +1256,7 @@ static BOOL CombineDLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Li
 					continue;
 				}
 
-				Hit = TRUE;
+				Hit = GE_TRUE;
 
 				Val = (Radius2 - Dist2);
 
@@ -1277,9 +1285,9 @@ static BOOL CombineDLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Li
 //=====================================================================================
 //	CombineDSpotLightWithRGBMap
 //=====================================================================================
-static BOOL CombineDSpotLightWithRGBMap(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo)
+static geBoolean CombineDSpotLightWithRGBMap(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo)
 {
-	BOOL		Hit;
+	geBoolean	Hit;
 	geFloat		Angle, Angle2, Dist, Radius, Val;
 	GFX_Plane	*Plane;
 	geVec3d		LPos, PNormal, Vect, Start, Right, Down, LMapPos;
@@ -1290,7 +1298,7 @@ static BOOL CombineDSpotLightWithRGBMap(int32 *LightData, Light_DLight *Light, G
 	assert(BSPData != NULL);
 	assert(BSPData->GFXPlanes != NULL);
 
-	Hit = FALSE;
+	Hit = GE_FALSE;
 
 	Radius = Light->Radius;
 
@@ -1334,7 +1342,7 @@ static BOOL CombineDSpotLightWithRGBMap(int32 *LightData, Light_DLight *Light, G
 				}
 				else
 				{
-					Hit = TRUE;
+					Hit = GE_TRUE;
 
 					// get a nice falloff ...
 					Val = (Angle2-Light->Angle)/(1.001f-Light->Angle);
@@ -1367,9 +1375,9 @@ static BOOL CombineDSpotLightWithRGBMap(int32 *LightData, Light_DLight *Light, G
 //=====================================================================================
 //	CombineDSpotLightWithRGBMapWithShadow
 //=====================================================================================
-static BOOL CombineDSpotLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo)
+static geBoolean CombineDSpotLightWithRGBMapWithShadow(int32 *LightData, Light_DLight *Light, GFX_Face *Face, Surf_SurfInfo *SInfo)
 {
-	BOOL		Hit;
+	geBoolean	Hit;
 	geFloat		Angle, Angle2, Dist, Radius, Val;
 	GFX_Plane	*Plane;
 	geVec3d		LPos, PNormal, Vect, Start, Right, Down, LMapPos;
@@ -1379,7 +1387,7 @@ static BOOL CombineDSpotLightWithRGBMapWithShadow(int32 *LightData, Light_DLight
 	assert(BSPData != NULL);
 	assert(BSPData->GFXPlanes != NULL);
 
-	Hit = FALSE;
+	Hit = GE_FALSE;
 
 	Radius = Light->Radius;
 	Plane = &BSPData->GFXPlanes[Face->PlaneNum];
@@ -1430,7 +1438,7 @@ static BOOL CombineDSpotLightWithRGBMapWithShadow(int32 *LightData, Light_DLight
 				}
 				else
 				{
-					Hit = TRUE;
+					Hit = GE_TRUE;
 
 					// get a nice falloff ...
 					Val = (Angle2-Light->Angle)/(1.001f-Light->Angle);
@@ -1561,9 +1569,9 @@ static void UpdateLTypeTables(geWorld *World)
 		LInfo->LTypeIntensities[s] = (int32)(i * (1<<LIGHT_FRACT));
 
 		if (LInfo->LTypeIntensities2[s] != LInfo->LTypeTable[s][LInfo->IPos[s]]-96)
-			LInfo->LTypeDynamic[s] = TRUE;
+			LInfo->LTypeDynamic[s] = GE_TRUE;
 		else
-			LInfo->LTypeDynamic[s] = FALSE;
+			LInfo->LTypeDynamic[s] = GE_FALSE;
 
 		LInfo->LTypeIntensities2[s] = LInfo->LTypeTable[s][LInfo->IPos[s]]-96;
 	}
@@ -1728,6 +1736,9 @@ geBoolean Light_WorldSetLTypeTable(geWorld *World, int32 LType, const char *Tabl
 //	Local static support functions
 //=====================================================================================
 
+#define A_MOD 7							// How much to modulus the anim too
+
+#if 0
 //=====================================================================================
 //	FastDist
 //	Quick sqrt routine
@@ -1753,8 +1764,6 @@ static int32 FastDist(int32 dx, int32 dy, int32 dz)
 	Max += Med + Min;
 	return Max>>2;
 }
-
-#define A_MOD 7							// How much to modulus the anim too
 
 //=====================================================================================
 //	SetupWavyColorLight1
@@ -1943,6 +1952,7 @@ static void SetupColorLight2(DRV_RGB *light1, DRV_RGB *RGBM, int32 lw, int32 lh,
 		rgb++;
 	}
 }
+#endif
 
 //=====================================================================================
 //	AddLightTypeWavy1
@@ -2100,7 +2110,6 @@ geBoolean Light_GetLightmapRGB(Surf_SurfInfo *Surf, geVec3d *Pos, GE_RGBA *RGBA)
 {
 
 	DRV_RGB		*RGBLight;
-	geFloat		fr = 0.0f, fg = 0.0f, fb = 0.0f;
 	geVec3d		VecU, VecV;
 	geFloat		TexU, TexV;
 	int32		Index, Width, Height;
@@ -2161,7 +2170,6 @@ geBoolean Light_GetLightmapRGBBlended(Surf_SurfInfo *Surf, geVec3d *Pos, GE_RGBA
 {
 
 	DRV_RGB		*RGBLight;
-	geFloat		fr = 0.0f, fg = 0.0f, fb = 0.0f;
 	geVec3d		VecU, VecV;
 	geFloat		TexU, TexV;
 	int32		Index, Width, Height;

@@ -19,7 +19,7 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
-#ifndef	MATRIX33_H
+#ifndef MATRIX33_H
 #define MATRIX33_H
 
 #ifdef __cplusplus

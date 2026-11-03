@@ -97,7 +97,6 @@ GENESISAPI	void geSound3D_GetConfig(
 	geVec3d			ViewPos, LocalPos, Dist;
 	geSound3d_Cfg	Cfg;
 	geFloat			Magnitude;
-	geVec3d			Origin = {0.0f, 0.0f, 0.0f};
 	geXForm3d		CXForm;
 	int32			Leaf1, Leaf2;
 
@@ -166,7 +165,6 @@ GENESISAPI	void geSound3D_GetConfigIgnoreObstructions(
 	geVec3d			ViewPos, LocalPos, Dist;
 	geSound3d_Cfg	Cfg;
 	geFloat			Magnitude;
-	geVec3d			Origin = {0.0f, 0.0f, 0.0f};
 	geXForm3d		CXForm;
 	int32			Leaf1, Leaf2;
 

@@ -67,12 +67,12 @@ typedef void * HBITMAP;
 #define VOID void
 typedef char CHAR;
 typedef short SHORT;
-typedef long LONG;
+typedef int32 LONG;
 #endif
 
 #ifndef BASETYPES
 #define BASETYPES
-typedef unsigned long ULONG;
+typedef uint32 ULONG;
 typedef ULONG *PULONG;
 typedef unsigned short USHORT;
 typedef USHORT *PUSHORT;
@@ -81,10 +81,11 @@ typedef UCHAR *PUCHAR;
 typedef char *PSZ;
 #endif  /* !BASETYPES */
 
-typedef unsigned long       DWORD;
-typedef int                 geBoolean;
+typedef uint32               DWORD;
+typedef int                  BOOL;
+typedef int                  geBoolean;
 typedef unsigned char       BYTE;
-typedef unsigned short      WORD;
+typedef uint16                WORD;
 typedef geFloat               FLOAT;
 
 typedef struct tagRECT
@@ -98,17 +99,21 @@ typedef struct tagRECT
 #endif // WINVER
 
 #if defined(__linux__)
-	#define	DRIVERCC	__attribute__((fastcall))
+	#define	DRIVERCC
 #elif defined _WIN32 || defined _WIN64
 	#define	DRIVERCC	_fastcall
 #endif
 
+#if defined(__linux__)
+	#define DllExport
+#elif defined _WIN32 || defined _WIN64
 #ifndef __cplusplus
 	#define DllImport	__declspec( dllimport )
 	#define DllExport	__declspec( dllexport )
 #else
 	#define DllImport	extern "C" __declspec( dllimport )
 	#define DllExport	extern "C" __declspec( dllexport )
+#endif
 #endif
 
 #define DRV_VERSION_MAJOR		100			// Genesis 1.0
@@ -182,7 +187,7 @@ typedef struct geRDriver_THandle	geRDriver_THandle;
 	TODO: CUBEMAPPING
 #define RDRIVER_PF_CUBEMAP		(1<<RDRIVER_PF_COMBINE_CUBEMAP_SHIFT)	*/
 
-typedef struct
+typedef struct geRDriver_PixelFormat
 {
 	gePixelFormat	PixelFormat;
 	uint32			Flags;

@@ -24,8 +24,13 @@
 #include <assert.h>
 
 #ifndef NDEBUG
+#if defined(__linux__)
+#define _malloc_dbg(size,blockType,filename,linenumber ) malloc(size)
+#define _realloc_dbg(memblock,size,blockType,filename,linenumber) realloc(memblock,size)
+#elif defined _WIN32 || defined _WIN64
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
+#endif
 #endif
 
 #include "Ram.h"
@@ -493,7 +498,9 @@ GENESISAPI     void * geRam_Realloc (void *ptr, uint32 newsize)
 
 GENESISAPI void geRam_ReportAllocations(void)
 {
+#if defined _WIN32 || defined _WIN64
 	_CrtDumpMemoryLeaks();
+#endif
 }
 
 #endif

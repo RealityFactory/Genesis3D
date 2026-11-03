@@ -518,8 +518,9 @@ __inline static void geSprite_UpdateTextureMap(geSprite *S)
 	geSprite_UpdateBackfaceTextureMap(S);
 }
 
-
+#if defined _WIN32 || defined _WIN64
 #pragma warning(disable : 4700 )
+#endif
 __inline static void geSprite_UpdateLighting(geSprite *S, geWorld *World)
 {
 	int32 i, j;
@@ -793,8 +794,9 @@ __inline static void geSprite_UpdateLighting(geSprite *S, geWorld *World)
 			S->BackfaceRGBA.b = 0.0f;
 	}
 }
+#if defined _WIN32 || defined _WIN64
 #pragma warning(default : 4700 )
-
+#endif
 
 GENESISAPI int32 GENESISCC geSprite_GetCount()
 {

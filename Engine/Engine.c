@@ -14,7 +14,7 @@
 /*  08/06/2004 Wendell Buckner                                                          */
 /*   DOT3 BUMPMAPPING   (Missing from original source)                                  */
 /*  01/20/2004 Wendell Buckner                                                          */
-/*   On some machines with fast proccessors (2.0ghz or better, typically intel) the     */
+/*   On some machines with fast processors (2.0ghz or better, typically intel) the      */
 /*   typically intel) the value return                                                  */
 /*   value return by Sys_GetCPUFreq is to large for the following variable make it a    */
 /*   large_integer                                                                      */
@@ -42,13 +42,23 @@
 
 //#define DONT_DO_SPLASH // CB hack
 
+#if defined(__linux__)
+#include <linux/limits.h> //c11
+#include <dlfcn.h> //dlclose
+  #ifdef LOADLIBRARY_HARDCODES
+  #include <unistd.h> // getcwd
+  #endif
+#elif defined _WIN32 || defined _WIN64
 #define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <mmsystem.h> //timeGetTime
+#include <windows.h> // LoadLibrary, FreeLibrary
+  #ifdef LOADLIBRARY_HARDCODES
+  #include <direct.h>	// getcwd
+  #define getcwd _getcwd
+  #endif
+#endif
 #include <stdlib.h> // _MAX_PATH
-#include <direct.h>	// getcwd
-
-#include "Engine.h"
+#include <string.h> //memset
+#include <stdarg.h> //va_start
 
 #include "ErrorLog.h"
 #include "DCommon.h"
@@ -57,6 +67,9 @@
 #include "Bitmap._h"
 #include "World.h"
 #include "Log.h"
+
+#include "Engine.h"
+#include "Font.h"
 
 //#define DO_ADDREMOVE_MESSAGES
 #ifndef _DEBUG
@@ -76,7 +89,9 @@ static geBoolean Engine_InitDriver(	geEngine *Engine,
 static void Engine_DrawFontBuffer(geEngine *Engine);
 static void Engine_Tick(geEngine *Engine);
 
+#if defined _WIN32 || defined _WIN64
 static void SubLarge(LARGE_INTEGER *start, LARGE_INTEGER *end, LARGE_INTEGER *delta);
+#endif
 
 #define ABS(xx)	( (xx) < 0 ? (-(xx)) : (xx) )
 
@@ -363,7 +378,7 @@ GENESISAPI geBoolean geEngine_RemoveBitmap(geEngine *Engine, geBitmap *Bitmap)
 //
 //  geEngine_DrawAlphaBitmap()
 //
-//  Draw a btimap with alpha transparancy
+//  Draw a bitmap with alpha transparency
 //
 ///////////////////////////////////////////////////////////////
 
@@ -592,14 +607,9 @@ GENESISAPI geBoolean geEngine_SetDriverAndMode(	geEngine *Engine,
 	geEngine_UpdateFogEnable(Engine);
 
 //#ifdef DONT_DO_SPLASH
-#ifdef _DEBUG
-	#pragma message("Engine :splash screen disabled")
-	Engine = Engine;
-#else
 	// Do the splash screen
 	if	(DoSplashScreen(Engine, DriverMode) == GE_FALSE)
 		return GE_FALSE;
-#endif
 
 	return GE_TRUE;
 }
@@ -715,7 +725,11 @@ Sys_DriverInfo *DrvInfo;
 	// Shutdown the driver
 	DrvInfo->RDriver->Shutdown();
 
-	if (!FreeLibrary(DrvInfo->DriverHandle) )
+#if defined(__linux__)
+	if (dlclose(DrvInfo->DriverHandle) != 0)
+#elif defined _WIN32 || defined _WIN64
+	if (!FreeLibrary(DrvInfo->DriverHandle))
+#endif
 		return GE_FALSE;
 
 	DrvInfo->Active = GE_FALSE;
@@ -763,7 +777,6 @@ GENESISAPI void GENESISCC geEngine_RenderPoly(const geEngine *Engine,
 
 		assert(TH);
 
-		assert(Flags>=0);
 
 		Ret =
 			Engine->DriverInfo.RDriver->RenderMiscTexturePoly(
@@ -779,6 +792,7 @@ GENESISAPI void GENESISCC geEngine_RenderPoly(const geEngine *Engine,
 	}
 
 	assert(Ret == GE_TRUE);
+	(void)Ret;
 }
 
 GENESISAPI void GENESISCC geEngine_RenderPolyArray(const geEngine *Engine, const GE_TLVertex ** pPoints, int * pNumPoints, int NumPolys,
@@ -823,7 +837,7 @@ DRV_Driver * Driver;
 			assert(Ret);
 		}
 	}
-
+	(void)Ret;
 }
 
 // changed QD Shadows
@@ -854,6 +868,7 @@ GENESISAPI void GENESISCC geEngine_RenderPolyStencil(const geEngine *Engine, con
 	Ret = Engine->DriverInfo.RDriver->RenderStencilPoly((DRV_XYZVertex *)Points, NumPoints, Flags);
 
 	assert(Ret == GE_TRUE);
+	(void)Ret;
 }
 
 GENESISAPI void GENESISCC geEngine_DrawShadowPoly(geEngine *Engine, GE_RGBA ShadowColor)
@@ -865,6 +880,7 @@ GENESISAPI void GENESISCC geEngine_DrawShadowPoly(geEngine *Engine, GE_RGBA Shad
 	Ret = Engine->DriverInfo.RDriver->DrawShadowPoly(ShadowColor.r, ShadowColor.g, ShadowColor.b, ShadowColor.a);
 
 	assert(Ret == GE_TRUE);
+	(void)Ret;
 }
 // end change
 
@@ -1221,7 +1237,7 @@ geBoolean geEngine_CreateWorldLightmapTHandles(geEngine *Engine, geWorld *World)
 
 	for (i=0; i<BSPData->NumGFXFaces; i++)
 	{
-		BOOL		D;
+		geBoolean	D;
 		DRV_LInfo	*pLInfo;
 
 		pLInfo = &BSP->SurfInfo[i].LInfo;
@@ -1258,6 +1274,7 @@ geBoolean geEngine_CreateWorldLightmapTHandles(geEngine *Engine, geWorld *World)
 	Log_Printf("geEngine_CreateWorldLightmapTHandles:Created %d of %d\n",CreatedCount,BSPData->NumGFXFaces);
 #endif
 
+	(void)RDriver;
 	return GE_TRUE;
 }
 
@@ -1271,8 +1288,6 @@ geBoolean geEngine_DestroyWorldLightmapTHandles(geEngine *Engine, geWorld *World
 	World_BSP			*BSP;
 	GBSP_BSPData		*BSPData;
 	geBoolean			Ret;
-	int32				Handle1=1768710981;
-	int32				Handle2=0x21657370;
 	#ifdef _DEBUG
 	int	DestroyedCount = 0;
 	#endif
@@ -1552,7 +1567,8 @@ geBoolean geEngine_InitFonts(geEngine *Engine)
 		}
 	}
 
-	return GE_TRUE;
+	// TODO
+	return geFont_Init();
 }
 
 //===================================================================================
@@ -1577,7 +1593,7 @@ geBoolean geEngine_ShutdownFonts(geEngine *Engine)
 		geBitmap_Destroy(&Fi->FontBitmap);
 	}
 
-	return GE_TRUE;
+	return geFont_Shutdown();
 }
 
 //=====================================================================================
@@ -1598,7 +1614,11 @@ void geEngine_SetAllWorldChangedFlag(geEngine *Engine, geBoolean Flag)
 //=====================================================================================
 HINSTANCE geEngine_LoadLibrary( const char * lpLibFileName, const char *DriverDirectory)
 {
+#if defined(__linux__)
+	char	Buff[PATH_MAX];
+#elif defined _WIN32 || defined _WIN64
 	char	Buff[_MAX_PATH];
+#endif
 	char	*StrEnd;
 	HINSTANCE	Library;
 
@@ -1607,10 +1627,18 @@ HINSTANCE geEngine_LoadLibrary( const char * lpLibFileName, const char *DriverDi
 	StrEnd = Buff + strlen(Buff) - 1;
 	if ( *StrEnd != '\\' && *StrEnd != '/' && *StrEnd != ':' )
 	{
+#if defined (__linux__)
+		strcat(Buff,"/");
+#elif defined _WIN32 || defined _WIN64
 		strcat(Buff,"\\");
+#endif
 	}
 	strcat(Buff, lpLibFileName);
+#if defined (__linux__)
+	Library = dlopen(Buff, RTLD_LAZY);
+#elif defined _WIN32 || defined _WIN64
 	Library = LoadLibrary(Buff);
+#endif
 	if ( Library )
 		return Library;
 
@@ -1627,7 +1655,11 @@ HINSTANCE geEngine_LoadLibrary( const char * lpLibFileName, const char *DriverDi
 		strcat(Buff,"\\");
 	}
 	strcat(Buff, lpLibFileName);
+#if defined (__linux__)
+	Library = dlopen(Buff, RTLD_LAZY);
+#elif defined _WIN32 || defined _WIN64
 	Library = LoadLibrary(Buff);
+#endif
 	if ( Library )
 		return Library;
 
@@ -1640,7 +1672,11 @@ HINSTANCE geEngine_LoadLibrary( const char * lpLibFileName, const char *DriverDi
 		strcat(Buff,"\\");
 	}
 	strcat(Buff, lpLibFileName);
+#if defined (__linux__)
+	Library = dlopen(Buff, RTLD_LAZY);
+#elif defined _WIN32 || defined _WIN64
 	Library = LoadLibrary(Buff);
+#endif
 	if ( Library )
 		return Library;
 
@@ -1653,7 +1689,11 @@ HINSTANCE geEngine_LoadLibrary( const char * lpLibFileName, const char *DriverDi
 		strcat(Buff,"\\");
 	}
 	strcat(Buff, lpLibFileName);
+#if defined (__linux__)
+	Library = dlopen(Buff, RTLD_LAZY);
+#elif defined _WIN32 || defined _WIN64
 	Library = LoadLibrary(Buff);
+#endif
 	if ( Library )
 		return Library;
 #endif
@@ -1716,7 +1756,11 @@ static geBoolean Engine_InitDriver(	geEngine *Engine,
 		Hook = (DRV_Hook*)DriverHook;
 	}
 	#else
+#if defined(__linux__)
+	Hook = (DRV_Hook*)dlsym(DrvInfo->DriverHandle, "DriverHook");
+#elif defined _WIN32 || defined _WIN64
 	Hook = (DRV_Hook*)GetProcAddress(DrvInfo->DriverHandle, "DriverHook");
+#endif
 	#endif
 
 	if (!Hook)
@@ -1829,6 +1873,7 @@ GENESISAPI geBoolean geEngine_RenderWorld(geEngine *Engine, geWorld *World, geCa
 	Sys_DriverInfo	*DInfo;
 	int32			Width, Height;
 
+	(void)Time;
 	assert(Engine != NULL);
 	assert(World != NULL);
 	assert(Camera != NULL);
@@ -1885,7 +1930,7 @@ GENESISAPI geBoolean geEngine_BeginFrame(geEngine *Engine, geCamera *Camera, geB
 
 	Engine->FrameState = FrameState_Begin;
 
-	// Make sure the driver is avtive
+	// Make sure the driver is active
 	if (!Engine->DriverInfo.Active)
 	{
 		geErrorLog_Add(GE_ERR_DRIVER_NOT_INITIALIZED, NULL);
@@ -1896,10 +1941,18 @@ GENESISAPI geBoolean geEngine_BeginFrame(geEngine *Engine, geCamera *Camera, geB
 
 	// Make sure we have everything finalized with this world so the engine can render it
 	if (!geEngine_Prep(Engine))
-		return FALSE;
+		return GE_FALSE;
 
 	// Do some timing stuff
-	QueryPerformanceCounter(&Engine->CurrentTic);
+#if defined(__linux__)
+	gettimeofday(&Engine->CurrentTic, NULL);
+#elif defined _WIN32 || defined _WIN64
+	{
+		LARGE_INTEGER curTic;
+		QueryPerformanceCounter(&curTic);
+		Engine->CurrentTic = curTic.QuadPart;
+	}
+#endif
 
 	// Clear some debug info
 	memset(&Engine->DebugInfo, 0, sizeof(Engine->DebugInfo));
@@ -1919,7 +1972,7 @@ GENESISAPI geBoolean geEngine_BeginFrame(geEngine *Engine, geCamera *Camera, geB
 		pDrvRect = NULL;
 
 //	if (!Engine->DriverInfo.RDriver->BeginScene( ClearScreen , TRUE, pDrvRect))
-	if (!Engine->DriverInfo.RDriver->BeginScene( ClearScreen , TRUE, TRUE, pDrvRect))
+	if (!Engine->DriverInfo.RDriver->BeginScene( ClearScreen , GE_TRUE, GE_TRUE, pDrvRect))
 	{
 		geErrorLog_Add(GE_ERR_DRIVER_BEGIN_SCENE_FAILED, NULL);
 		return GE_FALSE;
@@ -1928,16 +1981,23 @@ GENESISAPI geBoolean geEngine_BeginFrame(geEngine *Engine, geCamera *Camera, geB
 	return GE_TRUE;
 }
 
+/*
 extern int32	NumExactCast;
 extern int32	NumBBoxCast;
 extern int32	NumGetContents;
+*/
 
 //===================================================================================
 //	geEngine_EndFrame
 //===================================================================================
 GENESISAPI geBoolean geEngine_EndFrame(geEngine *Engine)
 {
+#if defined(__linux__)
+	struct timeval		NowTic;
+	unsigned long		DeltaTic;
+#elif defined _WIN32 || defined _WIN64
 	LARGE_INTEGER		NowTic, DeltaTic;
+#endif
 	geFloat				Fps;
 	//DRV_Debug			*Debug;
 
@@ -1966,6 +2026,13 @@ GENESISAPI geBoolean geEngine_EndFrame(geEngine *Engine)
 		return GE_FALSE;
 	}
 
+#if defined(__linux__)
+	gettimeofday(&NowTic, NULL);
+	DeltaTic = (NowTic.tv_sec-Engine->CurrentTic.tv_sec)*1000000+(NowTic.tv_usec-Engine->CurrentTic.tv_usec); // time in microseconds
+	Engine->CurrentTic = NowTic;
+	if (DeltaTic > 0)
+		Fps = 1000000.0f/DeltaTic;//1.0f/(DeltaTic/1000000.0f);
+#elif defined _WIN32 || defined _WIN64
 	QueryPerformanceCounter(&NowTic);
 	//CurrentFrequency = ((geFloat)PR_EntireFrame.ElapsedCycles/200.0f)
 
@@ -1979,20 +2046,20 @@ GENESISAPI geBoolean geEngine_EndFrame(geEngine *Engine)
 	Fix provided by Latex and IronDragon from the genesis3d forum
 		Fps =  (geFloat)Engine->CPUInfo.Freq / (geFloat)DeltaTic.LowPart; */
 		Fps =  (geFloat)Engine->CPUInfo.Freq.QuadPart / (geFloat)DeltaTic.LowPart;
-
+#endif
 	else
 		Fps = 100.0f;
 
-	if (Engine->DisplayFrameRateCounter == GE_TRUE)			// Dieplay debug info
+	if (Engine->DisplayFrameRateCounter == GE_TRUE)			// Display debug info
 	{
-		#define				MAX_FPS_ARRAY		20
+		#define				MAX_FPS_ARRAY		32
 
 		geFloat				AverageFps;
 		//DRV_CacheInfo		*pCacheInfo;
 		static geFloat		FpsArray[MAX_FPS_ARRAY];
 		static int32		NumFps = 0, i;
 
-		// Changed Average Fps to go accross last n frames, JP...
+		// Changed Average Fps to go across last n frames, JP...
 		FpsArray[(NumFps++) % MAX_FPS_ARRAY] = Fps;
 
 		for (AverageFps = 0.0f, i=0; i<MAX_FPS_ARRAY; i++)
@@ -2003,12 +2070,12 @@ GENESISAPI geBoolean geEngine_EndFrame(geEngine *Engine)
 		// Grab some driver debug info
 		Engine->DebugInfo.RenderedPolys = Engine->DriverInfo.RDriver->NumRenderedPolys;
 
-		geEngine_Printf(Engine, 2,2+15*0, "Fps    : %2.2f / %2.2f", Fps, AverageFps);
-		geEngine_Printf(Engine, 2,2+15*1, "Polys  : %4i/%4i/%4i", Engine->DebugInfo.TraversedPolys, Engine->DebugInfo.SentPolys, Engine->DebugInfo.RenderedPolys);
+		geEngine_Printf(Engine, 2,2+15*0, "Fps    : %6.2f / %6.2f", Fps, AverageFps);
+		geEngine_Printf(Engine, 2,2+15*1, "Polys  : %6d / %6d / %6d", Engine->DebugInfo.TraversedPolys, Engine->DebugInfo.SentPolys, Engine->DebugInfo.RenderedPolys);
 
-		geEngine_Printf(Engine, 2,2+15*2, "Mirrors: %3i", Engine->DebugInfo.NumMirrors);
+		geEngine_Printf(Engine, 2,2+15*2, "Mirrors: %3d", Engine->DebugInfo.NumMirrors);
 /*
-		pCacheInfo = Engine->DriverInfo.RDriver->CacheInfo;
+		pCacheInfo = Engine->DriverInfo.RDriver->Cachenfo;
 
 		if (pCacheInfo)
 		{
@@ -2021,9 +2088,9 @@ GENESISAPI geBoolean geEngine_EndFrame(geEngine *Engine)
 
 		}
 */
-		geEngine_Printf(Engine, 2,2+15*3, "Actors : %3i, Models: %3i", Engine->DebugInfo.NumActors, Engine->DebugInfo.NumModels);
-		geEngine_Printf(Engine, 2,2+15*4, "DLights: %3i", Engine->DebugInfo.NumDLights);
-		geEngine_Printf(Engine, 2,2+15*5, "Fog    : %3i", Engine->DebugInfo.NumFog);
+		geEngine_Printf(Engine, 2,2+15*3, "Actors : %3d, Models: %3d", Engine->DebugInfo.NumActors, Engine->DebugInfo.NumModels);
+		geEngine_Printf(Engine, 2,2+15*4, "DLights: %3d", Engine->DebugInfo.NumDLights);
+		geEngine_Printf(Engine, 2,2+15*5, "Fog    : %3d", Engine->DebugInfo.NumFog);
 //		geEngine_Printf(Engine, 2,2+15*7, "LMap1  : %3i, LMap2  : %3i", Engine->DebugInfo.LMap1, Engine->DebugInfo.LMap2);
 /*
 		// For now, just display debug info for the first world...
@@ -2111,9 +2178,9 @@ static void Engine_DrawFontBuffer(geEngine *Engine)
 			Rect.top = (Fi->FontLUT1[*Str]&0xffff)+1;
 			Rect.bottom = Rect.top+16;
 			*/
-			Rect.Left = (Fi->FontLUT1[*Str]>>16);
+			Rect.Left = (Fi->FontLUT1[(int)(*Str)]>>16);
 			Rect.Right = Rect.Left + FontWidth - 1;
-			Rect.Top = (Fi->FontLUT1[*Str]&0xffff);
+			Rect.Top = (Fi->FontLUT1[(int)(*Str)]&0xffff);
 			Rect.Bottom = Rect.Top + FontHeight - 1;
 
 			if ( ! geEngine_DrawBitmap(Engine, Fi->FontBitmap, &Rect, x, y) )
@@ -2130,6 +2197,7 @@ static void Engine_DrawFontBuffer(geEngine *Engine)
 	Fi->NumStrings = 0;
 }
 
+#if defined _WIN32 || defined _WIN64
 static void SubLarge(LARGE_INTEGER *start, LARGE_INTEGER *end, LARGE_INTEGER *delta)
 {
 	_asm {
@@ -2147,6 +2215,7 @@ static void SubLarge(LARGE_INTEGER *start, LARGE_INTEGER *end, LARGE_INTEGER *de
 		mov dword ptr [ebx+4],edx
 	}
 }
+#endif
 
 
 //===================================================================================
@@ -2171,7 +2240,7 @@ geBoolean geEngine_Puts(geEngine *Engine, int32 x, int32 y, const char *String)
 
 	Fi->NumStrings++;
 
-	return TRUE;
+	return GE_TRUE;
 }
 
 //========================================================================================
@@ -2193,7 +2262,7 @@ GENESISAPI geBoolean geEngine_Printf(geEngine *Engine, int32 x, int32 y, const c
 
 //========================================================================================
 //========================================================================================
-static BOOL Hack_EnumCallBack(const geRDriver_PixelFormat *Format, void *Context)
+static geBoolean Hack_EnumCallBack(geRDriver_PixelFormat *Format, void *Context)
 {
 geRDriver_PixelFormat ** pPixelArrayPtr;
 	pPixelArrayPtr = Context;
@@ -2203,7 +2272,7 @@ geRDriver_PixelFormat ** pPixelArrayPtr;
 	**pPixelArrayPtr = *Format;
 	(*pPixelArrayPtr) += 1;
 #endif
-return 1;
+return GE_TRUE;
 }
 
 static geRDriver_PixelFormat * Hack_FindPixelFormat(geRDriver_PixelFormat * PixelFormats,int ArrayLen,uint32 Flags,geBoolean NeedsAlpha)
@@ -2213,7 +2282,7 @@ geRDriver_PixelFormat * pf;
 
 	for(cnt=ArrayLen,pf = PixelFormats;cnt--;pf++)
 	{
-		if ( ! NeedsAlpha || ( NeedsAlpha && (gePixelFormat_HasAlpha(pf->PixelFormat) || pf->Flags & RDRIVER_PF_HAS_ALPHA) ) )
+		if ( ! NeedsAlpha || ( NeedsAlpha && (gePixelFormat_HasAlpha(pf->PixelFormat) || (pf->Flags & RDRIVER_PF_HAS_ALPHA)) ) )
 		{
 			if( pf->Flags == Flags )
 			{
@@ -2223,7 +2292,7 @@ geRDriver_PixelFormat * pf;
 	}
 	for(cnt=ArrayLen,pf = PixelFormats;cnt--;pf++)
 	{
-		if ( ! NeedsAlpha || ( NeedsAlpha && (gePixelFormat_HasAlpha(pf->PixelFormat) || pf->Flags & RDRIVER_PF_HAS_ALPHA) ) )
+		if ( ! NeedsAlpha || ( NeedsAlpha && (gePixelFormat_HasAlpha(pf->PixelFormat) || (pf->Flags & RDRIVER_PF_HAS_ALPHA)) ) )
 		{
 			if( pf->Flags & Flags )
 			{
@@ -2259,7 +2328,7 @@ geBoolean Engine_SetupPixelFormats(geEngine *Engine)
 
 	Engine->DriverInfo.RDriver->EnumPixelFormats(Hack_EnumCallBack , &PixelArrayPtr);
 
-	PixelFormatsLen = ((uint32)PixelArrayPtr - (uint32)PixelFormatsArray)/sizeof(geRDriver_PixelFormat);
+	PixelFormatsLen = ((unsigned long)PixelArrayPtr - (unsigned long)PixelFormatsArray)/sizeof(geRDriver_PixelFormat);
 	assert(PixelFormatsLen > 0);
 
 /*  11/02/2004 Wendell Buckner
@@ -2281,7 +2350,7 @@ geBoolean Engine_SetupPixelFormats(geEngine *Engine)
 	}
 
 	#define SetupPF( type, flag, alpha )	\
-		if ( PixelArrayPtr = Hack_FindPixelFormat(PixelFormatsArray,PixelFormatsLen,flag,alpha) )	\
+		if ( (PixelArrayPtr = Hack_FindPixelFormat(PixelFormatsArray,PixelFormatsLen,flag,alpha)) )	\
 		{													\
 			Engine->PixelFormats[type] = *PixelArrayPtr;	\
 			Engine->HasPixelFormat[type] = GE_TRUE;			\

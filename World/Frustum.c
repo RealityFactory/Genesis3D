@@ -20,8 +20,8 @@
 /*                                                                                      */
 /****************************************************************************************/
 #include <assert.h>
-#include <windows.h>
 #include <math.h>
+#include <string.h> //memcpy
 
 #include "Camera.h"
 #include "Frustum.h"
@@ -111,7 +111,7 @@ void Frustum_SetFromCamera(Frustum_Info *Info, geCamera *Camera)
 
 		Info->NumPlanes = 5;
 	}
-/**/
+*/
 	Normal.X = 0.0f;
 	Normal.Y = 0.0f;
 	Normal.Z = -1.0f;
@@ -1254,7 +1254,7 @@ geBoolean Frustum_ClipToPlaneL(GFX_Plane *pPlane,
 		pInVert++;
 	}
 
-	*NumOutVerts = ((uint32)pOutVert - (uint32)pOut)/sizeof(*pOut);
+	*NumOutVerts = ((unsigned long)pOutVert - (unsigned long)pOut)/sizeof(*pOut);
 
 	if ( *NumOutVerts < 3)
 		return GE_FALSE;

@@ -19,10 +19,9 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
+
 #include "geAssert.h"
 #include <assert.h>
-#include <stdlib.h>
-#include <string.h>
 #include <stdio.h>
 
 // See geAssert.h for details.
@@ -41,11 +40,15 @@ geAssertCallbackFn *geSetAssertCallback( geAssertCallbackFn *newAssertCallback )
 void geAssertDefault( void *exp, void *file, unsigned line )
 {
 #ifdef _DEBUG
+#if defined(__linux__)
+	assert(exp);
+#elif defined _WIN32 || _WIN64
 	#if _MSC_VER > 1200
 		_wassert(exp, file, line);
 	#else
 		_assert(exp, file, line);
 	#endif
+#endif
 #endif
 }
 
@@ -71,8 +74,9 @@ void geAssert_SetCriticalShutdownCallback( geAssert_CriticalShutdownCallback CB 
 }
 
 #ifndef NDEBUG
-
+#if defined _WIN32 || _WIN64
 #include <windows.h>
+#endif
 #include <signal.h>
 
 #define MAX_ASSERT_STRING_LENGTH 4096

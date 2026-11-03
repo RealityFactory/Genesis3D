@@ -31,7 +31,8 @@
 /*                                                                                      */
 /****************************************************************************************/
 #include <assert.h>
-#include <windows.h>
+#include <string.h> // memset, memcpy
+#include <stdlib.h> //qsort
 
 #include "User.h"
 #include "World.h"
@@ -378,6 +379,7 @@ geBoolean User_DestroyOncePolys(geWorld *World)
 static geBoolean RenderTexturedTLPoint ( DRV_Driver *RDriver, gePoly *Poly, Frustum_Info *FInfo, geCamera *Camera)
 {
 	assert(geWorld_PolyIsValid(Poly));
+	(void)FInfo;
 
 	if (MirrorRecursion > 0)
 	{

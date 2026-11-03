@@ -5,8 +5,10 @@
 extern "C" {
 #endif
 
-#define	WIN32_LEAN_AND_MEAN
+#if defined _WIN32 || defined _WIN64
+#define WIN32_LEAN_AND_MEAN
 #include	<windows.h>
+#endif
 
 #include	<stdio.h>
 #include	<assert.h>
@@ -35,7 +37,9 @@ typedef	struct	geVFile
 	void *						FSData;
 	geVFile *					Context;
 	FSSearchList *				SearchList;
+#if defined _WIN32 || defined _WIN64
 	CRITICAL_SECTION			CriticalSection;
+#endif
 	geVFile *					BaseFile;
 }	geVFile;
 

@@ -19,11 +19,6 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
-#define	WIN32_LEAN_AND_MEAN
-#pragma warning(disable : 4201 4214 4115)
-#include <windows.h>
-#include <windowsx.h>
-#pragma warning(default : 4201 4214 4115)
 
 #include <assert.h>
 #include <string.h>
@@ -34,7 +29,9 @@
 
 #include "wgClip.h"
 
+#if defined _WIN32 || defined _WIN64
 #pragma warning (disable:4514)	// unreferenced inline function (caused by Windows)
+#endif
 
 //***************************************************************
 // returns true if you need to draw at all.

@@ -126,10 +126,10 @@ double diffTSC(ulong *tsc1,ulong *tsc2)
 
 void pushTSC(void) {}
 double popTSC(void) { return 0.0; }
-void showPopTSC(const char *tag) { }
-void showPopTSCper(const char *tag,int items,const char *itemTag) { }
-void readTSC(ulong *hi) {}
-double diffTSC(ulong *tsc1,ulong *tsc2) { return 0; }
+void showPopTSC(const char *tag) { (void)tag; }
+void showPopTSCper(const char *tag,int items,const char *itemTag) { (void)tag; (void)items; (void)itemTag; }
+void readTSC(ulong *hi) { (void)hi; }
+double diffTSC(ulong *tsc1,ulong *tsc2) { (void)tsc1; (void)tsc2; return 0; }
 
 #endif // _TSC
 // }

@@ -42,6 +42,10 @@ this code only work on Intel-Endian CPU's
 #include <assert.h>
 #include "PixelFormat.h"
 
+#if defined(__linux__)
+static int max(int a, int b) { return a>b?a:b; }
+#endif
+
 #define isinrange(x,lo,hi)	( (x)>=(lo) && (x)<=(hi) )
 
 #define SHIFTL(val,shift)	( (shift) >= 0 ? ((val)<<(shift)) : ((val)>>(-(shift))) )
@@ -259,6 +263,7 @@ void	PutPixel_32bit(uint8 **ppData,uint32 Pixel)
 
 uint32	Compose_8bitGray   (int R,int G,int B,int A)
 {
+(void)A;
 return (uint32)RGB_to_Gray(R,G,B);
 }
 
@@ -279,6 +284,7 @@ int V;
 void	Put_8bitGray(uint8 **ppData,int  R,int  G,int  B,int  A)
 {
 int V;
+(void)A;
 	V = RGB_to_Gray(R,G,B);
 	**ppData = V;
 	(*ppData) += 1;
@@ -288,19 +294,38 @@ int V;
 
 uint32	Compose_nada   (int R,int G,int B,int A)
 {
+	(void)R;
+	(void)B;
+	(void)G;
+	(void)A;
 return 0;
 }
 
 void	Decompose_nada (uint32 Pixel,int *R,int *G,int *B,int *A)
 {
+	(void)Pixel;
+	(void)R;
+	(void)B;
+	(void)G;
+	(void)A;
 }
 
 void	Get_nada(uint8 **ppData,int *R,int *G,int *B,int *A)
 {
+	(void)ppData;
+	(void)R;
+	(void)B;
+	(void)G;
+	(void)A;
 }
 
 void	Put_nada(uint8 **ppData,int  R,int  G,int  B,int  A)
 {
+	(void)ppData;
+	(void)R;
+	(void)B;
+	(void)G;
+	(void)A;
 }
 
 /*}{****************************************************************************************/
@@ -308,6 +333,7 @@ void	Put_nada(uint8 **ppData,int  R,int  G,int  B,int  A)
 uint32	Compose_555rgb   (int R,int G,int B,int A)
 {
 	assert( (R&0xFF) == R && (G&0xFF) == G && (B&0xFF) == B );
+	(void)A;
 	return	( ((R>>3)<<10) + ((G>>3)<<5) + ((B>>3)) );
 }
 
@@ -333,6 +359,7 @@ uint16 Pixel;
 void	Put_555rgb(uint8 **ppData,int  R,int  G,int  B,int  A)
 {
 uint16 Pixel;
+	(void)A;
 	Pixel = ( ((R>>3)<<10) + ((G>>3)<<5) + ((B>>3)) );
 	*((uint16 *)*ppData) = Pixel;
 	(*ppData) += 2;
@@ -341,6 +368,7 @@ uint16 Pixel;
 uint32	Compose_555bgr   (int R,int G,int B,int A)
 {
 	assert( (R&0xFF) == R && (G&0xFF) == G && (B&0xFF) == B );
+	(void)A;
 	return	( ((B>>3)<<10) + ((G>>3)<<5) + ((R>>3)) );
 }
 
@@ -366,6 +394,7 @@ uint16 Pixel;
 void	Put_555bgr(uint8 **ppData,int  R,int  G,int  B,int  A)
 {
 uint16 Pixel;
+	(void)A;
 	Pixel = ( ((B>>3)<<10) + ((G>>3)<<5) + ((R>>3)) );
 	*((uint16 *)*ppData) = Pixel;
 	(*ppData) += 2;
@@ -377,6 +406,7 @@ uint16 Pixel;
 uint32	Compose_565rgb   (int R,int G,int B,int A)
 {
 	assert( (R&0xFF) == R && (G&0xFF) == G && (B&0xFF) == B );
+	(void)A;
 	return	( ((R>>3)<<11) + ((G>>2)<<5) + ((B>>3)) );
 }
 
@@ -402,6 +432,7 @@ uint16 Pixel;
 void	Put_565rgb(uint8 **ppData,int  R,int  G,int  B,int  A)
 {
 uint16 Pixel;
+	(void)A;
 	Pixel = ( ((R>>3)<<11) + ((G>>2)<<5) + ((B>>3)) );
 	*((uint16 *)*ppData) = Pixel;
 	(*ppData) += 2;
@@ -410,6 +441,7 @@ uint16 Pixel;
 uint32	Compose_565bgr   (int R,int G,int B,int A)
 {
 	assert( (R&0xFF) == R && (G&0xFF) == G && (B&0xFF) == B );
+	(void)A;
 	return	( ((B>>3)<<11) + ((G>>2)<<5) + ((R>>3)) );
 }
 
@@ -435,6 +467,7 @@ uint16 Pixel;
 void	Put_565bgr(uint8 **ppData,int  R,int  G,int  B,int  A)
 {
 uint16 Pixel;
+	(void)A;
 	Pixel = ( ((B>>3)<<11) + ((G>>2)<<5) + ((R>>3)) );
 	*((uint16 *)*ppData) = Pixel;
 	(*ppData) += 2;
@@ -514,6 +547,7 @@ uint16 Pixel;
 uint32	Compose_24rgb   (int R,int G,int B,int A)
 {
 	assert( (R&0xFF) == R && (G&0xFF) == G && (B&0xFF) == B );
+	(void)A;
 	return	(R<<16) + (G<<8) + B;
 }
 
@@ -538,6 +572,7 @@ uint8 * ptr = *ppData;
 void	Put_24rgb(uint8 **ppData,int  R,int  G,int  B,int  A)
 {
 uint8 * ptr = *ppData;
+	(void)A;
 	ptr[0] = R;
 	ptr[1] = G;
 	ptr[2] = B;
@@ -547,6 +582,7 @@ uint8 * ptr = *ppData;
 uint32	Compose_24bgr   (int R,int G,int B,int A)
 {
 	assert( (R&0xFF) == R && (G&0xFF) == G && (B&0xFF) == B );
+	(void)A;
 	return	(B<<16) + (G<<8) + R;
 }
 
@@ -571,6 +607,7 @@ uint8 * ptr = *ppData;
 void	Put_24bgr(uint8 **ppData,int  R,int  G,int  B,int  A)
 {
 uint8 * ptr = *ppData;
+	(void)A;
 	ptr[0] = B;
 	ptr[1] = G;
 	ptr[2] = R;
@@ -584,6 +621,7 @@ uint8 * ptr = *ppData;
 uint32	Compose_32rgbx   (int R,int G,int B,int A)
 {
 	assert( (R&0xFF) == R && (G&0xFF) == G && (B&0xFF) == B );
+	(void)A;
 	return	(R<<24) + (G<<16) + (B<<8);
 }
 
@@ -606,6 +644,7 @@ void	Get_32rgbx(uint8 **ppData,int *R,int *G,int *B,int *A)
 
 void	Put_32rgbx(uint8 **ppData,int  R,int  G,int  B,int  A)
 {
+	(void)A;
 	(*ppData) += 1;
 	**ppData = B; (*ppData) += 1;
 	**ppData = G; (*ppData) += 1;
@@ -615,6 +654,7 @@ void	Put_32rgbx(uint8 **ppData,int  R,int  G,int  B,int  A)
 uint32	Compose_32xrgb   (int R,int G,int B,int A)
 {
 	assert( (R&0xFF) == R && (G&0xFF) == G && (B&0xFF) == B );
+	(void)A;
 	return	(R<<16) + (G<<8) + (B);
 }
 
@@ -637,6 +677,7 @@ void	Get_32xrgb(uint8 **ppData,int *R,int *G,int *B,int *A)
 
 void	Put_32xrgb(uint8 **ppData,int  R,int  G,int  B,int  A)
 {
+	(void)A;
 	**ppData = B; (*ppData) += 1;
 	**ppData = G; (*ppData) += 1;
 	**ppData = R; (*ppData) += 1;
@@ -646,6 +687,7 @@ void	Put_32xrgb(uint8 **ppData,int  R,int  G,int  B,int  A)
 uint32	Compose_32bgrx   (int R,int G,int B,int A)
 {
 	assert( (R&0xFF) == R && (G&0xFF) == G && (B&0xFF) == B );
+	(void)A;
 	return	(B<<24) + (G<<16) + (R<<8);
 }
 
@@ -668,6 +710,7 @@ void	Get_32bgrx(uint8 **ppData,int *R,int *G,int *B,int *A)
 
 void	Put_32bgrx(uint8 **ppData,int  R,int  G,int  B,int  A)
 {
+	(void)A;
 	(*ppData) += 1;
 	**ppData = R; (*ppData) += 1;
 	**ppData = G; (*ppData) += 1;
@@ -677,6 +720,7 @@ void	Put_32bgrx(uint8 **ppData,int  R,int  G,int  B,int  A)
 uint32	Compose_32xbgr   (int R,int G,int B,int A)
 {
 	assert( (R&0xFF) == R && (G&0xFF) == G && (B&0xFF) == B );
+	(void)A;
 	return	(B<<16) + (G<<8) + (R);
 }
 
@@ -699,6 +743,7 @@ void	Get_32xbgr(uint8 **ppData,int *R,int *G,int *B,int *A)
 
 void	Put_32xbgr(uint8 **ppData,int  R,int  G,int  B,int  A)
 {
+	(void)A;
 	**ppData = R; (*ppData) += 1;
 	**ppData = G; (*ppData) += 1;
 	**ppData = B; (*ppData) += 1;
@@ -836,6 +881,8 @@ void	Put_32abgr(uint8 **ppData,int  R,int  G,int  B,int  A)
 
 uint32	Compose_16uv   (int U,int V,int L,int A)
 {
+	(void)A;
+	(void)L;
 	return	(V<<8) + (U);
 }
 
@@ -849,6 +896,7 @@ void	Decompose_16uv (uint32 Pixel, int *U,int *V,int *L,int *A)
 
 uint32	Compose_16uvl   (int U,int V,int L,int A)
 {
+	(void)A;
 	return	((L<<10) + (V<<5) + (U));
 }
 
@@ -862,6 +910,7 @@ void	Decompose_16uvl (uint32 Pixel, int *U,int *V,int *L,int *A)
 
 uint32	Compose_24uvl   (int U,int V,int L,int A)
 {
+	(void)A;
 	return	( (L<<16) + (V<<8) + (U));
 }
 

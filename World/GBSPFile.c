@@ -21,6 +21,7 @@
 /****************************************************************************************/
 #include <stdio.h>
 #include <assert.h>
+#include <string.h> // strcmp
 
 #include "GBSPFile.h"
 #include "Vec3d.h"
@@ -49,7 +50,7 @@ static geBoolean LoadMotions(GBSP_BSPData *BSP, geVFile *f)
 	if	(geVFile_GetS(f, line, sizeof(line)) == GE_FALSE)
 		goto fail;
 
-	if (sscanf(line, "%s %i\n", KeyS, &NumMotions) != 2)
+	if (sscanf(line, "%s %d\n", KeyS, &NumMotions) != 2)
 		goto fail;
 
 	if (strcmp(KeyS, "NumMotions"))
@@ -62,7 +63,7 @@ static geBoolean LoadMotions(GBSP_BSPData *BSP, geVFile *f)
 		if	(geVFile_GetS(f, line, sizeof(line)) == GE_FALSE)
 			goto fail;
 
-		if (sscanf(line, "%s %i\n", KeyS, &ModelNum) != 2)
+		if (sscanf(line, "%s %d\n", KeyS, &ModelNum) != 2)
 			goto fail;
 
 		if (strcmp(KeyS, "ModelNum"))
@@ -128,18 +129,20 @@ static geBoolean ReadChunk(GBSP_BSPData *BSP, GBSP_Chunk *Chunk, geVFile *f)
 		case GBSP_CHUNK_MODELS:
 		{
 //		printf("GBSP_CHUNK_MODELS\n");
-			if (sizeof(GFX_Model) != Chunk->Size)
+			if (sizeof(GFX_Model) != Chunk->Size - sizeof(int32) + sizeof(geMotion*)) // TODO: 32/64bit HACK
 			{
 				geErrorLog_Add(GE_ERR_BAD_BSP_FILE_CHUNK_SIZE, NULL);
 				return GE_FALSE;
 			}
 			BSP->NumGFXModels = Chunk->Elements;
 			BSP->GFXModels = GE_RAM_ALLOCATE_ARRAY(GFX_Model, BSP->NumGFXModels);
-			if (!ReadChunkData(Chunk, (void*)BSP->GFXModels, f))
-				return GE_FALSE;
 			// Walk the models and zero out the motion pointers
 			for	(i = 0; i < BSP->NumGFXModels; i++)
+			{
+				if(!geVFile_Read(f, &BSP->GFXModels[i], Chunk->Size)) // TODO: 32/64bit HACK
+					return GE_FALSE;
 				BSP->GFXModels[i].Motion = NULL;
+			}
 			break;
 		}
 		case GBSP_CHUNK_NODES:
@@ -478,13 +481,13 @@ static geBoolean ReadChunk(GBSP_BSPData *BSP, GBSP_Chunk *Chunk, geVFile *f)
 			return GE_FALSE;
 	}
 
-	return TRUE;
+	return GE_TRUE;
 }
 
 //========================================================================================
 //	GBSP_LoadGBSPFile
 //========================================================================================
-BOOL GBSP_LoadGBSPFile(geVFile *File, GBSP_BSPData *BSP)
+geBoolean GBSP_LoadGBSPFile(geVFile *File, GBSP_BSPData *BSP)
 {
 	GBSP_Chunk	Chunk;
 
@@ -503,13 +506,13 @@ BOOL GBSP_LoadGBSPFile(geVFile *File, GBSP_BSPData *BSP)
 			break;
 	}
 
-	return TRUE;
+	return GE_TRUE;
 }
 
 //========================================================================================
 //	GBSP_FreeGBSPFile
 //========================================================================================
-BOOL GBSP_FreeGBSPFile(GBSP_BSPData *BSP)
+geBoolean GBSP_FreeGBSPFile(GBSP_BSPData *BSP)
 {
 	if (BSP->GFXModels)
 	{
@@ -612,6 +615,6 @@ BOOL GBSP_FreeGBSPFile(GBSP_BSPData *BSP)
 	BSP->NumGFXVisData = 0;
 	BSP->NumGFXPortals = 0;
 
-	return TRUE;
+	return GE_TRUE;
 }
 

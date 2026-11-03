@@ -20,7 +20,6 @@
 #ifndef THANDLE_H
 #define THANDLE_H
 
-#include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 

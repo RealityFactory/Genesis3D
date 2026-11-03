@@ -134,7 +134,7 @@ geBoolean GENESISCC geQKFrame_LinearRead(geVFile* pFile, void* geQKFrame);
 geBoolean GENESISCC geQKFrame_SlerpRead(geVFile* pFile, void* geQKFrame);
 geBoolean GENESISCC geQKFrame_SquadRead(geVFile* pFile, void* geQKFrame);
 
-geBoolean GENESISCC geQKFrame_WriteToFile(geVFile *pFile, void *geQKFrame,
+geBoolean GENESISCC geQKFrame_WriteToFile(geVFile *pFile, geTKArray *KeyList,
 								geQKFrame_InterpolationType InterpolationType, int Looping);
 geTKArray *GENESISCC geQKFrame_CreateFromFile(geVFile *pFile, geQKFrame_InterpolationType *InterpolationType, int *Looping);
 geTKArray *GENESISCC geQKFrame_CreateFromBinaryFile(geVFile *pFile, geQKFrame_InterpolationType *InterpolationType, int *Looping);

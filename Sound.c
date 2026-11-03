@@ -19,9 +19,14 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
+
+#if defined (__linux__)
+#include	<dlfcn.h>
+#include	<AL/al.h>
+#elif defined _WIN32 || defined _WIN64
 #include	<windows.h>
-//#include	<dplay.h>
 #include	<dsound.h>
+#endif
 #include	<stdio.h>
 #include	<assert.h>
 
@@ -49,7 +54,7 @@ typedef struct geSound_Cfg
 	geFloat			Frequency;
 } geSound_Cfg;
 
-
+#if defined _WIN32 || defined _WIN64
 /*
 	The interfaces here allow an application to write sound data to
 	abstract channels which are then to be mixed.  The interfaces here
@@ -438,8 +443,12 @@ static	SoundManager *	CreateSoundManager(HWND hWnd )
 	SoundManager *	sm;
 	DS_CREATE_FUNC pDirectSoundCreate;
 
-	// load the DirectSound DLL
+#if defined (__linux__)
+	hmodDirectSound = dlopen("./libopenal.so", RTLD_LAZY);
+#elif defined _WIN32 || defined _WIN64
 	hmodDirectSound = LoadLibrary ("DSOUND.DLL");
+#endif
+	// load the DirectSound DLL
 	if (hmodDirectSound == NULL)
 	{
 		// Couldn't load DSOUND.DLL
@@ -450,7 +459,11 @@ static	SoundManager *	CreateSoundManager(HWND hWnd )
 	if (pDirectSoundCreate == NULL)
 	{
 		// couldn't find the DirectSoundCreate function
-		FreeLibrary (hmodDirectSound);
+#if defined(__linux__)
+		dlclose(hmodDirectSound);
+#elif defined _WIN32 || defined _WIN64
+		FreeLibrary(hmodDirectSound);
+#endif
 		return NULL;
 	}
 
@@ -458,7 +471,11 @@ static	SoundManager *	CreateSoundManager(HWND hWnd )
 	if	(hres != DS_OK)
 	{
 		// failed somehow
-		FreeLibrary (hmodDirectSound);
+#if defined(__linux__)
+		dlclose(hmodDirectSound);
+#elif defined _WIN32 || defined _WIN64
+		FreeLibrary(hmodDirectSound);
+#endif
 		return NULL;
 	}
 
@@ -466,8 +483,12 @@ static	SoundManager *	CreateSoundManager(HWND hWnd )
 	sm = geRam_Allocate(sizeof(*sm));
 	if	(!sm)
 	{
+#if defined(__linux__)
+		dlclose(hmodDirectSound);
+#elif defined _WIN32 || defined _WIN64
 		IDirectSound_Release(lpDirectSound);
-		FreeLibrary (hmodDirectSound);
+		FreeLibrary(hmodDirectSound);
+#endif
 		return NULL;
 	}
 	sm->smChannelCount = 0;
@@ -510,8 +531,12 @@ static	SoundManager *	CreateSoundManager(HWND hWnd )
 		{
 			return sm;
 		}
+#if defined(__linux__)
+		dlclose(hmodDirectSound);
+#elif defined _WIN32 || defined _WIN64
 		IDirectSound_Release(lpDirectSound);
-		FreeLibrary (hmodDirectSound);
+		FreeLibrary(hmodDirectSound);
+#endif
 	}
 //	free( sm );
 	geRam_Free(sm);
@@ -1082,3 +1107,5 @@ static	Channel* GetChannel( SoundManager *sm, unsigned int ID )
 	}
 	return( channel );
 }
+
+#endif

@@ -19,8 +19,11 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
+
+#if defined _WIN32 || defined _WIN64
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#endif
 #include <stdio.h>
 #include <assert.h>		// assert()
 #include <stdlib.h>
@@ -72,6 +75,7 @@ GENESISAPI void geErrorLog_AddExplicit(geErrorLog_ErrorClassType Error,
 	char	*SDst;
 	char	*CDst;
 
+	(void)Error;
 	assert( geErrorLog_Locals.ErrorCount >= 0 );
 
 	if (geErrorLog_Locals.ErrorCount>=MAX_ERRORS)
@@ -108,7 +112,11 @@ GENESISAPI void geErrorLog_AddExplicit(geErrorLog_ErrorClassType Error,
 
 	{
 		char Number[20];
+#if defined(__linux__)
+		snprintf(Number, 20, "%d", LineNumber);
+#elif defined _WIN32 || defined _WIN64
 		itoa(LineNumber,Number,10);
+#endif
 		strncat(SDst,Number,MAX_USER_NAME_LEN);
 	}
 
@@ -142,9 +150,13 @@ GENESISAPI void geErrorLog_AddExplicit(geErrorLog_ErrorClassType Error,
 {
 	char	buff[100];
 	sprintf(buff, "ErrorLog: %d -", Error);
+#if defined(__linux__)
+	fprintf(stderr, "%s %s\n", buff, SDst);
+#elif defined _WIN32 || defined _WIN64
 	OutputDebugString(buff);
 	OutputDebugString(SDst);
 	OutputDebugString("\r\n");
+#endif
 }
 #endif
 }

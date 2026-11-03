@@ -25,6 +25,13 @@
 #include	<stdlib.h>
 #include	<string.h>
 
+#if defined(__linux__)
+#include <linux/limits.h> // c11
+#include <libgen.h>
+#include <strings.h> //strcasecmp
+#define stricmp strcasecmp
+#endif
+
 #include	"BaseType.h"
 #include	"Ram.h"
 
@@ -32,17 +39,16 @@
 #include	"DirTreeCommon.h"
 
 #define	DIRTREE_FILE_SIGNATURE	MAKEFOURCC('D', 'T', '0', '1')
-static int DirTree_SignatureBase=0x696C6345;
-static int DirTree_SignatureOffset=0x21657370;
+
 
 typedef struct	DirTree
 {
 	char *				Name;
 	geVFile_Time		Time;
 	geVFile_Attributes	AttributeFlags;
-	long				Size;
+	int32				Size;
 	geVFile_Hints		Hints;
-	long				Offset;
+	int32				Offset;
 	struct DirTree *	Parent;
 	struct DirTree *	Children;
 	struct DirTree *	Siblings;
@@ -93,8 +99,8 @@ void	DirTree_Destroy(DirTree *Tree)
 
 static	geBoolean	WriteTree(const DirTree *Tree, geVFile *File)
 {
-	int		Length;
-	int		Terminator;
+	int32		Length;
+	int32		Terminator;
 
 	assert(Tree);
 	assert(Tree->Name);
@@ -161,11 +167,11 @@ static	geBoolean	WriteTree(const DirTree *Tree, geVFile *File)
 	return GE_TRUE;
 }
 
-static	geBoolean DirTree_WriteToFile1(const DirTree *Tree, geVFile *File, long *Size)
+static	geBoolean DirTree_WriteToFile1(const DirTree *Tree, geVFile *File, int32 *Size)
 {
 	DirTree_Header	Header;
-	long			StartPosition;
-	long			EndPosition;
+	int32			StartPosition;
+	int32			EndPosition;
 
 	if	(geVFile_Tell(File, &StartPosition) == GE_FALSE)
 		return GE_FALSE;
@@ -191,13 +197,13 @@ static	geBoolean DirTree_WriteToFile1(const DirTree *Tree, geVFile *File, long *
 	return GE_TRUE;
 }
 
-void DirTree_SetFileSize(DirTree *Tree, long Size)
+void DirTree_SetFileSize(DirTree *Tree, int32 Size)
 {
 	assert(Tree);
 	Tree->Size = Size;
 }
 
-void DirTree_GetFileSize(DirTree *Tree, long *Size)
+void DirTree_GetFileSize(DirTree *Tree, int32 *Size)
 {
 	assert(Tree);
 	*Size = Tree->Size;
@@ -206,7 +212,7 @@ void DirTree_GetFileSize(DirTree *Tree, long *Size)
 geBoolean DirTree_WriteToFile(const DirTree *Tree, geVFile *File)
 {
 	geBoolean	Res;
-	long		Size;
+	int32		Size;
 
 	Res = DirTree_WriteToFile1(Tree, File, &Size);
 	if	(Res == GE_FALSE)
@@ -215,7 +221,7 @@ geBoolean DirTree_WriteToFile(const DirTree *Tree, geVFile *File)
 	return GE_TRUE;
 }
 
-geBoolean DirTree_GetSize(const DirTree *Tree, long *Size)
+geBoolean DirTree_GetSize(const DirTree *Tree, int32 *Size)
 {
 	geVFile *				FS;
 	geVFile_MemoryContext	Context;
@@ -254,8 +260,8 @@ geBoolean DirTree_GetSize(const DirTree *Tree, long *Size)
 
 static	geBoolean	ReadTree(geVFile *File, DirTree **TreePtr)
 {
-	int			Terminator;
-	int			Length;
+	int32			Terminator;
+	int32			Length;
 	DirTree *	Tree;
 
 	if	(geVFile_Read(File, &Terminator, sizeof(Terminator)) == GE_FALSE)
@@ -340,8 +346,8 @@ DirTree *DirTree_CreateFromFile(geVFile *File)
 {
 	DirTree *		Res;
 	DirTree_Header	Header;
-	long			StartPosition;
-	long			EndPosition;
+	int32			StartPosition;
+	int32			EndPosition;
 
 	if	(geVFile_Tell(File, &StartPosition) == GE_FALSE)
 		return GE_FALSE;
@@ -367,13 +373,17 @@ DirTree *DirTree_CreateFromFile(geVFile *File)
 
 DirTree *DirTree_FindExact(const DirTree *Tree, const char *Path)
 {
+#if defined(__linux__)
+	static char	Buff[PATH_MAX];
+#elif defined _WIN32 || defined _WIN64
 	static char	Buff[_MAX_PATH];
+#endif
 	DirTree *	Siblings;
 
 	assert(Tree);
 	assert(Path);
 
-	if	(*Path == '\\')
+	if	(*Path == DIRECTORY_SEPARATOR)
 		return NULL;
 
 	if	(*Path == '\0')
@@ -401,13 +411,17 @@ DirTree *DirTree_FindPartial(
 	const char *	Path,
 	const char **	LeftOvers)
 {
+#if defined(__linux__)
+	static char	Buff[PATH_MAX];
+#elif defined _WIN32 || defined _WIN64
 	static char	Buff[_MAX_PATH];
+#endif
 	DirTree *	Siblings;
 
 	assert(Tree);
 	assert(Path);
 
-	if	(*Path == '\\')
+	if	(*Path == DIRECTORY_SEPARATOR)
 		return NULL;
 
 	*LeftOvers = Path;
@@ -538,7 +552,7 @@ void DirTree_GetFileAttributes(DirTree *Tree, geVFile_Attributes *Attributes)
 	*Attributes = Tree->AttributeFlags;
 }
 
-void DirTree_SetFileOffset(DirTree *Leaf, long Offset)
+void DirTree_SetFileOffset(DirTree *Leaf, int32 Offset)
 {
 	assert(Leaf);
 	assert(!(Leaf->AttributeFlags & GE_VFILE_ATTRIB_DIRECTORY));
@@ -546,7 +560,7 @@ void DirTree_SetFileOffset(DirTree *Leaf, long Offset)
 	Leaf->Offset = Offset;
 }
 
-void DirTree_GetFileOffset(DirTree *Leaf, long *Offset)
+void DirTree_GetFileOffset(DirTree *Leaf, int32 *Offset)
 {
 	assert(Leaf);
 	assert(!(Leaf->AttributeFlags & GE_VFILE_ATTRIB_DIRECTORY));
@@ -589,7 +603,7 @@ void DirTree_GetFileHints(DirTree *Tree, geVFile_Hints *Hints)
 	*Hints = Tree->Hints;
 }
 
-geBoolean DirTree_GetName(DirTree *Tree, char *Buff, int MaxLen)
+geBoolean DirTree_GetName(DirTree *Tree, char *Buff, int32 MaxLen)
 {
 	int	Length;
 
@@ -618,14 +632,38 @@ DirTree_Finder * DirTree_CreateFinder(DirTree *Tree, const char *Path)
 {
 	DirTree_Finder *	Finder;
 	DirTree *			SubTree;
+#if defined(__linux__)
+	char				PathCopy[PATH_MAX];
+	char				Directory[PATH_MAX];
+	char				Name[NAME_MAX];
+	char				Ext[NAME_MAX] = {0};
+#elif defined _WIN32 || defined _WIN64
 	char				Directory[_MAX_PATH];
 	char				Name[_MAX_FNAME];
 	char				Ext[_MAX_EXT];
+#endif
 
 	assert(Tree);
 	assert(Path);
 
+#if defined(__linux__)
+	// TODO:
+	//some versions of dirname/basename may modify original string
+	strcpy(PathCopy, Path);
+	strcpy(Directory, dirname(PathCopy));
+	strcpy(PathCopy, Path);
+	strcpy(Name, basename(PathCopy));
+	{
+		char *ext_start = strchr(Name, '.');
+		if(ext_start)
+		{
+			strcpy(Ext, ext_start);
+			*ext_start = '\0';
+		}
+	}
+#elif defined _WIN32 || defined _WIN64
 	_splitpath(Path, NULL, Directory, Name, Ext);
+#endif
 
 	SubTree = DirTree_FindExact(Tree, Directory);
 	if	(!SubTree)
@@ -674,8 +712,14 @@ void DirTree_DestroyFinder(DirTree_Finder *Finder)
 DirTree * DirTree_FinderGetNextFile(DirTree_Finder *Finder)
 {
 	DirTree *	Res;
+#if defined(__linux__)
+	char		NameCopy[PATH_MAX];
+	char		Name[NAME_MAX];
+	char		Ext[NAME_MAX];
+#elif defined _WIN32 || defined _WIN64
 	char		Name[_MAX_FNAME];
 	char		Ext[_MAX_EXT];
+#endif
 
 	assert(Finder);
 
@@ -686,7 +730,22 @@ DirTree * DirTree_FinderGetNextFile(DirTree_Finder *Finder)
 
 	do
 	{
+#if defined(__linux__)
+	// TODO:
+	//some versions of dirname/basename may modify original string
+	strcpy(NameCopy, Res->Name);
+	strcpy(Name, basename(NameCopy));
+	{
+		char *ext_start = strchr(Name, '.');
+		if(ext_start)
+		{
+			strcpy(Ext, &ext_start[1]);
+			*ext_start = '\0';
+		}
+	}
+#elif defined _WIN32 || defined _WIN64
 		_splitpath(Res->Name, NULL, NULL, Name, Ext);
+#endif
 		if	(MatchPattern(Name, Finder->MatchName) == GE_TRUE &&
 			 MatchPattern(Ext,  Finder->MatchExt) == GE_TRUE)
 		{

@@ -20,8 +20,6 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
-#define	WIN32_LEAN_AND_MEAN
-#include	<windows.h>
 
 #include	<stdio.h>
 #include	<stdlib.h>
@@ -36,6 +34,10 @@
 
 #include	"FSMemory.h"
 
+#if defined(__linux__)
+static int32 min(int32 a, int32 b) { return a<b?a:b; }
+#endif
+
 //	"MF01"
 #define	MEMORYFILE_SIGNATURE	0x3130464D
 
@@ -49,11 +51,11 @@
 
 typedef struct	MemoryFile
 {
-	unsigned int	Signature;
+	uint32			Signature;
 	char *			Memory;
-	int				Size;
-	int				AllocatedSize;
-	int				Position;
+	int32				Size;
+	int32				AllocatedSize;
+	int32				Position;
 	geBoolean		WeOwnMemory;
 	geBoolean		ReadOnly;
 }	MemoryFile;
@@ -63,24 +65,31 @@ static	void *	GENESISCC FSMemory_FinderCreate(
 	void *			Handle,
 	const char *	FileSpec)
 {
+	(void)FS;
+	(void)Handle;
+	(void)FileSpec;
 	return NULL;
 }
 
 static	geBoolean	GENESISCC FSMemory_FinderGetNextFile(void *Handle)
 {
 	assert(!Handle);
+	(void)Handle;
 	return GE_FALSE;
 }
 
 static	geBoolean	GENESISCC FSMemory_FinderGetProperties(void *Handle, geVFile_Properties *Props)
 {
 	assert(!Handle);
+	(void)Handle;
+	(void)Props;
 	return GE_FALSE;
 }
 
 static	void GENESISCC FSMemory_FinderDestroy(void *Handle)
 {
 	assert(!Handle);
+	(void)Handle;
 }
 
 static	void *	GENESISCC FSMemory_Open(
@@ -88,8 +97,13 @@ static	void *	GENESISCC FSMemory_Open(
 	void *			Handle,
 	const char *	Name,
 	void *			Context,
-	unsigned int 	OpenModeFlags)
+	uint32			OpenModeFlags)
 {
+	(void)FS;
+	(void)Handle;
+	(void)Name;
+	(void)Context;
+	(void)OpenModeFlags;
 	return NULL;
 }
 
@@ -97,7 +111,7 @@ static	void *	GENESISCC FSMemory_OpenNewSystem(
 	geVFile *		FS,
 	const char *	Name,
 	void *			Context,
-	unsigned int 	OpenModeFlags)
+	uint32			OpenModeFlags)
 {
 	MemoryFile *			NewFS;
 	geVFile_MemoryContext *	MemContext;
@@ -146,10 +160,11 @@ static	geBoolean	GENESISCC FSMemory_UpdateContext(
 	geVFile *		FS,
 	void *			Handle,
 	void *			Context,
-	int 			ContextSize)
+	int32 			ContextSize)
 {
 	MemoryFile *			File;
 	geVFile_MemoryContext *	MemoryContext;
+	(void)FS;
 
 	assert(FS);
 	assert(Context);
@@ -182,7 +197,7 @@ static	void	GENESISCC FSMemory_Close(void *Handle)
 	geRam_Free(File);
 }
 
-static int GENESISCC ClampOperationSize(const MemoryFile *File, int Size)
+static int GENESISCC ClampOperationSize(const MemoryFile *File, int32 Size)
 {
 	return min(File->Size - File->Position, Size);
 }
@@ -192,7 +207,7 @@ static char * GENESISCC DataPtr(const MemoryFile *File)
 	return File->Memory + File->Position;
 }
 
-static	geBoolean	GENESISCC FSMemory_GetS(void *Handle, void *Buff, int MaxLen)
+static	geBoolean	GENESISCC FSMemory_GetS(void *Handle, void *Buff, int32 MaxLen)
 {
 	MemoryFile *	File;
 	char *			p;
@@ -243,7 +258,7 @@ static	geBoolean	GENESISCC FSMemory_GetS(void *Handle, void *Buff, int MaxLen)
 
 }
 
-static	geBoolean	GENESISCC FSMemory_Read(void *Handle, void *Buff, int Count)
+static	geBoolean	GENESISCC FSMemory_Read(void *Handle, void *Buff, int32 Count)
 {
 	MemoryFile *	File;
 
@@ -266,7 +281,7 @@ static	geBoolean	GENESISCC FSMemory_Read(void *Handle, void *Buff, int Count)
 	return GE_TRUE;
 }
 
-static	geBoolean	GENESISCC TestForExpansion(MemoryFile *File, int Size)
+static	geBoolean	GENESISCC TestForExpansion(MemoryFile *File, int32 Size)
 {
 	assert(File);
 	assert(File->ReadOnly == GE_FALSE);
@@ -277,7 +292,7 @@ static	geBoolean	GENESISCC TestForExpansion(MemoryFile *File, int Size)
 
 	if	(File->AllocatedSize - File->Position < Size)
 	{
-		int		NewSize;
+		int32	NewSize;
 		char *	NewBlock;
 
 		NewSize = ((File->AllocatedSize + Size + (MEMORY_FILE_GROW - 1)) / MEMORY_FILE_GROW) * MEMORY_FILE_GROW;
@@ -292,7 +307,7 @@ static	geBoolean	GENESISCC TestForExpansion(MemoryFile *File, int Size)
 	return GE_TRUE;
 }
 
-static	geBoolean	GENESISCC FSMemory_Write(void *Handle, const void *Buff, int Count)
+static	geBoolean	GENESISCC FSMemory_Write(void *Handle, const void *Buff, int32 Count)
 {
 	MemoryFile *	File;
 
@@ -318,7 +333,7 @@ static	geBoolean	GENESISCC FSMemory_Write(void *Handle, const void *Buff, int Co
 	return GE_TRUE;
 }
 
-static	geBoolean	GENESISCC FSMemory_Seek(void *Handle, int Where, geVFile_Whence Whence)
+static	geBoolean	GENESISCC FSMemory_Seek(void *Handle, int32 Where, geVFile_Whence Whence)
 {
 	MemoryFile *	File;
 
@@ -328,7 +343,7 @@ static	geBoolean	GENESISCC FSMemory_Seek(void *Handle, int Where, geVFile_Whence
 
 	switch	(Whence)
 	{
-	int		NewPos;
+	int32		NewPos;
 
 	case	GE_VFILE_SEEKCUR:
 		NewPos = File->Position + Where;
@@ -388,7 +403,7 @@ static	geBoolean	GENESISCC FSMemory_EOF(const void *Handle)
 	return GE_FALSE;
 }
 
-static	geBoolean	GENESISCC FSMemory_Tell(const void *Handle, long *Position)
+static	geBoolean	GENESISCC FSMemory_Tell(const void *Handle, int32 *Position)
 {
 	const MemoryFile *	File;
 
@@ -401,7 +416,7 @@ static	geBoolean	GENESISCC FSMemory_Tell(const void *Handle, long *Position)
 	return GE_TRUE;
 }
 
-static	geBoolean	GENESISCC FSMemory_Size(const void *Handle, long *Size)
+static	geBoolean	GENESISCC FSMemory_Size(const void *Handle, int32 *Size)
 {
 	const MemoryFile *	File;
 
@@ -417,35 +432,48 @@ static	geBoolean	GENESISCC FSMemory_Size(const void *Handle, long *Size)
 static	geBoolean	GENESISCC FSMemory_GetProperties(const void *Handle, geVFile_Properties *Properties)
 {
 	assert(!"Not implemented");
+	(void)Handle;
+	(void)Properties;
 	return GE_FALSE;
 }
 
-static	geBoolean	GENESISCC FSMemory_SetSize(void *Handle, long Size)
+static	geBoolean	GENESISCC FSMemory_SetSize(void *Handle, int32 Size)
 {
 	assert(!"Not implemented");
+	(void)Handle;
+	(void)Size;
 	return GE_FALSE;
 }
 
 static	geBoolean	GENESISCC FSMemory_SetAttributes(void *Handle, geVFile_Attributes Attributes)
 {
 	assert(!"Not implemented");
+	(void)Handle;
+	(void)Attributes;
 	return GE_FALSE;
 }
 
 static	geBoolean	GENESISCC FSMemory_SetTime(void *Handle, const geVFile_Time *Time)
 {
 	assert(!"Not implemented");
+	(void)Handle;
+	(void)Time;
 	return GE_FALSE;
 }
 
 static	geBoolean	GENESISCC FSMemory_SetHints(void *Handle, const geVFile_Hints *Hints)
 {
 	assert(!"Not implemented");
+	(void)Handle;
+	(void)Hints;
 	return GE_FALSE;
 }
 
 static	geBoolean	GENESISCC FSMemory_FileExists(geVFile *FS, void *Handle, const char *Name)
 {
+	(void)FS;
+	(void)Handle;
+	(void)Name;
 	return GE_FALSE;
 }
 
@@ -455,16 +483,27 @@ static	geBoolean	GENESISCC FSMemory_Disperse(
 	const char *Directory,
 	geBoolean	Recursive)
 {
+	(void)FS;
+	(void)Handle;
+	(void)Directory;
+	(void)Recursive;
 	return GE_FALSE;
 }
 
 static	geBoolean	GENESISCC FSMemory_DeleteFile(geVFile *FS, void *Handle, const char *Name)
 {
+	(void)FS;
+	(void)Handle;
+	(void)Name;
 	return GE_FALSE;
 }
 
 static	geBoolean	GENESISCC FSMemory_RenameFile(geVFile *FS, void *Handle, const char *Name, const char *NewName)
 {
+	(void)FS;
+	(void)Handle;
+	(void)Name;
+	(void)NewName;
 	return GE_FALSE;
 }
 

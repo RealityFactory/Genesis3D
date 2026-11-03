@@ -31,10 +31,19 @@
 #define GE_SYSTEM_H
 
 //#define OLD_FONT
+#include <stdint.h>
 
 #include "ErrorLog.h"
 #include "Genesis.h"
-#include <windows.h>
+
+#if defined(__linux__)
+#include <sys/time.h>
+typedef void *PVOID;
+typedef PVOID HANDLE;
+typedef HANDLE HINSTANCE;
+#elif defined _WIN32 || defined _WIN64
+#include <windows.h> // LARGE_INTEGER
+#endif
 #include "DCommon.h"
 #include "Camera.h"
 #include "PtrTypes.h"
@@ -85,13 +94,13 @@ typedef struct
 	by Sys_GetCPUFreq is to large for the following variable make it a large_integer
 	Fix provide by Latex and IronDragon from the genesis3d forum
 	int32		  Freq; */
-	LARGE_INTEGER Freq;
+	int64_t Freq;
 } Sys_CPUInfo;
 
 typedef struct geDriver_Mode
 {
 	int32			Id;							// Driver assigned mode id
-	char			Name[DRV_MODE_STR_SIZE];		// Driver assigned mode name
+	char			Name[DRV_MODE_STR_SIZE];	// Driver assigned mode name
 	int32			Width;						// Mode width
 	int32			Height;						// Mode height
 } geDriver_Mode;
@@ -172,7 +181,11 @@ typedef struct geEngine
 	Sys_CPUInfo			CPUInfo;			// Info about the Cpu
 	Sys_DebugInfo		DebugInfo;
 
+#if defined(__linux__)
+	struct timeval		CurrentTic;
+#elif defined _WIN32 || defined _WIN64
 	LARGE_INTEGER		CurrentTic;
+#endif
 
 	Sys_FontInfo		FontInfo;
 

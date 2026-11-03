@@ -32,7 +32,9 @@
 #include <assert.h>
 
 #ifdef _DEBUG
+#if defined _WIN32 || defined _WIN64
 #include <windows.h>
+#endif
 #endif
 
 #include <stdio.h>
@@ -51,7 +53,7 @@
 
 struct BitmapList
 {
-#ifdef _DEBUG
+#if defined _DEBUG && defined(_WIN32) /// TODO: CHECK ME
 	BitmapList * MySelf;
 #endif
 	Hash * Hash;
@@ -77,7 +79,7 @@ BitmapList * pList;
 		geRam_Free(pList);
 		return NULL;
 	}
-	#ifdef _DEBUG
+	#if defined _DEBUG && defined(_WIN32) /// TODO: CHECK ME
 	pList->MySelf = pList;
 	#endif
 return pList;
@@ -103,7 +105,7 @@ geBoolean	Ret = GE_TRUE;
 		geBitmap *Bmp;
 		uint32 TimesAdded;
 
-			HashNode_GetData(pNode,(uint32 *)&Bmp,&TimesAdded);
+			HashNode_GetData(pNode,(unsigned long *)&Bmp,&TimesAdded);
 
 /* 02/18/2004 Wendell Buckner
 	DOT3 BUMPMAPPING */
@@ -252,7 +254,6 @@ geBoolean BitmapList_DetachAll(BitmapList *pList)
 {
 HashNode	*pNode;
 geBoolean	Ret = GE_TRUE;
-int MembersAttached;
 
 	assert(BitmapList_IsValid(pList));
 
@@ -262,7 +263,7 @@ int MembersAttached;
 	geBitmap *Bmp;
 	uint32 TimesAdded;
 
-		HashNode_GetData(pNode,(uint32 *)&Bmp,&TimesAdded);
+		HashNode_GetData(pNode,(unsigned long *)&Bmp,&TimesAdded);
 
 /* 02/18/2004 Wendell Buckner
 	DOT3 BUMPMAPPING */
@@ -275,8 +276,6 @@ int MembersAttached;
 		if (!geBitmap_DetachDriver(Bmp, GE_TRUE))
 			Ret = GE_FALSE;
 	}
-
-	MembersAttached = 0;
 
 	return Ret;
 }
@@ -317,7 +316,7 @@ int Count;
 	geBitmap *Bmp;
 	uint32 TimesAdded;
 
-		HashNode_GetData(pNode,(uint32 *)&Bmp,&TimesAdded);
+		HashNode_GetData(pNode,(unsigned long *)&Bmp,&TimesAdded);
 
 		if ( geBitmap_GetTHandle(Bmp) )
 			Count ++;
@@ -338,7 +337,7 @@ uint32 TimesAdded;
 
 	assert(pList && Bitmap);
 
-	pNode = Hash_Get(pList->Hash,(uint32)Bitmap,&TimesAdded);
+	pNode = Hash_Get(pList->Hash,(unsigned long)Bitmap,&TimesAdded);
 
 	assert( pList->Adds >= (int)TimesAdded );
 
@@ -361,7 +360,7 @@ uint32 TimesAdded;
 
 	pList->Adds ++;
 
-	if ( (pNode = Hash_Get(pList->Hash, (uint32)Bitmap, &TimesAdded)) != NULL )
+	if ( (pNode = Hash_Get(pList->Hash, (unsigned long)Bitmap, &TimesAdded)) != NULL )
 	{
 		HashNode_SetData(pNode,TimesAdded+1);
 		return GE_FALSE;
@@ -369,7 +368,7 @@ uint32 TimesAdded;
 	else
 	{
 		pList->Members ++;
-		Hash_Add(pList->Hash,(uint32)Bitmap,1);
+		Hash_Add(pList->Hash,(unsigned long)Bitmap,1);
 		return GE_TRUE;
 	}
 }
@@ -381,12 +380,12 @@ geBoolean BitmapList_Remove(BitmapList *pList,geBitmap *Bitmap)
 {
 HashNode *pNode;
 uint32 TimesAdded;
-uint32 Key;
+unsigned long Key;
 
 	assert(BitmapList_IsValid(pList));
 	assert(Bitmap);
 
-	Key = (uint32) Bitmap;
+	Key = (unsigned long) Bitmap;
 	pNode = Hash_Get(pList->Hash,Key,&TimesAdded);
 
 	assert(pNode);
@@ -448,7 +447,7 @@ geBoolean BitmapList_IsValid(BitmapList *pList)
 	if ( pList->Adds < pList->Members )
 		return GE_FALSE;
 
-#ifdef _DEBUG
+#if defined _DEBUG && defined(_WIN32) /// TODO: CHECK ME
 	if ( pList->MySelf != pList )
 		return GE_FALSE;
 #endif

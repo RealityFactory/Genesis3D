@@ -56,6 +56,7 @@
 
 #include <math.h>  //fabs()
 #include <assert.h>
+#include <string.h> //memset
 
 #include "Light.h"
 #include "World.h"
@@ -101,10 +102,10 @@ typedef struct gePuppet
 {
 	geVFile *			 TextureFileContext;
 	geBodyInst			*BodyInstance;
-	int					 MaterialCount;
+	int32				 MaterialCount;
 	gePuppet_Material	*MaterialArray;
-	int					 MaxDynamicLightsToUse;
-	int					 LightReferenceBoneIndex;
+	int32				 MaxDynamicLightsToUse;
+	int32				 LightReferenceBoneIndex;
 
 	geVec3d				 FillLightNormal;
 	gePuppet_Color		 FillLightColor;			// 0..255
@@ -119,7 +120,7 @@ typedef struct gePuppet
 	geBoolean			 DoShadow;
 	geFloat				 ShadowScale;
 	const geBitmap		*ShadowMap;
-	int					 ShadowBoneIndex;
+	int32				 ShadowBoneIndex;
 
 	// LWM_ACTOR_RENDERING:
 	geFloat				 OverallAlpha ;
@@ -128,7 +129,7 @@ typedef struct gePuppet
 	geWorld				*World;
 	geBoolean			 AmbientLightFromStaticLights;	// use static lights from map
 	geBoolean			 DoTestRayCollision;			//test static light in shadow
-	int					 MaxStaticLightsToUse; 			//max number of light to use
+	int32				 MaxStaticLightsToUse; 			//max number of light to use
 
 /*  03/10/2004 Wendell Buckner
      Ambient light is leeking into objects that should not receive light, each object
@@ -164,16 +165,16 @@ typedef struct
 	gePuppet_Color	Ambient;
 	geVec3d			SurfaceNormal;
 	gePuppet_Light	StaticLights[MAX_DYNAMIC_LIGHTS];
-	int				StaticLightCount;
+	int32			StaticLightCount;
 	gePuppet_Light	Lights[MAX_DYNAMIC_LIGHTS];
-	int				LightCount;
+	int32			LightCount;
 	geBoolean		PerBoneLighting;
 } gePuppet_LightParamGroup;
 
 typedef struct
 {
 	gePuppet_Light Lights[MAX_DYNAMIC_LIGHTS];
-	int LightCount;
+	int32 LightCount;
 } gePuppet_BoneLight;
 
 // Local info stored across multiple puppets to avoid resource waste.
@@ -189,7 +190,7 @@ static geBoolean GENESISCC gePuppet_FetchTextures(gePuppet *P, const geBody *B)
 
 /* 08/27/2003 Wendell Buckner
 	BUMPMAPPING
-	Remove artificial limit of only 255 bitmaps.
+	Remove artificial limit of only 255 bitmaps.  */
 /* 04/08/2003 Wendell Buckner
 	BUMPMAPPING
 	int BumpBmpNameCount = 0;
@@ -249,7 +250,7 @@ static geBoolean GENESISCC gePuppet_FetchTextures(gePuppet *P, const geBody *B)
 
 /* 08/27/2003 Wendell Buckner
 	BUMPMAPPING
-	Remove artificial limit of only 255 bitmaps...
+	Remove artificial limit of only 255 bitmaps...  */
 /* 04/08/2003 Wendell Buckner
 	BUMPMAPPING *
 		if ( geBitmap_IsBumpmapName(Name) && (BumpBmpNameCount <255))
@@ -262,7 +263,7 @@ static geBoolean GENESISCC gePuppet_FetchTextures(gePuppet *P, const geBody *B)
 /* 08/27/2003 Wendell Buckner
 	BUMPMAPPING
 	Remove artificial limit of only 255 bitmaps...
-	Don't just look for a specific bump map pixel format, use the best available of what is found...
+	Don't just look for a specific bump map pixel format, use the best available of what is found...  */
 /* 04/08/2003 Wendell Buckner
 	BUMPMAPPING *
 	for(i= 0; i < BumpBmpNameCount; i++)
@@ -310,7 +311,6 @@ static geBoolean GENESISCC gePuppet_FetchTextures(gePuppet *P, const geBody *B)
 			if (BumpMapPixelFormatCount == 0 ) break; */
 			if ( geBitmap_IsBumpmapNameDot3(Name) && HasBumpDot3 )
 			{
-				geBitmap *BumpBmpAlt = NULL;
 				geBoolean BumpmapCreated = GE_FALSE;
 
 				BumpmapCreated = geBody_CreateBumpmapByNameDot3(B, Name);
@@ -873,7 +873,6 @@ static int  GENESISCC gePuppet_ComputeAmbientLight(
 		{
 			geVec3d *Position;
 			geVec3d Normal;
-			geBoolean keepLight = GE_TRUE;
 			aLight = (light*)geEntity_GetUserData(entity);
 			Position = &(aLight->origin);
 			geVec3d_Subtract(Position,ReferencePoint,&Normal);
@@ -918,7 +917,6 @@ static int  GENESISCC gePuppet_ComputeAmbientLight(
 		{
 			geVec3d *Position;
 			geVec3d Normal;
-			geBoolean keepLight = GE_TRUE;
 			sLight = (spotlight*)geEntity_GetUserData(entity);
 			Position = &(sLight->origin);
 			geVec3d_Subtract(Position,ReferencePoint,&Normal);
@@ -1247,6 +1245,7 @@ static void GENESISCC gePuppet_DrawShadow(const gePuppet *P,
 				NULL,
 				&Collision);
 
+		(void)GoodImpact;
 		//if(GoodImpact)
 			Impact = Collision.Impact;
 		//else
@@ -1691,7 +1690,7 @@ geBoolean GENESISCC gePuppet_AddToGList ( const GE_TLVertex *Points, int NumPoin
 	if ( Flush )
 	{
 		if ( PuppetTransPolyList )
-			GList_AddOperation ( 2, (uint32) PuppetTransPolyList );
+			GList_AddOperation ( 2, (unsigned long) PuppetTransPolyList );
 
 		PuppetTransPolyList = NULL;
 		CurrentPuppetTransPoly = NULL;
@@ -1780,6 +1779,8 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 	geBitmap **MaterialArray = NULL;
 	int32    MaterialCount = 0;
 	int32    i = 0;
+
+	(void)Box;
 
 // changed QD Performance
 	if(P->OverallAlpha==0.0f)
@@ -1963,6 +1964,7 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 			assert( Command == GE_BODYINST_FACE_TRIANGLE );
 			assert( Material>=0 );
 			assert( Material<P->MaterialCount);
+			(void)Command;
 
 			PM = &(P->MaterialArray[Material]);
 			gePuppet_StaticLightGrp.MaterialColor = PM->Color;
@@ -2203,7 +2205,6 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 	rdtsc_timer_type RDTSCStart,RDTSCEnd;
 	#endif
 	geRect ClippingRect;
-	geBoolean Clipping = GE_TRUE;
 // changed QD Clipping
 	int32 ClipFlags;
 
@@ -2568,6 +2569,7 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 			assert( Command == GE_BODYINST_FACE_TRIANGLE );
 			assert( Material>=0 );
 			assert( Material<P->MaterialCount);
+			(void)Command;
 
 // changed QD Clipping
 			// facing the camera?
@@ -2812,6 +2814,7 @@ static void GENESISCC AddEdge(geBodyInst_Index *pEdges, int *NumEdges,
 							  geBodyInst_Index v0, geBodyInst_Index v1, const geBodyInst_Geometry *G)
 {
 	int i;
+	(void)G;
 	// Remove interior edges (which appear in the list twice)
 	for(i=0;i<*NumEdges;i++)
 	{
@@ -2939,6 +2942,7 @@ geBoolean GENESISCC gePuppet_RenderShadowVolume(gePuppet *P,
 			//Material = *List;
 			List++;
 			//assert( Command == GE_BODY_FACE_TRIANGLE );
+			(void)Command;
 
 			{
 				geVec3d *vert[3];

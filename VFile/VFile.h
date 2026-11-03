@@ -33,19 +33,19 @@ typedef	struct	geVFile			geVFile;
 //--------- Finder (Directory) --------------
 typedef	struct	geVFile_Finder	geVFile_Finder;
 
-typedef int     		geVFile_TypeIdentifier;
-typedef unsigned int    geVFile_Attributes;
+typedef int32     		geVFile_TypeIdentifier;
+typedef uint32    geVFile_Attributes;
 
 typedef struct	geVFile_Hints
 {
 	void *	HintData;
-	int		HintDataLength;
+	int32		HintDataLength;
 }	geVFile_Hints;
 
 typedef	struct	geVFile_Time
 {
-	unsigned long	Time1;
-	unsigned long	Time2;
+	uint32	Time1;
+	uint32	Time2;
 }	geVFile_Time;
 
 #define	GE_VFILE_ATTRIB_READONLY	0x00000001
@@ -55,16 +55,18 @@ typedef	struct	geVFile_Properties
 {
 	geVFile_Time				Time;
 	geVFile_Attributes		AttributeFlags;
-	long					Size;
+	int32					Size;
 	geVFile_Hints			Hints;
 	char					Name[1024];
 }	geVFile_Properties;
 
+#if defined _WIN32 || defined _WIN64
 #ifdef _INC_WINDOWS
 GENESISAPI void GENESISCC geVFile_TimeToWin32FileTime(const geVFile_Time *, LPFILETIME Win32FileTime);
 	// Converts a geVFile time to a Win32 FILETIME structure.  This API is the
 	// way to get the file time into a format to do standardized date/time
 	// operations on.  We do not provide date/time operations natively.
+#endif
 #endif
 
 GENESISAPI geVFile_Finder * GENESISCC geVFile_CreateFinder(
@@ -88,7 +90,7 @@ GENESISAPI geBoolean GENESISCC geVFile_FinderGetProperties(const geVFile_Finder 
 typedef	struct	geVFile_MemoryContext
 {
 	void *	Data;
-	int		DataLength;
+	int32	DataLength;
 }	geVFile_MemoryContext;
 
 #define GE_VFILE_TYPE_DOS	    ( (geVFile_TypeIdentifier) 1L )
@@ -110,10 +112,10 @@ GENESISAPI geVFile * GENESISCC geVFile_OpenNewSystem(
 	geVFile_TypeIdentifier	FileSystemType,  // { DOS, MEMORY, ETC ... },
 	const char *			Name,
 	void *					Context,
-	unsigned int 			OpenModeFlags);
+	uint32		 			OpenModeFlags);
 	// Opens a file / file system.
 
-GENESISAPI geBoolean GENESISCC geVFile_UpdateContext(geVFile *FS, void *Context, int ContextSize);
+GENESISAPI geBoolean GENESISCC geVFile_UpdateContext(geVFile *FS, void *Context, int32 ContextSize);
 
 GENESISAPI geVFile * GENESISCC geVFile_GetContext(const geVFile *File);
 	// Returns the outer context in which File was opened.
@@ -121,7 +123,7 @@ GENESISAPI geVFile * GENESISCC geVFile_GetContext(const geVFile *File);
 GENESISAPI geVFile * GENESISCC geVFile_Open(
 	geVFile *			FS,
 	const char *	Name,
-	unsigned int 	OpenModeFlags);
+	uint32	OpenModeFlags);
 
 /*
 typedef	enum
@@ -167,19 +169,19 @@ typedef	enum
 	GE_VFILE_SEEKSET	= 2
 }	geVFile_Whence;
 
-GENESISAPI geBoolean GENESISCC geVFile_GetS  		 (		geVFile *File, void *Buff, int MaxLen);
-GENESISAPI geBoolean GENESISCC geVFile_Read  		 (		geVFile *File, void *Buff, int Count);
-GENESISAPI geBoolean GENESISCC geVFile_Write 		 (		geVFile *File, const void *Buff, int Count);
-GENESISAPI geBoolean GENESISCC geVFile_Seek  		 (		geVFile *File, int where, geVFile_Whence Whence);
+GENESISAPI geBoolean GENESISCC geVFile_GetS  		 (		geVFile *File, void *Buff, int32 MaxLen);
+GENESISAPI geBoolean GENESISCC geVFile_Read  		 (		geVFile *File, void *Buff, int32 Count);
+GENESISAPI geBoolean GENESISCC geVFile_Write 		 (		geVFile *File, const void *Buff, int32 Count);
+GENESISAPI geBoolean GENESISCC geVFile_Seek  		 (		geVFile *File, int32 where, geVFile_Whence Whence);
 GENESISAPI geBoolean GENESISCC geVFile_Printf		 (		geVFile *File, const char *Format, ...);
 GENESISAPI geBoolean GENESISCC geVFile_EOF   		 (const geVFile *File);
-GENESISAPI geBoolean GENESISCC geVFile_Tell  		 (const geVFile *File, long *Position);
+GENESISAPI geBoolean GENESISCC geVFile_Tell  		 (const geVFile *File, int32 *Position);
 GENESISAPI geBoolean GENESISCC geVFile_GetProperties(const geVFile *File, geVFile_Properties *Properties);
 //geBoolean geVFile_GetName(geVFile *File, char *Buff, int MaxBuffLen);
 	// Gets the name of the file
 
-GENESISAPI geBoolean GENESISCC geVFile_Size  		 (const geVFile *File, long *Size);
-GENESISAPI geBoolean GENESISCC geVFile_SetSize		 (		geVFile *File, long Size);
+GENESISAPI geBoolean GENESISCC geVFile_Size  		 (const geVFile *File, int32 *Size);
+GENESISAPI geBoolean GENESISCC geVFile_SetSize		 (		geVFile *File, int32 Size);
 GENESISAPI geBoolean GENESISCC geVFile_SetAttributes(		geVFile *File, geVFile_Attributes Attributes);
 GENESISAPI geBoolean GENESISCC geVFile_SetTime		 (		geVFile *File, const geVFile_Time *Time);
 GENESISAPI geBoolean GENESISCC geVFile_SetHints	 (		geVFile *File, const geVFile_Hints *Hints);

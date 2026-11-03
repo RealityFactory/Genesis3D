@@ -20,6 +20,7 @@
 /*                                                                                      */
 /****************************************************************************************/
 #include <assert.h>
+#include <stddef.h>
 #include "XFArray.h"
 #include "Ram.h"
 #include "ErrorLog.h"

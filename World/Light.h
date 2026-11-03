@@ -66,7 +66,7 @@ typedef struct
 typedef struct Light_LightInfo
 {
 	// Intensity tables, for animated styles
-	BOOL			LTypeDynamic[MAX_LTYPES];
+	geBoolean		LTypeDynamic[MAX_LTYPES];
 	int32			LTypeIntensities[MAX_LTYPES];
 	uint8			LTypeIntensities2[MAX_LTYPES];
 
@@ -120,7 +120,7 @@ geBoolean	Light_SetAttributes(	Light_DLight *Light,
 geBoolean	Light_WorldSetLTypeTable(geWorld *World, int32 LType, const char *Table);
 
 char		Light_WorldGetLTypeCurrent(geWorld *World, int32 LType);
-void		Light_SetupLightmap(DRV_LInfo *LInfo, BOOL *Dynamic);
+void		Light_SetupLightmap(DRV_LInfo *LInfo, geBoolean *Dynamic);
 geBoolean	Light_GetLightmapRGB(Surf_SurfInfo *Surf, geVec3d *Pos, GE_RGBA *RGBA);
 geBoolean	Light_GetLightmapRGBBlended(Surf_SurfInfo *Surf, geVec3d *Pos, GE_RGBA *RGBA);
 void		Light_FogVerts(const geFog *Fog, const geVec3d *POV, const geVec3d *Verts, Surf_TexVert *TexVerts, int32 NumVerts);

@@ -19,15 +19,19 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
-#include <windows.h>
-#include <stdlib.h>
+
 #include <stdio.h>
-#include <string.h>
+#include <stdarg.h>
+#if defined _WIN32 || defined _WIN64
+#include <windows.h> // OutputDebugString
+#endif
 
 void Log_Out(const char * string)
 {
+#if defined _WIN32 || defined _WIN64
 #ifdef _DEBUG
 	OutputDebugString(string);
+#endif
 #endif
 	printf(string);
 }

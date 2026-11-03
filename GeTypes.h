@@ -137,4 +137,4 @@ typedef GE_Rect geRect;
 #endif
 
 
-#endif GETYPES_H
+#endif // GETYPES_H

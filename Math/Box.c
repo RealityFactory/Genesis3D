@@ -45,6 +45,7 @@ static void geBox_ComputeGlobalFrameAxes(geBox* Box)
 
 	isOrthonormal = geXForm3d_IsOrthonormal(&(Box->Transform));
 	assert(isOrthonormal);
+	(void)isOrthonormal;
 
 	Box->GlobalFrameAxes[0].X = Box->Transform.AX * Box->xScale;
 	Box->GlobalFrameAxes[0].Y = Box->Transform.BX * Box->xScale;
@@ -73,6 +74,7 @@ void geBox_Set(geBox* Box, geFloat xScale, geFloat yScale, geFloat zScale, const
 
 	isOrthonormal = geXForm3d_IsOrthonormal(&(Box->Transform));
 	assert(isOrthonormal);
+	(void)isOrthonormal;
 
 	Box->xScale = xScale;
 	Box->yScale = yScale;
@@ -97,6 +99,7 @@ void geBox_SetXForm(geBox* Box, const geXForm3d* Transform)
 
 	isOrthonormal = geXForm3d_IsOrthonormal(&(Box->Transform));
 	assert(isOrthonormal);
+	(void)isOrthonormal;
 
 	geXForm3d_GetTranspose(Transform, &(Box->TransformInv));
 
@@ -127,6 +130,7 @@ geBoolean geBox_DetectCollisionBetween(const geBox* Box1, const geBox* Box2)
 
 	isOrthonormal = geXForm3d_IsOrthonormal(&(Box1->Transform));
 	assert(isOrthonormal);
+	(void)isOrthonormal;
 
 	isOrthonormal = geXForm3d_IsOrthonormal(&(Box2->Transform));
 	assert(isOrthonormal);

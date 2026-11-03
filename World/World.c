@@ -37,6 +37,12 @@
 /****************************************************************************************/
 #include <assert.h>
 #include <math.h>
+#include <string.h> //memset
+#include <stdlib.h> //qsort
+#if defined(__linux__)
+#include <strings.h> //strcasecmp
+#define stricmp strcasecmp
+#endif
 
 #include "World.h"
 #include "System.h"
@@ -151,7 +157,7 @@ static void RenderTransPoly(geCamera *Camera, World_TransPoly *pPoly);
 typedef struct
 {
 	uint8		Type;
-	uint32		Data;
+	unsigned long		Data; // may hold pointers -> potential 32/64bit issue
 } GList_Operation;
 
 typedef struct
@@ -249,6 +255,8 @@ GENESISAPI geBitmap * geWorld_CreateBumpmapByName(geWorld *World, const char *Bu
 //=====================================================================================
 GList *GList_Create(geEngine *Engine, geWorld *World)
 {
+	(void)Engine;
+	(void)World;
 	return NULL;
 }
 
@@ -257,12 +265,13 @@ GList *GList_Create(geEngine *Engine, geWorld *World)
 void GList_Destroy(GList *GList)
 {
 	assert(GList);
+	(void)GList;
 }
 
 //=====================================================================================
 //	GList_AddOperation
 //=====================================================================================
-void GList_AddOperation(uint8 Type, uint32 Data)
+void GList_AddOperation(uint8 Type, unsigned long Data)
 {
 	int32		Op;
 
@@ -312,7 +321,7 @@ geBoolean GList_RenderOperations(geCamera *Camera)
 typedef struct
 {
 	uint32	Type;
-	uint32	Data;
+	unsigned long	Data; // may hold ponter
 	geFloat	ZOrder;
 } GList_OperationSorted;
 
@@ -480,7 +489,7 @@ void GList_AddOperationsSorted(geCamera *Camera)
 				GListOperationsSorted[NumGListOperationsSorted].ZOrder /= pWTPoly->NumVerts;
 
 				GListOperationsSorted[NumGListOperationsSorted].Type  = GListOperations[Op].Type;
-				GListOperationsSorted[NumGListOperationsSorted].Data = (uint32) pWTPoly;
+				GListOperationsSorted[NumGListOperationsSorted].Data = (unsigned long) pWTPoly;
 				NumGListOperationsSorted++;
 			}
 			break;
@@ -516,7 +525,7 @@ void GList_AddOperationsSorted(geCamera *Camera)
 
 						GListOperationsSorted[NumGListOperationsSorted].ZOrder /= pUPoly->NumVerts;
 
-						GListOperationsSorted[NumGListOperationsSorted].Data = (uint32) pUPoly;
+						GListOperationsSorted[NumGListOperationsSorted].Data = (unsigned long) pUPoly;
 						GListOperationsSorted[NumGListOperationsSorted].Type  = GListOperations[Op].Type;
 						NumGListOperationsSorted++;
 
@@ -547,7 +556,7 @@ void GList_AddOperationsSorted(geCamera *Camera)
 
 					GListOperationsSorted[NumGListOperationsSorted].ZOrder /= pUPoly->NumVerts;
 
-					GListOperationsSorted[NumGListOperationsSorted].Data = (uint32) pUPoly;
+					GListOperationsSorted[NumGListOperationsSorted].Data = (unsigned long) pUPoly;
 					GListOperationsSorted[NumGListOperationsSorted].Type  = GListOperations[Op].Type;
 					NumGListOperationsSorted++;
 
@@ -700,11 +709,9 @@ geBoolean GList_RenderOperations(geCamera *Camera)
 static void CalcBSPModelInfo(World_BSP *BSP);
 static geBoolean RenderScene(geEngine *Engine, geWorld *World, geCamera *Camera, Frustum_Info *FrustumInfo);
 static void RenderBSPFrontBack_r(int32 Node, const geWorld_RenderInfo *RenderInfo, int32 ClipFlags);
-static void RenderBSPFrontBackMirror_r(int32 Node, geCamera *Camera, Frustum_Info *Fi, int32 ClipFlags);
 static void RenderFace(int32 Face, const geWorld_RenderInfo *RenderInfo, int32 ClipFlags);
 static geBoolean RenderWorldModel(geCamera *Camera, Frustum_Info *FrustumInfo, geWorld_SkyBoxTData *SkyTData);
 static geBoolean RenderSubModels(geCamera *Camera, Frustum_Info *FrustumInfo, geWorld_SkyBoxTData *SkyTData);
-static geBoolean WorldSetGBSP(geWorld *World, World_BSP *BSP);
 static World_BSP *CreateGBSP(geVFile *File);
 // changed QD Shadows
 static geBoolean RenderShadowVolumes(geEngine *Engine, geWorld *World, geCamera *Camera, Frustum_Info *FrustumInfo);
@@ -722,6 +729,7 @@ static void SetupSkyForScene(World_SkyBox *SkyBox, geCamera *Camera, Frustum_Inf
 //=====================================================================================
 geBoolean World_EngineInit(geEngine *Engine)
 {
+	(void)Engine;
 	return GE_TRUE;
 }
 
@@ -730,6 +738,7 @@ geBoolean World_EngineInit(geEngine *Engine)
 //=====================================================================================
 void World_EngineShutdown(geEngine *Engine)
 {
+	(void)Engine;
 	CEngine = NULL;
 	CWorld = NULL;
 	BSPData = NULL;
@@ -2024,7 +2033,7 @@ static void RenderBSPFrontBack_r2(int32 Node, geCamera *Camera)
 		if (PolyList)
 		{
 			CDebugInfo->NumLeafsWithUserPolys++;
-			GList_AddOperation(1, (uint32)PolyList);
+			GList_AddOperation(1, (unsigned long)PolyList);
 		}
 
 		CDebugInfo->NumLeafsHit2++;
@@ -2081,7 +2090,7 @@ static void RenderBSPFrontBack_r(int32 Node, const geWorld_RenderInfo *RenderInf
 		if (PolyList)
 		{
 			CDebugInfo->NumLeafsWithUserPolys++;
-			GList_AddOperation(1, (uint32)PolyList);
+			GList_AddOperation(1, (unsigned long)PolyList);
 		}
 
 		CDebugInfo->NumLeafsHit1++;
@@ -2519,7 +2528,7 @@ static void RenderFace(int32 Face, const geWorld_RenderInfo *RenderInfo, int32 C
 		pPoly->NumVerts = Length1;
 
 		// Add this TransPoly to the GList (Geometry List) that is rendered after the current subscene is done
-		GList_AddOperation(0, (uint32)pPoly);
+		GList_AddOperation(0, (unsigned long)pPoly);
 
 		NumTransPolys[MirrorRecursion]++;
 
@@ -2673,7 +2682,7 @@ static geBoolean RenderWorldModel(geCamera *Camera, Frustum_Info *FrustumInfo, g
 static geBoolean RenderSubModels(geCamera *Camera, Frustum_Info *FrustumInfo, geWorld_SkyBoxTData *SkyTData)
 {
 	int32				i;
-	BOOL				OldVis;
+	geBoolean			OldVis;
 	geWorld_Model		*Model;
 	geXForm3d			OldXForm, NewXForm, CXForm;
 	Frustum_Info		ModelSpaceFrustum;
@@ -2692,7 +2701,7 @@ static geBoolean RenderSubModels(geCamera *Camera, Frustum_Info *FrustumInfo, ge
 
 	OldVis = CWorld->VisInfo;		// Save old vis info flag
 
-	CWorld->VisInfo = FALSE;		// Fake no vis info so ALL model faces/modes will draw
+	CWorld->VisInfo = GE_FALSE;		// Fake no vis info so ALL model faces/modes will draw
 
 	Model = &CBSP->Models[1];		// Start with the model (skip the world, Models[0])
 
@@ -2805,6 +2814,7 @@ static void RenderTransPoly(geCamera *Camera, World_TransPoly *pPoly)
 	Surf_SurfInfo	*pSurfInfo2;
 	DRV_LInfo		*pLInfo;
 	DRV_TexInfo		DrvTexInfo;
+	(void)Camera;
 
 	Face = pPoly->Face;
 
@@ -2958,6 +2968,7 @@ GENESISAPI geBoolean geWorld_SetModelXForm(geWorld *World, geWorld_Model *Model,
 
 	assert(World != NULL);
 	assert(Model != NULL);
+	(void)World;
 
 	Model->XForm = *XForm;
 	memset(AxisVecs, 0, sizeof(geVec3d)*3);
@@ -3021,6 +3032,7 @@ GENESISAPI geBoolean geWorld_GetModelXForm(const geWorld *World, const geWorld_M
 	assert(World != NULL);
 	assert(Model != NULL);
 	assert(XForm != NULL);
+	(void)World;
 
 	*XForm = Model->XForm;
 
@@ -3038,7 +3050,7 @@ void FillAreas_r(geWorld *World, uint32 Area, uint8 *List, uint32 *Count)
 	int32			i;
 
 	List[*Count] = (uint8)Area;
-	*Count++;
+	(*Count)++;
 
 	BSP = &World->CurrentBSP->BSPData;
 
@@ -3153,6 +3165,7 @@ GENESISAPI geBoolean geWorld_GetModelRotationalCenter(
 	assert(World != NULL);
 	assert(Model != NULL);
 	assert(Center != NULL);
+	(void)World;
 
 	*Center = Model->Pivot;
 
@@ -3170,6 +3183,7 @@ GENESISAPI geBoolean geWorld_ModelGetBBox(const geWorld *World, const geWorld_Mo
 	assert(Model != NULL);
 	assert(Mins);
 	assert(Maxs);
+	(void)World;
 
 	*Mins = Model->Mins;
 	*Maxs = Model->Maxs;
@@ -3863,9 +3877,9 @@ typedef struct
 //====================================================================================
 static geBoolean CreateStaticFogList(geWorld *World)
 {
-	geEntity			*Entity;
-	geEntity_EntitySet	*EntitySet;
-	geFog				*Fog;
+	geEntity			*Entity = NULL;
+	geEntity_EntitySet	*EntitySet = NULL;
+	geFog				*Fog = NULL;
 
 	// ONly interested in "FogLight"'s
 
@@ -3877,7 +3891,6 @@ static geBoolean CreateStaticFogList(geWorld *World)
 	if (!EntitySet)
 		return GE_TRUE;
 
-	Entity = NULL;
 
 	while (1)
 	{
@@ -4092,7 +4105,6 @@ static void RenderSkyThroughFrustum(World_SkyBox *SkyBox, geWorld_SkyBoxTData *S
 	Surf_TexVert	*pTex1, *pTex2, Tex1[30], Tex2[30];
 	int32			Length1, Length2;
 	geBitmap		*pBitmap;
-	geVec3d			CameraPos = {0.0f, 0.0f, 0.0f};
 	int32			TexNum;
 	GFX_Plane		*Planes;
 	uint32			SkyFlags;
@@ -4231,10 +4243,12 @@ static void SetupSkyBoxFaceForScene(World_SkyBox *SkyBox, int32 Face, const geXF
 	int32			Length1, Length2;
 	int32			p;
 	GFX_Plane		*pFPlane;
+#ifdef SKY_BOX_USE_WORLD_POLY
 	geFloat			Width, Height;
-	int32			TexNum;
 	GFX_Texture		*pTexture;
-  int nFoo;
+#endif
+	int32			TexNum;
+	int nFoo;
 
 	TexNum = CWorld->CurrentBSP->BSPData.GFXSkyData.Textures[Face];
 
@@ -4255,10 +4269,10 @@ static void SetupSkyBoxFaceForScene(World_SkyBox *SkyBox, int32 Face, const geXF
 //	..far clip plane is, this little EVIL HACK makes sure the skybox doesn't
 //	..fall prey to the far clip plane, if active.
 
-  nFoo = Fi->NumPlanes;			// EVIL HACK
+	nFoo = Fi->NumPlanes;			// EVIL HACK
 
-	if(nFoo > 4)							// EVIL HACK - 5 planes means far clip enabled
-	  nFoo = Fi->NumPlanes-1;								// EVIL HACK - leave my skybox alone!
+	if(nFoo > 4)					// EVIL HACK - 5 planes means far clip enabled
+		nFoo = Fi->NumPlanes-1;		// EVIL HACK - leave my skybox alone!
 
 	for (p=0; p< nFoo; p++, pFPlane++)
 	{
@@ -4290,10 +4304,12 @@ static void SetupSkyBoxFaceForScene(World_SkyBox *SkyBox, int32 Face, const geXF
 	SkyTData->NumTransformedVerts[SkyTData->NumTransformed] = Length1;
 	SkyTData->OriginalFaces[SkyTData->NumTransformed] = Face;
 
+#ifdef SKY_BOX_USE_WORLD_POLY
 	pTexture = &CWorld->CurrentBSP->BSPData.GFXTextures[TexNum];
 
 	Width = (geFloat)pTexture->Width;
 	Height = (geFloat)pTexture->Height;
+#endif
 
 	//geXForm3d_RotateArray(CXForm, pDest1, pDest2, Length1);
 	for (p=0; p<Length1; p++)
@@ -4394,7 +4410,6 @@ geBoolean geWorld_BitmapListInit(geWorld *World)
 			geBitmap		*pBitmap;
 			geWBitmap		*pWBitmap;
 			geBitmap_Info	Info;
-			uint32			Flags;
 
 			pWBitmap = geWBitmap_Pool_GetWBitmapByIndex(World->CurrentBSP->WBitmapPool, i);
 			assert(pWBitmap);
@@ -4402,7 +4417,6 @@ geBoolean geWorld_BitmapListInit(geWorld *World)
 			pBitmap = geWBitmap_GetBitmap(pWBitmap);
 			assert(pBitmap);
 
-			Flags = geWBitmap_GetFlags(pWBitmap);
 
 			if (!geBitmap_GetInfo(pBitmap, &Info, NULL))
 			{
@@ -4454,10 +4468,10 @@ geBoolean geWorld_BitmapListInit(geWorld *World)
 		  if ( !geBitmap_IsBumpmapName(Name) ) continue; */
 		  if ( geBitmap_IsBumpmapNameDot3(Name) && HasBumpDot3 )
 		  {
-		   geBitmap *BumpBmpAlt = NULL;
 		   geBoolean BumpmapCreated = GE_FALSE;
 
 		   BumpmapCreated = geWorld_CreateBumpmapByNameDot3(World, Name);
+		   (void)BumpmapCreated;
 		  }
 		  else if ( geBitmap_IsBumpmapName(Name) && BumpMapPixelFormatCount )
 		  {
@@ -4669,7 +4683,7 @@ GENESISAPI geBoolean geWorld_BitmapIsVisible(geWorld *World, const geBitmap *Bit
 //================================================================================
 GENESISAPI geBoolean geWorld_GetWorldGeometry(geWorld *World,
 							geVec3d **Verts, int *NumVerts,
-							long **Indices, long *NumIndices)
+							int32 **Indices, int32 *NumIndices)
 {
 	int i, j, k;
 	GBSP_BSPData *bspData; // convenience pointer
@@ -4690,7 +4704,7 @@ GENESISAPI geBoolean geWorld_GetWorldGeometry(geWorld *World,
 		numTris += bspData->GFXFaces[i].NumVerts-2; // assuming stored as fans or strips
 
 	*NumIndices = numTris*3; // returning a triangle list
-	*Indices = malloc( sizeof(long)*(*NumIndices) );
+	*Indices = malloc( sizeof(int32)*(*NumIndices) );
 
 	// FANS
 	j = 0; // j is the index into the vert index array

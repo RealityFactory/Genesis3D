@@ -19,13 +19,18 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h> //malloc
+#include <string.h> //memcpy
 
 #include "THandle.h"
 #include "OglDrv.h"
 #include "Render.h"
 
-extern boundTexture;
-extern boundTexture2;
+#if defined(__linux__)
+static int32 max(int32 a, int32 b) { return a>b?a:b; }
+#endif
+extern GLint boundTexture;
+extern GLint boundTexture2;
 
 geRDriver_THandle	TextureHandles[MAX_TEXTURE_HANDLES];
 
@@ -89,7 +94,7 @@ geBoolean DRIVERCC THandle_Destroy(geRDriver_THandle *THandle)
 		}
 	}
 
-	memset(THandle, 0, sizeof(geRDriver_THandle));	
+	memset(THandle, 0, sizeof(geRDriver_THandle));
 
 	return	GE_TRUE;
 }
@@ -110,7 +115,7 @@ geBoolean FreeAllTextureHandles(void)
 		{
 			continue;
 		}
-		
+
 		THandle_Destroy(pTHandle);
 	}
 
@@ -124,13 +129,13 @@ geBoolean FreeAllTextureHandles(void)
 
 
 // Create a new texture handle...
-geRDriver_THandle *DRIVERCC THandle_Create(int32 Width, int32 Height, int32 NumMipLevels, 
+geRDriver_THandle *DRIVERCC THandle_Create(int32 Width, int32 Height, int32 NumMipLevels,
 										   const geRDriver_PixelFormat *PixelFormat)
 {
-	geRDriver_THandle	*THandle;	
+	geRDriver_THandle	*THandle;
 	GLubyte				Log;
 
-	
+
 	THandle = FindTextureHandle();
 
 	if (!THandle)
@@ -163,9 +168,9 @@ geRDriver_THandle *DRIVERCC THandle_Create(int32 Width, int32 Height, int32 NumM
 	THandle->Height				= Height;
 	THandle->PixelFormat		= *PixelFormat;
 	THandle->Flags				= 0;
-	
+
 	Log							= (uint8)GetLog(Width, Height);
-	
+
 	if(THandle->PixelFormat.Flags & RDRIVER_PF_2D)
 	{
 		THandle->PaddedWidth = SnapToPower2(THandle->Width);
@@ -179,14 +184,14 @@ geRDriver_THandle *DRIVERCC THandle_Create(int32 Width, int32 Height, int32 NumM
 	{
 		// Must be a lightmap
 		THandle->Flags |= THANDLE_UPDATE_LM;
-		THandle->InvScale = 1.0f / (GLfloat)((1<<Log)<<4);	
+		THandle->InvScale = 1.0f / (GLfloat)((1<<Log)<<4);
 	}
 
 	// Init an OpenGL texture object to hold this texture
 	glGenTextures(1, &(THandle->TextureID));
 
 	return THandle;
-		
+
 	ExitWithError:
 	{
 		return NULL;
@@ -286,25 +291,25 @@ geBoolean DRIVERCC THandle_UnLock(geRDriver_THandle *THandle, int32 MipLevel)
 		return GE_FALSE;
 	}
 
-	THandle->Flags	&=~(THANDLE_LOCKED << MipLevel);	
+	THandle->Flags	&=~(THANDLE_LOCKED << MipLevel);
 
 	// Don't update on mips other than level 0.  We ignore the engine-created mips.
 	// Somewhat inefficient (since mips will be generated twice), but good visual results.
 	// Would be nice if you could tell the engine not to bother with mipping
 	if(MipLevel == 0)
-	{	
-		THandle->Flags	|= THANDLE_UPDATE;					
+	{
+		THandle->Flags	|= THANDLE_UPDATE;
 	}
-	
+
 	return GE_TRUE;
 }
 
 
-// Do an actual card upload (well, at least tell the OpenGL driver you'd like one when it 
+// Do an actual card upload (well, at least tell the OpenGL driver you'd like one when it
 // gets a chance) of a texture.  Called from the Render_* functions when they require
 // use of a texture that is marked for updating (THANDLE_UPDATE)
 void THandle_Update(geRDriver_THandle *THandle)
-{		
+{
 	if(THandle->PixelFormat.Flags & RDRIVER_PF_2D)
 	{
 		if(THandle->PixelFormat.PixelFormat == GE_PIXELFORMAT_24BIT_RGB)
@@ -315,19 +320,19 @@ void THandle_Update(geRDriver_THandle *THandle)
 
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-				
+
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-			
+
 				glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 0.5f);
 
 				dest = malloc(THandle->PaddedWidth * THandle->PaddedHeight * 4);
 
-				CkBlit24_32(dest, THandle->PaddedWidth, THandle->PaddedHeight, THandle->Data[0], 
+				CkBlit24_32(dest, THandle->PaddedWidth, THandle->PaddedHeight, THandle->Data[0],
 					THandle->Width, THandle->Height);
 
-				glTexImage2D(GL_TEXTURE_2D, 0, 4, THandle->PaddedWidth, THandle->PaddedHeight, 
-					0, GL_RGBA, GL_UNSIGNED_BYTE, dest); 
+				glTexImage2D(GL_TEXTURE_2D, 0, 4, THandle->PaddedWidth, THandle->PaddedHeight,
+					0, GL_RGBA, GL_UNSIGNED_BYTE, dest);
 
 				free(dest);
 			}
@@ -347,11 +352,11 @@ void THandle_Update(geRDriver_THandle *THandle)
 	}
 	else
 	{
-#ifdef USE_LINEAR_INTERPOLATION 
+#ifdef USE_LINEAR_INTERPOLATION
  #ifdef TRILINEAR_INTERPOLATION
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
- #else 
+ #else
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
  #endif
@@ -363,27 +368,29 @@ void THandle_Update(geRDriver_THandle *THandle)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
  #endif
-#endif 
+#endif
 
 		if(THandle->PixelFormat.PixelFormat == GE_PIXELFORMAT_32BIT_ABGR)
 		{
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			
+
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 1.0f);
-			
-			gluBuild2DMipmaps(GL_TEXTURE_2D, 4, THandle->Width, THandle->Height, GL_RGBA,
-				GL_UNSIGNED_BYTE, THandle->Data[0]);
+
+			glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, THandle->Width, THandle->Height, 0, GL_RGBA,
+					GL_UNSIGNED_BYTE, THandle->Data[0]);
 		}
 		else
 		{
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-			
+
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 0.0f);
-			
-			gluBuild2DMipmaps(GL_TEXTURE_2D, 3, THandle->Width, THandle->Height, 
-				GL_RGB, GL_UNSIGNED_BYTE, THandle->Data[0]);
+
+			glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, THandle->Width, THandle->Height, 0, GL_RGB,
+					GL_UNSIGNED_BYTE, THandle->Data[0]);
 		}
 	}
 
@@ -413,7 +420,7 @@ geBoolean DRIVERCC DrvResetAll(void)
 
 S32 SnapToPower2(S32 Width)
 {
-	if(Width > 1 && Width <= 2) 
+	if(Width > 1 && Width <= 2)
 	{
 		Width = 2;
 	}
@@ -421,7 +428,7 @@ S32 SnapToPower2(S32 Width)
 	{
 		Width = 4;
 	}
-	else if(Width > 4 && Width <= 8) 
+	else if(Width > 4 && Width <= 8)
 	{
 		Width = 8;
 	}
@@ -433,27 +440,27 @@ S32 SnapToPower2(S32 Width)
 	{
 		Width = 32;
 	}
-	else if(Width > 32 && Width <= 64) 
+	else if(Width > 32 && Width <= 64)
 	{
 		Width = 64;
 	}
-	else if(Width > 64 && Width <= 128) 
+	else if(Width > 64 && Width <= 128)
 	{
 		Width = 128;
 	}
-	else if(Width > 128 && Width <= 256) 
+	else if(Width > 128 && Width <= 256)
 	{
 		Width = 256;
 	}
-	else if(Width > 256 && Width <= 512) 
+	else if(Width > 256 && Width <= 512)
 	{
 		Width = 512;
 	}
-	else if(Width > 512 && Width <= 1024) 
+	else if(Width > 512 && Width <= 1024)
 	{
 		Width = 1024;
 	}
-	else if(Width > 1024 && Width <= 2048) 
+	else if(Width > 1024 && Width <= 2048)
 	{
 		Width = 2048;
 	}
@@ -465,7 +472,7 @@ S32 SnapToPower2(S32 Width)
 	{
 		Width = 8192;
 	}
-    else if (Width > 8192 && Width <= 16384)
+	else if (Width > 8192 && Width <= 16384)
 	{
 		Width = 16384;
 	}
@@ -478,7 +485,7 @@ uint32 Log2(uint32 P2)
 {
 	uint32		p = 0;
 	int32		i = 0;
-	
+
 	for (i = P2; i > 0; i>>=1)
 		p++;
 
@@ -489,6 +496,6 @@ uint32 Log2(uint32 P2)
 int32 GetLog(int32 Width, int32 Height)
 {
 	int32	LWidth = SnapToPower2(max(Width, Height));
-	
+
 	return Log2(LWidth);
 }

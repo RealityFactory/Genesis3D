@@ -208,7 +208,7 @@ GENESISAPI void geErrorLog_AddExplicit(geErrorLog_ErrorClassType,
 		// logs an error.
 
 	#define geErrorLog_AddString(Error,String, Context) geErrorLog_AddExplicit(Error, #Error, __FILE__,__LINE__, String, Context)
-		// logs an error with additional identifing string.
+		// logs an error with additional identifying string.
 
 GENESISAPI	geBoolean geErrorLog_AppendStringToLastError(const char *String);// use geErrorLog_AppendString
 
@@ -222,7 +222,7 @@ GENESISAPI	geBoolean geErrorLog_AppendStringToLastError(const char *String);// u
 		// logs an error.
 
 	#define geErrorLog_AddString(Error,String, Context) geErrorLog_AddExplicit(Error, "", __FILE__,__LINE__, "", Context)
-		// logs an error with additional identifing string.
+		// logs an error with additional identifying string.
 
 	#define geErrorLog_AppendString(XXX)
 		// adds text to the previous logged error

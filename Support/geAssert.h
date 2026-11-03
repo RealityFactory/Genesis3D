@@ -22,7 +22,6 @@
 #ifndef GE_ASSERT_H
 #define GE_ASSERT_H
 
-#include <assert.h>
 
 #ifdef __cplusplus
 extern "C" {

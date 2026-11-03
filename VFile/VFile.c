@@ -19,8 +19,11 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
+
+#if defined _WIN32 || defined _WIN64
 #define	WIN32_LEAN_AND_MEAN
 #include	<windows.h>
+#endif
 
 #include	<stdio.h>
 #include	<assert.h>
@@ -53,7 +56,9 @@ typedef	struct	geVFile
 	void *						FSData;
 	geVFile *					Context;
 	FSSearchList *				SearchList;
+#if defined _WIN32 || defined _WIN64
 	CRITICAL_SECTION			CriticalSection;
+#endif
 	geVFile *					BaseFile;
 }	geVFile;
 
@@ -67,11 +72,10 @@ static	geVFile_SystemAPIs **		RegisteredAPIs;
 static	int							SystemCount;
 static	geBoolean					BuiltInAPIsRegistered = GE_FALSE;
 
-#ifndef	NDEBUG
-static	geBoolean					SystemInitialized = GE_FALSE;
-#endif
 
+#if defined _WIN32 || defined _WIN64
 static	CRITICAL_SECTION			MainCriticalSection;
+#endif
 
 static	geBoolean GENESISCC geVFile_RegisterFileSystemInternal(const geVFile_SystemAPIs *APIs, geVFile_TypeIdentifier *Type)
 {
@@ -142,7 +146,7 @@ GENESISAPI geBoolean GENESISCC geVFile_RegisterFileSystem(const geVFile_SystemAP
 	return Result;
 }
 
-static	geBoolean	GENESISCC	CheckOpenFlags(unsigned int OpenModeFlags)
+static	geBoolean	GENESISCC	CheckOpenFlags(uint32 OpenModeFlags)
 {
 	int 			FlagCount;
 	unsigned int	AccessFlags;
@@ -169,7 +173,7 @@ GENESISAPI geVFile * GENESISCC geVFile_OpenNewSystem(
 	geVFile_TypeIdentifier 	FileSystemType,
 	const char *			Name,
 	void *					Context,
-	unsigned int 			OpenModeFlags)
+	uint32					OpenModeFlags)
 {
 	const geVFile_SystemAPIs *	APIs;
 	geVFile *					File;
@@ -250,7 +254,7 @@ GENESISAPI geVFile * GENESISCC geVFile_OpenNewSystem(
 	return File;
 }
 
-GENESISAPI geBoolean GENESISCC geVFile_UpdateContext(geVFile *FS, void *Context, int ContextSize)
+GENESISAPI geBoolean GENESISCC geVFile_UpdateContext(geVFile *FS, void *Context, int32 ContextSize)
 {
 	assert(FS);
 	assert(Context);
@@ -261,7 +265,7 @@ GENESISAPI geBoolean GENESISCC geVFile_UpdateContext(geVFile *FS, void *Context,
 GENESISAPI geVFile * GENESISCC geVFile_Open(
 	geVFile *		FS,
 	const char *	Name,
-	unsigned int 	OpenModeFlags)
+	uint32		 	OpenModeFlags)
 {
 	FSSearchList *	SearchList;
 	geVFile *		StartContext;
@@ -449,7 +453,7 @@ GENESISAPI geBoolean GENESISCC geVFile_Close(geVFile *File)
 }
 
 
-GENESISAPI geBoolean GENESISCC geVFile_GetS(geVFile *File, void *Buff, int MaxLen)
+GENESISAPI geBoolean GENESISCC geVFile_GetS(geVFile *File, void *Buff, int32 MaxLen)
 {
 	assert(File);
 	assert(Buff);
@@ -460,7 +464,7 @@ GENESISAPI geBoolean GENESISCC geVFile_GetS(geVFile *File, void *Buff, int MaxLe
 	return File->APIs->GetS(File->FSData, Buff, MaxLen);
 }
 
-GENESISAPI geBoolean GENESISCC geVFile_Read(geVFile *File, void *Buff, int Count)
+GENESISAPI geBoolean GENESISCC geVFile_Read(geVFile *File, void *Buff, int32 Count)
 {
 	assert(File);
 	assert(Buff);
@@ -471,7 +475,7 @@ GENESISAPI geBoolean GENESISCC geVFile_Read(geVFile *File, void *Buff, int Count
 	return File->APIs->Read(File->FSData, Buff, Count);
 }
 
-GENESISAPI geBoolean GENESISCC geVFile_Write(geVFile *File, const void *Buff, int Count)
+GENESISAPI geBoolean GENESISCC geVFile_Write(geVFile *File, const void *Buff, int32 Count)
 {
 	assert(File);
 	assert(Buff);
@@ -482,7 +486,7 @@ GENESISAPI geBoolean GENESISCC geVFile_Write(geVFile *File, const void *Buff, in
 	return File->APIs->Write(File->FSData, Buff, Count);
 }
 
-GENESISAPI geBoolean GENESISCC geVFile_Seek(geVFile *File, int Where, geVFile_Whence Whence)
+GENESISAPI geBoolean GENESISCC geVFile_Seek(geVFile *File, int32 Where, geVFile_Whence Whence)
 {
 	assert(File);
 
@@ -511,14 +515,14 @@ GENESISAPI geBoolean GENESISCC geVFile_EOF   (const geVFile *File)
 	return File->APIs->Eof(File->FSData);
 }
 
-GENESISAPI geBoolean GENESISCC geVFile_Tell  (const geVFile *File, long *Position)
+GENESISAPI geBoolean GENESISCC geVFile_Tell  (const geVFile *File, int32 *Position)
 {
 	assert(File);
 
 	return File->APIs->Tell(File->FSData, Position);
 }
 
-GENESISAPI geBoolean GENESISCC geVFile_Size  (const geVFile *File, long *Size)
+GENESISAPI geBoolean GENESISCC geVFile_Size  (const geVFile *File, int32 *Size)
 {
 	assert(File);
 
@@ -532,7 +536,7 @@ GENESISAPI geBoolean GENESISCC geVFile_GetProperties(const geVFile *File, geVFil
 	return File->APIs->GetProperties(File->FSData, Properties);
 }
 
-GENESISAPI geBoolean GENESISCC geVFile_SetSize(geVFile *File, long Size)
+GENESISAPI geBoolean GENESISCC geVFile_SetSize(geVFile *File, int32 Size)
 {
 	assert(File);
 
@@ -611,8 +615,9 @@ GENESISAPI geBoolean GENESISCC geVFile_FinderGetProperties(const geVFile_Finder 
 	return Finder->APIs->FinderGetProperties(Finder->Data, Properties);
 }
 
-
+#if defined _WIN32 || defined _WIN64
 GENESISAPI void GENESISCC geVFile_TimeToWin32FileTime(const geVFile_Time *Time, LPFILETIME Win32FileTime)
 {
 	*Win32FileTime = *(LPFILETIME)Time;
 }
+#endif

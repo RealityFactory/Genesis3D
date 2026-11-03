@@ -19,12 +19,55 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
+#if defined(__linux__)
+#include "DCommon.h"
+
+typedef struct tagBITMAPFILEHEADER
+{
+    WORD    bfType; // 2  /* Magic identifier */
+    DWORD   bfSize; // 4  /* File size in bytes */
+    WORD    bfReserved1; // 2
+    WORD    bfReserved2; // 2
+    DWORD   bfOffBits; // 4 /* Offset to image data, bytes */
+} __attribute__((packed)) BITMAPFILEHEADER;
+
+typedef struct tagBITMAPINFOHEADER
+{
+    DWORD    biSize; // 4 /* Header size in bytes */
+    LONG     biWidth; // 4 /* Width of image */
+    LONG     biHeight; // 4 /* Height of image */
+    WORD     biPlanes; // 2 /* Number of colour planes */
+    WORD     biBitCount; // 2 /* Bits per pixel */
+    DWORD    biCompression; // 4 /* Compression type */
+    DWORD    biSizeImage; // 4 /* Image size in bytes */
+    LONG     biXPelsPerMeter; // 4
+    LONG     biYPelsPerMeter; // 4 /* Pixels per meter */
+    DWORD    biClrUsed; // 4 /* Number of colours */
+    DWORD    biClrImportant; // 4 /* Important colours */
+} __attribute__((packed)) BITMAPINFOHEADER;
+
+typedef struct tagRGBQUAD {
+  BYTE rgbBlue;
+  BYTE rgbGreen;
+  BYTE rgbRed;
+  BYTE rgbReserved;
+} __attribute__((packed)) RGBQUAD;
+
+typedef struct tagBITMAPINFO {
+  BITMAPINFOHEADER bmiHeader;
+  RGBQUAD          bmiColors[1];
+} __attribute__((packed)) BITMAPINFO, *PBITMAPINFO;
+
+#define BI_RGB 0
+
+#elif defined _WIN32 || defined _WIN64
 #define	WIN32_LEAN_AND_MEAN
 #include	<windows.h>
+#endif
 
 #include	<stdio.h>
 
-#define	WIDTH			640
+#define WIDTH			640
 #define HEIGHT			480
 
 BITMAPFILEHEADER	bfh =
@@ -74,16 +117,10 @@ int WriteBMP(unsigned short *ScreenBuffer, const char *Name)
 		return 0;
 
 	if	(fwrite(&bfh, sizeof(bfh), 1, out) != 1)
-	{
-		fclose(out);
 		return 0;
-	}
 
 	if	(fwrite(&bi, sizeof(bi), 1, out) != 1)
-	{
-		fclose(out);
 		return 0;
-	}
 
 	for	(y = HEIGHT-1; y >= 0; y--)
 	{

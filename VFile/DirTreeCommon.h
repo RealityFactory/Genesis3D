@@ -25,10 +25,16 @@
 
 #include	"VFile.h"
 
+#if defined(__linux__)
+#define DIRECTORY_SEPARATOR '/'
+#elif defined _WIN32 || defined _WIN64
+#define DIRECTORY_SEPARATOR '\\'
+#endif
+
 typedef	struct	DirTree_Header
 {
-	unsigned long	Signature;
-	int				Size;
+	uint32	Signature;
+	int32	Size;
 
 }	DirTree_Header;
 
@@ -37,8 +43,8 @@ typedef	struct	DirTree_Header
 
 #ifndef	MAKEFOURCC
 #define MAKEFOURCC(ch0, ch1, ch2, ch3)                              \
-		((unsigned long)(unsigned char)(ch0) | ((unsigned long)(unsigned char)(ch1) << 8) |   \
-		((unsigned long)(unsigned char)(ch2) << 16) | ((unsigned long)(unsigned char)(ch3) << 24 ))
+		((uint32)(unsigned char)(ch0) | ((uint32)(unsigned char)(ch1) << 8) |   \
+		((uint32)(unsigned char)(ch2) << 16) | ((uint32)(unsigned char)(ch3) << 24 ))
 #endif
 
 char *	DuplicateString(const char *String);

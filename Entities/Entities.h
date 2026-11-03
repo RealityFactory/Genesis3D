@@ -23,7 +23,6 @@
 #define GE_ENTITIES_H
 
 #include <assert.h>
-#include <windows.h>
 
 #include "BaseType.h"
 #include "ErrorLog.h"

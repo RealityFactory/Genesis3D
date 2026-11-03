@@ -24,11 +24,11 @@
 
 #include <assert.h>
 
-#include "Vec3d.h"
 #include "BaseType.h"
 #include "GeTypes.h"
 #include "Ram.h"
 #include "ErrorLog.h"
+#include "Vec3d.h"
 
 #ifdef __cplusplus
 extern "C" {

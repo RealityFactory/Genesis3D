@@ -33,7 +33,7 @@ DirTree *DirTree_CreateFromFile(geVFile *File);
 
 geBoolean DirTree_WriteToFile(const DirTree *Tree, geVFile *File);
 
-geBoolean DirTree_GetSize(const DirTree *Tree, long *Size);
+geBoolean DirTree_GetSize(const DirTree *Tree, int32 *Size);
 	// Gets the size of data that will be written to disk to persist
 	// the tree.  This API is NOT efficient.
 
@@ -54,23 +54,23 @@ void DirTree_SetFileAttributes(DirTree *Tree, geVFile_Attributes Attributes);
 
 void DirTree_GetFileAttributes(DirTree *Tree, geVFile_Attributes *Attributes);
 
-void DirTree_SetFileOffset(DirTree *Tree, long Offset);
+void DirTree_SetFileOffset(DirTree *Tree, int32 Offset);
 
-void DirTree_GetFileOffset(DirTree *Tree, long *Offset);
+void DirTree_GetFileOffset(DirTree *Tree, int32 *Offset);
 
 void DirTree_SetFileTime(DirTree *Tree, const geVFile_Time *Time);
 
 void DirTree_GetFileTime(DirTree *Tree, geVFile_Time *Time);
 
-void DirTree_SetFileSize(DirTree *Tree, long Size);
+void DirTree_SetFileSize(DirTree *Tree, int32 Size);
 
-void DirTree_GetFileSize(DirTree *Tree, long *Size);
+void DirTree_GetFileSize(DirTree *Tree, int32 *Size);
 
 geBoolean DirTree_SetFileHints(DirTree *Tree, const geVFile_Hints *Hints);
 
 void DirTree_GetFileHints(DirTree *Tree, geVFile_Hints *Hints);
 
-geBoolean DirTree_GetName(DirTree *Tree, char *Buff, int MaxLen);
+geBoolean DirTree_GetName(DirTree *Tree, char *Buff, int32 MaxLen);
 
 geBoolean DirTree_FileExists(const DirTree *Tree, const char *Path);
 

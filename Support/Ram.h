@@ -123,7 +123,7 @@ GENESISAPI void * geRam_AllocateClear(uint32 size);
 #define GE_RAM_ALLOCATE_ARRAY(type,count) (type *)geRam_Allocate (sizeof (type) * (count))
 
 #ifndef NDEBUG
-#define GE_RAM_REALLOC_ARRAY(ptr,type,count)  (type *)geRam_Realloc(  (ptr), sizeof(type) * (count) );{type *XX=(ptr);}
+#define GE_RAM_REALLOC_ARRAY(ptr,type,count)  (type *)geRam_Realloc(  (ptr), sizeof(type) * (count) );{type *XX=(ptr); (void)XX; }
 #else
 #define GE_RAM_REALLOC_ARRAY(ptr,type,count)  (type *)geRam_Realloc(  (ptr), sizeof(type) * (count) )
 #endif

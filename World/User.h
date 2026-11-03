@@ -27,7 +27,6 @@
 #define GE_USER_H
 
 #include <assert.h>
-#include <windows.h>
 
 #include "BaseType.h"
 #include "Vec3d.h"

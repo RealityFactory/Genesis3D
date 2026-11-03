@@ -318,7 +318,7 @@ geBoolean geWorld_DetachAll(geWorld *World);
 
 /* 03/24/2004 Wendell Buckner
 	BUG FIX: Rendering Transparent Polys properly (2) */
-void GList_AddOperation(uint8 Type, uint32 Data);
+void GList_AddOperation(uint8 Type, unsigned long Data);
 
 /* 02/18/2004 Wendell Buckner
 	DOT BUMPMAPPING */
@@ -327,7 +327,7 @@ GENESISAPI geBoolean geWorld_CreateBumpmapByNameDot3(geWorld *World, const char 
 /* 10/15/2003 Wendell Buckner
 	Bumpmapping for the World */
 GENESISAPI geBitmap * geWorld_CreateBumpmapByName(geWorld *World, const char *BumpmapName, gePixelFormat BumpFormat);
-GENESISAPI geBoolean geWorld_GetWorldGeometry(geWorld *World, geVec3d **Verts, int *NumVerts, long **Indices, long *NumIndices);
+GENESISAPI geBoolean geWorld_GetWorldGeometry(geWorld *World, geVec3d **Verts, int *NumVerts, int32 **Indices, int32 *NumIndices);
 
 #ifdef __cplusplus
 }

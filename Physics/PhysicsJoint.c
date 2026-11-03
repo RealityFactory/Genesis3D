@@ -21,6 +21,7 @@
 /****************************************************************************************/
 #include <math.h>
 #include <assert.h>
+#include <stddef.h>
 
 #include "Vec3d.h"
 #include "XForm3d.h"

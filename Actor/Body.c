@@ -37,6 +37,8 @@
 #include <math.h> 						//fabs()
 #include <stdio.h>						//sscanf
 
+
+#define SANITY_CHECK
 #include "Body.h"
 #include "Body._h"
 #include "Ram.h"
@@ -114,137 +116,136 @@ geBoolean GENESISCC geBody_CreateTangentSpace( const geBody *B )
 
 	if ( !B->XSkinTangentSpace ) return GE_FALSE;
 
+	geBody_Index FaceCount = B->SkinFaces[GE_BODY_HIGHEST_LOD].FaceCount;
+	const geBody_Triangle     *SF = B->SkinFaces[GE_BODY_HIGHEST_LOD].FaceArray;
+	const geBody_XSkinVertex  *SV = B->XSkinVertexArray;
+	const geBody_Normal       *SN = B->SkinNormalArray;
+
+	memset(B->XSkinTangentSpace,0,sizeof(geBody_TangentSpace) * VertexCount );
+
 	{
-		geBody_Index FaceCount = B->SkinFaces[GE_BODY_HIGHEST_LOD].FaceCount;
-		const geBody_Triangle     *SF = B->SkinFaces[GE_BODY_HIGHEST_LOD].FaceArray;
-		const geBody_XSkinVertex  *SV = B->XSkinVertexArray;
-		const geBody_Normal       *SN = B->SkinNormalArray;
-
-		memset(B->XSkinTangentSpace,0,sizeof(geBody_TangentSpace) * VertexCount );
-
-		{
-			geBody_TangentSpace       *TS = B->XSkinTangentSpace;
-			geBody_Index i;
-			geBody_Index j;
-			geBody_Index k;
+		geBody_TangentSpace       *TS = B->XSkinTangentSpace;
+		geBody_Index i;
+		geBody_Index j;
+		geBody_Index k;
 
 #ifdef _DEBUG // changed QD bug fix
+		{
+			FILE *fp = fopen("c:\\cube.txt","at");
+
+			if(fp)
 			{
-				FILE *fp = fopen("c:\\cube.txt","at");
+				fprintf(fp,"Vertex List\n");
 
-				if(fp)
-				{
-					fprintf(fp,"Vertex List\n");
+				for ( i= 0; i < VertexCount; i++ )
+					fprintf(fp,"%i,  X = %f Y = %f Z= %f U = %f V = %f \n", i, SV[i].XPoint.X,SV[i].XPoint.Y,SV[i].XPoint.Z,SV[i].XU,SV[i].XV);
 
-					for ( i= 0; i < VertexCount; i++ )
-						fprintf(fp,"%i,  X = %f Y = %f Z= %f U = %f V = %f \n", i, SV[i].XPoint.X,SV[i].XPoint.Y,SV[i].XPoint.Z,SV[i].XU,SV[i].XV);
+				fprintf(fp,"Normal List\n");
 
-					fprintf(fp,"Normal List\n");
-
-					for ( i= 0; i < B->SkinNormalCount; i++ )
-						fprintf(fp,"%i,  X = %f Y = %f Z = %f\n", i, SN[i].Normal.X,SN[i].Normal.Y,SN[i].Normal.Z);
-
-					for ( j = 0; j < FaceCount; j++ )
-						fprintf(fp,"%i,  V1 = %i V2 = %i V3 = %i N1 = %i N2 = %i N3 = %i\n",j, SF[j].VtxIndex[0],SF[j].VtxIndex[1],SF[j].VtxIndex[2],SF[j].NormalIndex[0],SF[j].NormalIndex[1],SF[j].NormalIndex[2]);
-
-					fclose(fp);
-				}
-			}
-#endif // end change
-
-			for ( i= 0; i < VertexCount; i++ )
-			{
-				geBoolean TangentSpaceCreated = GE_FALSE;
+				for ( i= 0; i < B->SkinNormalCount; i++ )
+					fprintf(fp,"%i,  X = %f Y = %f Z = %f\n", i, SN[i].Normal.X,SN[i].Normal.Y,SN[i].Normal.Z);
 
 				for ( j = 0; j < FaceCount; j++ )
+					fprintf(fp,"%i,  V1 = %i V2 = %i V3 = %i N1 = %i N2 = %i N3 = %i\n",j, SF[j].VtxIndex[0],SF[j].VtxIndex[1],SF[j].VtxIndex[2],SF[j].NormalIndex[0],SF[j].NormalIndex[1],SF[j].NormalIndex[2]);
+
+				fclose(fp);
+			}
+		}
+#endif // end change
+
+		for ( i= 0; i < VertexCount; i++ )
+		{
+			geBoolean TangentSpaceCreated = GE_FALSE;
+
+			for ( j = 0; j < FaceCount; j++ )
+			{
+				for ( k = 0; k < 3; k++)
 				{
-					for ( k = 0; k < 3; k++)
-					{
-						if ( i  != SF[j].VtxIndex[k] ) continue;
+					if ( i  != SF[j].VtxIndex[k] ) continue;
 
 //Compute tangent space for the vertex...
 
+					{
+						geBody_Index v1 = SF[j].VtxIndex[0];
+						geBody_Index v2 = SF[j].VtxIndex[1];
+						geBody_Index v3 = SF[j].VtxIndex[2];
+						const geBody_XSkinVertex *p1 = &SV[v1];
+						const geBody_XSkinVertex *p2 = &SV[v2];
+						const geBody_XSkinVertex *p3 = &SV[v3];
+						geFloat p1U = (geFloat) fabs(p1->XU) + 10.0f;
+						geFloat p1V = (geFloat) fabs(p1->XV) + 10.0f;
+						geFloat p2U = (geFloat) fabs(p2->XU) + 10.0f;
+						geFloat p2V = (geFloat) fabs(p2->XV) + 10.0f;
+						geFloat p3U = (geFloat) fabs(p3->XU) + 10.0f;
+						geFloat p3V = (geFloat) fabs(p3->XV) + 10.0f;
+						geBody_Index n1 = SF[j].NormalIndex[k];
+						const geBody_Normal *BodyNormal = &SN[n1];
+						const geVec3d *Normal = &BodyNormal->Normal;
+						geBody_Index vt = SF[j].VtxIndex[k];
+						geBody_TangentSpace *TSP1 = &TS[vt];
+						geVec3d AlignedVector;
+						geVec3d BaseVector1;
+						geVec3d BaseVector2;
+						geVec3d Tangent;
+						geVec3d Binormal;
+						geFloat UV[2] = {0.0f, 0.0f};
+
+						geVec3d_Subtract(&p2->XPoint,&p1->XPoint,&BaseVector1);
+						geVec3d_Subtract(&p3->XPoint,&p1->XPoint,&BaseVector2);
+
+						if ( (p2U == p1U) || (p3U == p1U) )
 						{
-							geBody_Index v1 = SF[j].VtxIndex[0];
-							geBody_Index v2 = SF[j].VtxIndex[1];
-							geBody_Index v3 = SF[j].VtxIndex[2];
-							const geBody_XSkinVertex *p1 = &SV[v1];
-							const geBody_XSkinVertex *p2 = &SV[v2];
-							const geBody_XSkinVertex *p3 = &SV[v3];
-							geFloat p1U = (geFloat) fabs(p1->XU) + 10.0f;
-							geFloat p1V = (geFloat) fabs(p1->XV) + 10.0f;
-							geFloat p2U = (geFloat) fabs(p2->XU) + 10.0f;
-							geFloat p2V = (geFloat) fabs(p2->XV) + 10.0f;
-							geFloat p3U = (geFloat) fabs(p3->XU) + 10.0f;
-							geFloat p3V = (geFloat) fabs(p3->XV) + 10.0f;
-							geBody_Index n1 = SF[j].NormalIndex[k];
-							const geBody_Normal *BodyNormal = &SN[n1];
-							const geVec3d *Normal = &BodyNormal->Normal;
-							geBody_Index vt = SF[j].VtxIndex[k];
-							geBody_TangentSpace *TSP1 = &TS[vt];
-							geVec3d AlignedVector;
-							geVec3d BaseVector1;
-							geVec3d BaseVector2;
-							geVec3d Tangent;
-							geVec3d Binormal;
-							geFloat UV[2];
-
-							geVec3d_Subtract(&p2->XPoint,&p1->XPoint,&BaseVector1);
-							geVec3d_Subtract(&p3->XPoint,&p1->XPoint,&BaseVector2);
-
-							if ( (p2U == p1U) || (p3U == p1U) )
+							if ( p2U == p1U )
 							{
-								if ( p2U == p1U )
-								{
-									UV[0] = ( p1V < p2V ) ?  1.0f : -1.0f;
-									UV[1] = 0.0f;
-								}
-								else if	( p3U == p1U )
-								{
-									UV[0] = 0.0f;
-									UV[1] = ( p1V < p3V ) ?  -1.0f : 1.0f;
-								}
+								UV[0] = ( p1V < p2V ) ?  1.0f : -1.0f;
+								UV[1] = 0.0f;
 							}
-							else
+							else if	( p3U == p1U )
 							{
-								UV[0] = -p1U/(p2U-p1U);
-								UV[1] = -p1U/(p3U-p1U);
-
-								if ( UV[0] * UV[1] < 0.0f )
-								{
-									UV[0] = -UV[0];
-									UV[1] = -UV[1];
-								}
+								UV[0] = 0.0f;
+								UV[1] = ( p1V < p3V ) ?  -1.0f : 1.0f;
 							}
+						}
+						else
+						{
+							UV[0] = -p1U/(p2U-p1U);
+							UV[1] = -p1U/(p3U-p1U);
 
-							geVec3d_Scale(&BaseVector2,UV[1],&BaseVector2);
-							geVec3d_Scale(&BaseVector1,UV[0],&BaseVector1);
-							geVec3d_Subtract(&BaseVector2,&BaseVector1,&AlignedVector);
-
-							geVec3d_CrossProduct(&AlignedVector,Normal,&Tangent);
-							geVec3d_CrossProduct(&Tangent,Normal,&Binormal);
-
-							if ( ( (p1U-p3U) * (p2V-p3V) ) > ( (p2U-p3U) *(p1V - p3V) ) )
-								geVec3d_Scale(&Binormal,-1.0f,&Binormal);
-
-							geVec3d_Normalize(&Tangent);
-							geVec3d_Normalize(&Binormal);
-
-							geVec3d_Set(&TSP1->T,Tangent.X,Tangent.Y,Tangent.Z);
-							geVec3d_Set(&TSP1->B,Binormal.X,Binormal.Y,Binormal.Z);
-							geVec3d_Set(&TSP1->N,Normal->X,Normal->Y,Normal->Z);
-
-							TangentSpaceCreated = GE_TRUE;
+							if ( UV[0] * UV[1] < 0.0f )
+							{
+								UV[0] = -UV[0];
+								UV[1] = -UV[1];
+							}
 						}
 
-//Compute tangent space for the vertex...
+						geVec3d_Scale(&BaseVector2,UV[1],&BaseVector2);
+						geVec3d_Scale(&BaseVector1,UV[0],&BaseVector1);
+						geVec3d_Subtract(&BaseVector2,&BaseVector1,&AlignedVector);
 
-						if ( TangentSpaceCreated ) break;
+						geVec3d_CrossProduct(&AlignedVector,Normal,&Tangent);
+						geVec3d_CrossProduct(&Tangent,Normal,&Binormal);
+
+						if ( ( (p1U-p3U) * (p2V-p3V) ) > ( (p2U-p3U) *(p1V - p3V) ) )
+							geVec3d_Scale(&Binormal,-1.0f,&Binormal);
+
+						geVec3d_Normalize(&Tangent);
+						geVec3d_Normalize(&Binormal);
+
+						geVec3d_Set(&TSP1->T,Tangent.X,Tangent.Y,Tangent.Z);
+						geVec3d_Set(&TSP1->B,Binormal.X,Binormal.Y,Binormal.Z);
+						geVec3d_Set(&TSP1->N,Normal->X,Normal->Y,Normal->Z);
+
+						TangentSpaceCreated = GE_TRUE;
 					}
+
+//Compute tangent space for the vertex...
 
 					if ( TangentSpaceCreated ) break;
 				}
+
+				if ( TangentSpaceCreated ) break;
 			}
+
 		}
 	}
 
@@ -393,7 +394,7 @@ void GENESISCC geBody_SetVertexColorDot3( geVec3d LightPosition, const geXForm3d
 }
 
 /* 04/08/2003 Wendell Buckner
-    BUMPMAPPING */
+	BUMPMAPPING */
 
 //****************************************************************************************
 
@@ -665,10 +666,11 @@ static void GENESISCC geBody_DestroyPossiblyIncompleteBody( geBody **PB )
 	{
 		for (i=0; i<B->MaterialCount; i++)
 		{
+			// TODO??
 			// <> CB ; see note above
 			// this doesn't seem to prevent us from crashing here
 			//	when an actor has an error during _Create
-			if ( (uint32)(B->MaterialArray[i].Bitmap) > 1 )
+			if ( (B->MaterialArray[i].Bitmap) > 1 )
 				geBitmap_Destroy(&(B->MaterialArray[i].Bitmap));
 			B->MaterialArray[i].Bitmap = NULL;
 		}
@@ -933,6 +935,7 @@ static void GENESISCC geBody_SwapVertexIndices( geBody *B, geBody_Index Index1, 
 	}
 }
 
+/*
 static void GENESISCC geBody_ChangeVertexIndex( geBody *B, geBody_Index Index1, geBody_Index Index2)
 	// zips through all triangles, and changes index1 to index2.
 {
@@ -958,6 +961,7 @@ static void GENESISCC geBody_ChangeVertexIndex( geBody *B, geBody_Index Index1, 
 		}
 	}
 }
+*/
 
 static void GENESISCC geBody_SortSkinVertices( geBody *B )
 {
@@ -1382,7 +1386,7 @@ geBoolean GENESISCC geBody_ComputeLevelsOfDetail( geBody *B ,int Levels)
 	assert( geBody_IsValid(B) != GE_FALSE );
 	#pragma message ("LOD code goes here:")
 	B->LevelsOfDetail = GE_BODY_HIGHEST_LOD_MASK; // Levels
-	Levels;
+	(void)Levels;
 	return GE_TRUE;
 }
 
@@ -1468,13 +1472,34 @@ static geBoolean GENESISCC geBody_ReadGeometry(geBody *B, geVFile *pFile)
 
 	if (B->MaterialCount>0)
 	{
+		// TODO !!! 32bit/64bit clash!!! Writing/reading a pointer to the file!!!
 		u = sizeof(geBody_Material) * B->MaterialCount;
 		B->MaterialArray = geRam_Allocate(u);
 		if (B->MaterialArray == NULL)
 		{	geErrorLog_Add( ERR_BODY_ENOMEM , NULL);   return GE_FALSE;  }
-		if(geVFile_Read(pFile, B->MaterialArray, u) == GE_FALSE)
-		{	geErrorLog_Add( ERR_BODY_FILE_READ , NULL);	 return GE_FALSE; }
-
+		// 32/64bit HACK
+		if (sizeof(geBitmap*) == 4)
+		{
+			if(geVFile_Read(pFile, B->MaterialArray, u) == GE_FALSE)
+			{	geErrorLog_Add( ERR_BODY_FILE_READ , NULL);	 return GE_FALSE; }
+		}
+		else
+		{
+			int16 MaterialIndex;
+			uint32 dummy;
+			for(MaterialIndex=0;MaterialIndex<B->MaterialCount;MaterialIndex++)
+			{
+				if(geVFile_Read(pFile, &dummy, sizeof(uint32)) == GE_FALSE)
+				{	geErrorLog_Add( ERR_BODY_FILE_READ , NULL);	 return GE_FALSE; }
+				B->MaterialArray[MaterialIndex].Bitmap = (geBitmap *)dummy;
+				if(geVFile_Read(pFile, &B->MaterialArray[MaterialIndex].Red, sizeof(geFloat)) == GE_FALSE)
+				{	geErrorLog_Add( ERR_BODY_FILE_READ , NULL);	 return GE_FALSE; }
+				if(geVFile_Read(pFile, &B->MaterialArray[MaterialIndex].Green, sizeof(geFloat)) == GE_FALSE)
+				{	geErrorLog_Add( ERR_BODY_FILE_READ , NULL);	 return GE_FALSE; }
+				if(geVFile_Read(pFile, &B->MaterialArray[MaterialIndex].Blue, sizeof(geFloat)) == GE_FALSE)
+				{	geErrorLog_Add( ERR_BODY_FILE_READ , NULL);	 return GE_FALSE; }
+			}
+		}
 		// CB added this nastiness because it seems the Bitmap pointer is
 		//	read in with the Material array, and is later used as a boolean
 		//	for "should this material have a texture"
@@ -1662,9 +1687,29 @@ geBoolean GENESISCC geBody_WriteGeometry(const geBody *B,geVFile *pFile)
 
 	if (B->MaterialCount>0)
 	{
-		u = sizeof(geBody_Material) * B->MaterialCount;
-		if(geVFile_Write(pFile, B->MaterialArray, u) == GE_FALSE)
-		{	geErrorLog_Add( ERR_BODY_FILE_WRITE , NULL);	return GE_FALSE; }
+		// TODO !!! 32bit/64bit clash!!! We're writing a pointer to the file!!!
+		if (sizeof(geBitmap*) == 4)
+		{
+			u = sizeof(geBody_Material) * B->MaterialCount;
+			if(geVFile_Write(pFile, B->MaterialArray, u) == GE_FALSE)
+			{	geErrorLog_Add( ERR_BODY_FILE_WRITE , NULL);	return GE_FALSE; }
+		}
+		else
+		{
+			uint32 MaterialIndex;
+			for(MaterialIndex=0;MaterialIndex<B->MaterialCount;MaterialIndex++)
+			{
+				uint32 dummy = (uint32)B->MaterialArray[MaterialIndex].Bitmap;
+				if(geVFile_Write(pFile, &dummy, sizeof(uint32)) == GE_FALSE)
+				{	geErrorLog_Add( ERR_BODY_FILE_WRITE , NULL);	return GE_FALSE; }
+				if(geVFile_Write(pFile, &B->MaterialArray[MaterialIndex].Red, sizeof(geFloat)) == GE_FALSE)
+				{	geErrorLog_Add( ERR_BODY_FILE_WRITE , NULL);	return GE_FALSE; }
+				if(geVFile_Write(pFile, &B->MaterialArray[MaterialIndex].Green, sizeof(geFloat)) == GE_FALSE)
+				{	geErrorLog_Add( ERR_BODY_FILE_WRITE , NULL);	return GE_FALSE; }
+				if(geVFile_Write(pFile, &B->MaterialArray[MaterialIndex].Blue, sizeof(geFloat)) == GE_FALSE)
+				{	geErrorLog_Add( ERR_BODY_FILE_WRITE , NULL);	return GE_FALSE; }
+			}
+		}
 	}
 
 	if (geStrBlock_WriteToBinaryFile(B->MaterialNames,pFile)==GE_FALSE)

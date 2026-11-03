@@ -20,7 +20,6 @@
 /*                                                                                      */
 /****************************************************************************************/
 #include <assert.h>
-#include <windows.h>
 #include <math.h>
 
 #include "BaseType.h"

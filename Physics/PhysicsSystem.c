@@ -239,10 +239,10 @@ GENESISAPI geBoolean GENESISCC gePhysicsSystem_Destroy(gePhysicsSystem** ppPhyss
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // physics stuff follows
 
-static geFloat fmin(geFloat a, geFloat b)
+/*static geFloat fmin(geFloat a, geFloat b)
 {
 	return a < b ? a : b;
-}
+}*/
 
 GENESISAPI geBoolean GENESISCC gePhysicsSystem_Iterate(gePhysicsSystem* psPtr, geFloat Time)
 {
@@ -314,6 +314,7 @@ GENESISAPI geBoolean GENESISCC gePhysicsSystem_Iterate(gePhysicsSystem* psPtr, g
 		gePhysicsObject_SetActiveConfig(psPtr->Objects[i], psPtr->sourceConfigIndex);
 	}
 
+	(void)minAssemblyRate;
 	return GE_TRUE;
 }
 
@@ -362,6 +363,7 @@ static geBoolean gePhysicsSystem_EnforceConstraints(gePhysicsSystem* PS, geFloat
 
 	gePhysicsJoint_Kind type;
 
+	(void)subStepSize;
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// BEGIN
 	assert( PS != NULL );

@@ -17,16 +17,25 @@
 /*                                                                                      */
 /****************************************************************************************/
 
+#if defined _WIN32 || defined _WIN64
 #include <windows.h>
+#endif
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
+#include <stdlib.h>
 #include <GL/gl.h>
 
 #include "OglDrv.h"
 #include "OglMisc.h"
 #include "THandle.h"
 #include "Render.h"
+
+#if defined(__linux__)
+#include "GLX.h"
+#elif defined _WIN32 || defined _WIN64
 #include "Win32.h"
+#endif
 
 
 int32 LastError;
@@ -34,7 +43,7 @@ char LastErrorStr[255];
 
 GLfloat	CurrentGamma = 1.0f;
 DRV_Window	ClientWindow;
-static DRV_CacheInfo	CacheInfo;
+DRV_CacheInfo	CacheInfo;
 
 GLint maxTextureSize = 0;
 geBoolean FogEnabled = GE_TRUE;
@@ -43,8 +52,6 @@ GLfloat ClearColor[3];
 
 // Toggle and function pointers for OpenGL multitexture extention
 GLboolean multitexture = GE_FALSE;
-PFNGLACTIVETEXTUREARBPROC glActiveTextureARB;
-PFNGLMULTITEXCOORD4FARBPROC glMultiTexCoord4fARB;
 
 
 
@@ -187,10 +194,11 @@ geBoolean DRIVERCC DrvInit(DRV_DriverHook *Hook)
 	stream = fopen("D3D24.ini","r");
 	if(stream)
 	{
-		fscanf(stream,"%d",&COLOR_DEPTH);
-		fscanf(stream,"%d",&ZBUFFER_DEPTH);
+		(void)fscanf(stream,"%d",&COLOR_DEPTH);
+		(void)fscanf(stream,"%d",&ZBUFFER_DEPTH);
 		fclose(stream);
 
+#if defined _WIN32 || defined _WIN64
 		{
 			char lpRetStr[25];
 			DWORD dwRetCount;
@@ -199,16 +207,29 @@ geBoolean DRIVERCC DrvInit(DRV_DriverHook *Hook)
 			dwRetCount = GetPrivateProfileString("D3D24", "ZBufferD","16", (LPTSTR) &lpRetStr,sizeof(lpRetStr), ".\\D3D24.INI");
 			if ( dwRetCount ) ZBUFFER_DEPTH = atoi(lpRetStr);
 		}
+#endif
 	}
 
 	WindowSetup(Hook);
 
+	// if windowed, get window size
 	if(Hook->Width == -1 && Hook->Height == -1)
 	{
+#if defined(__linux__)
+		// TODO:
+		Window root;//, child;
+		int x, y, left, top;
+		unsigned int width, height, border_width, depth;
+		glxWnd *Wnd = (glxWnd*)(Hook->hWnd);
+		XGetGeometry(Wnd->display, Wnd->win, &root, &x, &y, &width, &height, &border_width, &depth);
+		Hook->Width = width;
+		Hook->Height = height;
+#elif defined _WIN32 || defined _WIN64
 		GetClientRect(Hook->hWnd, &WRect);
-
 		Hook->Width = (WRect.right - WRect.left);
 		Hook->Height = (WRect.bottom - WRect.top);
+#endif
+
 	}
 	else if(!SetFullscreen(Hook))
 	{
@@ -224,8 +245,6 @@ geBoolean DRIVERCC DrvInit(DRV_DriverHook *Hook)
 #ifdef USE_LIGHTMAPS
 	if(ExtensionExists("GL_ARB_multitexture"))
 	{
-		glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)wglGetProcAddress("glActiveTextureARB");
-		glMultiTexCoord4fARB = (PFNGLMULTITEXCOORD4FARBPROC)wglGetProcAddress("glMultiTexCoord4fARB");
 
 		if(glActiveTextureARB != NULL && glMultiTexCoord4fARB != NULL)
 		{
@@ -334,7 +353,7 @@ geBoolean DRIVERCC GetGamma(float *Gamma)
 {
 	*Gamma = CurrentGamma;
 
-	return TRUE;
+	return GE_TRUE;
 }
 
 
@@ -342,7 +361,6 @@ DRV_EngineSettings EngineSettings;
 
 DllExport BOOL DriverHook(DRV_Driver **Driver)
 {
-
 	EngineSettings.CanSupportFlags = (DRV_SUPPORT_ALPHA | DRV_SUPPORT_COLORKEY);
 	EngineSettings.PreferenceFlags = 0;
 
@@ -365,6 +383,7 @@ geBoolean DRIVERCC EnumModes(int32 Driver, char *DriverName, DRV_ENUM_MODES_CB *
 	GLint modeCount = 0;
 
 	modeCount = EnumNativeModes(Cb, Context);
+	(void)modeCount;
 
 	return GE_TRUE;
 }
@@ -452,9 +471,9 @@ geBoolean DRIVERCC ScreenShot(const char *Name)
 	memset(tgaHeader, 0, sizeof(tgaHeader));
 	tgaHeader[2] = 2;
 	tgaHeader[12] = (unsigned char)ClientWindow.Width;
-	tgaHeader[13] = (unsigned char)((unsigned long)ClientWindow.Width >> 8);
+	tgaHeader[13] = (unsigned char)((uint32)ClientWindow.Width >> 8);
 	tgaHeader[14] = (unsigned char)ClientWindow.Height;
-	tgaHeader[15] = (unsigned char)((unsigned long)ClientWindow.Height >> 8);
+	tgaHeader[15] = (unsigned char)((uint32)ClientWindow.Height >> 8);
 	tgaHeader[16] = 24;
 
 	// Convert the extention (if one exists) to .tga.  They probably expect a .bmp.

@@ -191,18 +191,18 @@ struct octNode
 
 #define RADIX_SIZE	1024
 
-int createOctTree(octNode * root,const geBitmap_Info * Info,const void * Bits,geBoolean doYUV);
+static int createOctTree(octNode * root,const geBitmap_Info * Info,const void * Bits,geBoolean doYUV);
 geBitmap_Palette * createPaletteGoodSub(const geBitmap_Info * Info,const void * Bits);
-void addOctNode(octNode *root,int R,int G,int B,int *nLeavesPtr);
-void gatherLeaves(octNode *node,octNode *** leavesPtrPtr,int minCount);
-void gatherLeavesCutting(octNode *node,octNode *** leavesPtrPtr);
-int leafCompareCount(const void *a,const void *b);
-int leafCompareCost(const void *a,const void *b);
-int findClosest(int R,int G,int B,uint8 *palette,int palEntries,int *foundPalPtr);
-void computeOctRGBs(octNode *node);
-void computeCutCosts(octNode *node);
-void readLeavesToPal(octNode **leaves,int gotLeaves,uint8 *palette,int palEntries);
-void insertRadix(octNode * radix,octNode *leaf);
+static void addOctNode(octNode *root,int R,int G,int B,int *nLeavesPtr);
+static void gatherLeaves(octNode *node,octNode *** leavesPtrPtr,int minCount);
+static void gatherLeavesCutting(octNode *node,octNode *** leavesPtrPtr);
+static int leafCompareCount(const void *a,const void *b);
+//static int leafCompareCost(const void *a,const void *b);
+static int findClosest(int R,int G,int B,uint8 *palette,int palEntries,int *foundPalPtr);
+static void computeOctRGBs(octNode *node);
+static void computeCutCosts(octNode *node);
+static void readLeavesToPal(octNode **leaves,int gotLeaves,uint8 *palette,int palEntries);
+static void insertRadix(octNode * radix,octNode *leaf);
 
 /*}{*************************************************/
 
@@ -264,7 +264,7 @@ geBitmap_Palette * Pal;
 	{
 		leavesPtr = leaves;
 		gatherLeaves(root,&leavesPtr,minCount);
-		gotLeaves = ((uint32)leavesPtr - (uint32)leaves)/sizeof(octNode *);
+		gotLeaves = ((unsigned long)leavesPtr - (unsigned long)leaves)/sizeof(octNode *);
 	}
 
 	// sort the leaves by count
@@ -330,7 +330,7 @@ geBitmap_Palette * Pal;
 
 	leavesPtr = leaves;
 	gatherLeavesCutting(root,&leavesPtr);
-	gotLeaves = ((uint32)leavesPtr - (uint32)leaves)/sizeof(octNode *);
+	gotLeaves = ((unsigned long)leavesPtr - (unsigned long)leaves)/sizeof(octNode *);
 
 	// if gotLeaves < palEntries, just exit asap
 	if ( gotLeaves < palEntries )
@@ -421,7 +421,7 @@ return Pal;
 
 /*}{*************************************************/
 
-void insertRadix(octNode * radix,octNode *leaf)
+static void insertRadix(octNode * radix,octNode *leaf)
 {
 octNode *insertAt;
 
@@ -441,7 +441,7 @@ octNode *insertAt;
 	insertAt->next->prev = insertAt;
 }
 
-int findClosest(int R,int G,int B,uint8 *palette,int palEntries,int *foundPalPtr)
+static int findClosest(int R,int G,int B,uint8 *palette,int palEntries,int *foundPalPtr)
 {
 int i,d,bestD,bestP;
 	bestD = 99999999; bestP = -1;
@@ -552,15 +552,15 @@ octNode *na,*nb;
 	nb = *((octNode **)b);
 return (nb->count) - (na->count);
 }
-static int leafCompareCost(const void *a,const void *b)
+/*static int leafCompareCost(const void *a,const void *b)
 {
 octNode *na,*nb;
 	na = *((octNode **)a);
 	nb = *((octNode **)b);
 return (nb->cutCost) - (na->cutCost);
-}
+}*/
 
-void computeCutCosts(octNode *node)
+static void computeCutCosts(octNode *node)
 {
 	assert(node->parent);
 	node->cutCost = square(node->R - node->parent->R)
@@ -580,7 +580,7 @@ void computeCutCosts(octNode *node)
 	}
 }
 
-void computeOctRGBs(octNode *node)
+static void computeOctRGBs(octNode *node)
 {
 	if ( node->nKids > 0 )
 	{
@@ -593,7 +593,7 @@ void computeOctRGBs(octNode *node)
 				computeOctRGBs(node->kids[i]);
 		for(i=0;i<8;i++)
 		{
-			if ( kid = node->kids[i] )
+			if ( (kid = node->kids[i]) )
 			{
 				R += kid->count * kid->R;
 				G += kid->count * kid->G;
@@ -606,7 +606,7 @@ void computeOctRGBs(octNode *node)
 	}
 }
 
-void readLeavesToPal(octNode **leaves,int gotLeaves,uint8 *palette,int palEntries)
+static void readLeavesToPal(octNode **leaves,int gotLeaves,uint8 *palette,int palEntries)
 {
 octNode **leavesPtr;
 uint8 *palPtr;
@@ -640,7 +640,7 @@ int distance,minDistance;
 
 /*}{*************************************************/
 
-int createOctTree(octNode * root,const geBitmap_Info * Info,const void * Bits,geBoolean doYUV)
+static int createOctTree(octNode * root,const geBitmap_Info * Info,const void * Bits,geBoolean doYUV)
 {
 int nLeaves;
 int w,h,xtra,bpp,x,y;

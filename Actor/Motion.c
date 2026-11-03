@@ -36,7 +36,11 @@
 #include "TKEvents.h"
 #include "StrBlock.h"
 
+#if defined(__linux__)
+#define strnicmp strncasecmp
+#elif defined _WIN32 || defined _WIN64
 #pragma warning(disable : 4201)		// we're using nameless structures
+#endif
 
 #define gePath_TimeType geFloat
 
@@ -80,7 +84,7 @@ typedef struct geMotion_Branch
 typedef struct geMotion
 {
 	char			 *Name;
-	int				  CloneCount;
+	int32			  CloneCount;
 	geBoolean		  MaintainNames;
 	geMotion_NodeType NodeType;
 	union
@@ -286,7 +290,7 @@ GENESISAPI void GENESISCC geMotion_Destroy(geMotion **PM)
 					{
 						geBoolean Test=	geMotion_RemoveNames(M);
 						assert( Test != GE_FALSE );
-						Test;
+						(void)Test;
 					}
 				for (i=0; i< M->Leaf.PathCount; i++)
 					{
@@ -1205,8 +1209,9 @@ GENESISAPI geBoolean  GENESISCC geMotion_SetBaseTransform( geMotion *M,int SubMo
 	return GE_FALSE;
 }
 
-
+#if defined _WIN32 || defined _WIN64
 #pragma warning( disable : 4701)	// don't want to set Translation until we are ready
+#endif
 GENESISAPI geBoolean GENESISCC geMotion_GetTransform( const geMotion *M, geFloat Time, geXForm3d *Transform)
 {
 	assert( M         != NULL);
@@ -1306,8 +1311,9 @@ GENESISAPI geBoolean GENESISCC geMotion_GetTransform( const geMotion *M, geFloat
 		}
 	return GE_FALSE;
 }
+#if defined _WIN32 || defined _WIN64
 #pragma warning( default : 4701)
-
+#endif
 
 //--------------------------------------------------------------------------------------------
 //   Event Support
@@ -1384,7 +1390,7 @@ GENESISAPI void GENESISCC geMotion_SetupEventIterator(
 	gePath_TimeType StartTime,				// Inclusive search start
 	gePath_TimeType EndTime)				// Non-inclusive search stop
 	// For searching or querying the array for events between two times
-	// times are compaired [StartTime,EndTime), '[' is inclusive, ')' is
+	// times are compared [StartTime,EndTime), '[' is inclusive, ')' is
 	// non-inclusive.  This prepares the geMotion_GetNextEvent() function.
 {
 	int i;
@@ -1531,7 +1537,7 @@ GENESISAPI geMotion* GENESISCC geMotion_CreateFromFile(geVFile* pFile)
 				geErrorLog_Add( ERR_MOTION_FILE_READ , NULL);
 				return NULL;
 			}
-		if	(sscanf(line, "%X.%X\n", &u, &v) != 2)
+		if	(sscanf(line, "%lX.%lX\n", &u, &v) != 2)
 			{
 				geErrorLog_Add( ERR_MOTION_FILE_READ , NULL);
 				return NULL;
@@ -1601,7 +1607,7 @@ GENESISAPI geMotion* GENESISCC geMotion_CreateFromFile(geVFile* pFile)
 			}
 			else if(strnicmp(line, MOTION_NAMECHECKSUM_ID, sizeof(MOTION_NAMECHECKSUM_ID)-1) == 0)
 			{
-				if(sscanf(line + sizeof(MOTION_NAMECHECKSUM_ID)-1, "%d", &M->Leaf.NameChecksum) != 1)
+				if(sscanf(line + sizeof(MOTION_NAMECHECKSUM_ID)-1, "%ld", &M->Leaf.NameChecksum) != 1)
 					{
 						geErrorLog_Add( ERR_MOTION_FILE_READ , NULL);
 						break;
@@ -1785,6 +1791,7 @@ static geBoolean GENESISCC geMotion_WriteBranch(const geMotion *M, geVFile *pFil
 	assert( M->NodeType == MOTION_NODE_BRANCH);
 	assert( geMotion_IsValid(M) != GE_FALSE );
 	#pragma message("finish this")
+	(void)pFile;
 	return GE_FALSE;
 }
 
@@ -1871,6 +1878,7 @@ static geBoolean GENESISCC geMotion_ReadBinaryBranch(geMotion *M, geVFile *pFile
 			return GE_FALSE;
 		}
 
+	(void)pFile;
 	#pragma message("finish this")
 	return GE_FALSE;
 }
@@ -2107,6 +2115,7 @@ static geBoolean GENESISCC geMotion_WriteBinaryBranch(const geMotion *M, geVFile
 	assert( M->NodeType == MOTION_NODE_BRANCH);
 	assert( geMotion_IsValid(M) != GE_FALSE );
 	#pragma message("finish this")
+	(void)pFile;
 	return GE_FALSE;
 }
 

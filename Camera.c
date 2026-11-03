@@ -197,7 +197,7 @@ GENESISAPI void GENESISCC geCamera_SetAttributes(geCamera *Camera, geFloat Fov, 
 
 #define TOO_SMALL (0.0001f)		// width and Fov must be >= TOO_SMALL
 
-	geFloat	Width, Height;
+	geFloat Width, Height;
 	geFloat OneOverFov;
 
 	assert (Camera != NULL);
@@ -466,7 +466,7 @@ void GENESISCC geCamera_GetViewAngleYSinCos( const geCamera *Camera, geFloat *Si
 //============================================================================================
 GENESISAPI void GENESISCC geCamera_Transform(const geCamera *Camera,
 						const geVec3d *WorldSpacePoint,
-						      geVec3d *CameraSpacePoint)
+							  geVec3d *CameraSpacePoint)
 {
 	assert( Camera );
 	assert( WorldSpacePoint );
@@ -482,7 +482,7 @@ GENESISAPI void GENESISCC geCamera_Transform(const geCamera *Camera,
 //============================================================================================
 GENESISAPI void GENESISCC geCamera_TransformArray(const geCamera *Camera,
 						const geVec3d *WorldSpacePointPtr,
-						      geVec3d *CameraSpacePointPtr, int count)
+							  geVec3d *CameraSpacePointPtr, int count)
 {
 	assert( Camera );
 	assert( WorldSpacePointPtr );
@@ -499,7 +499,7 @@ GENESISAPI void GENESISCC geCamera_TransformArray(const geCamera *Camera,
 //============================================================================================
 GENESISAPI void GENESISCC geCamera_TransformAndProjectArray(const geCamera *Camera,
 						const geVec3d *WorldSpacePointPtr,
-						      geVec3d *ProjectedSpacePointPtr,
+							  geVec3d *ProjectedSpacePointPtr,
 							int count)
 {
 	assert( Camera );
@@ -516,7 +516,7 @@ GENESISAPI void GENESISCC geCamera_TransformAndProjectArray(const geCamera *Came
 //============================================================================================
 GENESISAPI void GENESISCC geCamera_TransformAndProjectLArray(const geCamera *Camera,
 						const GE_LVertex *WorldSpacePointPtr,
-						      GE_TLVertex *ProjectedSpacePointPtr, int count)
+							  GE_TLVertex *ProjectedSpacePointPtr, int count)
 {
 	assert( Camera );
 	assert( WorldSpacePointPtr );

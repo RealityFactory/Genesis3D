@@ -145,7 +145,6 @@ static void RASTERIZECC geTClip_Rasterize_Tex(const GE_LVertex * TriVtx);
 static void RASTERIZECC geTClip_Rasterize_Gou(const GE_LVertex * TriVtx);
 static void GENESISCC geTClip_Split(GE_LVertex *NewVertex,const GE_LVertex *V1,const GE_LVertex *V2,int ClippingPlane);
 static void GENESISCC geTClip_TrianglePlane(const GE_LVertex * zTriVertex,geTClip_ClippingPlane ClippingPlane);
-static void GENESISCC geTClip_TrianglePlane_Old(const GE_LVertex * zTriVertex,geTClip_ClippingPlane ClippingPlane);
 
 /*}{************ The State Statics ***********/
 
@@ -294,6 +293,7 @@ static void RASTERIZECC geTClip_Rasterize_Gou(const GE_LVertex * TriVtx)
 	geTClip_Statics.Driver->RenderGouraudPoly((DRV_TLVertex *)TriVtx,3,ActiveRenderFlags); // LA
 }
 
+#if 0
 static void GENESISCC geTClip_Rasterize(const GE_LVertex * TriVtx)
 {
 
@@ -315,6 +315,7 @@ static void GENESISCC geTClip_Rasterize(const GE_LVertex * TriVtx)
 			3,ActiveRenderFlags); // LA
 	}
 }
+#endif
 
 /*}{************ TClip_Split ***********/
 

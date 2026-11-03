@@ -20,7 +20,9 @@
 /*                                                                                      */
 /****************************************************************************************/
 
+#if defined _WIN32 || _WIN64
 #include <windows.h>
+#endif
 #include <math.h>
 #include <assert.h>
 
@@ -46,13 +48,10 @@
 //=====================================================================================
 //	local static globals
 //=====================================================================================
-static	geEngine			*CEngine;				// The current engine object
-static char *geTag="Eclipse!";
 
 //=====================================================================================
 //	local static function prototypes
 //=====================================================================================
-geBoolean geEngine_SetWorld(geEngine *Engine, geWorld *World);
 
 //=====================================================================================
 //	Engine
@@ -285,6 +284,7 @@ GENESISAPI geBoolean geWorld_SetLightAttributes(	geWorld *World,
 	assert(Light != NULL);
 	assert(Pos != NULL);
 	assert(RGBA != NULL);
+	(void)World;
 
 	return Light_SetAttributes((Light_DLight*)Light, Pos, RGBA, Radius, CastShadow);
 }
@@ -319,6 +319,7 @@ GENESISAPI geBoolean geWorld_SetSpotLightAttributes(		geWorld *World,
 	assert(Pos != NULL);
 	assert(RGBA != NULL);
 	assert(Angles != NULL);
+	(void)World;
 
 	return Light_SetSpotAttributes((Light_DLight*)Light, Pos, RGBA, Radius, Arc, Angles, Style, CastShadow);
 }

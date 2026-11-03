@@ -21,6 +21,7 @@
 /****************************************************************************************/
 #include "ExtBox.h"
 #include <assert.h>
+#include <stddef.h>
 
 #define MAX(aa,bb)   ( ((aa)>(bb))?(aa):(bb) )
 #define MIN(aa,bb)   ( ((aa)<(bb))?(aa):(bb) )

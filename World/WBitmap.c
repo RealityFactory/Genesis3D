@@ -24,6 +24,9 @@
 /*                                                                                      */
 /****************************************************************************************/
 #include <assert.h>
+#include <stdio.h>
+#include <string.h> //memset, strcpy, memcpy
+#include <strings.h> //strcasecmp
 
 //=====================================================================================
 //=====================================================================================
@@ -34,6 +37,9 @@
 #include "ErrorLog.h"
 #include "Bitmap._h"
 
+#if defined(__linux__)
+#define stricmp strcasecmp
+#endif
 //#define USEPERPIXEL
 
 //	NOTES -
@@ -413,7 +419,7 @@ geBoolean geWBitmap_Pool_CreateAllWBitmaps(geWBitmap_Pool *Pool, GBSP_BSPData *B
 		// Create the palette...
 		{
 			geBitmap_Palette		*Pal;
-			int32					PalSize,cnt;
+			int						PalSize,cnt;
 			gePixelFormat			Format;
 			uint32					*DstPalPtr,*DstPalData;
 			DRV_RGB					*SrcPalPtr;
@@ -427,7 +433,7 @@ geBoolean geWBitmap_Pool_CreateAllWBitmaps(geWBitmap_Pool *Pool, GBSP_BSPData *B
 				return GE_FALSE;
 			}
 
-			if (!geBitmap_Palette_Lock(Pal, &DstPalData, &Format, &PalSize))
+			if (!geBitmap_Palette_Lock(Pal, (void**)&DstPalData, &Format, &PalSize))
 			{
 				geErrorLog_AddString(-1, "geWBitmap_Pool_CreateAllWBitmaps:  geBitmap_Palette_Lock failed.", NULL);
 				return GE_FALSE;
@@ -605,8 +611,12 @@ char *geWBitmap_Pool_GetWNameByBitmap(geWBitmap_Pool *Pool, const geBitmap *Bitm
 	for (i=0; i< Pool->NumWBitmaps; i++, pWBitmap++)
 	{
 		char str[100];
-		sprintf(str,"WBitmap : %x\n",pWBitmap->Bitmap);
+		sprintf(str,"WBitmap : %p\n",pWBitmap->Bitmap);
+#if defined(__linux__)
+		fprintf(stderr, "%s", str);
+#elif defined _WIN32 || defined _WIN64
 		OutputDebugString(str);
+#endif
 		if (pWBitmap->Bitmap == Bitmap)
 			return pWBitmap->Name;
 	}

@@ -26,7 +26,13 @@
 /*                                                                                      */
 /****************************************************************************************/
 
+#if defined(__linux__)
+#include <dlfcn.h> //dlclose
+#include <time.h>
+#endif
+
 #include <assert.h>
+#include <string.h> //memset, strlen, memcpy, strcpy
 
 #include "BaseType.h"
 #include "System.h"
@@ -59,13 +65,14 @@
 //=====================================================================================
 static char DriverFileNames[][200] =
 {
+#if defined(__linux__)
+    {"libOglDrv.so"},
+#elif defined _WIN32 || defined _WIN64
 	{"D3D7xDrv.dll"},
 	{"D3DDrv.dll"},
-	{"GlideDrv.dll"},
-	{"SoftDrv.dll"},
-	{"SoftDrv2.dll"},
 	{"OglDrv.dll"},
 	{"WireDrv.dll"},
+#endif
 	{""}
 };
 
@@ -75,8 +82,8 @@ static char DriverFileNames[][200] =
 
 static geBoolean EnumSubDrivers(Sys_DriverInfo *DriverInfo, const char *DriverDirectory);
 
-static BOOL EnumSubDriversCB(S32 DriverId, char *Name, void *Context);
-static BOOL EnumModesCB(S32 ModeId, char *Name, S32 Width, S32 Height, void *Context);
+static geBoolean EnumSubDriversCB(S32 DriverId, char *Name, void *Context);
+static geBoolean EnumModesCB(S32 ModeId, char *Name, S32 Width, S32 Height, void *Context);
 
 //=====================================================================================
 //	geDriver_SystemGetNextDriver
@@ -91,7 +98,9 @@ GENESISAPI geDriver *geDriver_SystemGetNextDriver(geDriver_System *DriverSystem,
 	DriverInfo = (Sys_DriverInfo*)DriverSystem;
 
 	if (!DriverInfo->NumSubDrivers)
+	{
 		return NULL;
+	}
 
 	Last = &DriverInfo->SubDrivers[DriverInfo->NumSubDrivers-1];
 
@@ -184,7 +193,7 @@ const uint32 geEngine_Version_OldestSupported =
 
 geEngine *Sys_EngineCreate(HWND hWnd, const char *AppName, const char *DriverDirectory, uint32 Version)
 {
-	int16			i;
+	int32			i;
 	geEngine		*NewEngine;
 	int				Length;
 
@@ -197,7 +206,7 @@ geEngine *Sys_EngineCreate(HWND hWnd, const char *AppName, const char *DriverDir
 	if ( Version > geEngine_Version )
 	{
 	char str[1024];
-		sprintf(str,"%d - %d",Version,geEngine_Version);
+		sprintf(str,"%u - %u",Version,geEngine_Version);
 		geErrorLog_AddString(-1,"Genesis Engine is older than application; aborting!", str);
 		return NULL;
 	}
@@ -205,7 +214,7 @@ geEngine *Sys_EngineCreate(HWND hWnd, const char *AppName, const char *DriverDir
 	if ( Version < geEngine_Version_OldestSupported )
 	{
 	char str[1024];
-		sprintf(str,"%d - %d",Version,geEngine_Version);
+		sprintf(str,"%u - %u",Version,geEngine_Version);
 		geErrorLog_AddString(-1,"Genesis Engine does not support the old version!", str);
 		return NULL;
 	}
@@ -266,7 +275,7 @@ geEngine *Sys_EngineCreate(HWND hWnd, const char *AppName, const char *DriverDir
 
 	NewEngine->DisplayFrameRateCounter = GE_TRUE;	// Default to showing the FPS counter
 
-	geAssert_SetCriticalShutdownCallback( geEngine_ShutdownDriver , NewEngine );
+	geAssert_SetCriticalShutdownCallback( geEngine_ShutdownDriver, NewEngine );
 
 	NewEngine->CurrentGamma = 1.0f;
 
@@ -323,6 +332,7 @@ void Sys_EngineFree(geEngine *Engine)
 
 	Ret = geEngine_BitmapListShutdown(Engine);
 	assert(Ret == GE_TRUE);
+	(void)Ret;
 
 	geRam_Free(Engine->DriverDirectory);
 
@@ -336,22 +346,36 @@ void Sys_EngineFree(geEngine *Engine)
 //=====================================================================================
 geBoolean Sys_GetCPUFreq(Sys_CPUInfo *Info)
 {
+#if defined(__linux__)
+	// TODO:
+	//struct timespec spec;
+#else
 	LARGE_INTEGER Freq;
+#endif
 
 	assert(Info != NULL);
 
+#if defined(__linux__)
+	// TODO:
+	if(0)
+#else
 	if (!QueryPerformanceFrequency(&Freq))
+#endif
 	{
 		geErrorLog_Add(GE_ERR_NO_PERF_FREQ, NULL);
 		return GE_FALSE;
 	}
 
+#if defined(__linux__)
+    Info->Freq = 1;
+#else
 /* 01/20/2004 Wendell Buckner
-	LOGO CRASH BUG - On some machines with fast proccessors (2.0ghz or better, typically intel) the value return
-	by Sys_GetCPUFreq is to large for the following variable make it a large_integer
+	LOGO CRASH BUG - On machines with fast proccessors (2.15ghz or better) the value return
+	by Sys_GetCPUFreq is too large for a 32 bit signed integer variable - make it a large_integer
 	Fix provided by Latex and IronDragon from the genesis3d forum
 	Info->Freq = Freq.LowPart; */
-	Info->Freq.QuadPart = Freq.LowPart;
+	Info->Freq.QuadPart = Freq.QuadPart;
+#endif
 
 	return GE_TRUE;
 }
@@ -389,17 +413,17 @@ void Sys_WorldFreeMesh(geWorld *World, Mesh_MeshDef *MeshDef)
 //===================================================================================
 //	EnumSubDriversCB
 //===================================================================================
-static BOOL EnumSubDriversCB(S32 DriverId, char *Name, void *Context)
+static geBoolean EnumSubDriversCB(S32 DriverId, char *Name, void *Context)
 {
 	Sys_DriverInfo	*DriverInfo = (Sys_DriverInfo*)Context;
 	DRV_Driver		*RDriver;
 	geDriver		*Driver;
 
 	if (strlen(Name) >=	DRV_STR_SIZE)
-		return TRUE;		// Ignore
+		return GE_TRUE;		// Ignore
 
 	if (DriverInfo->NumSubDrivers+1 >= MAX_SUB_DRIVERS)
-		return FALSE;		// Stop when no more driver slots available
+		return GE_FALSE;		// Stop when no more driver slots available
 
 	Driver = &DriverInfo->SubDrivers[DriverInfo->NumSubDrivers];
 
@@ -413,31 +437,31 @@ static BOOL EnumSubDriversCB(S32 DriverId, char *Name, void *Context)
 	DriverInfo->CurDriver = Driver;
 
 	if (!RDriver->EnumModes(Driver->Id, Driver->Name, EnumModesCB, (void*)DriverInfo))
-		return FALSE;
+		return GE_FALSE;
 
 	DriverInfo->NumSubDrivers++;
 
-	return TRUE;
+	return GE_TRUE;
 }
 
 //===================================================================================
 //	EnumModesCB
 //===================================================================================
-static BOOL EnumModesCB(S32 ModeId, char *Name, S32 Width, S32 Height, void *Context)
+static geBoolean EnumModesCB(S32 ModeId, char *Name, S32 Width, S32 Height, void *Context)
 {
 	Sys_DriverInfo	*DriverInfo;
 	geDriver		*Driver;
 	geDriver_Mode	*Mode;
 
 	if (strlen(Name) >=	DRV_MODE_STR_SIZE)
-		return TRUE;		// Ignore
+		return GE_TRUE;		// Ignore
 
 	DriverInfo = (Sys_DriverInfo*)Context;
 
 	Driver = DriverInfo->CurDriver;
 
 	if (Driver->NumModes+1 >= MAX_DRIVER_MODES)
-		return FALSE;
+		return GE_FALSE;
 
 	Mode = &Driver->Modes[Driver->NumModes];
 
@@ -448,7 +472,7 @@ static BOOL EnumModesCB(S32 ModeId, char *Name, S32 Width, S32 Height, void *Con
 
 	Driver->NumModes++;
 
-	return TRUE;
+	return GE_TRUE;
 }
 
 //===================================================================================
@@ -460,11 +484,9 @@ static geBoolean EnumSubDrivers(Sys_DriverInfo *DriverInfo, const char *DriverDi
 	DRV_Hook	*DriverHook;
 	HINSTANCE	Handle;
 	DRV_Driver	*RDriver;
-	geBoolean	GlideFound;
 
 	DriverInfo->NumSubDrivers = 0;
 
-	GlideFound = GE_FALSE;
 
 	for (i=0; DriverFileNames[i][0]!=0; i++)
 	{
@@ -474,27 +496,45 @@ static geBoolean EnumSubDrivers(Sys_DriverInfo *DriverInfo, const char *DriverDi
 		Handle = geEngine_LoadLibrary(DriverFileNames[i], DriverDirectory);
 
 		if (!Handle)
+		{
 			continue;
+		}
 
 		DriverInfo->CurFileName = DriverFileNames[i];
 
+#if defined(__linux__)
+		DriverHook = (DRV_Hook*)dlsym(Handle, "DriverHook");
+#elif defined _WIN32 || defined _WIN64
 		DriverHook = (DRV_Hook*)GetProcAddress(Handle, "DriverHook");
+#endif
 
 		if (!DriverHook)
 		{
+#if defined(__linux__)
+			dlclose(Handle);
+#elif defined _WIN32 || defined _WIN64
 			FreeLibrary(Handle);
+#endif
 			continue;
 		}
 
 		if (!DriverHook(&RDriver))
 		{
+#if defined(__linux__)
+			dlclose(Handle);
+#elif defined _WIN32 || defined _WIN64
 			FreeLibrary(Handle);
+#endif
 			continue;
 		}
 
 		if (RDriver->VersionMajor != DRV_VERSION_MAJOR || RDriver->VersionMinor != DRV_VERSION_MINOR)
 		{
+#if defined(__linux__)
+			dlclose(Handle);
+#elif defined _WIN32 || defined _WIN64
 			FreeLibrary(Handle);
+#endif
 			geErrorLog_AddString(-1,"EnumSubDrivers : found driver of different version; ignoring; non-fatal",DriverFileNames[i]);
 			continue;
 		}
@@ -503,14 +543,20 @@ static geBoolean EnumSubDrivers(Sys_DriverInfo *DriverInfo, const char *DriverDi
 
 		if (!RDriver->EnumSubDrivers(EnumSubDriversCB, (void*)DriverInfo))
 		{
+#if defined(__linux__)
+			dlclose(Handle);
+#elif defined _WIN32 || defined _WIN64
 			FreeLibrary(Handle);
+#endif
 			continue;		// Should we return FALSE, or just continue?
 		}
 
+#if defined(__linux__)
+		dlclose(Handle);
+#elif defined _WIN32 || defined _WIN64
 		FreeLibrary(Handle);
+#endif
 
-		if (!strcmp(DriverFileNames[i], "GlideDrv.dll"))
-			GlideFound = GE_TRUE;
 	}
 
 	DriverInfo->RDriver = NULL;	// Reset this

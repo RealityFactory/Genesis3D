@@ -26,8 +26,22 @@
 
 #include "BaseType.h"
 #include "Vec3d.h"
-#include <windows.h>
 #include "DCommon.h"
+
+#if defined(__linux__)
+typedef struct _SYSTEMTIME {
+  WORD wYear;
+  WORD wMonth;
+  WORD wDayOfWeek;
+  WORD wDay;
+  WORD wHour;
+  WORD wMinute;
+  WORD wSecond;
+  WORD wMilliseconds;
+} SYSTEMTIME, *PSYSTEMTIME;
+#elif defined _WIN32 || defined _WIN64
+#include <windows.h>
+#endif
 #include "VFile.h"
 #include "Motion.h"
 
@@ -244,6 +258,7 @@ typedef struct
 	uint8			LTypes[4];
 } GFX_Face;
 
+#pragma pack(4)
 typedef struct
 {
 	int32			RootNode[2];				// Top level Node in GFXNodes/GFXBNodes
@@ -259,6 +274,7 @@ typedef struct
 	int32			Areas[2];
 	geMotion *		Motion;
 } GFX_Model;
+#pragma pack()
 
 typedef struct
 {
@@ -276,7 +292,7 @@ typedef struct
 	geFloat			Shift[2];
 	geFloat			DrawScale[2];
 	int32			Flags;
-	geFloat			FaceLight;			// Used in radiosity satge only (remove?)
+	geFloat			FaceLight;			// Used in radiosity stage only (remove?)
 	geFloat			ReflectiveScale;
 	geFloat			Alpha;
 	geFloat			MipMapBias;

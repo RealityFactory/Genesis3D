@@ -20,6 +20,7 @@
 /*                                                                                      */
 /****************************************************************************************/
 #ifdef USE_DPLAY
+#if defined _WIN32 || defined _WIN64
 #define IDIRECTPLAY2_OR_GREATER
 
 #include <windows.h>
@@ -864,3 +865,6 @@ static void DoDPError(HRESULT Hr)
 }
 
 #endif
+
+#endif // USE_DPLAY
+

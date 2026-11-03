@@ -45,6 +45,11 @@
 #include "ErrorLog.h"
 #include "Ram.h"
 
+#if defined(__linux__)
+#include <strings.h> //strcasecmp
+#define stricmp strcasecmp
+#define strnicmp strncasecmp
+#endif
 #define LINEAR_BLEND(a,b,t)  ( (t)*((b)-(a)) + (a) )
 			// linear blend of a and b  0<t<1 where  t=0 ->a and t=1 ->b
 
@@ -546,7 +551,7 @@ geTKArray *GENESISCC geVKFrame_CreateFromFile(geVFile *pFile, geVKFrame_Interpol
 {
 	#define ERROREXIT  {geErrorLog_Add( ERR_PATH_FILE_READ , NULL);if (KeyList != NULL){geTKArray_Destroy(&KeyList);}	return NULL;}
 	int i,u,NumElements;
-	int Compression;
+	int itype, Compression;
 	#define LINE_LENGTH 256
 	char line[LINE_LENGTH];
 	geTKArray *KeyList= NULL;
@@ -564,9 +569,10 @@ geTKArray *GENESISCC geVKFrame_CreateFromFile(geVFile *pFile, geVKFrame_Interpol
 		ERROREXIT;
 
 	if(sscanf(line + sizeof(VKFRAME_KEYLIST_ID)-1, "%d %d %d %d",
-					&NumElements,InterpolationType,&Compression,Looping) != 4)
+					&NumElements, &itype, &Compression,Looping) != 4)
 		ERROREXIT;
 
+	*InterpolationType = itype;
 	switch (*InterpolationType)
 		{
 			case (VKFRAME_LINEAR):

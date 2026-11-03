@@ -25,12 +25,12 @@
 /****************************************************************************************/
 #include <assert.h>
 #include <math.h>
-
+#include <stddef.h>
 #include "XForm3d.h"
 
 
 #ifndef NDEBUG
-	static geXForm3d_MaximalAssertionMode = GE_TRUE;
+	static geBoolean geXForm3d_MaximalAssertionMode = GE_TRUE;
 	#define geXForm3d_Assert if (geXForm3d_MaximalAssertionMode) assert
 
 GENESISAPI 	void GENESISCC geXForm3d_SetMaximalAssertionMode( geBoolean Enable )
@@ -411,7 +411,6 @@ GENESISAPI void GENESISCC geXForm3d_RotateNoOrthogonal(
 GENESISAPI void GENESISCC geXForm3d_TransformArray(const geXForm3d *XForm, const geVec3d *Source, geVec3d *Dest, int32 Count)
 {
 	#define FSIZE	4
-	static int32 Lookup[]={0x696C6345,0x21657370};
 	assert( XForm != NULL );
 	assert( Source != NULL );
 	assert( Dest != NULL );
@@ -421,6 +420,16 @@ GENESISAPI void GENESISCC geXForm3d_TransformArray(const geXForm3d *XForm, const
 	if (Count <= 0)								// Early out if possible
 		return;
 
+#if defined(__linux__)
+// TODO: optimize
+	{
+		int32 i;
+		for(i=0; i<Count; ++i)
+		{
+			geXForm3d_Transform(XForm, &Source[i], &Dest[i]);
+		}
+	}
+#elif defined _WIN32 || defined _WIN64
 	_asm
 	{
 	mov     ecx,Count							// get item count
@@ -481,7 +490,7 @@ Again:
 	cmp ecx, 0
 	jne Again
 	}
-
+#endif
 	// 34 cycles predicted (per loop)
 	// 39 cycles measured
 }

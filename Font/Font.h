@@ -24,8 +24,8 @@
 #define GE_FONT_H
 
 // includes
+#include "GeTypes.h"
 #include "Genesis.h"
-#include "BaseType.h"
 #include "Bitmap.h"
 // **************************
 // to use this API:
@@ -59,6 +59,8 @@ extern "C" {
 // opaque structure headers.
 typedef struct geFont geFont;			// an instance of a font
 
+geBoolean geFont_Init();
+geBoolean geFont_Shutdown();
 
 //***************************************************************************************
 GENESISAPI geFont *GENESISCC geFont_Create(const geEngine *Engine, const char *fontNameString,

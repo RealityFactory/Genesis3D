@@ -32,7 +32,9 @@ extern "C" {
 #define	ELECTRIC_BOLT_GREENDOMINANT	1
 #define	ELECTRIC_BOLT_BLUEDOMINANT	2
 
+#if defined _WIN32 || defined _WIN64
 #pragma warning( disable : 4068 )
+#endif
 
 typedef struct	_Electric_BoltEffect
 {

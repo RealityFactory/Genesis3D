@@ -55,7 +55,7 @@ TIMER_VARS(List_RadixInit);
 
 #endif // DO_TIMER
 
-#ifdef _DEBUG
+#if defined _DEBUG && defined(_WIN32) /// TODO: CHECK ME
 #define Debug(func)	func;
 #define DebugAlert()	do { __asm { int 03h } } while(0)
 #else
@@ -498,9 +498,9 @@ void * RadixList_CutMax(RadixList *pRadixList,int *pKey)
 
 	while ( pRadixList->Max >= 0 )
 	{
-	void * Data;
+	void * Data = List_CutHead(pRadixList->Lists[pRadixList->Max]);
 
-		if ( Data = List_CutHead(pRadixList->Lists[pRadixList->Max]) )
+		if ( Data )
 		{
 			if ( pKey ) *pKey = pRadixList->Max;
 			return Data;
@@ -518,9 +518,9 @@ void * RadixList_CutMin(RadixList *pRadixList,int *pKey)
 
 	while ( pRadixList->Min < pRadixList->NumLists )
 	{
-	void * Data;
+	void * Data = List_CutHead(pRadixList->Lists[pRadixList->Min]);
 
-		if ( Data = List_CutHead(pRadixList->Lists[pRadixList->Min]) )
+		if ( Data )
 		{
 			if ( pKey ) *pKey = pRadixList->Min;
 			return Data;
@@ -606,9 +606,9 @@ LinkNode * RadixLN_CutMax(RadixLN *pRadixLN,int *pKey)
 TIMER_P(List_RadixWalk);
 	while ( pRadixLN->Max >= 0 )
 	{
-	LinkNode * LN;
+	LinkNode * LN = LN_CutHead(&(pRadixLN->LNs[pRadixLN->Max]));
 
-		if ( LN = LN_CutHead(&(pRadixLN->LNs[pRadixLN->Max])) )
+		if ( LN )
 		{
 			if ( pKey ) *pKey = pRadixLN->Max;
 TIMER_Q(List_RadixWalk);
@@ -628,9 +628,9 @@ LinkNode * RadixLN_CutMin(RadixLN *pRadixLN,int *pKey)
 TIMER_P(List_RadixWalk);
 	while ( pRadixLN->Min < pRadixLN->NumLNs )
 	{
-	LinkNode * LN;
+	LinkNode * LN = LN_CutHead(&(pRadixLN->LNs[pRadixLN->Min]));
 
-		if ( LN = LN_CutHead(&(pRadixLN->LNs[pRadixLN->Min])) )
+		if ( LN )
 		{
 			if ( pKey ) *pKey = pRadixLN->Max;
 TIMER_Q(List_RadixWalk);
@@ -898,14 +898,14 @@ to do an add :
 		we step back; now the current is (C) and the previous is (A) :
 
          A--+
-         |  |   
+         |  |
 (Head)---A  +->C--x->E--x-->(Tail)
 [0]		[1][2][3][4][5][6]
 
 		which is a good list, so we do the normal add:
 
          A--+
-         |  |   
+         |  |
 (Head)---A  B->C--x->E--x-->(Tail)
 [0]		[1][2][3][4][5][6]
 
@@ -1059,6 +1059,7 @@ uint32		LISTCALL Hash_NumMembers(Hash *pHash)
 #define HASH_SIZE	(HASH_MOD + 1)
 #define HASH(Key)	((( ((Key)>>15) ^ (Key) )%HASH_MOD)+1)
 
+// TODO: CHEK DEBUG CONFIG
 struct Hash
 {
 
@@ -1074,7 +1075,7 @@ struct Hash
 struct HashNode
 {
 	LinkNode LN;
-	uint32	Key;
+	unsigned long	Key; // is used as a pointer (geBitmap*)
 	uint32	Data;
 	uint32	Hash;
 };
@@ -1120,17 +1121,22 @@ void Hash_Destroy(Hash *pHash)
 	{
 	HashNode *pList,*pNode,*pNext;
 
+#if defined _DEBUG && defined(_WIN32) /// TODO: CHECK ME
 		assert( pHash->MySelf1 == pHash && pHash->MySelf2 == pHash );
-
+#endif
 		Debug(pHash->Members += 2) // count Head & Tail
 
 		pList = pHash->NodeList;
-		LN_Walk_Editting(pNode,pList,pNext) {
+		LN_Walk_Editing(pNode,pList,pNext)	{
 			MemPool_FreeHunk(HashNodePool_g,pNode);
+#if defined _DEBUG && defined(_WIN32) /// TODO: CHECK ME
 			assert(pHash->Members > 1);
 			Debug(pHash->Members --)
+#endif
 		}
+#if defined _DEBUG && defined(_WIN32) /// TODO: CHECK ME
 		assert(pHash->Members == 1);
+#endif
 		MemPool_FreeHunk(HashNodePool_g,pList);
 		destroy(pHash);
 	}
@@ -1147,22 +1153,25 @@ int Len = 0;
 	while( hn->Hash == H )
 	{
 		Len ++;
+#if defined _DEBUG && defined(_WIN32) /// TODO: CHECK ME
 		assert(pHash->Members >= Len);
+#endif
 		hn = LN_Next(hn);
 	}
 return Len;
 }
 #endif
 
-HashNode * LISTCALL Hash_Add(Hash *pHash,uint32 Key,uint32 Data)
+HashNode * LISTCALL Hash_Add(Hash *pHash,unsigned long Key,uint32 Data)
 {
 uint32 H;
 HashNode *hn,**pTable,*Node,*Prev;
 Debug( int ListLen1; int ListLen2; int HashLen1; int HashLen2; int WalkLen)
 
 	assert(pHash);
+#if defined _DEBUG && defined(_WIN32) /// TODO: CHECK ME
 	assert( pHash->MySelf1 == pHash && pHash->MySelf2 == pHash );
-
+#endif
 	hn = MemPool_GetHunk(HashNodePool_g);
 	assert(hn);
 	Debug( LN_Null(hn) )
@@ -1193,9 +1202,10 @@ Debug( int ListLen1; int ListLen2; int HashLen1; int HashLen2; int WalkLen)
 		{
 			Prev = Node;
 			Node = LN_Next(Prev);
-
+#if defined _DEBUG && defined(_WIN32) /// TODO: CHECK ME
 			assert(WalkLen < pHash->Members );
 			Debug( WalkLen ++)
+#endif
 
 			assert(Prev->Hash <= Node->Hash);
 			assert(Prev->Hash < HASH_SIZE );
@@ -1208,12 +1218,13 @@ Debug( int ListLen1; int ListLen2; int HashLen1; int HashLen2; int WalkLen)
 	LN_AddBefore(hn,Node);
 	*pTable = hn;
 
-	Debug(pHash->Members ++)
+#if defined _DEBUG && defined(_WIN32) /// TODO: CHECK ME	Debug(pHash->Members ++)
 
 	Debug(ListLen2 = Hash_ListLen(pHash,H))
 	assert( ListLen2 == (ListLen1 + 1) );
 	Debug(HashLen2 = Hash_NumMembers(pHash))
 	assert( HashLen2 == (HashLen1 + 1) );
+#endif
 
 return hn;
 }
@@ -1226,17 +1237,20 @@ Debug( int ListLen1; int ListLen2;int HashLen1; int HashLen2)
 
 	assert(pNode );
 	assert( pHash );
+#if defined _DEBUG && defined(_WIN32) /// TODO: CHECK ME
 	assert( pHash->MySelf1 == pHash && pHash->MySelf2 == pHash );
-
+#endif
 	assert( pNode->Hash > 0 && pNode->Hash < HASH_SIZE );
 
 	H = pNode->Hash;
 	pHead = & ( pHash->HashTable[H] );
 
 	Debug( HashLen1 = Hash_NumMembers(pHash) )
-	Debug( ListLen1 = Hash_ListLen(pHash,H) )
+	Debug( ListLen1 = Hash_ListLen(pHash,H); (void)ListLen1 )
+#if defined _DEBUG && defined(_WIN32) /// TODO: CHECK ME
 	assert(pHash->Members > 0);
 	Debug(pHash->Members --)
+#endif
 
 	if ( *pHead == pNode )
 	{
@@ -1254,20 +1268,22 @@ Debug( int ListLen1; int ListLen2;int HashLen1; int HashLen2)
 
 	MemPool_FreeHunk(HashNodePool_g,pNode);
 
+#if defined _DEBUG && defined(_WIN32) /// TODO: CHECK ME
 	Debug( HashLen2 = Hash_NumMembers(pHash) )
-	Debug( ListLen2 = Hash_ListLen(pHash,H) )
+	Debug( ListLen2 = Hash_ListLen(pHash,H); (void)ListLen2 )
 	assert( HashLen2 == (HashLen1 - 1) );
-
+#endif
 }
 
-HashNode * LISTCALL Hash_Get(Hash *pHash,uint32 Key,uint32 *pData)
+HashNode * LISTCALL Hash_Get(Hash *pHash,unsigned long Key,uint32 *pData)
 {
 uint32 H;
 HashNode *pNode;
 
 	assert(pHash );
+#if defined _DEBUG && defined(_WIN32) /// TODO: CHECK ME
 	assert( pHash->MySelf1 == pHash && pHash->MySelf2 == pHash );
-
+#endif
 	H = HASH(Key);
 	assert( H > 0 && H < HASH_SIZE );
 
@@ -1296,8 +1312,9 @@ HashNode * LISTCALL Hash_WalkNext(Hash *pHash,HashNode *pNode)
 HashNode *pNext;
 
 	assert(pHash);
+#if defined _DEBUG && defined(_WIN32) /// TODO: CHECK ME
 	assert( pHash->MySelf1 == pHash && pHash->MySelf2 == pHash );
-
+#endif
 	if ( ! pNode )
 	{
 		pNode = pHash->NodeList;
@@ -1328,8 +1345,9 @@ uint32 N;
 HashNode *pNode;
 
 	assert(pHash);
+#if defined _DEBUG && defined(_WIN32) /// TODO: CHECK ME
 	assert( pHash->MySelf1 == pHash && pHash->MySelf2 == pHash );
-
+#endif
 	pNode = pHash->NodeList;
 	assert( pNode->Hash == 0 );
 	pNode = LN_Next(pNode);
@@ -1338,12 +1356,16 @@ HashNode *pNode;
 	N = 0;
 	while( pNode->Hash < HASH_SIZE )
 	{
+#if defined _DEBUG && defined(_WIN32) /// TODO: CHECK ME
 		assert( N < (uint32)pHash->Members );
+#endif
 		pNode = LN_Next(pNode);
 		N ++;
 	}
 
+#if defined _DEBUG && defined(_WIN32) /// TODO: CHECK ME
 	assert( N == (uint32)pHash->Members );
+#endif
 
 return N;
 }
@@ -1361,7 +1383,7 @@ void	HashNode_SetData(HashNode *pNode,uint32 Data)
 	pNode->Data = Data;
 }
 
-void	HashNode_GetData(HashNode *pNode,uint32 *pKey,uint32 *pData)
+void	HashNode_GetData(HashNode *pNode,unsigned long *pKey,uint32 *pData)
 {
 	assert(pNode);
 	*pKey	= pNode->Key;

@@ -79,7 +79,7 @@ there's something wacked out about these format names :
 		_RGB order in a dword !!
 
 * YUV : the pixelformat ops here are identical to those of 24bit_RGB ;
-		this is just a place-keeper to notify you that you should to a YUV_to_RGB conversion
+		this is just a place-keeper to notify you that you should do a YUV_to_RGB conversion
 
 *********/
 

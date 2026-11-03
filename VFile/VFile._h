@@ -33,15 +33,15 @@ typedef void 		(GENESISCC *geVFile_FinderDestroyFN)(void *Handle);
 typedef	void * 	(GENESISCC *geVFile_OpenNewSystemFN)(geVFile *FS,
 					 const char *Name,
 					 void *	Context,
-					 unsigned int OpenModeFlags);
+					 uint32 OpenModeFlags);
 
-typedef geBoolean (GENESISCC *geVFile_UpdateContextFN)(geVFile *FS, void *Handle, void *Context, int ContextSize);
+typedef geBoolean (GENESISCC *geVFile_UpdateContextFN)(geVFile *FS, void *Handle, void *Context, int32 ContextSize);
 
 typedef	void * 	(GENESISCC *geVFile_OpenFN)(geVFile *FS,
 					 void *Handle,
 					 const char *Name,
 					 void *	Context,
-					 unsigned int OpenModeFlags);
+					 uint32 OpenModeFlags);
 
 typedef	geBoolean  (GENESISCC *geVFile_DeleteFileFN)(geVFile *FS, void *Handle, const char *FileName);
 typedef	geBoolean  (GENESISCC *geVFile_RenameFileFN)(geVFile *FS, void *Handle, const char *FileName, const char *NewFileName);
@@ -49,16 +49,16 @@ typedef	geBoolean  (GENESISCC *geVFile_FileExistsFN)(geVFile *FS, void *Handle, 
 typedef	geBoolean  (GENESISCC *geVFile_DisperseFN)(geVFile *FS, void *Handle, const char *Directory, geBoolean Recursive);
 typedef	void 	  (GENESISCC *geVFile_CloseFN)(void *Handle);
 
-typedef	geBoolean  (GENESISCC *geVFile_GetSFN)(void *Handle, void *Buff, int MaxSize);
-typedef	geBoolean  (GENESISCC *geVFile_ReadFN)(void *Handle, void *Buff, int Count);
-typedef	geBoolean  (GENESISCC *geVFile_WriteFN)(void *Handle, const void *Buff, int Count);
-typedef	geBoolean  (GENESISCC *geVFile_SeekFN)(void *Handle, int Where, geVFile_Whence Whence);
+typedef	geBoolean  (GENESISCC *geVFile_GetSFN)(void *Handle, void *Buff, int32 MaxSize);
+typedef	geBoolean  (GENESISCC *geVFile_ReadFN)(void *Handle, void *Buff, int32 Count);
+typedef	geBoolean  (GENESISCC *geVFile_WriteFN)(void *Handle, const void *Buff, int32 Count);
+typedef	geBoolean  (GENESISCC *geVFile_SeekFN)(void *Handle, int32 Where, geVFile_Whence Whence);
 typedef	geBoolean  (GENESISCC *geVFile_EOFFN)(const void *Handle);
-typedef	geBoolean  (GENESISCC *geVFile_TellFN)(const void *Handle, long *Position);
+typedef	geBoolean  (GENESISCC *geVFile_TellFN)(const void *Handle, int32 *Position);
 typedef	geBoolean  (GENESISCC *geVFile_GetPropertiesFN)(const void *Handle, geVFile_Properties *Properties);
 
-typedef	geBoolean  (GENESISCC *geVFile_SizeFN)(const void *Handle, long *Size);
-typedef geBoolean  (GENESISCC *geVFile_SetSizeFN)(void *Handle, long Size);
+typedef	geBoolean  (GENESISCC *geVFile_SizeFN)(const void *Handle, int32 *Size);
+typedef geBoolean  (GENESISCC *geVFile_SetSizeFN)(void *Handle, int32 Size);
 typedef geBoolean  (GENESISCC *geVFile_SetAttributesFN)(void *Handle, geVFile_Attributes Attributes);
 typedef geBoolean  (GENESISCC *geVFile_SetTimeFN)(void *Handle, const geVFile_Time *Time);
 typedef geBoolean  (GENESISCC *geVFile_SetHintsFN)(void *Handle, const geVFile_Hints *Hints);

@@ -118,7 +118,7 @@ typedef struct geBody
 	geBody_Material		 *MaterialArray;
 	geStrBlock			 *MaterialNames;
 
-	int					  LevelsOfDetail;
+	int32				  LevelsOfDetail;
 	geBody_TriangleList	  SkinFaces[GE_BODY_NUMBER_OF_LOD];
 
 	geBody				 *IsValid;
@@ -130,7 +130,9 @@ typedef struct geBody
 } geBody;
 
 #if defined(DEBUG) || !defined(NDEBUG)
-geBoolean GENESISCC geBody_SanityCheck(const geBody *B);
+#if defined SANITY_CHECK
+static geBoolean GENESISCC geBody_SanityCheck(const geBody *B);
+#endif
 #endif
 
 

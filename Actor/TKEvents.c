@@ -36,6 +36,10 @@
 #include "ErrorLog.h"
 #include "Ram.h"
 
+#if defined(__linux__)
+#define strnicmp strncasecmp
+#endif
+
 typedef struct
 {
 	geTKEvents_TimeType EventTime;

@@ -234,7 +234,7 @@ typedef struct
 //================================================================================
 
 
-#ifdef _INC_WINDOWS
+#if defined _INC_WINDOWS || defined(__linux__)
 	// Windows.h must be included before genesis.h for this api to be exposed.
 
 

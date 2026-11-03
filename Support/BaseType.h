@@ -28,7 +28,12 @@ extern "C" {
 
 /******** The Genesis Calling Conventions ***********/
 
-#define	GENESISCC	_fastcall
+#if defined(__linux__)
+	#define	 GENESISCC	/*__attribute__((fastcall))*/
+	typedef void * HWND;
+#elif defined _WIN32 || defined _WIN64
+	#define	 GENESISCC	_fastcall
+#endif
 
 #if	defined(BUILDGENESIS) && defined(GENESISDLLVERSION)
   #define GENESISAPI	_declspec(dllexport)
@@ -54,10 +59,11 @@ typedef double geDouble;
 #define NULL 0
 #endif
 
-typedef signed long     int32;
+#include <stdint.h>
+typedef int32_t     int32;
 typedef signed short    int16;
 typedef signed char     int8 ;
-typedef unsigned long  uint32;
+typedef uint32_t uint32;
 typedef unsigned short uint16;
 typedef unsigned char  uint8 ;
 

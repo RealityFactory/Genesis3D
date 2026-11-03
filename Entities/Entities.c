@@ -19,19 +19,22 @@
 /*  Copyright (C) 1999 WildTangent, Inc. All Rights Reserved                            */
 /*                                                                                      */
 /****************************************************************************************/
-#include <windows.h>
-#include <assert.h>
 
-#include "Entities.h"
-#include "BaseType.h"
-#include "ErrorLog.h"
-#include "Vec3d.h"
-#include "Ram.h"
+#include <stdio.h>
+#include <string.h>
 
-// These are temporary until we find a better way to get models pointers into the entity stuff
-#include "World.h"
+#include "GeTypes.h"
+#include "VFile.h"
 #include "GBSPFile.h"
 
+#include "Entities.h"
+
+#if defined(__linux__)
+#include <strings.h> //strcasecmp
+#define stricmp strcasecmp
+#define strnicmp strncasecmp
+static int min(int a, int b) { return a<b?a:b; }
+#endif
 
 //=====================================================================================
 //	Local Static Globals
@@ -407,7 +410,7 @@ geBoolean geEntity_ClassAddField(geEntity_Class	*Class, geEntity_Field *Field)
 	assert(Class);
 	assert(Field);
 
-	// Put at the beggining
+	// Put at the beginning
 	Field->Next = Class->Fields;
 	Class->Fields = Field;
 
@@ -481,7 +484,7 @@ void geEntity_EntitySetDestroy(geEntity_EntitySet *EntitySet)
 		}
 	}
 
-	// Finclaly destroy the sets themselves...
+	// Finally destroy the sets themselves...
 	for (Set = EntitySet; Set; Set = Next)
 	{
 		Next = Set->Next;
@@ -1082,7 +1085,7 @@ geEntity_EntitySet *LoadEntitySet(const char *EntityData, int32 EntityDataSize)
 	MemFile = geVFile_OpenNewSystem(NULL, GE_VFILE_TYPE_MEMORY, NULL, &Context, GE_VFILE_OPEN_READONLY);
 
 	if (!MemFile)
-		return FALSE;
+		return NULL;
 
 	// Create the entityset
 	EntitySet = geEntity_EntitySetCreate();
