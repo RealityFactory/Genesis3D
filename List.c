@@ -1055,9 +1055,9 @@ uint32		LISTCALL Hash_NumMembers(Hash *pHash)
 
 #else //}{ the real thing
 
-#define HASH_MOD	(1009) // or 1013  , a nice prime
-#define HASH_SIZE	(HASH_MOD + 1)
-#define HASH(Key)	((( ((Key)>>15) ^ (Key) )%HASH_MOD)+1)
+#define HASH_MOD	1009U
+#define HASH_SIZE	(HASH_MOD + 1U)
+#define HASH(Key)	((uint32)((((Key) >> 15) ^ (Key)) % HASH_MOD) + 1U)
 
 // TODO: CHEK DEBUG CONFIG
 struct Hash
@@ -1075,7 +1075,7 @@ struct Hash
 struct HashNode
 {
 	LinkNode LN;
-	unsigned long	Key; // is used as a pointer (geBitmap*)
+	uintptr	Key; // is used as a pointer (geBitmap*)
 	uint32	Data;
 	uint32	Hash;
 };
@@ -1162,7 +1162,7 @@ return Len;
 }
 #endif
 
-HashNode * LISTCALL Hash_Add(Hash *pHash,unsigned long Key,uint32 Data)
+HashNode * LISTCALL Hash_Add(Hash *pHash,uintptr Key,uint32 Data)
 {
 uint32 H;
 HashNode *hn,**pTable,*Node,*Prev;
@@ -1275,7 +1275,7 @@ Debug( int ListLen1; int ListLen2;int HashLen1; int HashLen2)
 #endif
 }
 
-HashNode * LISTCALL Hash_Get(Hash *pHash,unsigned long Key,uint32 *pData)
+HashNode * LISTCALL Hash_Get(Hash *pHash, uintptr Key, uint32 *pData)
 {
 uint32 H;
 HashNode *pNode;
@@ -1383,7 +1383,7 @@ void	HashNode_SetData(HashNode *pNode,uint32 Data)
 	pNode->Data = Data;
 }
 
-void	HashNode_GetData(HashNode *pNode,unsigned long *pKey,uint32 *pData)
+void	HashNode_GetData(HashNode *pNode, uintptr *pKey, uint32 *pData)
 {
 	assert(pNode);
 	*pKey	= pNode->Key;
@@ -1396,7 +1396,7 @@ uint32	HashNode_Data(HashNode *pNode)
 return pNode->Data;
 }
 
-uint32	HashNode_Key(HashNode *pNode)
+uintptr HashNode_Key(HashNode *pNode)
 {
 	assert(pNode);
 return pNode->Key;

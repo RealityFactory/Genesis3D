@@ -105,7 +105,7 @@ geBoolean	Ret = GE_TRUE;
 		geBitmap *Bmp;
 		uint32 TimesAdded;
 
-			HashNode_GetData(pNode,(unsigned long *)&Bmp,&TimesAdded);
+			HashNode_GetData(pNode,(uintptr *)&Bmp,&TimesAdded);
 
 /* 02/18/2004 Wendell Buckner
 	DOT3 BUMPMAPPING */
@@ -263,7 +263,7 @@ geBoolean	Ret = GE_TRUE;
 	geBitmap *Bmp;
 	uint32 TimesAdded;
 
-		HashNode_GetData(pNode,(unsigned long *)&Bmp,&TimesAdded);
+		HashNode_GetData(pNode,(uintptr *)&Bmp,&TimesAdded);
 
 /* 02/18/2004 Wendell Buckner
 	DOT3 BUMPMAPPING */
@@ -316,7 +316,7 @@ int Count;
 	geBitmap *Bmp;
 	uint32 TimesAdded;
 
-		HashNode_GetData(pNode,(unsigned long *)&Bmp,&TimesAdded);
+		HashNode_GetData(pNode,(uintptr *)&Bmp,&TimesAdded);
 
 		if ( geBitmap_GetTHandle(Bmp) )
 			Count ++;
@@ -337,7 +337,7 @@ uint32 TimesAdded;
 
 	assert(pList && Bitmap);
 
-	pNode = Hash_Get(pList->Hash,(unsigned long)Bitmap,&TimesAdded);
+	pNode = Hash_Get(pList->Hash,(uintptr)Bitmap,&TimesAdded);
 
 	assert( pList->Adds >= (int)TimesAdded );
 
@@ -360,7 +360,7 @@ uint32 TimesAdded;
 
 	pList->Adds ++;
 
-	if ( (pNode = Hash_Get(pList->Hash, (unsigned long)Bitmap, &TimesAdded)) != NULL )
+	if ( (pNode = Hash_Get(pList->Hash, (uintptr)Bitmap, &TimesAdded)) != NULL )
 	{
 		HashNode_SetData(pNode,TimesAdded+1);
 		return GE_FALSE;
@@ -368,7 +368,7 @@ uint32 TimesAdded;
 	else
 	{
 		pList->Members ++;
-		Hash_Add(pList->Hash,(unsigned long)Bitmap,1);
+		Hash_Add(pList->Hash,(uintptr)Bitmap,1);
 		return GE_TRUE;
 	}
 }
@@ -380,12 +380,12 @@ geBoolean BitmapList_Remove(BitmapList *pList,geBitmap *Bitmap)
 {
 HashNode *pNode;
 uint32 TimesAdded;
-unsigned long Key;
+uintptr Key;
 
 	assert(BitmapList_IsValid(pList));
 	assert(Bitmap);
 
-	Key = (unsigned long) Bitmap;
+	Key = (uintptr) Bitmap;
 	pNode = Hash_Get(pList->Hash,Key,&TimesAdded);
 
 	assert(pNode);

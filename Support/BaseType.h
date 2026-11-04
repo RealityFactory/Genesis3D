@@ -66,6 +66,7 @@ typedef signed char     int8 ;
 typedef uint32_t uint32;
 typedef unsigned short uint16;
 typedef unsigned char  uint8 ;
+typedef uintptr_t uintptr;
 
 /******** Macros on Genesis basic types *************/
 

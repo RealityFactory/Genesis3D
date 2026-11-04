@@ -160,9 +160,9 @@ typedef struct HashNode HashNode;
 
 extern Hash *	Hash_Create(void);
 extern void		Hash_Destroy(Hash *pHash);
-HashNode *	LISTCALL Hash_Add(Hash *pHash,unsigned long Key,uint32 Data);
+HashNode *	LISTCALL Hash_Add(Hash *pHash, uintptr Key, uint32 Data);
 void		LISTCALL Hash_DeleteNode(Hash *pHash,HashNode *pNode);
-HashNode *	LISTCALL Hash_Get(Hash *pHash,unsigned long Key,uint32 *pData);
+HashNode *	LISTCALL Hash_Get(Hash *pHash,uintptr Key,uint32 *pData);
 							// pdata is optional
 HashNode *	LISTCALL Hash_WalkNext(Hash *pHash,HashNode *pCur);
 							//use pCur == NULL to start walking
@@ -170,8 +170,8 @@ HashNode *	LISTCALL Hash_WalkNext(Hash *pHash,HashNode *pCur);
 uint32		LISTCALL Hash_NumMembers(Hash *pHash);
 
 void	HashNode_SetData(HashNode *pNode,uint32 Data);
-void	HashNode_GetData(HashNode *pNode,unsigned long *pKey,uint32 *pData);
-uint32	HashNode_Key(HashNode *pNode);
+void	HashNode_GetData(HashNode *pNode,uintptr *pKey,uint32 *pData);
+uintptr	HashNode_Key(HashNode *pNode);
 uint32	HashNode_Data(HashNode *pNode);
 
 uint32	Hash_StringToKey(const char * String);
