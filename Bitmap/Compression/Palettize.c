@@ -58,7 +58,7 @@ we palettize ("inverse colormap") using an octree lookup system
 
 typedef struct palInfo palInfo;
 
-int __inline	closestPalInlineRGB(int R,int G,int B,palInfo *pi);
+static inline int	closestPalInlineRGB(int R,int G,int B,palInfo *pi);
 int				closestPal(int R,int G,int B,palInfo *pi);
 palInfo *		closestPalInit(uint8 * palette);
 void			closestPalFree(palInfo *info);
@@ -449,7 +449,7 @@ int hash,d,bestD,bestP;
 
 #define doSteps()	do { node = pi->root; doStep(7); doStep(6); doStep(5); doStep(4); doStep(3); doStep(2); doStep(1); doStep(0); } while(0)
 
-int __inline closestPalInlineRGB(int R,int G,int B,palInfo *pi)
+static inline int closestPalInlineRGB(int R,int G,int B,palInfo *pi)
 {
 octNode *node,*kid;
 
