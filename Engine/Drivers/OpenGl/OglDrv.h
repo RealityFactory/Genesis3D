@@ -26,8 +26,8 @@
 // Here are some useful values you can change to meet your needs.
 // These should, in the future, really be handled at run-time as opposed to compile-time.
 // The defaults work well with TNT2 based cards.
-unsigned int COLOR_DEPTH;	// Bits per pixel to use for OpenGL Window/Context
-unsigned int ZBUFFER_DEPTH;		// Depth of the ZBuffer to use in OpenGL.
+extern		unsigned int COLOR_DEPTH;	// Bits per pixel to use for OpenGL Window/Context
+extern		unsigned int ZBUFFER_DEPTH;	// Depth of the ZBuffer to use in OpenGL.
 
 #define USE_LIGHTMAPS					// Render lightmaps
 #define USE_LINEAR_INTERPOLATION		// Comment out to use nearest neighbor interpolation

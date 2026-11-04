@@ -18,6 +18,7 @@
 /****************************************************************************************/
 
 #include <GL/gl.h>
+#include <string.h> // strchr
 
 #include "DCommon.h"
 #include "OglMisc.h"

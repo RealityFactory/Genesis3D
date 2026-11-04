@@ -37,7 +37,8 @@
 #include "Win32.h"
 #endif
 
-
+unsigned int COLOR_DEPTH;
+unsigned int ZBUFFER_DEPTH;
 int32 LastError;
 char LastErrorStr[255];
 
