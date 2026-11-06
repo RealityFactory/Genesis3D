@@ -35,9 +35,9 @@ typedef int (* geRam_CriticalCallbackFunction)(void);
   callback function if it's unable to allocate memory.
 */
 GENESISAPI geRam_CriticalCallbackFunction geRam_SetCriticalCallback
-    (
-      geRam_CriticalCallbackFunction callback
-    );
+	(
+	  geRam_CriticalCallbackFunction callback
+	);
 
 /*
   increments or decrements a counter .  if the counter is >0
@@ -71,11 +71,7 @@ GENESISAPI void *geRam_Allocate(uint32 size);
 */
 GENESISAPI void geRam_Free_(void *ptr);
 
-		extern void *StupidUnusedPointer;    // never used, except to mask the
-		// possible warning you get if you use the geRam_Free macro below, without
-		// using the xxx pointer again in the same block.  This is ugly.
-
-#define geRam_Free(xxx) geRam_Free_(xxx) ,(xxx)=NULL, StupidUnusedPointer=(xxx)
+#define geRam_Free(xxx) geRam_Free_(xxx) ,(xxx)=NULL, (void)(xxx)
 
 /*
   Reallocate memory.  This function supports shrinking and expanding blocks,
@@ -106,14 +102,14 @@ GENESISAPI void geRam_ReportAllocations(void);
 #endif
 
 #ifndef NDEBUG
-    extern int32 geRam_CurrentlyUsed;
-    extern int32 geRam_NumberOfAllocations;
-    extern int32 geRam_MaximumUsed;
-    extern int32 geRam_MaximumNumberOfAllocations;
+	extern int32 geRam_CurrentlyUsed;
+	extern int32 geRam_NumberOfAllocations;
+	extern int32 geRam_MaximumUsed;
+	extern int32 geRam_MaximumNumberOfAllocations;
 
 GENESISAPI     void geRam_AddAllocation(int n,uint32 size);
 #else
-    #define geRam_AddAllocation(n,s)
+	#define geRam_AddAllocation(n,s)
 #endif
 
 // allocate the ram & clear it. (calloc)
