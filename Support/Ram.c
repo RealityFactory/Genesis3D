@@ -104,10 +104,10 @@ static int geRam_DoCriticalCallback
 }
 
 
-GENESISAPI void * geRam_AllocateClear(uint32 size)
+GENESISAPI void * geRam_AllocateClear(size_t size)
 {
 void * mem;
-	size = (size + 3)&(~(uint32)3);
+	size = (size + 3)&(~(size_t)3);
 	mem = geRam_Allocate(size);
 	if ( mem )
 	{
@@ -130,7 +130,7 @@ return mem;
 	*/
 	void *geRam_Allocate
 		(
-		  uint32 size
+		  size_t size
 		)
 	{
 		void *p;
@@ -157,7 +157,7 @@ return mem;
 GENESISAPI     void *geRam_Realloc
 		(
 		  void *ptr,
-		  uint32 newsize
+		  size_t newsize
 		)
 	{
 		char *p;
@@ -199,11 +199,11 @@ GENESISAPI     void *geRam_Realloc
 
 	// header and trailer stuff...
 	static char MemStamp[] = {"!CHECKME!"};
-	static const int MemStampSize = sizeof (MemStamp);
-	static const int SizeSize = sizeof (uint32);
+	static const size_t MemStampSize = sizeof (MemStamp);
+	static const size_t SizeSize = sizeof (size_t);
 	// <> CB : pad sized to multiples of 8 !!!
-	#define HEADER_SIZE		(((SizeSize		+ MemStampSize)+7)&(~(uint32)7))
-	#define EXTRA_SIZE		(((HEADER_SIZE	+ MemStampSize)+7)&(~(uint32)7))
+	#define HEADER_SIZE		(((SizeSize		+ MemStampSize)+7)&(~(size_t)7))
+	#define EXTRA_SIZE		(((HEADER_SIZE	+ MemStampSize)+7)&(~(size_t)7))
 	static const unsigned char AllocFillerByte = (unsigned char)0xA5;
 	static const unsigned char FreeFillerByte  = (unsigned char)0xB6;
 	/*
@@ -223,7 +223,7 @@ GENESISAPI     void *geRam_Realloc
 	static void geRam_SetupBlock
 		  (
 			char * p,
-			uint32 size,
+			size_t size,
 			geRam_MemoryInitialization InitMem
 		  )
 	{
@@ -234,7 +234,7 @@ GENESISAPI     void *geRam_Realloc
 		}
 
 		// add the size at the front
-		*((uint32 *)p) = size;
+		*((size_t *)p) = size;
 
 		// copy the memstamp to the front of the block
 		memcpy (p+SizeSize, MemStamp, MemStampSize);
@@ -244,7 +244,7 @@ GENESISAPI     void *geRam_Realloc
 	}
 
 #ifndef NDEBUG
-GENESISAPI 	void* _geRam_DebugAllocate(uint32 size, const char* pFile, int line)
+GENESISAPI 	void* _geRam_DebugAllocate(size_t size, const char* pFile, int line)
 	{
 	  char *p;
 
@@ -279,7 +279,7 @@ GENESISAPI 	void* _geRam_DebugAllocate(uint32 size, const char* pFile, int line)
 
 #else // NDEBUG
 
-GENESISAPI     void * geRam_Allocate (uint32 size)
+GENESISAPI     void * geRam_Allocate (size_t size)
 	{
 	  char *p;
 
@@ -319,7 +319,7 @@ GENESISAPI     void * geRam_Allocate (uint32 size)
 		  )
 	{
 		char * p = ptr;
-		uint32 size;
+		size_t size;
 
 		if (p == NULL)
 		{
@@ -331,7 +331,7 @@ GENESISAPI     void * geRam_Allocate (uint32 size)
 		p -= HEADER_SIZE;
 
 		// get size from block
-		size = *((uint32 *)p);
+		size = *((size_t *)p);
 
 		// check stamp at front
 		if (memcmp (p+SizeSize, MemStamp, MemStampSize) != 0)
@@ -353,7 +353,7 @@ GENESISAPI     void * geRam_Allocate (uint32 size)
 GENESISAPI     void geRam_Free_ (void *ptr)
 	{
 		char *p;
-		uint32 size;
+		size_t size;
 
 		// make sure it's a valid block...
 		p = ram_verify_block (ptr);
@@ -363,7 +363,7 @@ GENESISAPI     void geRam_Free_ (void *ptr)
 		}
 
 		// gotta get the size before you free it
-		size = *((uint32 *)p);
+		size = *((size_t *)p);
 
 		// fill it with trash...
 		memset (p, FreeFillerByte, size+EXTRA_SIZE);
@@ -381,11 +381,11 @@ GENESISAPI     void geRam_Free_ (void *ptr)
 
 #ifndef NDEBUG
 
-GENESISAPI     void * _geRam_DebugRealloc (void *ptr, uint32 newsize, const char* pFile, int line)
+GENESISAPI     void * _geRam_DebugRealloc (void *ptr, size_t newsize, const char* pFile, int line)
 	{
 		char *p;
 		char * NewPtr;
-		uint32 size;
+		size_t size;
 
 		// if realloc is called with NULL, just treat it like an alloc
 		if (ptr == NULL)
@@ -408,7 +408,7 @@ GENESISAPI     void * _geRam_DebugRealloc (void *ptr, uint32 newsize, const char
 		}
 
 		// gotta get the size before I realloc it...
-		size = *((uint32 *)p);
+		size = *((size_t *)p);
 
 		do
 		{
@@ -435,11 +435,11 @@ GENESISAPI     void * _geRam_DebugRealloc (void *ptr, uint32 newsize, const char
 
 #else // NDEBUG
 
-GENESISAPI     void * geRam_Realloc (void *ptr, uint32 newsize)
+GENESISAPI     void * geRam_Realloc (void *ptr, size_t newsize)
 	{
 		char *p;
 		char * NewPtr;
-		uint32 size;
+		size_t size;
 
 		// if realloc is called with NULL, just treat it like an alloc
 		if (ptr == NULL)
@@ -462,7 +462,7 @@ GENESISAPI     void * geRam_Realloc (void *ptr, uint32 newsize)
 		}
 
 		// gotta get the size before I realloc it...
-		size = *((uint32 *)p);
+		size = *((size_t *)p);
 
 		do
 		{
@@ -502,7 +502,7 @@ GENESISAPI void geRam_ReportAllocations(void)
 
 	// for external programs that allocate memory some other way.
 	// Here they can use ram to keep track of the memory.
-GENESISAPI     void geRam_AddAllocation (int n, uint32 size)
+GENESISAPI     void geRam_AddAllocation (int n, size_t size)
 	{
 		// and update the allocations stuff
 		geRam_NumberOfAllocations += n;
@@ -525,7 +525,7 @@ GENESISAPI     void geRam_AddAllocation (int n, uint32 size)
 geBoolean geRam_IsValidPtr(void *ptr)
 {
 char * p = ptr;
-uint32 size;
+size_t size;
 
 	if (p == NULL) return GE_FALSE;
 
@@ -533,7 +533,7 @@ uint32 size;
 	p -= HEADER_SIZE;
 
 	// get size from block
-	size = *((uint32 *)p);
+	size = *((size_t *)p);
 
 	// check stamp at front
 	if (memcmp (p+SizeSize, MemStamp, MemStampSize) != 0)

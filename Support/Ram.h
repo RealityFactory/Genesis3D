@@ -58,11 +58,11 @@ GENESISAPI int geRam_EnableCriticalCallback(int add);
 #define geRam_Allocate(size) _geRam_DebugAllocate(size, __FILE__, __LINE__)
 
 // Do not call _geRam_DebugAllocate directly.
-GENESISAPI void* _geRam_DebugAllocate(uint32 size, const char* pFile, int line);
+GENESISAPI void* _geRam_DebugAllocate(size_t size, const char* pFile, int line);
 
 #else
 
-GENESISAPI void *geRam_Allocate(uint32 size);
+GENESISAPI void *geRam_Allocate(size_t size);
 
 #endif
 
@@ -83,11 +83,11 @@ GENESISAPI void geRam_Free_(void *ptr);
 #define geRam_Realloc(ptr, newsize) _geRam_DebugRealloc(ptr, newsize, __FILE__, __LINE__)
 
 // Do not call _geRam_DebugRealloc directly.
-GENESISAPI void* _geRam_DebugRealloc(void* ptr, uint32 size, const char* pFile, int line);
+GENESISAPI void* _geRam_DebugRealloc(void* ptr, size_t size, const char* pFile, int line);
 
 #else
 
-GENESISAPI void *geRam_Realloc(void *ptr,uint32 newsize);
+GENESISAPI void *geRam_Realloc(void *ptr, size_t newsize);
 
 #endif
 
@@ -107,21 +107,21 @@ GENESISAPI void geRam_ReportAllocations(void);
 	extern int32 geRam_MaximumUsed;
 	extern int32 geRam_MaximumNumberOfAllocations;
 
-GENESISAPI     void geRam_AddAllocation(int n,uint32 size);
+GENESISAPI     void geRam_AddAllocation(int n,size_t size);
 #else
 	#define geRam_AddAllocation(n,s)
 #endif
 
 // allocate the ram & clear it. (calloc)
-GENESISAPI void * geRam_AllocateClear(uint32 size);
+GENESISAPI void * geRam_AllocateClear(size_t size);
 
 #define GE_RAM_ALLOCATE_STRUCT(type)      (type *)geRam_Allocate (sizeof (type))
-#define GE_RAM_ALLOCATE_ARRAY(type,count) (type *)geRam_Allocate (sizeof (type) * (count))
+#define GE_RAM_ALLOCATE_ARRAY(type,count) (type *)geRam_Allocate (sizeof (type) * (size_t)(count))
 
 #ifndef NDEBUG
-#define GE_RAM_REALLOC_ARRAY(ptr,type,count)  (type *)geRam_Realloc(  (ptr), sizeof(type) * (count) );{type *XX=(ptr); (void)XX; }
+#define GE_RAM_REALLOC_ARRAY(ptr,type,count)  (type *)geRam_Realloc(  (ptr), sizeof(type) * (size_t)(count) );{type *XX=(ptr); (void)XX; }
 #else
-#define GE_RAM_REALLOC_ARRAY(ptr,type,count)  (type *)geRam_Realloc(  (ptr), sizeof(type) * (count) )
+#define GE_RAM_REALLOC_ARRAY(ptr,type,count)  (type *)geRam_Realloc(  (ptr), sizeof(type) * (size_t)(count) )
 #endif
 
 #ifndef NDEBUG
