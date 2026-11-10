@@ -60,13 +60,17 @@ typedef double geDouble;
 #endif
 
 #include <stdint.h>
-typedef int32_t     int32;
-typedef signed short    int16;
-typedef signed char     int8 ;
-typedef uint32_t uint32;
-typedef unsigned short uint16;
-typedef unsigned char  uint8 ;
-typedef uintptr_t uintptr;
+#include <stddef.h>
+typedef int64_t			int64;
+typedef int32_t			int32;
+typedef int16_t			int16;
+typedef signed char		int8;
+typedef intptr_t		intptr;
+typedef uint64_t		uint64;
+typedef uint32_t		uint32;
+typedef uint16_t		uint16;
+typedef unsigned char	uint8;
+typedef uintptr_t		uintptr;
 
 /******** Macros on Genesis basic types *************/
 
