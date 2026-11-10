@@ -136,7 +136,6 @@ set(GENESIS3D_SOURCES
     Support/Log.c
     Support/MemPool.c
     Support/Ram.c
-    Support/RamDLL.c
 
     # VFile
     VFile/DirTree.c
