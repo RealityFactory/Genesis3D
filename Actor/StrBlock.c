@@ -68,7 +68,7 @@ int GENESISCC geStrBlock_GetChecksum(const geStrBlock *SB)
 			assert(Str!=NULL);
 			Len = strlen(Str);
 			for (j=0; j<Len; j++)
-				 {
+				{
 					Checksum += (int)Str[j];
 				}
 			Checksum = Checksum*3;
@@ -95,9 +95,9 @@ geStrBlock *GENESISCC geStrBlock_Create(void)
 
 void GENESISCC geStrBlock_Destroy(geStrBlock **SB)
 {
-	assert( (*SB)->SanityCheck == (*SB) );
 	assert(  SB != NULL );
 	assert( *SB != NULL );
+	assert( (*SB)->SanityCheck == (*SB) );
 	geRam_Free( *SB );
 	*SB = NULL;
 }
