@@ -1537,7 +1537,7 @@ GENESISAPI geMotion* GENESISCC geMotion_CreateFromFile(geVFile* pFile)
 				geErrorLog_Add( ERR_MOTION_FILE_READ , NULL);
 				return NULL;
 			}
-		if	(sscanf(line, "%lX.%lX\n", &u, &v) != 2)
+		if	(sscanf(line, "%X.%X\n", &u, &v) != 2)
 			{
 				geErrorLog_Add( ERR_MOTION_FILE_READ , NULL);
 				return NULL;
@@ -1607,7 +1607,7 @@ GENESISAPI geMotion* GENESISCC geMotion_CreateFromFile(geVFile* pFile)
 			}
 			else if(strnicmp(line, MOTION_NAMECHECKSUM_ID, sizeof(MOTION_NAMECHECKSUM_ID)-1) == 0)
 			{
-				if(sscanf(line + sizeof(MOTION_NAMECHECKSUM_ID)-1, "%ld", &M->Leaf.NameChecksum) != 1)
+				if(sscanf(line + sizeof(MOTION_NAMECHECKSUM_ID)-1, "%d", &M->Leaf.NameChecksum) != 1)
 					{
 						geErrorLog_Add( ERR_MOTION_FILE_READ , NULL);
 						break;
