@@ -41,7 +41,7 @@ static geBoolean LoadMotions(GBSP_BSPData *BSP, geVFile *f)
 	if	(geVFile_GetS(f, line, sizeof(line)) == GE_FALSE)
 		goto fail;
 
-	if (sscanf(line, "%s %s\n", KeyS, ValueS) != 2)
+	if (sscanf(line, "%99s %99s\n", KeyS, ValueS) != 2)
 		goto fail;
 
 	if (strcmp(KeyS, "Genesis_Motion_File"))
@@ -50,7 +50,7 @@ static geBoolean LoadMotions(GBSP_BSPData *BSP, geVFile *f)
 	if	(geVFile_GetS(f, line, sizeof(line)) == GE_FALSE)
 		goto fail;
 
-	if (sscanf(line, "%s %d\n", KeyS, &NumMotions) != 2)
+	if (sscanf(line, "%99s %d\n", KeyS, &NumMotions) != 2)
 		goto fail;
 
 	if (strcmp(KeyS, "NumMotions"))
@@ -63,10 +63,13 @@ static geBoolean LoadMotions(GBSP_BSPData *BSP, geVFile *f)
 		if	(geVFile_GetS(f, line, sizeof(line)) == GE_FALSE)
 			goto fail;
 
-		if (sscanf(line, "%s %d\n", KeyS, &ModelNum) != 2)
+		if (sscanf(line, "%99s %d\n", KeyS, &ModelNum) != 2)
 			goto fail;
 
 		if (strcmp(KeyS, "ModelNum"))
+			goto fail;
+
+		if (ModelNum < 0 || ModelNum >= BSP->NumGFXModels)
 			goto fail;
 
 		Models[ModelNum].Motion = geMotion_CreateFromFile(f);
