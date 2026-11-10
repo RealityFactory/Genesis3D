@@ -205,6 +205,12 @@ if(UNIX AND NOT APPLE)
     )
 
     set_target_properties(Genesis3D PROPERTIES
+        C_STANDARD 11
+        C_STANDARD_REQUIRED ON
+        C_EXTENSIONS ON
+    )
+
+    set_target_properties(Genesis3D PROPERTIES
         OUTPUT_NAME Genesis3D
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
     )
