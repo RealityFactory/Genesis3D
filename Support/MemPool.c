@@ -56,14 +56,14 @@ struct MemBlock
 	MemBlock * Next;
 	char * MemBase;
 	char * MemPtr;
-	int MemLength;
-	int MemFree;	// MemPtr + MemFree == MemBase + MemLength
+	size_t MemLength;
+	size_t MemFree;	// MemPtr + MemFree == MemBase + MemLength
 };
 
 
 struct MemPool
 {
-	int HunkLength;
+	size_t HunkLength;
 	MemBlock * CurMemBlock; // jump into the list
 	MemBlock * MemList; // list of memblocks
 	int AutoExtendNumItems;
@@ -94,8 +94,11 @@ return 1;
 int MemPool_IsValid(MemPool * Pool)
 {
 	if ( ! Pool ) return 0;
-	if ( Pool->NumFreedHunks < 0 || Pool->AutoExtendNumItems < 0
-		|| Pool->MaxNumFreedHunks < 0 || Pool->NumItemsActive || Pool->HunkLength )
+	if ( Pool->NumFreedHunks < 0
+	  || Pool->AutoExtendNumItems < 0
+	  || Pool->MaxNumFreedHunks < 0
+	  || Pool->NumItemsActive < 0
+	  || Pool->HunkLength == 0)
 		return 0;
 	if ( Pool->NumFreedHunks >= Pool->MaxNumFreedHunks ) return 0;
 
@@ -107,6 +110,9 @@ int MemPool_IsValid(MemPool * Pool)
 
 MemPool * MemPool_Create (int HunkLength,int NumHunks,int AutoExtendNumItems)
 {
+if (HunkLength <= 0)
+  return (NULL);
+
 MemPool * Ret;
 
 if ( (Ret = RamCalloc(sizeof(MemPool))) == NULL )
@@ -220,6 +226,9 @@ MemBlock * CurMemBlock;
 
 int MemPool_Extend(MemPool * Pool, int NumHunks)
 {
+	if (NumHunks <= 0)
+		return 0;
+
 MemBlock * NewMemBlock;
 
 	NewMemBlock = Pool->MemList;
@@ -236,7 +245,7 @@ MemBlock * NewMemBlock;
 	if ( (NewMemBlock = RamCalloc(sizeof(MemBlock))) == NULL )
 		return(0);
 
-	NewMemBlock->MemLength = NumHunks * Pool->HunkLength;
+	NewMemBlock->MemLength = (size_t)NumHunks * Pool->HunkLength;
 	NewMemBlock->MemFree = NewMemBlock->MemLength;
 
 	if ( (NewMemBlock->MemBase = RamCalloc(NewMemBlock->MemLength)) == NULL )
