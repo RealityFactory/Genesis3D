@@ -149,7 +149,7 @@ static	geBoolean	BuildFileName(
 }
 
 static	void *	GENESISCC FSDos_FinderCreate(
-	geVFile *			FS,
+	geVFile *		FS,
 	void *			Handle,
 	const char *	FileSpec)
 {
@@ -157,9 +157,11 @@ static	void *	GENESISCC FSDos_FinderCreate(
 	DosFile *		File;
 	char *			NamePtr;
 #if defined(__linux__)
-	char *			Buff;//[PATH_MAX];
+	char *			Buff;
+	size_t			MaxPathLen = PATH_MAX;
 #elif defined _WIN32 || defined _WIN64
 	char			Buff[_MAX_PATH];
+	size_t			MaxPathLen = sizeof(Buff);
 #endif
 	(void)FS;
 
@@ -178,7 +180,7 @@ static	void *	GENESISCC FSDos_FinderCreate(
 #if defined(__linux__)
 	Buff = Finder->DirName; // on Linux save path for later usage
 #endif
-	if	(BuildFileName(File, FileSpec, Buff, &NamePtr, sizeof(Buff)) == GE_FALSE)
+	if	(BuildFileName(File, FileSpec, Buff, &NamePtr, MaxPathLen) == GE_FALSE)
 	{
 		geRam_Free(Finder);
 		return NULL;
@@ -189,7 +191,10 @@ static	void *	GENESISCC FSDos_FinderCreate(
 #if defined(__linux__)
 	Finder->FindDir = opendir(Finder->DirName);
 	if	(!Finder->FindDir)
+	{
+		geRam_Free(Finder);
 		return NULL;
+	}
 	Finder->FindHandle = readdir(Finder->FindDir);
 #elif defined _WIN32 || defined _WIN64
 	Finder->FindHandle = FindFirstFile(Buff, &Finder->FindData);
