@@ -190,6 +190,7 @@ if(UNIX AND NOT APPLE)
 
     target_compile_definitions(Genesis3D PRIVATE
         $<$<CONFIG:Debug>:_DEBUG>
+        $<$<CONFIG:Release>:NDEBUG>
     )
 
     target_link_libraries(Genesis3D PRIVATE
