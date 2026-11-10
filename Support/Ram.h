@@ -102,10 +102,10 @@ GENESISAPI void geRam_ReportAllocations(void);
 #endif
 
 #ifndef NDEBUG
-	extern int32 geRam_CurrentlyUsed;
-	extern int32 geRam_NumberOfAllocations;
-	extern int32 geRam_MaximumUsed;
-	extern int32 geRam_MaximumNumberOfAllocations;
+	extern int64 geRam_CurrentlyUsed;
+	extern int64 geRam_NumberOfAllocations;
+	extern int64 geRam_MaximumUsed;
+	extern int64 geRam_MaximumNumberOfAllocations;
 
 GENESISAPI     void geRam_AddAllocation(int n,size_t size);
 #else

@@ -192,10 +192,10 @@ GENESISAPI     void *geRam_Realloc
 	 */
 
 	// yes, this will break if we use more than 2 gigabytes of RAM...
-	int32 geRam_CurrentlyUsed       = 0;  // total ram currently in use
-	int32 geRam_MaximumUsed         = 0;  // max total ram allocated at any time
-	int32 geRam_NumberOfAllocations     = 0;  // current number of blocks allocated
-	int32 geRam_MaximumNumberOfAllocations = 0;  // max number of allocations at any time
+	int64 geRam_CurrentlyUsed       = 0;  // total ram currently in use
+	int64 geRam_MaximumUsed         = 0;  // max total ram allocated at any time
+	int64 geRam_NumberOfAllocations     = 0;  // current number of blocks allocated
+	int64 geRam_MaximumNumberOfAllocations = 0;  // max number of allocations at any time
 
 	// header and trailer stuff...
 	static char MemStamp[] = {"!CHECKME!"};
@@ -423,7 +423,14 @@ GENESISAPI     void * _geRam_DebugRealloc (void *ptr, size_t newsize, const char
 
 		geRam_SetupBlock (NewPtr, newsize, DONT_INITIALIZE);
 
-		geRam_CurrentlyUsed += (newsize - size);
+		if (newsize >= size)
+		{
+			geRam_CurrentlyUsed += (int64)(newsize - size);
+		}
+		else
+		{
+			geRam_CurrentlyUsed -= (int64)(size - newsize);
+		}
 		if (geRam_CurrentlyUsed > geRam_MaximumUsed)
 		{
 			geRam_MaximumUsed = geRam_CurrentlyUsed;
