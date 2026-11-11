@@ -375,7 +375,7 @@ const geBodyInst_Geometry *GENESISCC geBodyInst_GetGeometry(
 
 		for (i=0,T=B->SkinFaces[LevelOfDetail].FaceArray,D=G->FaceList;
 				i<Count;
-				i++,T++,B++)
+				i++,T++)
 		{
 			*D = GE_BODYINST_FACE_TRIANGLE;
 			D++;
