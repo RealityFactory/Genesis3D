@@ -827,7 +827,7 @@ static geBoolean ParseClassUserData(geEntity_EntitySet *EntitySet, geEntity *Ent
 			geEntity		*Ent;
 
 			case TYPE_INT:
-				sscanf(Epair->Value, "%d", UData + Field->Offset);
+				sscanf(Epair->Value, "%d", (int32 *)(UData + Field->Offset));
 				break;
 
 			case TYPE_FLOAT:
