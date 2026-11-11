@@ -1936,7 +1936,7 @@ static geBoolean GENESISCC geMotion_ReadBinaryLeaf(geMotion *M, geVFile *pFile)
 	if ( M->Leaf.PathArray == NULL )
 		{
 			geErrorLog_Add(ERR_MOTION_CREATE_ENOMEM, NULL);
-			return GE_TRUE;
+			return GE_FALSE;
 		}
 
 	for (i=0; i<Header.PathCount; i++)
