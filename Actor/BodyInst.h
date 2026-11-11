@@ -76,7 +76,7 @@ typedef struct geBodyInst_Geometry
 	geVec3d					*NormalArray;
 
 	geBodyInst_Index		 FaceCount;
-	int32					 FaceListSize;
+	size_t					 FaceListSize;
 	geBodyInst_Index		*FaceList;
 
 	geVec3d					 Maxs, Mins;

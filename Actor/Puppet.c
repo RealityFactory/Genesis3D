@@ -1495,7 +1495,7 @@ static void GENESISCC gePuppet_DrawShadow(const gePuppet *P,
 				geTClip_Triangle(v);
 			}
 		}
-		assert( ((uint32)List) - ((uint32)G->FaceList) == (uint32)(G->FaceListSize) );
+		assert( (size_t)((char*)List - (char*)G->FaceList) == G->FaceListSize );
 	}
 #endif
 }
@@ -2766,8 +2766,7 @@ ll Buckner
 				geEngine_RenderPoly(Engine, (GE_TLVertex*)ScreenPts, Length1, PM->Bitmap, 0 );
 // end change
 		}
-		//assert( ((uint32)List) - ((uint32)G->FaceList) == (uint32)(G->FaceListSize) );
-		assert( ((uint32)List) - ((uint32)P->BodyG->FaceList) == (uint32)(P->BodyG->FaceListSize) );
+		assert( (size_t)((char*)List - (char*)P->BodyG->FaceList) == P->BodyG->FaceListSize );
 	}
 
 	if (P->DoShadow)
@@ -3153,8 +3152,8 @@ geBoolean GENESISCC gePuppet_RenderShadowVolume(gePuppet *P,
 
 		if(pEdges!=NULL)
 			geRam_Free(pEdges);
-		assert( ((uint32)List) - ((uint32)P->BodyG->FaceList) == (uint32)(P->BodyG->FaceListSize) );
 
+		assert( (size_t)((char*)List - (char*)P->BodyG->FaceList) == P->BodyG->FaceListSize );
 	}
 
 	return GE_TRUE;

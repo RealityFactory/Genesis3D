@@ -389,7 +389,7 @@ const geBodyInst_Geometry *GENESISCC geBodyInst_GetGeometry(
 				D++;
 			}
 		}
-		assert( ((uint32)D) - ((uint32)G->FaceList) == (uint32)(G->FaceListSize) );
+		assert( (size_t)((char*)D - (char*)G->FaceList) == G->FaceListSize );
 		G->FaceCount = Count;
 		((geBodyInst *)BI)->LastLevelOfDetail = LevelOfDetail;
 	}
