@@ -33,7 +33,7 @@ void Log_Out(const char * string)
 	OutputDebugString(string);
 #endif
 #endif
-	printf(string);
+	fputs(string, stdout);
 }
 
 
