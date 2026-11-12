@@ -111,7 +111,7 @@ geBoolean SetFullscreen(DRV_DriverHook *Hook)
 }
 
 
-void SetGLPixelFormat(DRV_DriverHook *Hook)
+geBoolean SetGLPixelFormat(DRV_DriverHook *Hook)
 {
 	GLint nPixelFormat;
 	static PIXELFORMATDESCRIPTOR pfd;
@@ -140,7 +140,11 @@ void SetGLPixelFormat(DRV_DriverHook *Hook)
 
 		hRC = wglCreateContext(hDC);
 		wglMakeCurrent(hDC, hRC);
+
+		return GE_TRUE;
 	}
+
+	return GE_FALSE;
 }
 
 

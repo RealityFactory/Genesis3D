@@ -33,7 +33,7 @@ struct
 
 
 void WindowSetup(DRV_DriverHook *Hook);
-void SetGLPixelFormat(DRV_DriverHook *Hook);
+geBoolean SetGLPixelFormat(DRV_DriverHook *Hook);
 void WindowCleanup();
 void FlipGLBuffers();
 geBoolean SetFullscreen(DRV_DriverHook *Hook);

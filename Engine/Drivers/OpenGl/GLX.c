@@ -119,7 +119,7 @@ geBoolean SetFullscreen(DRV_DriverHook *Hook)
 }
 
 
-void SetGLPixelFormat(DRV_DriverHook *Hook)
+geBoolean SetGLPixelFormat(DRV_DriverHook *Hook)
 {
 	GLint att[] = { GLX_RGBA, GLX_DEPTH_SIZE, ZBUFFER_DEPTH, GLX_DOUBLEBUFFER, None };
 	glxWnd *GLXWnd = (glxWnd*)(Hook->hWnd);
@@ -133,11 +133,15 @@ void SetGLPixelFormat(DRV_DriverHook *Hook)
 		hRC = glXCreateContext(dpy, vis, NULL, True);
 		if(!hRC)
 		{
-			return;
+			return GE_FALSE;
 		}
 
 		glXMakeCurrent(dpy, win, hRC);
+
+		return GE_TRUE;
 	}
+
+	return GE_FALSE;
 }
 
 

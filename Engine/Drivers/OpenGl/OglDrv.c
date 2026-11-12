@@ -237,7 +237,11 @@ geBoolean DRIVERCC DrvInit(DRV_DriverHook *Hook)
 		return GE_FALSE;
 	}
 
-	SetGLPixelFormat(Hook);
+	if(!SetGLPixelFormat(Hook))
+	{
+		SetLastDrvError(DRV_ERROR_GENERIC, "OGL_DrvInit:  Setting Pixel Format failed...\n");
+		return GE_FALSE;
+	}
 
 	ClientWindow.Width = Hook->Width;
 	ClientWindow.Height = Hook->Height;
