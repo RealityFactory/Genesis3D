@@ -186,6 +186,7 @@ GLint EnumNativeModes(DRV_ENUM_MODES_CB *Cb, void *Context)
 				if(!Cb(modeCount + 1, resolution, screenSizes[sizeID].width, screenSizes[sizeID].height, Context))
 				{
 					XRRFreeScreenConfigInfo(screenConfig);
+					XCloseDisplay(dpy);
 					return modeCount;
 				}
 				modeCount++;
@@ -202,6 +203,7 @@ GLint EnumNativeModes(DRV_ENUM_MODES_CB *Cb, void *Context)
 
 		if(!Cb(modeCount + 1, resolution, width, height, Context))
 		{
+			XCloseDisplay(dpy);
 			return modeCount;
 		}
 		modeCount++;
