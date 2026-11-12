@@ -670,7 +670,8 @@ static void GENESISCC geBody_DestroyPossiblyIncompleteBody( geBody **PB )
 			// <> CB ; see note above
 			// this doesn't seem to prevent us from crashing here
 			//	when an actor has an error during _Create
-			if ( (B->MaterialArray[i].Bitmap) > 1 )
+			if ( B->MaterialArray[i].Bitmap != NULL &&
+				 B->MaterialArray[i].Bitmap != (geBitmap *)1 )
 				geBitmap_Destroy(&(B->MaterialArray[i].Bitmap));
 			B->MaterialArray[i].Bitmap = NULL;
 		}
@@ -1486,12 +1487,12 @@ static geBoolean GENESISCC geBody_ReadGeometry(geBody *B, geVFile *pFile)
 		else
 		{
 			int16 MaterialIndex;
-			uint32 dummy;
+			uint32 hasBitmap;
 			for(MaterialIndex=0;MaterialIndex<B->MaterialCount;MaterialIndex++)
 			{
-				if(geVFile_Read(pFile, &dummy, sizeof(uint32)) == GE_FALSE)
+				if(geVFile_Read(pFile, &hasBitmap, sizeof(uint32)) == GE_FALSE)
 				{	geErrorLog_Add( ERR_BODY_FILE_READ , NULL);	 return GE_FALSE; }
-				B->MaterialArray[MaterialIndex].Bitmap = (geBitmap *)dummy;
+				B->MaterialArray[MaterialIndex].Bitmap = hasBitmap ? (geBitmap *)1 : NULL;
 				if(geVFile_Read(pFile, &B->MaterialArray[MaterialIndex].Red, sizeof(geFloat)) == GE_FALSE)
 				{	geErrorLog_Add( ERR_BODY_FILE_READ , NULL);	 return GE_FALSE; }
 				if(geVFile_Read(pFile, &B->MaterialArray[MaterialIndex].Green, sizeof(geFloat)) == GE_FALSE)
@@ -1699,8 +1700,8 @@ geBoolean GENESISCC geBody_WriteGeometry(const geBody *B,geVFile *pFile)
 			uint32 MaterialIndex;
 			for(MaterialIndex=0;MaterialIndex<B->MaterialCount;MaterialIndex++)
 			{
-				uint32 dummy = (uint32)B->MaterialArray[MaterialIndex].Bitmap;
-				if(geVFile_Write(pFile, &dummy, sizeof(uint32)) == GE_FALSE)
+				uint32 hasBitmap = B->MaterialArray[MaterialIndex].Bitmap ? 1 : 0;
+				if(geVFile_Write(pFile, &hasBitmap, sizeof(uint32)) == GE_FALSE)
 				{	geErrorLog_Add( ERR_BODY_FILE_WRITE , NULL);	return GE_FALSE; }
 				if(geVFile_Write(pFile, &B->MaterialArray[MaterialIndex].Red, sizeof(geFloat)) == GE_FALSE)
 				{	geErrorLog_Add( ERR_BODY_FILE_WRITE , NULL);	return GE_FALSE; }

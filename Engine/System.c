@@ -191,6 +191,11 @@ const uint32 geEngine_Version = GE_VERSION;
 const uint32 geEngine_Version_OldestSupported =
 	( (GE_VERSION_MAJOR << GE_VERSION_MAJOR_SHIFT) + GE_VERSION_MINOR_MIN );
 
+static void Sys_CriticalShutdownCallback(void *Context)
+{
+	geEngine_ShutdownDriver((geEngine *)Context);
+}
+
 geEngine *Sys_EngineCreate(HWND hWnd, const char *AppName, const char *DriverDirectory, uint32 Version)
 {
 	int32			i;
@@ -275,7 +280,7 @@ geEngine *Sys_EngineCreate(HWND hWnd, const char *AppName, const char *DriverDir
 
 	NewEngine->DisplayFrameRateCounter = GE_TRUE;	// Default to showing the FPS counter
 
-	geAssert_SetCriticalShutdownCallback( geEngine_ShutdownDriver, NewEngine );
+	geAssert_SetCriticalShutdownCallback( Sys_CriticalShutdownCallback, NewEngine );
 
 	NewEngine->CurrentGamma = 1.0f;
 

@@ -1776,7 +1776,7 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 /* 03/24/2004 Wendell Buckner
 	BUG FIX: Rendering Transparent Polys properly (2) */
 	geBoolean *MaterialIsTransparent = NULL;
-	geBitmap **MaterialArray = NULL;
+	const geBitmap **MaterialArray = NULL;
 	int32    MaterialCount = 0;
 	int32    i = 0;
 
@@ -1859,7 +1859,7 @@ geBoolean GENESISCC gePuppet_RenderThroughFrustum(const gePuppet *P,
 /* 03/24/2004 Wendell Buckner
 	BUG FIX: Rendering Transparent Polys properly (2)*/
 	MaterialCount = P->MaterialCount;
-	MaterialArray = GE_RAM_ALLOCATE_ARRAY ( geBitmap *, MaterialCount );
+	MaterialArray = GE_RAM_ALLOCATE_ARRAY (const geBitmap *, MaterialCount );
 	MaterialIsTransparent = GE_RAM_ALLOCATE_ARRAY ( geBoolean, MaterialCount );
 
 	for ( i = 0; i < MaterialCount; i++ )
@@ -2226,7 +2226,7 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 /* 03/24/2004 Wendell Buckner
 	BUG FIX: Rendering Transparent Polys properly (2) */
 	geBoolean *MaterialIsTransparent = NULL;
-	geBitmap **MaterialArray = NULL;
+	const geBitmap **MaterialArray = NULL;
 	int32    MaterialCount = 0;
 
 // changed QD
@@ -2447,7 +2447,7 @@ geBoolean GENESISCC gePuppet_Render(	const gePuppet *P,
 /* 03/24/2004 Wendell Buckner
 	BUG FIX: Rendering Transparent Polys properly (2) */
 	MaterialCount = P->MaterialCount;
-	MaterialArray = GE_RAM_ALLOCATE_ARRAY ( geBitmap *, MaterialCount );
+	MaterialArray = GE_RAM_ALLOCATE_ARRAY (const geBitmap *, MaterialCount );
 	MaterialIsTransparent = GE_RAM_ALLOCATE_ARRAY ( geBoolean, MaterialCount );
 
 	for ( i = 0; i < MaterialCount; i++ )

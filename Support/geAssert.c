@@ -30,7 +30,7 @@
 void geAssertDefault(void *, void *, unsigned);
 geAssertCallbackFn *geAssertCallback = &geAssertDefault;
 
-geAssertCallbackFn *geSetAssertCallback( geAssertCallbackFn *newAssertCallback )
+geAssertCallbackFn *geAssertSetCallback( geAssertCallbackFn *newAssertCallback )
 {
 	geAssertCallbackFn *oldCallback = geAssertCallback;
 	geAssertCallback = newAssertCallback;
