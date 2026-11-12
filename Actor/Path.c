@@ -740,23 +740,20 @@ static gePath_TimeType GENESISCC gePath_AdjustTimeForLooping(
 {
 	if (Looped!=GE_FALSE)
 	{
+		if(TStart + GE_TKA_TIME_TOLERANCE > TEnd)
+			return TStart;
+
 		if (Time < TStart)
 		{
-			return (gePath_TimeType)fmod(Time - TStart, TEnd - TStart) + TStart + TEnd;
+			return (gePath_TimeType)fmod(Time - TStart, TEnd - TStart) + TEnd;
+		}
+		else if (Time >= TEnd)
+		{
+			return (gePath_TimeType)fmod(Time - TStart, TEnd - TStart) + TStart;
 		}
 		else
 		{
-			if (Time >= TEnd)
-			{
-				if(TStart + GE_TKA_TIME_TOLERANCE > TEnd)
-					return TStart;
-
-				return (gePath_TimeType)fmod(Time - TStart, TEnd - TStart) + TStart;
-			}
-			else
-			{
-				return Time;
-			}
+			return Time;
 		}
 	}
 	else
