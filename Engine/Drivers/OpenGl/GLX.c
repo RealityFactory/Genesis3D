@@ -162,6 +162,10 @@ GLint EnumNativeModes(DRV_ENUM_MODES_CB *Cb, void *Context)
 	modeCount = 0;
 
 	Display *dpy = XOpenDisplay(NULL);
+
+	if (dpy == NULL)
+		return 0;
+
 	if (XQueryExtension(dpy, "RANDR", &dummy, &dummy, &dummy))
 	{
 		XRRScreenConfiguration *screenConfig;
