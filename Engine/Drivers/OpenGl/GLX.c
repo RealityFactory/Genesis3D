@@ -126,7 +126,7 @@ void SetGLPixelFormat(DRV_DriverHook *Hook)
 	Display *dpy = GLXWnd->display;
 	Window win = GLXWnd->win;
 
-	XVisualInfo *vis = glXChooseVisual(dpy, 0, att);
+	XVisualInfo *vis = glXChooseVisual(dpy, DefaultScreen(dpy), att);
 
 	if(vis != NULL)
 	{
