@@ -254,7 +254,16 @@ geEngine *Sys_EngineCreate(HWND hWnd, const char *AppName, const char *DriverDir
 	memcpy(NewEngine->DriverDirectory, DriverDirectory, Length);
 
 	NewEngine->hWnd = hWnd;
-	strcpy(NewEngine->AppName, AppName);
+
+	if (AppName == NULL)
+	{
+		NewEngine->AppName[0] = 0;
+	}
+	else
+	{
+		strncpy(NewEngine->AppName, AppName, 200);
+		NewEngine->AppName[199] = 0;
+	}
 
 	// Get cpu info
 	if (!Sys_GetCPUFreq(&NewEngine->CPUInfo))
