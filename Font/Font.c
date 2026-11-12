@@ -345,7 +345,7 @@ static	void	IdentityMat(LPMAT2 lpMat)
 void PlaceLetter(int16 locX, int16 locY, geFont *font, geFontBitmap *fontMap,
 				 uint32 asciiValue, unsigned char *cellBuffer, DWORD bufferSize)
 {
-   GLYPHMETRICS glyphMetrics ={};
+   GLYPHMETRICS glyphMetrics ={0};
 #if defined _WIN32 || defined _WIN64
    HDC hdc;
    HFONT win32Font, win32OldFont;
@@ -510,7 +510,7 @@ GENESISAPI geBoolean GENESISCC geFont_AddCharacters(geFont *font,
 												  )
 {
    MAT2 mat2;
-   GLYPHMETRICS glyphMetrics ={};
+   GLYPHMETRICS glyphMetrics ={0};
 #if defined _WIN32 || defined _WIN64
    HDC hdc;
    HFONT win32Font, win32OldFont;
