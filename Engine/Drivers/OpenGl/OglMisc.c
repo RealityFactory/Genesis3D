@@ -57,6 +57,11 @@ geBoolean ExtensionExists(const char *extension)
 
 	extensions = glGetString(GL_EXTENSIONS);
 
+	if(extensions == NULL)
+	{
+		return GE_FALSE;
+	}
+
 	begin = extensions;
 
 	while(GE_TRUE)

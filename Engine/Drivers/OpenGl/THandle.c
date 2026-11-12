@@ -194,6 +194,9 @@ geRDriver_THandle *DRIVERCC THandle_Create(int32 Width, int32 Height, int32 NumM
 
 	ExitWithError:
 	{
+		if (THandle)
+			memset(THandle, 0, sizeof(geRDriver_THandle));
+
 		return NULL;
 	}
 }
@@ -231,6 +234,8 @@ geBoolean DRIVERCC THandle_GetInfo(geRDriver_THandle *THandle, int32 MipLevel, g
 // Lock a texture for editing by the engine
 geBoolean DRIVERCC THandle_Lock(geRDriver_THandle *THandle, int32 MipLevel, void **Data)
 {
+	if (MipLevel < 0 || MipLevel >= THANDLE_MAX_MIP_LEVELS)
+		return GE_FALSE;
 
 	// If we've already got data in system mem, return it to the engine as-is
 	if(THandle->Data[MipLevel] != NULL)
@@ -268,6 +273,11 @@ geBoolean DRIVERCC THandle_Lock(geRDriver_THandle *THandle, int32 MipLevel, void
 		return GE_FALSE;
 	}
 
+	if (THandle->Data[MipLevel] == NULL)
+	{
+		*Data = NULL;
+		return GE_FALSE;
+	}
 
 	THandle->Flags |= (THANDLE_LOCKED << MipLevel);
 	*Data = THandle->Data[MipLevel];
