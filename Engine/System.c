@@ -123,6 +123,9 @@ GENESISAPI geDriver *geDriver_SystemGetNextDriver(geDriver_System *DriverSystem,
 //=====================================================================================
 GENESISAPI geDriver_Mode *geDriver_GetNextMode(geDriver *Driver, geDriver_Mode *Start)
 {
+	if (!Driver || Driver->NumModes <= 0 || !Driver->Modes)
+		return NULL;
+
 	geDriver_Mode	*Last;
 
 	Last = &Driver->Modes[Driver->NumModes-1];
@@ -523,7 +526,9 @@ static geBoolean EnumSubDrivers(Sys_DriverInfo *DriverInfo, const char *DriverDi
 			continue;
 		}
 
-		if (!DriverHook(&RDriver))
+		RDriver = NULL;
+
+		if (!DriverHook(&RDriver) || RDriver == NULL)
 		{
 #if defined(__linux__)
 			dlclose(Handle);
